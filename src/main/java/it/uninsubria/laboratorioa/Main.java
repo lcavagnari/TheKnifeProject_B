@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa;
+ package it.uninsubria.laboratorioa;
 
 public class Main {
     public static void main(String[] args) {

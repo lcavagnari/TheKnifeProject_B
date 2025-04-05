@@ -5,13 +5,121 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>it.uninsubria.laboratorioa</groupId>
-    <artifactId>TheKnifeProject</artifactId>
+    <artifactId>theknife</artifactId>
     <version>1.0-SNAPSHOT</version>
+
+    <name>The Knife</name>
 
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
         <maven.compiler.target>19</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <destination.dir>${basedir}/bin</destination.dir>
     </properties>
-    
+
+    <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
+        <resources>
+            <resource>
+                <directory>data</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <relocations>
+                        <relocation>
+                            <pattern>com.zaxxer.hikari</pattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.libs.hikari</shadedPattern>
+                        </relocation>
+                    </relocations>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>shade</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.openjfx</groupId>
+                <artifactId>javafx-maven-plugin</artifactId>
+                <version>0.0.8</version>
+                <configuration>
+                    <mainClass>Main</mainClass>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>move-jar</id>
+                        <phase>package</phase>
+                        <configuration>
+                            <target>
+                                <!-- Create the destination directory if it does not exist -->
+                                <mkdir dir="${destination.dir}"/>
+
+                                <!-- Delete an old jar if it exists -->
+                                <delete file="${destination.dir}/${build.finalName}.jar"/>
+
+                                <!-- Copy the newly built jar -->
+                                <copy file="${build.directory}/${build.finalName}.jar"
+                                      todir="${destination.dir}"/>
+                            </target>
+                        </configuration>
+                        <goals>
+                            <goal>move-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>jcenter</id>
+            <url>https://jcenter.bintray.com/</url>
+        </repository>
+    </repositories>
+
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>5.0.1</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.34</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.16.1</version>
+        </dependency>
+
+    </dependencies>
 </project>
