@@ -2,7 +2,7 @@ package it.uninsubria.laboratorioa.jsonentities;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import it.uninsubria.laboratorioa.Constants;
+import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
 
 import java.io.File;

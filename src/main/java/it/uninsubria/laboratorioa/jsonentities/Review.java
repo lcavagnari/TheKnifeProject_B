@@ -1,6 +1,6 @@
 package it.uninsubria.laboratorioa.jsonentities;
 
-import it.uninsubria.laboratorioa.Constants;
+import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
 
 import java.time.LocalDate;
