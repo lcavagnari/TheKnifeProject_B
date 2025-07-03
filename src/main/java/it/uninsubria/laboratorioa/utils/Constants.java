@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa;
+package it.uninsubria.laboratorioa.utils;
 
 import lombok.Getter;
 
