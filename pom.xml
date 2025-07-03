@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>it.uninsubria.laboratorioa</groupId>
-    <artifactId>theknife</artifactId>
+    <artifactId>TheKnifeProject</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <name>The Knife</name>
@@ -36,8 +36,8 @@
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <relocations>
                         <relocation>
-                            <pattern>com.zaxxer.hikari</pattern>
-                            <shadedPattern>${project.groupId}.${project.artifactId}.libs.hikari</shadedPattern>
+                            <pattern>com.fasterxml.jackson.core</pattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.libs.jackson</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>
@@ -102,17 +102,30 @@
 
     <dependencies>
 
+        <!-- Jackson -->
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>5.0.1</version>
-            <scope>compile</scope>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>LATEST</version>
+        </dependency>
+
+        <!-- JSON-P + GlassFish provider -->
+        <dependency>
+            <groupId>javax.json</groupId>
+            <artifactId>javax.json-api</artifactId>
+            <version>1.1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.json</artifactId>
+            <version>1.1.4</version>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.34</version>
+            <version>1.18.38</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
