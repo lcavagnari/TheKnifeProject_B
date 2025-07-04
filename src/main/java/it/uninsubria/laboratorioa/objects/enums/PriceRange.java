@@ -19,11 +19,3 @@ public enum PriceRange {
         this.maxPrice = maxPrice;
     }
 }
-
-
-/*
-$
-$$
-$$$
-$$$$
- */

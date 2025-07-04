@@ -24,11 +24,7 @@ public class Main {
                     .forEach(fields -> {
 
                         Restaurant c = new Restaurant(
-                                fields[0], // nome
-                                fields[1], // indirizzo
-                                fields[7], // telefono
-                                "",
-                                0
+                                fields
                         );
 
                         companies.add(c);
@@ -40,38 +36,15 @@ public class Main {
         return companies;
     }
 
+
+    public static void
+
     @SneakyThrows
     public static void main(String[] args) {
-        /*
-
-        Company company = new Company(
-                "Omnissiah Industries","Mars Forge 42",
-                "+39 06 555 1234","info@omnissiah.mars",2025
-        );
-
-
-
-        company.addEmployee("John", "Doe", "1980-01-15");
-        company.addEmployee("Jane", "Smith", "1990-06-22");
-        company.addEmployee("Deez", "Nuts", "1990-06-22");
-
-        //Person p = new Person("John","Doe", "1980-01-15");
-        //Review r = new Review(company,p,2,"Deeznuts");
-        //company.addReview(r);
-
-        //company.rebuild();
-
-        System.out.println(company);
-        System.out.println(company.toPrettyString());
-
-        company.save();
-
-        */
-
         List<Restaurant> d = loadCompany();
 
         d.get(1).save();
-        for (Restaurant c : d) System.out.println(c);
+//        for (Restaurant c : d) System.out.println(c);
 
         System.out.println(d.size());
         //new DataHandler().loadFromFile();
