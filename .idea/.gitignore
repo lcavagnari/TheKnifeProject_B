@@ -49,3 +49,5 @@ build/
 /.idea/encodings.xml
 /encodings.xml
 /jarRepositories.xml
+/modules.xml
+/compiler.xml
