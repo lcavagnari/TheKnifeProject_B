@@ -3,7 +3,7 @@ package it.uninsubria.laboratorioa.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.uninsubria.laboratorioa.utils.Constants;
-import it.uninsubria.laboratorioa.jsonentities.Company;
+import it.uninsubria.laboratorioa.objects.Restaurant;
 
 import java.io.*;
 import java.util.UUID;
@@ -35,7 +35,7 @@ public class DataHandler {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode jsonNode = mapper.readTree(f);
 
-                Company company = new Company(
+                Restaurant restaurant = new Restaurant(
                         UUID.fromString(jsonNode.get("id").asText()),
                         jsonNode.get("name").asText(),
                         jsonNode.get("address").asText(),
@@ -45,7 +45,7 @@ public class DataHandler {
                 );
 
                 System.out.println(jsonNode.toPrettyString());
-                System.out.println(company);
+                System.out.println(restaurant);
 
             } catch (IOException e) {
                 System.out.println("ERROR while parsing "+f.getName()+", cause:"+e.getMessage());

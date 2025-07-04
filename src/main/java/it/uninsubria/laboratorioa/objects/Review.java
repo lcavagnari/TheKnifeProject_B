@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa.jsonentities;
+package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
@@ -8,17 +8,17 @@ import java.time.LocalDate;
 @Getter
 public class Review extends JsonEntity {
     private final LocalDate timestamp;
-    private final it.uninsubria.laboratorioa.jsonentities.Company company;
+    private final Restaurant restaurant;
     private final Person person;
 
     private int value;
     private String text;
     private String reply;
 
-    public Review(Company company, Person person, int value, LocalDate timestamp, String text) {
+    public Review(Restaurant restaurant, Person person, int value, LocalDate timestamp, String text) {
         super("reviews");
         this.timestamp = timestamp;
-        this.company = company;
+        this.restaurant = restaurant;
         this.person = person;
 
         this.value = value;
@@ -27,9 +27,9 @@ public class Review extends JsonEntity {
         build();
     }
 
-    public Review(Company company, Person person, int value, String text) {
+    public Review(Restaurant restaurant, Person person, int value, String text) {
         super("reviews");
-        this.company = company;
+        this.restaurant = restaurant;
         this.person = person;
         this.value = value;
         this.text = text;
@@ -69,14 +69,14 @@ public class Review extends JsonEntity {
 
     @Override
     public boolean save() {
-        return company.save();
+        return restaurant.save();
     }
 
     @Override
     public String toString() {
         return "Review{" +
                 "timestamp=" + timestamp +
-                ", company=" + company +
+                ", company=" + restaurant +
                 ", person=" + person +
                 ", value=" + value +
                 ", text='" + text + '\'' +
