@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa.objects;
+package it.uninsubria.laboratorioa.objects.enums;
 
 public enum CuisineType {
     AFGHAN,
