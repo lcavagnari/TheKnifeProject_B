@@ -1,5 +1,5 @@
 import it.uninsubria.laboratorioa.utils.Constants;
-import it.uninsubria.laboratorioa.jsonentities.Company;
+import it.uninsubria.laboratorioa.objects.Restaurant;
 import lombok.SneakyThrows;
 
 import java.io.File;
@@ -10,11 +10,12 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class Main {
+
     /*
     Name,Address,Location,Price,Cuisine,Longitude,Latitude,PhoneNumber,Url,WebsiteUrl,Award,GreenStar,FacilitiesAndServices,Description
      */
-    private static List<Company> loadCompany() {
-        List<Company> companies = new ArrayList<>();
+    private static List<Restaurant> loadCompany() {
+        List<Restaurant> companies = new ArrayList<>();
 
         File f = new File(Constants.ROOT,"michelin_my_maps.csv");
         try (Stream<String> lines = Files.lines(f.toPath())) {
@@ -22,10 +23,10 @@ public class Main {
                     .map(line -> line.split(";"))
                     .forEach(fields -> {
 
-                        Company c = new Company(
-                                fields[0],
-                                fields[1],
-                                fields[7],
+                        Restaurant c = new Restaurant(
+                                fields[0], // nome
+                                fields[1], // indirizzo
+                                fields[7], // telefono
                                 "",
                                 0
                         );
@@ -67,8 +68,12 @@ public class Main {
 
         */
 
-        List<Company> d = loadCompany();
-        System.out.println(d.get(1));
+        List<Restaurant> d = loadCompany();
+
+        d.get(1).save();
+        for (Restaurant c : d) System.out.println(c);
+
+        System.out.println(d.size());
         //new DataHandler().loadFromFile();
     }
     
