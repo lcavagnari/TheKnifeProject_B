@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa.jsonentities;
+package it.uninsubria.laboratorioa.objects;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class Person extends JsonEntity {
     private final String lastName;
     private final String dateOfBirth;
 
-    private final Set<Company> favourites;
+    private final Set<Restaurant> favourites;
     private final ArrayNode favouritesArray;
 
     public Person(String name, String lastName, String dateOfBirth) {

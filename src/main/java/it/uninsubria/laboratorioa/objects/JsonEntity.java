@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa.jsonentities;
+package it.uninsubria.laboratorioa.objects;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
