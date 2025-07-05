@@ -2,6 +2,9 @@ package it.uninsubria.laboratorioa.objects.enums;
 
 import lombok.Getter;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @Getter
 public enum PriceRange {
     ECONOMY("$", 0, 25),
@@ -10,8 +13,20 @@ public enum PriceRange {
     LUXURY("$$$$", 100, Integer.MAX_VALUE);
 
     private final String symbol;
-    private final int minPrice; 
+    private final int minPrice;
     private final int maxPrice;
+
+    private static final Map<Integer, PriceRange> SYMBOL_MAP = new HashMap<>();
+
+    static {
+        for (PriceRange pr : values())
+            SYMBOL_MAP.put(pr.symbol.length(), pr);
+    }
+
+    public static PriceRange byDollarAmount(int amount) {
+        return SYMBOL_MAP.getOrDefault(amount,MODERATE);
+    }
+
 
     PriceRange(String symbol, int minPrice, int maxPrice) {
         this.symbol = symbol;
