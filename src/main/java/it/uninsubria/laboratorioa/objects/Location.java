@@ -21,6 +21,7 @@ public class Location extends JsonEntity {
         this.longitude = longitude;
         this.address = address;
 
+        this.jsonObject.remove("id");
         build();
     }
 
