@@ -6,11 +6,11 @@ public class Location extends JsonEntity {
 
     private Nation nation;
     private String city;
-    private long latitude;
-    private long longitude;
+    private double latitude;
+    private double longitude;
     private String address;
 
-    public Location(Nation nation, String city, long latitude, long longitude, String address) {
+    public Location(Nation nation, String city, double latitude, double longitude, String address) {
         super("companies");
 
         this.nation = nation;
@@ -20,10 +20,13 @@ public class Location extends JsonEntity {
         this.address = address;
     }
 
+    /*
     public Location(String address) {
 
     }
 
+
+     */
     @Override
     protected void build() {
         this.jsonObject.put("nation", ""+nation)
@@ -36,5 +39,16 @@ public class Location extends JsonEntity {
     @Override
     public boolean save() {
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "Location{" +
+                "nation=" + nation +
+                ", city='" + city + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", address='" + address + '\'' +
+                '}';
     }
 }

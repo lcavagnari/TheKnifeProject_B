@@ -35,6 +35,7 @@ public class DataHandler {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode jsonNode = mapper.readTree(f);
 
+                /*
                 Restaurant restaurant = new Restaurant(
                         UUID.fromString(jsonNode.get("id").asText()),
                         jsonNode.get("name").asText(),
@@ -47,6 +48,7 @@ public class DataHandler {
                 System.out.println(jsonNode.toPrettyString());
                 System.out.println(restaurant);
 
+                 */
             } catch (IOException e) {
                 System.out.println("ERROR while parsing "+f.getName()+", cause:"+e.getMessage());
             } catch (SecurityException e) {

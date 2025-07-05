@@ -31,6 +31,18 @@ public class Restaurant extends JsonEntity {
     private boolean hasDelivery;
     private boolean hasOnlineBooking;
 
+
+    /**
+     *
+     * @param name
+     * @param description
+     * @param websiteUrl
+     * @param phone
+     * @param loc
+     * @param priceRange
+     * @param hasDelivery
+     * @param hasOnlineBooking
+     */
     public Restaurant(String name, String description, String websiteUrl, String phone, Location loc,
                       PriceRange priceRange, boolean hasDelivery, boolean hasOnlineBooking) {
 
@@ -42,7 +54,7 @@ public class Restaurant extends JsonEntity {
 
         this.phone = (phone == null || phone.isBlank()) ? "" : phone;
 
-        this.loc = (loc == null) ? new Location() : loc;
+        this.loc = (loc == null) ? null : loc;
         this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
 
         this.hasDelivery = hasDelivery;
@@ -100,6 +112,7 @@ public class Restaurant extends JsonEntity {
     }
 
 
+    /*
     // Employees
 
     public void addEmployee(Person p) {
@@ -110,6 +123,7 @@ public class Restaurant extends JsonEntity {
 
         build();
     }
+
 
     public void addEmployee(String name, String lastName, String date) {
         addEmployee(new Person(name,lastName,date));
@@ -127,6 +141,8 @@ public class Restaurant extends JsonEntity {
 
         rebuild();
     }
+
+     */
 
     // Recensioni
 
