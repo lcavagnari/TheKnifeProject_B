@@ -4,6 +4,7 @@ import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 @Getter
 public class Review extends JsonEntity {
@@ -16,7 +17,7 @@ public class Review extends JsonEntity {
     private String reply;
 
     public Review(Restaurant restaurant, Person person, int value, LocalDate timestamp, String text) {
-        super("reviews");
+        super(UUID.randomUUID());
         this.timestamp = timestamp;
         this.restaurant = restaurant;
         this.person = person;
@@ -68,11 +69,6 @@ public class Review extends JsonEntity {
     }
 
     @Override
-    public boolean save() {
-        return restaurant.save();
-    }
-
-    @Override
     public String toString() {
         return "Review{" +
                 "timestamp=" + timestamp +
@@ -83,5 +79,10 @@ public class Review extends JsonEntity {
                 ", reply='" + reply + '\'' +
                 ", id=" + id +
                 '}';
+    }
+
+    @Override public boolean save() {
+        build();
+        return true;
     }
 }

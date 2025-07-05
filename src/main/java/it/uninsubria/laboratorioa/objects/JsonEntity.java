@@ -12,11 +12,12 @@ import java.util.UUID;
 
 public abstract class JsonEntity {
     protected final ObjectMapper mapper = new ObjectMapper();
-    protected final File saveFolder;
-    protected ObjectNode jsonObject;
+
+    @Getter protected final UUID id;
+    @Getter protected final File saveFolder;
 
     @Getter protected File saveFile;
-    @Getter protected UUID id;
+    protected ObjectNode jsonObject;
 
 
     public JsonEntity(String folderName) {
@@ -28,6 +29,23 @@ public abstract class JsonEntity {
         this.saveFolder = new File(Constants.ROOT, folderName);
         this.saveFile = new File(saveFolder, id + ".json");
     }
+
+    public JsonEntity(UUID id) {
+        this.id = id;
+        this.saveFolder = this.saveFile = null;
+
+        this.jsonObject = mapper.createObjectNode();
+        if (id != null)
+            jsonObject.put("id",String.valueOf(id));
+    }
+
+    public JsonEntity() {
+        this.jsonObject = mapper.createObjectNode();
+
+        this.saveFolder = this.saveFile = null;
+        this.id = null;
+    }
+
 
 
     public boolean save() {
