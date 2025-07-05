@@ -123,6 +123,7 @@ public class ParsingTest {
                         // stili di cucina
                         String[] cuisines = fields[4].split(", ");
                         Set<CuisineType> cuisineTypes = new HashSet<>();
+
                         for (String c : cuisines) {
                             String[] parts = c.toUpperCase()
                                     .replace(" CUISINE", "")
@@ -141,6 +142,15 @@ public class ParsingTest {
                             }
                         }
 
+
+                        // Accessi e servizi
+
+                        Set<String> services = new HashSet<>();
+                        if (fields.length >= 14 && !fields[13].isBlank()) {
+                            String[] tmp = fields[13].split(",");
+
+                            services = Arrays.stream(tmp).filter(Objects::nonNull).collect(Collectors.toSet());
+                        }
 
                         // Ottieni il prefisso nazionale per il numero
                         String nationalPrefix = getNationalPrefix(fields[7],loc.getNation());
@@ -176,10 +186,10 @@ public class ParsingTest {
                                 PriceRange.byDollarAmount(fields[3].length()),      // Fascia di prezzo
                                 rd.nextBoolean(),                                   // Disponibilità alla consegna a domicilio
                                 rd.nextBoolean(),                                   // Disponibilità per la prenotazione online
-                                cuisineTypes,                                       // Stili culinari offerti
+                                award, greenStar, cuisineTypes,                                       // Stili culinari offerti
                                 new HashMap<>(),                                    // Recensioni
-                                award,                                              // Stelle Michelin
-                                greenStar                                           // "Green Star", certificato Michelin di sostenibilità
+                                // Stelle Michelin
+                                // "Green Star", certificato Michelin di sostenibilità
                         );
 
 
