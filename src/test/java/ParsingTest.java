@@ -148,9 +148,9 @@ public class ParsingTest {
                         // Ottieni il numero di stelle
                         Award award = Award.NONE;
                         try {
-                            String rating = fields[10];
+                            String rating = fields[10].toLowerCase();
                             if (rating.matches("[0-9].*")) {
-                                int val = Integer.parseInt(rating.trim().replaceAll("\\w*",""));
+                                int val = Integer.parseInt(rating.replaceAll(" \\w*",""));
                                 award = Award.fromInt(val);
 
                             } else award = Award.valueOf(rating.toUpperCase().replace(" ","_"));
@@ -205,8 +205,8 @@ public class ParsingTest {
             for (File ff : Objects.requireNonNull(f.listFiles()))
                 try {
                     ff.delete();
-                } catch (Exception ignored) {
-                }
+                } catch (Exception ignored) {}
+
         } else f.mkdirs();
 
         //d.get(1).save();
