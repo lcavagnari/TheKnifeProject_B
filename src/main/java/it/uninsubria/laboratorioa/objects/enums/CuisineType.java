@@ -264,6 +264,9 @@ public enum CuisineType {
     YUNNANESE,
     ZHEJIANG;
 
-
+    @Override
+    public String toString() {
+        return name().toLowerCase();
+    }
 }
 

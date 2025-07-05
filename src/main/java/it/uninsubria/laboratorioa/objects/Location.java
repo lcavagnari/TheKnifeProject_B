@@ -1,7 +1,9 @@
 package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.objects.enums.Nation;
+import lombok.Getter;
 
+@Getter
 public class Location extends JsonEntity {
 
     private Nation nation;
@@ -18,6 +20,8 @@ public class Location extends JsonEntity {
         this.latitude = latitude;
         this.longitude = longitude;
         this.address = address;
+
+        build();
     }
 
     /*

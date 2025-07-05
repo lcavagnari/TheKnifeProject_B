@@ -1,5 +1,9 @@
+import com.google.i18n.phonenumbers.NumberParseException;
+import com.google.i18n.phonenumbers.PhoneNumberUtil;
+import com.google.i18n.phonenumbers.Phonenumber;
 import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.Restaurant;
+import it.uninsubria.laboratorioa.objects.enums.Award;
 import it.uninsubria.laboratorioa.objects.enums.CuisineType;
 import it.uninsubria.laboratorioa.objects.enums.Nation;
 import it.uninsubria.laboratorioa.objects.enums.PriceRange;
@@ -66,6 +70,22 @@ public class ParsingTest {
         };
     }
 
+    public static String getNationalPrefix(String phoneNumber, Nation nation) {
+        PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
+        String regionCode = nation.getIsoCode();
+        if (regionCode == null || regionCode.isEmpty()) return "";
+
+        try {
+            Phonenumber.PhoneNumber parsed = phoneUtil.parse(phoneNumber, regionCode);
+            int countryCode = parsed.getCountryCode();
+            return "+" + countryCode;
+        } catch (NumberParseException e) {
+            return "";
+        }
+    }
+
+
+
     /**
      * index:      0	   1		2     3	      4		   5		6		  7		   8	  9		  10	  11			12					13
      * field csv: Name,Address,Location,Price,Cuisine,Longitude,Latitude,PhoneNumber,Url,WebsiteUrl,Award,GreenStar,FacilitiesAndServices,Description
@@ -125,19 +145,43 @@ public class ParsingTest {
                         }
 
 
+                        String nationalPrefix = getNationalPrefix(fields[7],loc.getNation());
+
+                        String awardRaw = fields[10].trim().replaceAll("\"", "");
+                        String greenStarRaw = fields[11].trim().replaceAll("\"", "");
+
+// Award parsing
+                        Award award = Award.NONE;
+                        try {
+                            if (!awardRaw.isEmpty() && !awardRaw.equals("0")) {
+                                String[] awardParts = awardRaw.split(" ");
+                                int awardVal = Integer.parseInt(awardParts[0]);
+                                award = Award.fromInt(awardVal);
+                            }
+                        } catch (Exception ignored) {}
+
+// GreenStar parsing
+                        boolean greenStar = false;
+                        try {
+                            greenStar = greenStarRaw.equals("1") || greenStarRaw.equalsIgnoreCase("true");
+                        } catch (Exception ignored) {}
 
 
                         Restaurant c = new Restaurant(
-                                fields[0],                                          // Nome
-                                fields[13],                                         // Descr
-                                fields[9],                                          // website
-                                fields[7],                                          // # telefono
-                                loc,                                                // Posizione
-                                PriceRange.byDollarAmount(fields[3].length()),      // Range di prezzo
-                                rd.nextBoolean(),                                   // Delivery
-                                rd.nextBoolean(),                                   // online booking
-                                cuisineTypes
+                                fields[0], // Name
+                                fields[13], // Description
+                                fields[9],  // WebsiteUrl
+                                nationalPrefix + fields[7], // Phone with prefix
+                                loc,
+                                PriceRange.byDollarAmount(fields[3].length()),
+                                rd.nextBoolean(), // Delivery flag
+                                rd.nextBoolean(), // OnlineBooking flag
+                                cuisineTypes,
+                                new HashMap<>(), // Empty reviews
+                                award,
+                                greenStar
                         );
+
 
                         companies.add(c);
                     });
@@ -159,7 +203,10 @@ public class ParsingTest {
 
         System.out.println(d.size());
 
-        System.out.println(d.get(rd.nextInt(d.size())+1));
+        Restaurant r = d.get(rd.nextInt(d.size())+1);
+        System.out.println(r);
+
+        r.save();
         //new DataHandler().loadFromFile();
     }
 
