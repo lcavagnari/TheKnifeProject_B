@@ -104,12 +104,12 @@ public class ParsingTest {
                     .forEach(fields -> {
 
                         // Lettura dati posizione
-                        Location loc = null;
+                        Location location = null;
                         try {
                             // 0: city , 1:nation , 2: address
                             String[] locData = retrieveLocData(fields[1], fields[2]);
 
-                            loc = new Location(
+                            location = new Location(
                                     Nation.valueOf(locData[1]),
                                     locData[0],
                                     Double.parseDouble(fields[5]),
@@ -153,7 +153,7 @@ public class ParsingTest {
                         }
 
                         // Ottieni il prefisso nazionale per il numero
-                        String nationalPrefix = getNationalPrefix(fields[7],loc.getNation());
+                        String nationalPrefix = getNationalPrefix(fields[7],location.getNation());
 
                         // Ottieni il numero di stelle
                         Award award = Award.NONE;
@@ -182,14 +182,15 @@ public class ParsingTest {
                                 fields[13],                                         // Descrizione
                                 fields[9],                                          // Url pagina web
                                 nationalPrefix + fields[7],                         // Contatto telefonico con prefisso nazionale
-                                loc,                                                // Posizione geografica
+                                location,                                           // Posizione geografica
                                 PriceRange.byDollarAmount(fields[3].length()),      // Fascia di prezzo
                                 rd.nextBoolean(),                                   // Disponibilità alla consegna a domicilio
                                 rd.nextBoolean(),                                   // Disponibilità per la prenotazione online
-                                award, greenStar, cuisineTypes,                                       // Stili culinari offerti
+                                award,                                              // Stelle Michelin
+                                greenStar,                                          // "Green Star", certificato Michelin di sostenibilità
+                                cuisineTypes,                                       // Stili culinari offerti
                                 new HashMap<>(),                                    // Recensioni
-                                // Stelle Michelin
-                                // "Green Star", certificato Michelin di sostenibilità
+                                services                                            // Servizi offerti o regole
                         );
 
 
