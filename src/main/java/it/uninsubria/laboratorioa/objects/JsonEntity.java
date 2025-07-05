@@ -1,6 +1,8 @@
 package it.uninsubria.laboratorioa.objects;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
@@ -11,13 +13,20 @@ import java.util.Objects;
 import java.util.UUID;
 
 public abstract class JsonEntity {
-    protected final ObjectMapper mapper = new ObjectMapper();
+    protected static final ObjectMapper mapper = new ObjectMapper();
 
     @Getter protected final UUID id;
     @Getter protected final File saveFolder;
 
     @Getter protected File saveFile;
     protected ObjectNode jsonObject;
+
+
+    static {
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.disable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE);
+    }
 
 
     public JsonEntity(String folderName) {
