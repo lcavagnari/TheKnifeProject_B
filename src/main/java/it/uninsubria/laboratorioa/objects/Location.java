@@ -2,19 +2,20 @@ package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.objects.enums.Nation;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 public class Location extends JsonEntity {
 
     private Nation nation;
     private String city;
-    private double latitude;
-    private double longitude;
     private String address;
 
-    public Location(Nation nation, String city, double latitude, double longitude, String address) {
-        super("companies");
+    private double latitude;
+    private double longitude;
 
+    public Location(Nation nation, String city, double latitude, double longitude, String address) {
         this.nation = nation;
         this.city = city;
         this.latitude = latitude;
@@ -42,11 +43,6 @@ public class Location extends JsonEntity {
     }
 
     @Override
-    public boolean save() {
-        return false;
-    }
-
-    @Override
     public String toString() {
         return "Location{" +
                 "nation=" + nation +
@@ -55,5 +51,11 @@ public class Location extends JsonEntity {
                 ", longitude=" + longitude +
                 ", address='" + address + '\'' +
                 '}';
+    }
+
+
+    @Override public boolean save() {
+        build();
+        return true;
     }
 }
