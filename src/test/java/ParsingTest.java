@@ -204,35 +204,15 @@ public class ParsingTest {
         return companies;
     }
 
-
+    /**
+     * Importare i dati nella struttura dati di TheKnife
+     * @param args
+     */
     @SneakyThrows
     public static void main(String[] args) {
-        List<Restaurant> d = parseFromDataset();
+        List<Restaurant> restaurants = parseFromDataset();
 
-
-        File f = new File(Constants.ROOT,"companies");
-
-        if (f.exists()) {
-            for (File ff : Objects.requireNonNull(f.listFiles()))
-                try {
-                    ff.delete();
-                } catch (Exception ignored) {}
-
-        } else f.mkdirs();
-
-        //d.get(1).save();
-//        for (Restaurant c : d) System.out.println(c);
-
-        //System.out.println(d.size());
-
-        //Restaurant r = d.get(rd.nextInt(d.size())+1);
-        Restaurant r = d.get(7);
-        System.out.println(r);
-
-
-
-        r.save();
-        //new DataHandler().loadFromFile();
+        for (Restaurant r : restaurants) r.save();
     }
 
 }
