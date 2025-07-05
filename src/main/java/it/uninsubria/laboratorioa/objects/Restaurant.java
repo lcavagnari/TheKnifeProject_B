@@ -13,8 +13,8 @@ import java.util.*;
 @Getter
 public class Restaurant extends JsonEntity {
     
-    @Getter(AccessLevel.NONE) private final Set<CuisineType> cuisinesTypes = new HashSet<>();
-    @Getter(AccessLevel.NONE) private final Map<UUID,Review> reviews = new HashMap<>();
+    @Getter(AccessLevel.NONE) private final Set<CuisineType> cuisinesTypes;
+    @Getter(AccessLevel.NONE) private final Map<UUID,Review> reviews;
 
     @Getter(AccessLevel.NONE) private final ArrayNode cuisinesTypesArray;
     @Getter(AccessLevel.NONE) private final ArrayNode reviewsArray;
@@ -54,7 +54,7 @@ public class Restaurant extends JsonEntity {
 
         this.phone = (phone == null || phone.isBlank()) ? "" : phone;
 
-        this.loc = (loc == null) ? null : loc;
+        this.loc = loc;
         this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
 
         this.hasDelivery = hasDelivery;
@@ -62,6 +62,60 @@ public class Restaurant extends JsonEntity {
 
         this.reviewsArray = mapper.createArrayNode();
         this.cuisinesTypesArray = mapper.createArrayNode();
+
+        this.cuisinesTypes = new HashSet<>();
+        this.reviews = new HashMap<>();
+
+        build();
+    }
+
+    public Restaurant(String name, String description, String websiteUrl, String phone, Location loc,
+                      PriceRange priceRange, boolean hasDelivery, boolean hasOnlineBooking, Set<CuisineType> cuisinesTypes) {
+        super("companies");
+
+        this.name = (name == null || name.isBlank()) ? "Resturant" : name;
+        this.description = (description == null || description.isBlank()) ? "" : description;
+        this.websiteUrl = (websiteUrl == null || websiteUrl.isBlank()) ? "" : websiteUrl;
+
+        this.phone = (phone == null || phone.isBlank()) ? "" : phone;
+
+        this.loc = loc;
+        this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
+
+        this.hasDelivery = hasDelivery;
+        this.hasOnlineBooking = hasOnlineBooking;
+
+        this.reviewsArray = mapper.createArrayNode();
+        this.cuisinesTypesArray = mapper.createArrayNode();
+
+        this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
+        this.reviews = new HashMap<>();
+
+        build();
+    }
+
+    public Restaurant(String name, String description, String websiteUrl, String phone, Location loc,
+                      PriceRange priceRange, boolean hasDelivery, boolean hasOnlineBooking, Set<CuisineType> cuisinesTypes, Map<UUID,Review> reviews) {
+        super("companies");
+
+        this.name = (name == null || name.isBlank()) ? "Resturant" : name;
+        this.description = (description == null || description.isBlank()) ? "" : description;
+        this.websiteUrl = (websiteUrl == null || websiteUrl.isBlank()) ? "" : websiteUrl;
+
+        this.phone = (phone == null || phone.isBlank()) ? "" : phone;
+
+        this.loc = loc;
+        this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
+
+        this.hasDelivery = hasDelivery;
+        this.hasOnlineBooking = hasOnlineBooking;
+
+        this.reviewsArray = mapper.createArrayNode();
+        this.cuisinesTypesArray = mapper.createArrayNode();
+
+        this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
+        this.reviews = (reviews == null) ? new HashMap<>() : reviews;
+
         build();
     }
 
@@ -166,15 +220,21 @@ public class Restaurant extends JsonEntity {
 
     @Override
     public String toString() {
-        return "Company{" +
-                "address='" + description + '\'' +
+        return "Restaurant{" +
+                "id=" + id +
+                ", saveFile=" + saveFile +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", websiteUrl='" + websiteUrl + '\'' +
                 ", phone='" + phone + '\'' +
-                ", companyName='" + name + '\'' +
-                ", employees=" + cuisinesTypes +
+                ", loc=" + loc +
+                ", priceRange=" + priceRange +
+                ", hasDelivery=" + hasDelivery +
+                ", hasOnlineBooking=" + hasOnlineBooking +
+                ", cuisinesTypes=" + cuisinesTypes +
                 ", reviews=" + reviews +
-                ", employeesArray=" + cuisinesTypesArray +
+                ", cuisinesTypesArray=" + cuisinesTypesArray +
                 ", reviewsArray=" + reviewsArray +
-                ", id=" + id +
                 '}';
     }
 }
