@@ -1,25 +1,54 @@
 package it.uninsubria.laboratorioa.objects.enums;
 
+import lombok.Getter;
+
+import java.util.HashMap;
+import java.util.Map;
+
 public enum Award {
     NONE(0),
     ONE_STAR(1),
-    TWO_STAR(2),
-    THREE_STAR(3);
+    TWO_STARS(2),
+    THREE_STARS(3),
+    BIB_GOURMAND(4),
+    SELECTED_RESTAURANTS(5);
 
+    @Getter
     private final int value;
+    private static final Map<Integer, Award> BY_VALUE = new HashMap<>();
+
+    static {
+        for (Award a : values()) {
+            BY_VALUE.put(a.value, a);
+        }
+    }
 
     Award(int value) {
         this.value = value;
     }
 
-    public int getValue() {
-        return value;
+    public static Award fromInt(int val) {
+        return BY_VALUE.getOrDefault(val, Award.NONE);
     }
 
-    public static Award fromInt(int val) {
-        for (Award a : Award.values()) {
-            if (a.value == val) return a;
+    @Override
+    public String toString() {
+        switch (value) {
+            case 4 -> {
+                return "Bib Gourmand";
+            }
+
+            case 5 -> {
+                return "Selected Restaurants";
+            }
+
+            case 1 -> {
+                return "1 star";
+            }
+
+            default -> {
+                return value + " stars";
+            }
         }
-        return NONE;
     }
 }

@@ -32,10 +32,12 @@ public abstract class JsonEntity {
 
     public boolean save() {
         try {
+
+            if (!saveFolder.exists()) saveFolder.mkdirs();
             mapper.writerWithDefaultPrettyPrinter().writeValue(saveFile, jsonObject);
             return true;
 
-        } catch (IOException e) {
+        } catch (IOException | SecurityException e) {
             return false;
         }
     }

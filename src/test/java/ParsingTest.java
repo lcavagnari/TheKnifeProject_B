@@ -87,9 +87,9 @@ public class ParsingTest {
 
 
     /**
-     * index:      0	   1		2     3	      4		   5		6		  7		   8	  9		  10	  11			12					13
+     * index:      0	   1		2     3	      4		   5		6		  7		   8	  9		  10	  11			12					13   <br>
      * field csv: Name,Address,Location,Price,Cuisine,Longitude,Latitude,PhoneNumber,Url,WebsiteUrl,Award,GreenStar,FacilitiesAndServices,Description
-     *
+     * <br>
      * @return Dataset letto come collection di ristoranti.
      */
     private static List<Restaurant> parseFromDataset() {
@@ -120,9 +120,6 @@ public class ParsingTest {
                         } catch (Exception e) {
                         }
 
-
-
-
                         // stili di cucina
                         String[] cuisines = fields[4].split(", ");
                         Set<CuisineType> cuisineTypes = new HashSet<>();
@@ -145,41 +142,44 @@ public class ParsingTest {
                         }
 
 
+                        // Ottieni il prefisso nazionale per il numero
                         String nationalPrefix = getNationalPrefix(fields[7],loc.getNation());
 
-                        String awardRaw = fields[10].trim().replaceAll("\"", "");
-                        String greenStarRaw = fields[11].trim().replaceAll("\"", "");
-
-// Award parsing
+                        // Ottieni il numero di stelle
                         Award award = Award.NONE;
                         try {
-                            if (!awardRaw.isEmpty() && !awardRaw.equals("0")) {
-                                String[] awardParts = awardRaw.split(" ");
-                                int awardVal = Integer.parseInt(awardParts[0]);
-                                award = Award.fromInt(awardVal);
-                            }
-                        } catch (Exception ignored) {}
+                            String rating = fields[10];
+                            if (rating.matches("[0-9].*")) {
+                                int val = Integer.parseInt(rating.trim().replaceAll("\\w*",""));
+                                award = Award.fromInt(val);
 
-// GreenStar parsing
+                            } else award = Award.valueOf(rating.toUpperCase().replace(" ","_"));
+
+                        } catch (NumberFormatException ignored) {}
+
+
+                        // GreenStar parsing
+
                         boolean greenStar = false;
                         try {
-                            greenStar = greenStarRaw.equals("1") || greenStarRaw.equalsIgnoreCase("true");
-                        } catch (Exception ignored) {}
+                             greenStar = Integer.parseInt(fields[11]) == 1;
 
+                        } catch (NumberFormatException ignored) {}
 
+                        // Costruzione dell'oggetto
                         Restaurant c = new Restaurant(
-                                fields[0], // Name
-                                fields[13], // Description
-                                fields[9],  // WebsiteUrl
-                                nationalPrefix + fields[7], // Phone with prefix
-                                loc,
-                                PriceRange.byDollarAmount(fields[3].length()),
-                                rd.nextBoolean(), // Delivery flag
-                                rd.nextBoolean(), // OnlineBooking flag
-                                cuisineTypes,
-                                new HashMap<>(), // Empty reviews
-                                award,
-                                greenStar
+                                fields[0],                                          // Nome
+                                fields[13],                                         // Descrizione
+                                fields[9],                                          // Url pagina web
+                                nationalPrefix + fields[7],                         // Contatto telefonico con prefisso nazionale
+                                loc,                                                // Posizione geografica
+                                PriceRange.byDollarAmount(fields[3].length()),      // Fascia di prezzo
+                                rd.nextBoolean(),                                   // Disponibilità alla consegna a domicilio
+                                rd.nextBoolean(),                                   // Disponibilità per la prenotazione online
+                                cuisineTypes,                                       // Stili culinari offerti
+                                new HashMap<>(),                                    // Recensioni
+                                award,                                              // Stelle Michelin
+                                greenStar                                           // "Green Star", certificato Michelin di sostenibilità
                         );
 
 
@@ -198,13 +198,27 @@ public class ParsingTest {
     public static void main(String[] args) {
         List<Restaurant> d = parseFromDataset();
 
+
+        File f = new File(Constants.ROOT,"companies");
+
+        if (f.exists()) {
+            for (File ff : Objects.requireNonNull(f.listFiles()))
+                try {
+                    ff.delete();
+                } catch (Exception ignored) {
+                }
+        } else f.mkdirs();
+
         //d.get(1).save();
 //        for (Restaurant c : d) System.out.println(c);
 
-        System.out.println(d.size());
+        //System.out.println(d.size());
 
-        Restaurant r = d.get(rd.nextInt(d.size())+1);
+        //Restaurant r = d.get(rd.nextInt(d.size())+1);
+        Restaurant r = d.get(7);
         System.out.println(r);
+
+
 
         r.save();
         //new DataHandler().loadFromFile();
