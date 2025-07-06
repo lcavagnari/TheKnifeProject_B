@@ -302,6 +302,7 @@ public class ParsingTest {
                 services                                            // Servizi offerti o regole
         );
 
+        c.save();
         return c;
     }
 
@@ -319,23 +320,15 @@ public class ParsingTest {
         File f = new File(Constants.ROOT, "michelin_my_maps.csv");
         try (Stream<String> lines = Files.lines(f.toPath())) {
             List<String> t = new ArrayList<>();
-
-            String[] fields = lines.toList().get(1).split(";");
-
-            Restaurant r = createRestaurant(fields);
-            System.out.println(r);
-
-            r.save();
-
-            return companies;
-
-            /*
             lines.skip(1) // Optional: skip header
                     .map(line -> line.split(";"))
-                    .forEach(fields -> companies.add(createRestaurant(fields)));
-             */
-        } catch (IOException e) {
-            System.out.println("Error while parsing csv database");
+                    .forEach(fields -> {
+                        try {
+                            companies.add(createRestaurant(fields));
+                        } catch (Exception ignored) {}
+                    });
+        } catch (IOException | SecurityException e) {
+            System.out.println("Error while parsing csv database: "+ e);
         }
 
         return companies;
@@ -344,12 +337,11 @@ public class ParsingTest {
 
     @SneakyThrows
     public static void main(String[] args) {
+        long timestamp = System.currentTimeMillis();
         List<Restaurant> restaurants = parseFromDataset();
 
-        //Restaurant r = restaurants.get();
-        //r.save();
-
-        //for (Restaurant r : restaurants) r.save();
+        System.out.println(restaurants.size());
+        System.out.println(System.currentTimeMillis() - timestamp);
     }
 
 }
