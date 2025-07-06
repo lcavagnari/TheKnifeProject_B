@@ -4,7 +4,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.Restaurant;
+import it.uninsubria.laboratorioa.objects.Review;
+import it.uninsubria.laboratorioa.objects.enums.Award;
+import it.uninsubria.laboratorioa.objects.enums.CuisineType;
 import it.uninsubria.laboratorioa.objects.enums.Nation;
+import it.uninsubria.laboratorioa.objects.enums.PriceRange;
+import it.uninsubria.laboratorioa.objects.users.Client;
+import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.objects.users.User;
 import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
@@ -12,9 +18,9 @@ import lombok.experimental.UtilityClass;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @UtilityClass
 public class DataHandler {
@@ -39,27 +45,103 @@ public class DataHandler {
 
     private void loadRestaurants(File[] rFiles) {
         if (rFiles == null) return;
-
-        int count = 0;
+        
         for (File f : rFiles) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode jsonNode = mapper.readTree(f);
 
+// === Parse base fields ===
+                UUID id = UUID.fromString(jsonNode.path("id").asText());
+                String name = jsonNode.path("name").asText();
+                String description = jsonNode.path("address").asText(); // maps to description
+                String websiteUrl = jsonNode.path("websiteUrl").asText(""); // optional
+                String phone = jsonNode.path("phone").asText();
 
-                count++;
-                return;
+                Award award = Award.fromInt(jsonNode.path("award").asInt());
+                boolean greenStar = jsonNode.path("greenStar").asBoolean();
+                boolean hasDelivery = jsonNode.path("hasDelivery").asBoolean(false); // optional default
+                boolean hasBooking = jsonNode.path("hasOnlineBooking").asBoolean(false); // optional default
+
+                // === Owner ===
+                UUID ownerId = UUID.fromString(jsonNode.path("owner").asText());
+                User owner = null;
+
+                if (usersById.containsKey(ownerId))
+                    owner = usersById.get(ownerId);
+
+                // === Location ===
+                JsonNode locNode = jsonNode.path("location");
+                Location loc = new Location(
+                        Nation.valueOf(locNode.path("nation").asText()),
+                        locNode.path("city").asText(),
+                        locNode.path("latitude").asDouble(),
+                        locNode.path("longitude").asDouble(),
+                        locNode.path("address").asText()
+                        );
+
+                // === Price Range ===
+                String price = jsonNode.get("priceRange").asText();
+                PriceRange priceRange = PriceRange.byDollarAmount(price.length());
+
+                // === Cuisines ===
+                Set<CuisineType> cuisines = new HashSet<>();
+                for (JsonNode node : jsonNode.path("cuisinesTypes")) {
+                    try {
+                        cuisines.add(CuisineType.valueOf(node.asText().toUpperCase()));
+                    } catch (IllegalArgumentException ignored) {}
+                }
+
+                // === Services ===
+                Set<String> services = new HashSet<>();
+                for (JsonNode node : jsonNode.path("services")) {
+                    services.add(node.asText());
+                }
+
+                // === Construct Restaurant ===
+                Restaurant restaurant = new Restaurant(
+                        name,
+                        description,
+                        websiteUrl,
+                        (Owner) owner,
+                        phone,
+                        loc,
+                        priceRange,
+                        hasDelivery,
+                        hasBooking,
+                        award,
+                        greenStar,
+                        cuisines,
+                        services
+                );
+
+                // === Reviews ===
+                Map<UUID, Review> reviews = new HashMap<>();
+                for (JsonNode node : jsonNode.path("reviews")) {
+                    UUID uId = UUID.fromString(node.path("user").asText());
+                    User user = null;
+                    if (!usersById.containsKey(uId)) continue;
+
+                    int value = node.path("velue").asInt();
+                    LocalDateTime time = LocalDateTime.parse(node.get("timestamp").asText());
+                    String text = node.get("text").asText();
+
+                    String reply = node.get("reply").asText();
+
+                    Review r = new Review(restaurant,usersById.get(uId),value, time,text, reply);
+                    restaurant.addReview(r);
+                }
+
 
             } catch (IOException e) {
                 System.out.println("ERROR while parsing " + f.getName() + ", cause:" + e.getMessage());
-                return;
+                continue;
             } catch (SecurityException e) {
                 System.out.println("Access is denied to " + f.getName());
-                return;
+                continue;
             }
         }
-
-        System.out.println(count);
+        
     }
 
     private void loadUsers(File[] uFiles) {
@@ -72,38 +154,60 @@ public class DataHandler {
                 JsonNode jsonNode = mapper.readTree(f);
                 if (jsonNode == null) continue;
 
-                String userName = jsonNode.asText("");
-                String firstName = jsonNode.asText("");
-                String lastName = jsonNode.asText("");
-                //LocalDate dateOfBirth = LocalDate.parse()
+                String id = jsonNode.path("id").asText();
+                String username = jsonNode.path("username").asText();
+                String name = jsonNode.path("name").asText();
+                String lastName = jsonNode.path("lastName").asText();
+                LocalDate dateOfBirth = LocalDate.parse(jsonNode.get("dateOfBirth").asText());
 
-                Location loc;
-                try {
-                    loc = new Location(
-                            Nation.valueOf(jsonNode.get("nation").asText()),
-                            jsonNode.get("city").asText(),
-                            jsonNode.get("latitude").asDouble(),
-                            jsonNode.get("longitude").asDouble(),
-                            jsonNode.get("address").asText()
+                JsonNode location = jsonNode.path("location");
+                Location loc = new Location(
+                        Nation.valueOf(location.path("nation").asText()),
+                        location.path("city").asText(),
+                        location.path("latitude").asDouble(),
+                        location.path("longitude").asDouble(),
+                        location.path("address").asText()
+                );
+
+                final JsonNode passwordNode = jsonNode.path("password");
+                final String salt = passwordNode.path("salt").asText();
+                final String passwordHash = passwordNode.path("password").asText();
+
+                User user;
+                if (Objects.equals(jsonNode.get("role").asText(""), "Owner")) {
+                    user = new Owner(
+                            username,
+                            passwordHash, salt,
+                            name, lastName,
+                            loc, dateOfBirth
                     );
-                } catch (Exception ignored) {
+
+                } else {
+                    Set<UUID> favourites = new HashSet<>();
+                    JsonNode favouritesNode = jsonNode.get("cuisines");
+                    if (favouritesNode != null && favouritesNode.isArray()) {
+                        for (JsonNode fav : favouritesNode)
+                            favourites.add(UUID.fromString(fav.asText()));
+                    }
+
+                    user = new Client(
+                            username,passwordHash,salt,
+                            name,lastName,
+                            loc,dateOfBirth,
+                            favourites
+                            );
                 }
 
 
-                /*
-                User user;
-                if (Objects.equals(jsonNode.get("role").asText(""), "Owner"))
-                    user = new Owner();
+                usersById.put(UUID.fromString(id),user);
+                usersByName.put(username,user);
 
-                else user = new Client();
-
-
-                 */
-
-            } catch (IOException e) {
-                System.out.println("ERROR while parsing " + f.getName() + ", cause:" + e.getMessage());
+            } catch (IOException | IllegalArgumentException e) {
+                System.err.println("ERROR while parsing " + f.getName() + ", cause:" + e.getMessage());
+                continue;
             } catch (SecurityException e) {
-                System.out.println("Access is denied to " + f.getName());
+                System.err.println("Access is denied to " + f.getName());
+
             }
         }
     }
