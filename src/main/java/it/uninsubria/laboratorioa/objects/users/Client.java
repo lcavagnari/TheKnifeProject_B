@@ -18,6 +18,8 @@ public class Client extends User {
 
         this.favouritesArray = mapper.createArrayNode();
         this.favourites = new HashSet<>();
+
+        build();
     }
 
 
@@ -36,10 +38,20 @@ public class Client extends User {
 
         jsonObject.put("role","Client");
 
-        favouritesArray.removeAll();
-        favourites.forEach(fav -> favouritesArray.add(fav.toString()));
+        if (favouritesArray != null) {
+            favouritesArray.removeAll();
+            favourites.forEach(fav -> favouritesArray.add(fav.getJsonObject()));
+        }
 
-        jsonObject.put("ddd",1);
         jsonObject.set("favourites", favouritesArray);
+    }
+
+    @Override
+    public String toString() {
+        return "Client{" +
+                super.toString()+
+                ", favourites=" + favourites +
+                ", favouritesArray=" + favouritesArray +
+                '}';
     }
 }

@@ -98,8 +98,7 @@ public abstract class User extends JsonEntity {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
+        return  "id=" + id +
                 ", name='" + name + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +
