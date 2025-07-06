@@ -30,10 +30,29 @@ public abstract class User extends JsonEntity {
         this.username = (username == null || username.length() < 4) ? "user" : username.substring(0, 16);
         this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
         this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName.substring(0, 20);
-        this.dateOfBirth = dateOfBirth;
-
         this.hasher = new PasswordHasher(password);
 
+        LocalDate birth = (dateOfBirth == null) ? LocalDate.MIN : dateOfBirth;
+        if (dateOfBirth.isBefore(LocalDate.MIN) || dateOfBirth.isAfter(LocalDate.now().plusDays(1))) {
+            birth = LocalDate.MIN;
+        }
+
+        this.dateOfBirth = birth;
+        build();
+    }
+
+    public User(String username, String password, String salt, String name, String lastName, LocalDate dateOfBirth) {
+        this.username = (username == null || username.length() < 4) ? "user" : username.substring(0, 16);
+        this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
+        this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName.substring(0, 20);
+        this.hasher = new PasswordHasher(password,salt);
+
+        LocalDate birth = (dateOfBirth == null) ? LocalDate.MIN : dateOfBirth;
+        if (dateOfBirth.isBefore(LocalDate.MIN) || dateOfBirth.isAfter(LocalDate.now().plusDays(1))) {
+            birth = LocalDate.MIN;
+        }
+
+        this.dateOfBirth = birth;
         build();
     }
 
