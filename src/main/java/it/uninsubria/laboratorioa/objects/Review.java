@@ -1,5 +1,6 @@
 package it.uninsubria.laboratorioa.objects;
 
+import it.uninsubria.laboratorioa.objects.users.User;
 import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
 
@@ -10,17 +11,17 @@ import java.util.UUID;
 public class Review extends JsonEntity {
     private final LocalDate timestamp;
     private final Restaurant restaurant;
-    private final Person person;
+    private final User user;
 
     private int value;
     private String text;
     private String reply;
 
-    public Review(Restaurant restaurant, Person person, int value, LocalDate timestamp, String text) {
+    public Review(Restaurant restaurant, User user, int value, LocalDate timestamp, String text) {
         super(UUID.randomUUID());
         this.timestamp = timestamp;
         this.restaurant = restaurant;
-        this.person = person;
+        this.user = user;
 
         this.value = value;
         this.text = text;
@@ -28,10 +29,10 @@ public class Review extends JsonEntity {
         build();
     }
 
-    public Review(Restaurant restaurant, Person person, int value, String text) {
+    public Review(Restaurant restaurant, User user, int value, String text) {
         super("reviews");
         this.restaurant = restaurant;
-        this.person = person;
+        this.user = user;
         this.value = value;
         this.text = text;
 
@@ -73,7 +74,7 @@ public class Review extends JsonEntity {
         return "Review{" +
                 "timestamp=" + timestamp +
                 ", company=" + restaurant +
-                ", person=" + person +
+                ", person=" + user +
                 ", value=" + value +
                 ", text='" + text + '\'' +
                 ", reply='" + reply + '\'' +
@@ -83,6 +84,6 @@ public class Review extends JsonEntity {
 
     @Override public boolean save() {
         build();
-        return true;
+        return false;
     }
 }
