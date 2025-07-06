@@ -82,7 +82,8 @@ public class Review extends JsonEntity {
                 '}';
     }
 
-    @Override public boolean save() {
+    @Override
+    public boolean save() {
         build();
         return false;
     }

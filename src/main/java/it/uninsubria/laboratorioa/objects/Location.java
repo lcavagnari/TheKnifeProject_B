@@ -36,7 +36,7 @@ public class Location extends JsonEntity {
      */
     @Override
     protected void build() {
-        this.jsonObject.put("nation", ""+nation)
+        this.jsonObject.put("nation", "" + nation)
                 .put("city", city)
                 .put("address", address)
                 .put("latitude", latitude)
@@ -55,7 +55,8 @@ public class Location extends JsonEntity {
     }
 
 
-    @Override public boolean save() {
+    @Override
+    public boolean save() {
         build();
         return false;
     }

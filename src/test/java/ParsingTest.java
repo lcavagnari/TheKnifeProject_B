@@ -85,11 +85,11 @@ public class ParsingTest {
     }
 
 
-
     /**
      * index:      0	   1		2     3	      4		   5		6		  7		   8	  9		  10	  11			12					13   <br>
      * field csv: Name,Address,Location,Price,Cuisine,Longitude,Latitude,PhoneNumber,Url,WebsiteUrl,Award,GreenStar,FacilitiesAndServices,Description
      * <br>
+     *
      * @return Dataset letto come collection di ristoranti.
      */
     private static List<Restaurant> parseFromDataset() {
@@ -153,28 +153,30 @@ public class ParsingTest {
                         }
 
                         // Ottieni il prefisso nazionale per il numero
-                        String nationalPrefix = getNationalPrefix(fields[7],location.getNation());
+                        String nationalPrefix = getNationalPrefix(fields[7], location.getNation());
 
                         // Ottieni il numero di stelle
                         Award award = Award.NONE;
                         try {
                             String rating = fields[10].toLowerCase();
                             if (rating.matches("[0-9].*")) {
-                                int val = Integer.parseInt(rating.replaceAll(" \\w*",""));
+                                int val = Integer.parseInt(rating.replaceAll(" \\w*", ""));
                                 award = Award.fromInt(val);
 
-                            } else award = Award.valueOf(rating.toUpperCase().replace(" ","_"));
+                            } else award = Award.valueOf(rating.toUpperCase().replace(" ", "_"));
 
-                        } catch (NumberFormatException ignored) {}
+                        } catch (NumberFormatException ignored) {
+                        }
 
 
                         // GreenStar parsing
 
                         boolean greenStar = false;
                         try {
-                             greenStar = Integer.parseInt(fields[11]) == 1;
+                            greenStar = Integer.parseInt(fields[11]) == 1;
 
-                        } catch (NumberFormatException ignored) {}
+                        } catch (NumberFormatException ignored) {
+                        }
 
                         // Costruzione dell'oggetto
                         Restaurant c = new Restaurant(
@@ -206,6 +208,7 @@ public class ParsingTest {
 
     /**
      * Importare i dati nella struttura dati di TheKnife
+     *
      * @param args
      */
     @SneakyThrows

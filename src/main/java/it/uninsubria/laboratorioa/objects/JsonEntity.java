@@ -15,25 +15,26 @@ import java.util.UUID;
 public abstract class JsonEntity {
     protected static final ObjectMapper mapper = new ObjectMapper();
 
-    @Getter protected final UUID id;
-    @Getter protected final File saveFolder;
-
-    @Getter protected File saveFile;
-    protected ObjectNode jsonObject;
-
-
     static {
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         mapper.disable(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE);
     }
 
+    @Getter
+    protected final UUID id;
+    @Getter
+    protected final File saveFolder;
+    @Getter
+    protected File saveFile;
+    protected ObjectNode jsonObject;
+
 
     public JsonEntity(String folderName) {
         this.jsonObject = mapper.createObjectNode();
         this.id = UUID.randomUUID();
 
-        jsonObject.put("id",String.valueOf(id));
+        jsonObject.put("id", String.valueOf(id));
 
         this.saveFolder = new File(Constants.ROOT, folderName);
         this.saveFile = new File(saveFolder, id + ".json");
@@ -45,7 +46,7 @@ public abstract class JsonEntity {
 
         this.jsonObject = mapper.createObjectNode();
         if (id != null)
-            jsonObject.put("id",String.valueOf(id));
+            jsonObject.put("id", String.valueOf(id));
     }
 
     public JsonEntity() {
@@ -54,7 +55,6 @@ public abstract class JsonEntity {
         this.saveFolder = this.saveFile = null;
         this.id = null;
     }
-
 
 
     public boolean save() {
@@ -72,7 +72,7 @@ public abstract class JsonEntity {
     public void rebuild() {
         jsonObject.removeAll();        // Purge old data
 
-        jsonObject.put("id",String.valueOf(id));
+        jsonObject.put("id", String.valueOf(id));
 
         build();                      // Invoke subclass builder
     }

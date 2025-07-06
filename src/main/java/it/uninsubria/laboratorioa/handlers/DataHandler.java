@@ -3,16 +3,15 @@ package it.uninsubria.laboratorioa.handlers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.uninsubria.laboratorioa.utils.Constants;
-import it.uninsubria.laboratorioa.objects.Restaurant;
 
-import java.io.*;
-import java.util.UUID;
+import java.io.File;
+import java.io.IOException;
 
 public class DataHandler {
 
     private static final File ROOT = Constants.ROOT;
-    private static final File COMPANIES_ROOT = new File(ROOT,"companies");
-    private static final File USERS_ROOT = new File(ROOT,"users");
+    private static final File COMPANIES_ROOT = new File(ROOT, "companies");
+    private static final File USERS_ROOT = new File(ROOT, "users");
 
 
     public void loadFromFile() {
@@ -50,9 +49,9 @@ public class DataHandler {
 
                  */
             } catch (IOException e) {
-                System.out.println("ERROR while parsing "+f.getName()+", cause:"+e.getMessage());
+                System.out.println("ERROR while parsing " + f.getName() + ", cause:" + e.getMessage());
             } catch (SecurityException e) {
-                System.out.println("Access is denied to "+f.getName());
+                System.out.println("Access is denied to " + f.getName());
             }
         }
     }

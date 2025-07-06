@@ -16,24 +16,27 @@ public class Restaurant extends JsonEntity {
     private final Set<String> services;
     private final Map<UUID, Review> reviews;
 
-    @Getter(AccessLevel.NONE) private final ArrayNode cuisinesTypesArray;
-    @Getter(AccessLevel.NONE) private final ArrayNode reviewsArray;
-    @Getter(AccessLevel.NONE) private final ArrayNode servicesArray;
+    @Getter(AccessLevel.NONE)
+    private final ArrayNode cuisinesTypesArray;
+    @Getter(AccessLevel.NONE)
+    private final ArrayNode reviewsArray;
+    @Getter(AccessLevel.NONE)
+    private final ArrayNode servicesArray;
 
 
     private String name;
-    private String description;
-    private String websiteUrl;
-    private String phone;
+    private final String description;
+    private final String websiteUrl;
+    private final String phone;
 
-    private Location loc;
-    private PriceRange priceRange;
+    private final Location loc;
+    private final PriceRange priceRange;
 
-    private boolean hasDelivery;
-    private boolean hasOnlineBooking;
+    private final boolean hasDelivery;
+    private final boolean hasOnlineBooking;
 
-    private Award award;
-    private boolean greenStar;
+    private final Award award;
+    private final boolean greenStar;
 
     public Restaurant(String name, String description, String websiteUrl, String phone, Location loc, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes,
@@ -128,9 +131,8 @@ public class Restaurant extends JsonEntity {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof Restaurant)) return false;
+        if (!(o instanceof Restaurant that)) return false;
         if (!super.equals(o)) return false;
-        Restaurant that = (Restaurant) o;
         return greenStar == that.greenStar && hasDelivery == that.hasDelivery && hasOnlineBooking == that.hasOnlineBooking && award == that.award && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(websiteUrl, that.websiteUrl) && Objects.equals(phone, that.phone) && Objects.equals(loc, that.loc) && priceRange == that.priceRange && Objects.equals(cuisinesTypes, that.cuisinesTypes) && Objects.equals(services, that.services) && Objects.equals(reviews, that.reviews);
     }
 

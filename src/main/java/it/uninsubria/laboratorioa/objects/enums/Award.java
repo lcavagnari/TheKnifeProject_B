@@ -13,8 +13,6 @@ public enum Award {
     BIB_GOURMAND(4),
     SELECTED_RESTAURANTS(5);
 
-    @Getter
-    private final int value;
     private static final Map<Integer, Award> BY_VALUE = new HashMap<>();
 
     static {
@@ -22,6 +20,9 @@ public enum Award {
             BY_VALUE.put(a.value, a);
         }
     }
+
+    @Getter
+    private final int value;
 
     Award(int value) {
         this.value = value;
