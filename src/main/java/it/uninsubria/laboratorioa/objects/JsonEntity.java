@@ -27,7 +27,7 @@ public abstract class JsonEntity {
     protected final File saveFolder;
     @Getter
     protected File saveFile;
-    protected ObjectNode jsonObject;
+    @Getter protected ObjectNode jsonObject;
 
 
     public JsonEntity(String folderName) {
@@ -59,8 +59,8 @@ public abstract class JsonEntity {
 
     public boolean save() {
         try {
-
             if (!saveFolder.exists()) saveFolder.mkdirs();
+            build();
             mapper.writerWithDefaultPrettyPrinter().writeValue(saveFile, jsonObject);
             return true;
 

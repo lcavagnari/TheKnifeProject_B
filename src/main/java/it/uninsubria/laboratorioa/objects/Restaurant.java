@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import it.uninsubria.laboratorioa.objects.enums.Award;
 import it.uninsubria.laboratorioa.objects.enums.CuisineType;
 import it.uninsubria.laboratorioa.objects.enums.PriceRange;
+import it.uninsubria.laboratorioa.objects.users.Owner;
+import it.uninsubria.laboratorioa.objects.users.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -29,6 +31,8 @@ public class Restaurant extends JsonEntity {
     private final String websiteUrl;
     private final String phone;
 
+    private final Owner owner;
+
     private final Location loc;
     private final PriceRange priceRange;
 
@@ -38,11 +42,11 @@ public class Restaurant extends JsonEntity {
     private final Award award;
     private final boolean greenStar;
 
-    public Restaurant(String name, String description, String websiteUrl, String phone, Location loc, PriceRange priceRange,
+    public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location loc, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes,
                       Map<UUID, Review> reviews, Set<String> services) {
 
-        super("companies");
+        super("restaurants");
 
         this.name = (name == null || name.isBlank()) ? "Restaurant" : name;
         this.description = (description == null || description.isBlank()) ? "" : description;
@@ -54,6 +58,8 @@ public class Restaurant extends JsonEntity {
         this.hasOnlineBooking = hasOnlineBooking;
         this.award = (award == null) ? Award.NONE : award;
         this.greenStar = greenStar;
+        
+        this.owner = owner;
 
         this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
         this.services = (services == null) ? new HashSet<>() : services;
@@ -70,26 +76,41 @@ public class Restaurant extends JsonEntity {
         build();
     }
 
-    public Restaurant(String name, String description, String websiteUrl, String phone, Location loc,
-                      PriceRange priceRange, boolean hasDelivery, boolean hasOnlineBooking) {
-        this(name, description, websiteUrl, phone, loc, priceRange, hasDelivery, hasOnlineBooking, Award.NONE, false, null, null, null);
+    public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location loc, PriceRange priceRange,
+                      boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes, Set<String> services) {
+
+        super("restaurants");
+        this.name = (name == null || name.isBlank()) ? "Restaurant" : name;
+        this.description = (description == null || description.isBlank()) ? "" : description;
+        this.websiteUrl = (websiteUrl == null || websiteUrl.isBlank()) ? "" : websiteUrl;
+        this.phone = (phone == null || phone.isBlank()) ? "" : phone;
+        this.loc = loc;
+        this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
+        this.hasDelivery = hasDelivery;
+        this.hasOnlineBooking = hasOnlineBooking;
+        this.award = (award == null) ? Award.NONE : award;
+        this.greenStar = greenStar;
+
+        this.owner = owner;
+        
+        this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
+        this.services = (services == null) ? new HashSet<>() : services;
+        this.reviews = new HashMap<>();
+
+        this.reviewsArray = mapper.createArrayNode();
+        this.cuisinesTypesArray = mapper.createArrayNode();
+        this.servicesArray = mapper.createArrayNode();
     }
 
-    public Restaurant(Restaurant other) {
-        this(other.name, other.description, other.websiteUrl, other.phone, other.loc, other.priceRange,
-                other.hasDelivery, other.hasOnlineBooking, other.award, other.greenStar, other.cuisinesTypes,
-                other.reviews, other.services);
-
-        this.jsonObject = other.jsonObject.deepCopy();
-
-        this.cuisinesTypesArray.addAll(other.cuisinesTypesArray);
-        this.reviewsArray.addAll(other.reviewsArray);
-        this.servicesArray.addAll(other.servicesArray);
-    }
 
     @Override
     protected void build() {
-        jsonObject.put("name", name).put("address", description).put("phone", phone).put("award", award.getValue()).put("greenStar", greenStar);
+        jsonObject.put("owner", owner.getId().toString())
+                .put("name", name)
+                .put("address", description)
+                .put("phone", phone)
+                .put("award", award.getValue())
+                .put("greenStar", greenStar);
 
         if (loc != null) jsonObject.set("location", loc.jsonObject);
 
@@ -144,25 +165,21 @@ public class Restaurant extends JsonEntity {
     @Override
     public String toString() {
         return "Restaurant{" +
-                "cuisinesTypes=" + cuisinesTypes +
-                ", services=" + services +
-                ", reviews=" + reviews +
-                ", cuisinesTypesArray=" + cuisinesTypesArray +
-                ", reviewsArray=" + reviewsArray +
-                ", servicesArray=" + servicesArray +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", websiteUrl='" + websiteUrl + '\'' +
-                ", phone='" + phone + '\'' +
-                ", loc=" + loc +
-                ", priceRange=" + priceRange +
-                ", hasDelivery=" + hasDelivery +
-                ", hasOnlineBooking=" + hasOnlineBooking +
-                ", award=" + award +
-                ", greenStar=" + greenStar +
-                ", id=" + id +
-                ", saveFile=" + saveFile +
-                ", saveFolder=" + saveFolder +
+                "\ncuisinesTypes=" + cuisinesTypes +
+                "\nservices=" + services +
+                "\nreviews=" + reviews +
+                "\nname='" + name + '\'' +
+                "\ndescription='" + description + '\'' +
+                "\nwebsiteUrl='" + websiteUrl + '\'' +
+                "\nphone='" + phone + '\'' +
+                "\nloc=" + loc +
+                "\npriceRange=" + priceRange +
+                "\nhasDelivery=" + hasDelivery +
+                "\nhasOnlineBooking=" + hasOnlineBooking +
+                "\naward=" + award +
+                "\ngreenStar=" + greenStar +
+                "\nid=" + id +
+                "\nsaveFile=" + saveFile +
                 '}';
     }
 }

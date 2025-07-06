@@ -30,7 +30,6 @@ public class Review extends JsonEntity {
     }
 
     public Review(Restaurant restaurant, User user, int value, String text) {
-        super("reviews");
         this.restaurant = restaurant;
         this.user = user;
         this.value = value;
@@ -63,7 +62,8 @@ public class Review extends JsonEntity {
     @Override
     protected void build() {
         this.jsonObject.put("timestamp", Constants.TIMESTAMP_FORMAT.format(timestamp))
-                .put("user", "")
+                .put("user", user.getId().toString())
+                .put("restaurant", restaurant.getId().toString())
                 .put("value", value)
                 .put("text", text)
                 .put("reply", reply);
