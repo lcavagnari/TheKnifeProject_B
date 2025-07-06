@@ -4,6 +4,7 @@
 
 target/*
 ./target
+./out
 
 .idea/modules.xml
 .idea/misc.xml
