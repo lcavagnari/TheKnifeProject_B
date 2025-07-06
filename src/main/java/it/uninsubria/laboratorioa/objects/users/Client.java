@@ -36,7 +36,7 @@ public class Client extends User {
     public void build() {
         super.build();
 
-        jsonObject.put("role","Client");
+        jsonObject.put("role", "Client");
 
         if (favouritesArray != null) {
             favouritesArray.removeAll();
@@ -49,7 +49,7 @@ public class Client extends User {
     @Override
     public String toString() {
         return "Client{" +
-                super.toString()+
+                super.toString() +
                 ", favourites=" + favourites +
                 ", favouritesArray=" + favouritesArray +
                 '}';

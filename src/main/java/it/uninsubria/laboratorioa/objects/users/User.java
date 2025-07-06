@@ -54,7 +54,7 @@ public abstract class User extends JsonEntity {
         this.username = (username == null || username.length() < 4) ? "user" : username.substring(0, 16);
         this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
         this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName.substring(0, 24);
-        this.hasher = new PasswordHasher(password,salt);
+        this.hasher = new PasswordHasher(password, salt);
 
         this.location = location;
 
@@ -67,6 +67,7 @@ public abstract class User extends JsonEntity {
         build();
     }
 
+
     @Override
     protected void build() {
         jsonObject.put("id", String.valueOf(getId()))
@@ -74,6 +75,8 @@ public abstract class User extends JsonEntity {
                 .put("name", name)
                 .put("lastName", lastName);
 
+
+        jsonObject.put("dateOfBirth", dateOfBirth.toString());
         if (location != null) jsonObject.set("location", location.getJsonObject());
 
         ObjectNode password = mapper.createObjectNode()
@@ -98,7 +101,7 @@ public abstract class User extends JsonEntity {
 
     @Override
     public String toString() {
-        return  "id=" + id +
+        return "id=" + id +
                 ", name='" + name + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", username='" + username + '\'' +

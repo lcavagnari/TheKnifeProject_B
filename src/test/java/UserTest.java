@@ -1,5 +1,4 @@
 import it.uninsubria.laboratorioa.objects.Location;
-import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.enums.Nation;
 import it.uninsubria.laboratorioa.objects.users.Client;
 
@@ -43,10 +42,10 @@ public class UserTest {
     public static void main(String[] args) {
         System.out.println("dddd");
 
-        Client c = new Client("111","kibafo33","name","last",generateRandomLocation(), LocalDate.now());
+        Client c = new Client("111", "kibafo33", "name", "last", generateRandomLocation(), LocalDate.now());
         System.out.println(c);
 
-        c.addFavourite(new Restaurant());
+        //c.addFavourite(new Restaurant());
 
         c.save();
     }

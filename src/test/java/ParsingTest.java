@@ -136,13 +136,6 @@ public class ParsingTest {
 
     private static final SecureRandom rd = Generators.getRd();
 
-    /**
-     * Ottiene i dati relativi alla posizione del ristorante dai dati csv
-     *
-     * @param address
-     * @param location
-     * @return Array ordinato -> [città,nazione,indirizzo completo]
-     */
     private static String[] retrieveLocData(String address, String location) {
         String[] cityAndNation = location.split(",");
         String city;
@@ -199,7 +192,6 @@ public class ParsingTest {
             return "";
         }
     }
-
 
 
     private static Restaurant createRestaurant(String[] fields) {
@@ -278,19 +270,20 @@ public class ParsingTest {
         try {
             greenStar = Integer.parseInt(fields[11]) == 1;
 
-        } catch (NumberFormatException ignored) {}
+        } catch (NumberFormatException ignored) {
+        }
 
 
         // Generazione casuale owner
 
-        String firstName = Generators.generateRandomName(4,20);
-        String lastName = Generators.generateRandomName(4,24);
+        String firstName = Generators.generateRandomName(4, 20);
+        String lastName = Generators.generateRandomName(4, 24);
         String userName = Generators.generateUsername(8);
         String password = Generators.generatePassword(10);
-        LocalDate birthdate = Generators.generateRandomBirthdate(20,80);
+        LocalDate birthdate = Generators.generateRandomBirthdate(20, 80);
         Location loc = Generators.generateRandomLocation();
 
-        Owner owner = new Owner(userName,password,firstName,lastName,loc,birthdate);
+        Owner owner = new Owner(userName, password, firstName, lastName, loc, birthdate);
         owner.save();
 
         // Costruzione dell'oggetto
@@ -334,10 +327,12 @@ public class ParsingTest {
                     .forEach(fields -> {
                         try {
                             companies.add(createRestaurant(fields));
-                        } catch (Exception ignored) {}
+
+                        } catch (Exception ignored) {
+                        }
                     });
         } catch (IOException | SecurityException e) {
-            System.out.println("Error while parsing csv database: "+ e);
+            System.out.println("Error while parsing csv database: " + e);
         }
 
         return companies;

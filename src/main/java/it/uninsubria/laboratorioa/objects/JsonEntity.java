@@ -27,7 +27,8 @@ public abstract class JsonEntity {
     protected final File saveFolder;
     @Getter
     protected File saveFile;
-    @Getter protected ObjectNode jsonObject;
+    @Getter
+    protected ObjectNode jsonObject;
 
 
     public JsonEntity(String folderName) {

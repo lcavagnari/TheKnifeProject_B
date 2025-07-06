@@ -5,7 +5,6 @@ import it.uninsubria.laboratorioa.objects.enums.Award;
 import it.uninsubria.laboratorioa.objects.enums.CuisineType;
 import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import it.uninsubria.laboratorioa.objects.users.Owner;
-import it.uninsubria.laboratorioa.objects.users.User;
 import lombok.AccessLevel;
 import lombok.Getter;
 
@@ -24,23 +23,17 @@ public class Restaurant extends JsonEntity {
     private final ArrayNode reviewsArray;
     @Getter(AccessLevel.NONE)
     private final ArrayNode servicesArray;
-
-
-    private String name;
     private final String description;
     private final String websiteUrl;
     private final String phone;
-
     private final Owner owner;
-
     private final Location loc;
     private final PriceRange priceRange;
-
     private final boolean hasDelivery;
     private final boolean hasOnlineBooking;
-
     private final Award award;
     private final boolean greenStar;
+    private String name;
 
     public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location loc, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes,
@@ -58,7 +51,7 @@ public class Restaurant extends JsonEntity {
         this.hasOnlineBooking = hasOnlineBooking;
         this.award = (award == null) ? Award.NONE : award;
         this.greenStar = greenStar;
-        
+
         this.owner = owner;
 
         this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
@@ -92,7 +85,7 @@ public class Restaurant extends JsonEntity {
         this.greenStar = greenStar;
 
         this.owner = owner;
-        
+
         this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
         this.services = (services == null) ? new HashSet<>() : services;
         this.reviews = new HashMap<>();

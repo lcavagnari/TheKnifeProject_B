@@ -10,7 +10,7 @@ public class Owner extends User {
         super(username, password, name, lastName, location, dateOfBirth);
     }
 
-    public Owner(String username, String password, String salt, String name, String lastName , Location location, LocalDate dateOfBirth) {
+    public Owner(String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth) {
         super(username, name, lastName, location, dateOfBirth, password, salt);
     }
 
@@ -18,6 +18,6 @@ public class Owner extends User {
     protected void build() {
         super.build();
 
-        jsonObject.put("role","Owner");
+        jsonObject.put("role", "Owner");
     }
 }
