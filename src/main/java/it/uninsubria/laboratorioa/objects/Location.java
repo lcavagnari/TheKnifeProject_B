@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 public class Location extends JsonEntity {
 
+
     private Nation nation;
     private String city;
     private String address;
@@ -56,6 +57,6 @@ public class Location extends JsonEntity {
 
     @Override public boolean save() {
         build();
-        return true;
+        return false;
     }
 }
