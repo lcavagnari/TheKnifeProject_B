@@ -1,6 +1,7 @@
 *.json
 *.txt
 *.py
+*.jar
 
 target/*
 ./target
@@ -11,3 +12,5 @@ target/*
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+/dependency-reduced-pom.xml
+/.idea/artifacts/TheKnifeProject_jar.xml
