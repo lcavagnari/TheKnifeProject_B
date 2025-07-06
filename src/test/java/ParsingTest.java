@@ -9,7 +9,9 @@ import it.uninsubria.laboratorioa.objects.enums.Nation;
 import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.utils.Constants;
+import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.experimental.UtilityClass;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +24,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ParsingTest {
-
+@UtilityClass
+class Generators {
     private static final String CONSONANTS = "bcdfghjklmnpqrstvwxyz";
     private static final String VOWELS = "aeiou";
 
@@ -40,6 +42,7 @@ public class ParsingTest {
             "88 Logic Gate Ln.", "1 Holy Dataway", "404 Not Found Rd."
     );
 
+    @Getter
     private static final SecureRandom rd = new SecureRandom();
 
     public static String generateRandomName(int minLen, int maxLen) {
@@ -112,6 +115,27 @@ public class ParsingTest {
     }
 
 
+    public static LocalDate generateRandomBirthdate(int minAge, int maxAge) {
+        if (minAge < 0 || maxAge < minAge) {
+            throw new IllegalArgumentException("Invalid age range");
+        }
+
+        LocalDate today = LocalDate.now();
+
+        LocalDate maxBirthdate = today.minusYears(minAge); // youngest birthdate
+        LocalDate minBirthdate = today.minusYears(maxAge); // oldest birthdate
+
+        long daysBetween = ChronoUnit.DAYS.between(minBirthdate, maxBirthdate);
+        long randomDays = ThreadLocalRandom.current().nextLong(daysBetween + 1);
+
+        return minBirthdate.plusDays(randomDays);
+    }
+}
+
+public class ParsingTest {
+
+    private static final SecureRandom rd = Generators.getRd();
+
     /**
      * Ottiene i dati relativi alla posizione del ristorante dai dati csv
      *
@@ -161,6 +185,7 @@ public class ParsingTest {
         };
     }
 
+
     public static String getNationalPrefix(String phoneNumber, Nation nation) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         String regionCode = nation.getIsoCode();
@@ -175,22 +200,6 @@ public class ParsingTest {
         }
     }
 
-
-    public static LocalDate generateRandomBirthdate(int minAge, int maxAge) {
-        if (minAge < 0 || maxAge < minAge) {
-            throw new IllegalArgumentException("Invalid age range");
-        }
-
-        LocalDate today = LocalDate.now();
-
-        LocalDate maxBirthdate = today.minusYears(minAge); // youngest birthdate
-        LocalDate minBirthdate = today.minusYears(maxAge); // oldest birthdate
-
-        long daysBetween = ChronoUnit.DAYS.between(minBirthdate, maxBirthdate);
-        long randomDays = ThreadLocalRandom.current().nextLong(daysBetween + 1);
-
-        return minBirthdate.plusDays(randomDays);
-    }
 
 
     private static Restaurant createRestaurant(String[] fields) {
@@ -274,12 +283,12 @@ public class ParsingTest {
 
         // Generazione casuale owner
 
-        String firstName = generateRandomName(4,20);
-        String lastName = generateRandomName(4,24);
-        String userName = generateUsername(8);
-        String password = generatePassword(10);
-        LocalDate birthdate = generateRandomBirthdate(20,80);
-        Location loc = generateRandomLocation();
+        String firstName = Generators.generateRandomName(4,20);
+        String lastName = Generators.generateRandomName(4,24);
+        String userName = Generators.generateUsername(8);
+        String password = Generators.generatePassword(10);
+        LocalDate birthdate = Generators.generateRandomBirthdate(20,80);
+        Location loc = Generators.generateRandomLocation();
 
         Owner owner = new Owner(userName,password,firstName,lastName,loc,birthdate);
         owner.save();
