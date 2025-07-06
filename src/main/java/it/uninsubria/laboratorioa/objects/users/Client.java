@@ -1,6 +1,7 @@
 package it.uninsubria.laboratorioa.objects.users;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.Restaurant;
 
 import java.time.LocalDate;
@@ -12,38 +13,33 @@ public class Client extends User {
     private final Set<Restaurant> favourites;
     private final ArrayNode favouritesArray;
 
-    public Client(String username, String password, String name, String lastName, LocalDate dateOfBirth) {
-        super(username, password, name, lastName, dateOfBirth);
+    public Client(String username, String password, String name, String lastName, Location location, LocalDate dateOfBirth) {
+        super(username, password, name, lastName, location, dateOfBirth);
 
         this.favouritesArray = mapper.createArrayNode();
         this.favourites = new HashSet<>();
     }
 
 
-    public void addFavourite(Restaurant r) {
-        if (r != null && favourites.add(r)) {
-            favouritesArray.add(r.getId().toString());
-            rebuild();
-        }
+    public boolean addFavourite(Restaurant r) {
+        return r != null && favourites.add(r);
     }
 
-    public void removeFavourite(Restaurant r) {
-        if (r != null && favourites.remove(r)) {
-            favouritesArray.removeAll();
-
-            favourites.forEach(res -> favouritesArray.add(res.getId().toString()));
-            rebuild();
-        }
+    public boolean removeFavourite(Restaurant r) {
+        return r != null && favourites.remove(r);
     }
 
 
     @Override
-    protected void build() {
+    public void build() {
         super.build();
+
+        jsonObject.put("role","Client");
 
         favouritesArray.removeAll();
         favourites.forEach(fav -> favouritesArray.add(fav.toString()));
 
+        jsonObject.put("ddd",1);
         jsonObject.set("favourites", favouritesArray);
     }
 }

@@ -2,6 +2,7 @@ package it.uninsubria.laboratorioa.objects.users;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratorioa.objects.JsonEntity;
+import it.uninsubria.laboratorioa.objects.Location;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,29 +24,39 @@ public abstract class User extends JsonEntity {
     private String name;
     private String lastName;
 
+    private Location location;
+
     private String username;
     private LocalDate dateOfBirth;
 
-    public User(String username, String password, String name, String lastName, LocalDate dateOfBirth) {
-        this.username = (username == null || username.length() < 4) ? "user" : username.substring(0, 16);
-        this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
-        this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName.substring(0, 20);
+    public User(String username, String password, String name, String lastName, Location location, LocalDate dateOfBirth) {
+        super("users");
+        this.username = (username == null || username.length() < 4) ? "user" : username;
+        this.name = (name == null || name.length() < 4) ? "nome" : name;
+        this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName;
         this.hasher = new PasswordHasher(password);
 
-        LocalDate birth = (dateOfBirth == null) ? LocalDate.MIN : dateOfBirth;
+        this.location = location;
+
+        /*LocalDate birth = (dateOfBirth == null) ? LocalDate.now() : dateOfBirth;
         if (dateOfBirth.isBefore(LocalDate.MIN) || dateOfBirth.isAfter(LocalDate.now().plusDays(1))) {
             birth = LocalDate.MIN;
         }
 
-        this.dateOfBirth = birth;
+         */
+
+        //this.dateOfBirth = birth;
+        this.dateOfBirth = dateOfBirth;
         build();
     }
 
-    public User(String username, String password, String salt, String name, String lastName, LocalDate dateOfBirth) {
+    public User(String username, String name, String lastName, Location location, LocalDate dateOfBirth, String password, String salt) {
         this.username = (username == null || username.length() < 4) ? "user" : username.substring(0, 16);
         this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
-        this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName.substring(0, 20);
+        this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName.substring(0, 24);
         this.hasher = new PasswordHasher(password,salt);
+
+        this.location = location;
 
         LocalDate birth = (dateOfBirth == null) ? LocalDate.MIN : dateOfBirth;
         if (dateOfBirth.isBefore(LocalDate.MIN) || dateOfBirth.isAfter(LocalDate.now().plusDays(1))) {
@@ -58,10 +69,12 @@ public abstract class User extends JsonEntity {
 
     @Override
     protected void build() {
-        jsonObject.put("id", getId().toString())
+        jsonObject.put("id", String.valueOf(getId()))
                 .put("username", username)
                 .put("name", name)
                 .put("lastName", lastName);
+
+        if (location != null) jsonObject.set("location", location.getJsonObject());
 
         ObjectNode password = mapper.createObjectNode()
                 .put("salt", hasher.salt)
@@ -96,7 +109,7 @@ public abstract class User extends JsonEntity {
 
     final static class PasswordHasher {
         private static final int SALT_LENGTH = 16;
-        private static final int ITERATIONS = 100_000;
+        private static final int ITERATIONS = 1000;
         private static final int KEY_LENGTH = 256;
 
         private final String salt;
