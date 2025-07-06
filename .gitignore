@@ -2,6 +2,7 @@
 *.txt
 *.py
 *.jar
+*.zip
 
 target/*
 ./target
