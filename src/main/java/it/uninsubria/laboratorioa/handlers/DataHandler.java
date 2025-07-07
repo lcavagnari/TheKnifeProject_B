@@ -22,27 +22,71 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Classe di utilità responsabile del caricamento e della gestione dei dati dell'applicazione
+ * a partire da file JSON memorizzati nel file system locale.
+ * <p>
+ * Gestisce la deserializzazione delle entità `User`, `Owner`, `Client` e `Restaurant` e
+ * le inserisce in strutture dati statiche per un accesso efficiente tramite ID, nome o proprietario.
+ * <p>
+ * Autore: Luke
+ * @version 1.0
+ */
 @UtilityClass
 public class DataHandler {
 
+    /**
+     * Cartella radice che contiene tutti i dati del sistema.
+     * Definita in {@link Constants#ROOT}
+     */
     private static final File ROOT = Constants.ROOT;
+
+    /**
+     * Directory contenente i file JSON dei ristoranti.
+     */
     private static final File RESTAURANTS_ROOT = new File(ROOT, "companies");
+
+    /**
+     * Directory contenente i file JSON degli utenti.
+     */
     private static final File USERS_ROOT = new File(ROOT, "users");
 
+    /**
+     * Mappa dei ristoranti indicizzati per ID.
+     */
     @Getter
     private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
+
+    /**
+     * Mappa dei ristoranti indicizzati per nome.
+     */
     @Getter
     private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
+
+    /**
+     * Mappa dei ristoranti indicizzati per ID del proprietario.
+     */
     @Getter
     private final static Map<UUID, Restaurant> restaurantsByOwnerId = new HashMap<>();
 
-
+    /**
+     * Mappa degli utenti indicizzati per ID.
+     */
     @Getter
     private final static Map<UUID, User> usersById = new HashMap<>();
+
+    /**
+     * Mappa degli utenti indicizzati per nome utente (username).
+     */
     @Getter
     private final static Map<String, User> usersByName = new HashMap<>();
 
-
+    /**
+     * Carica tutti i ristoranti dai file specificati e li deserializza in oggetti `Restaurant`.
+     * I ristoranti vengono aggiunti alle relative mappe di gestione interna.
+     *
+     * @param rFiles array di file JSON contenenti i dati dei ristoranti
+     */
     private void loadRestaurants(File[] rFiles) {
         if (rFiles == null) return;
 
@@ -51,26 +95,20 @@ public class DataHandler {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode jsonNode = mapper.readTree(f);
 
-// === Parse base fields ===
                 UUID id = UUID.fromString(jsonNode.path("id").asText());
                 String name = jsonNode.path("name").asText();
-                String description = jsonNode.path("address").asText(); // maps to description
-                String websiteUrl = jsonNode.path("websiteUrl").asText(""); // optional
+                String description = jsonNode.path("address").asText();
+                String websiteUrl = jsonNode.path("websiteUrl").asText("");
                 String phone = jsonNode.path("phone").asText();
 
                 Award award = Award.fromInt(jsonNode.path("award").asInt());
                 boolean greenStar = jsonNode.path("greenStar").asBoolean();
-                boolean hasDelivery = jsonNode.path("hasDelivery").asBoolean(false); // optional default
-                boolean hasBooking = jsonNode.path("hasOnlineBooking").asBoolean(false); // optional default
+                boolean hasDelivery = jsonNode.path("hasDelivery").asBoolean(false);
+                boolean hasBooking = jsonNode.path("hasOnlineBooking").asBoolean(false);
 
-                // === Owner ===
                 UUID ownerId = UUID.fromString(jsonNode.path("owner").asText());
-                User owner = null;
+                User owner = usersById.get(ownerId);
 
-                if (usersById.containsKey(ownerId))
-                    owner = usersById.get(ownerId);
-
-                // === Location ===
                 JsonNode locNode = jsonNode.path("location");
                 Location loc = new Location(
                         Nation.valueOf(locNode.path("nation").asText()),
@@ -80,26 +118,21 @@ public class DataHandler {
                         locNode.path("address").asText()
                 );
 
-                // === Price Range ===
                 String price = jsonNode.get("priceRange").asText();
                 PriceRange priceRange = PriceRange.byDollarAmount(price.length());
 
-                // === Cuisines ===
                 Set<CuisineType> cuisines = new HashSet<>();
                 for (JsonNode node : jsonNode.path("cuisinesTypes")) {
                     try {
                         cuisines.add(CuisineType.valueOf(node.asText().toUpperCase()));
-                    } catch (IllegalArgumentException ignored) {
-                    }
+                    } catch (IllegalArgumentException ignored) {}
                 }
 
-                // === Services ===
                 Set<String> services = new HashSet<>();
                 for (JsonNode node : jsonNode.path("services")) {
                     services.add(node.asText());
                 }
 
-                // === Construct Restaurant ===
                 Restaurant restaurant = new Restaurant(
                         name,
                         description,
@@ -116,42 +149,43 @@ public class DataHandler {
                         services
                 );
 
-                // === Reviews ===
-                Map<UUID, Review> reviews = new HashMap<>();
                 for (JsonNode node : jsonNode.path("reviews")) {
                     UUID uId = UUID.fromString(node.path("user").asText());
-                    User user = null;
                     if (!usersById.containsKey(uId)) continue;
 
                     int value = node.path("velue").asInt();
                     LocalDateTime time = LocalDateTime.parse(node.get("timestamp").asText());
                     String text = node.get("text").asText();
-
                     String reply = node.get("reply").asText();
 
                     Review r = new Review(restaurant, usersById.get(uId), value, time, text, reply);
                     restaurant.addReview(r);
                 }
 
+                restaurantsById.put(id, restaurant);
+                restaurantsByName.put(name, restaurant);
+                restaurantsByOwnerId.put(ownerId, restaurant);
 
             } catch (IOException e) {
-                System.out.println("ERROR while parsing " + f.getName() + ", cause:" + e.getMessage());
-                continue;
+                System.out.println("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
             } catch (SecurityException e) {
-                System.out.println("Access is denied to " + f.getName());
-                continue;
+                System.out.println("Accesso negato al file " + f.getName());
             }
         }
-
     }
 
+    /**
+     * Carica tutti gli utenti dai file specificati e li deserializza in oggetti `User`.
+     * Gli utenti possono essere di tipo `Client` o `Owner`.
+     *
+     * @param uFiles array di file JSON contenenti i dati degli utenti
+     */
     private void loadUsers(File[] uFiles) {
         if (uFiles == null) return;
 
         final ObjectMapper mapper = new ObjectMapper();
         for (File f : uFiles) {
             try {
-
                 JsonNode jsonNode = mapper.readTree(f);
                 if (jsonNode == null) continue;
 
@@ -182,7 +216,6 @@ public class DataHandler {
                             name, lastName,
                             loc, dateOfBirth
                     );
-
                 } else {
                     Set<UUID> favourites = new HashSet<>();
                     JsonNode favouritesNode = jsonNode.get("cuisines");
@@ -199,23 +232,22 @@ public class DataHandler {
                     );
                 }
 
-
                 usersById.put(UUID.fromString(id), user);
                 usersByName.put(username, user);
 
             } catch (IOException | IllegalArgumentException e) {
-                System.err.println("ERROR while parsing " + f.getName() + ", cause:" + e.getMessage());
-                continue;
+                System.err.println("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
             } catch (SecurityException e) {
-                System.err.println("Access is denied to " + f.getName());
-
+                System.err.println("Accesso negato al file " + f.getName());
             }
         }
     }
 
-
+    /**
+     * Carica tutti i dati degli utenti e dei ristoranti dal file system.
+     * I file devono trovarsi nelle directory configurate via `Constants.ROOT`.
+     */
     public void loadFromFile() {
-
         File[] restaurants;
         File[] users;
         try {
@@ -228,36 +260,7 @@ public class DataHandler {
             loadRestaurants(restaurants);
 
         } catch (SecurityException ex) {
-            System.out.println("Access denied");
+            System.out.println("Accesso negato");
         }
     }
-
 }
-
-
-/*
-public boolean read() {
-        if (!inputFile.exists() || !inputFile.canRead()) return false;
-
-        try (FileInputStream inputStream = new FileInputStream(inputFile.getName());
-             BufferedReader br = new BufferedReader(new InputStreamReader(inputStream))) {
-
-            String strLine;
-            while ((strLine = br.readLine()) != null) {
-                String[] params = strLine
-                        .replace(", ",",")
-                        .split(",");
-
-                if (params.length < 3) continue;
-                Award award = new Award(Integer.parseInt(params[0]), params[1], params[2],Integer.parseInt(params[3]));
-                awards.add(award);
-            }
-            return true;
-
-        } catch (IOException e) {
-            awards.clear();
-            e.printStackTrace();
-            return false;
-        }
-    }
- */
