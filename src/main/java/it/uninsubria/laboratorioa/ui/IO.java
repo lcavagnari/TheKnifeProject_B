@@ -1,27 +1,44 @@
 package it.uninsubria.laboratorioa.ui;
 
-
 import java.util.Scanner;
 
+/**
+ * Classe di utilità per Input/Output da console.<p>
+ * Contiene metodi statici per leggere input da tastiera, formattare output e gestire menu testuali.<p>
+ * Utilizza Scanner per lettura standard input.<p>
+ * Supporta formati booleani personalizzati, gestione menu, messaggi di errore e pulizia schermo.
+ */
 public class IO {
 
-    // Istanza scanner
+    /**
+     * Istanza Scanner condivisa per lettura input da tastiera.
+     */
     private static final Scanner INPUT = new Scanner(System.in);
 
+    /**
+     * Chiude lo Scanner per input.
+     */
     public static void closeScanner() {
         INPUT.close();
     }
 
     /**
-     * Formatta un booleano in Si/No, al posto di true/false
+     * Formatta un valore booleano in "Yes" o "No".
      *
-     * @param input variabile booleana
-     * @return Si se true, No se false
+     * @param input variabile booleana da formattare
+     * @return "Yes" se true, "No" se false
      */
     public static String formatBoolean(boolean input) {
-        return String.valueOf(input).replace("true", "Yes").replace("false", "No");
+        return String.valueOf(input).replace("true", "Sì").replace("false", "No");
     }
 
+    /**
+     * Stampa un menu testuale con titolo, lista voci e footer opzionali.
+     *
+     * @param title  Titolo del menu, può essere null
+     * @param footer Testo footer opzionale, può essere null
+     * @param items  Array di voci menu da stampare
+     */
     public static void printMenu(String title, String footer, String[] items) {
         if (items.length == 0) return;
         else if (title != null) System.out.println(title + "\n");
@@ -34,30 +51,31 @@ public class IO {
     }
 
     /**
-     * Chiede un input all'utente (yes/no)
+     * Richiede input booleano yes/no all'utente con validazione.
      *
-     * @param promptMessage Richiesta di input
-     * @return Input in formato boolean
+     * @param promptMessage Messaggio di richiesta input
+     * @return true se input valido "yes" o "y", false se "no" o "n"
      */
     public static boolean getBooleanInput(String promptMessage) {
         String input = getUserInput(promptMessage).toLowerCase();
 
-        // Usa un pattern di regex per controllare se input sia "yes" o "no"
-        while (!input.matches("\\b(yes|no)\\b|\\b[yn]\\b")) {
-            printErrorMessage("Invalid input, try again: ");
+        // Usa regex per controllare se input sia "sì" o "no", o "s" / "n"
+        while (!input.matches("\\b(s[iì]|no)\\b|\\b[sn]\\b")) {
+            printErrorMessage("Input non valido, riprova: ");
             input = getUserInput(promptMessage).toLowerCase();
         }
 
-        // Sostituisce y oppure yes con True
-        String bool = input.replaceAll("\\by.{2}\\b|y", "True");
+        // Sostituisce s oppure sì con True
+        String bool = input.replaceAll("\\bs.{1,2}\\b|s", "True");
         return Boolean.parseBoolean(bool);
     }
 
+
     /**
-     * Chiede un input all'utente (testo)
+     * Richiede input testuale all'utente.
      *
-     * @param promptMessage Richiesta di input
-     * @return Input in formato stringa
+     * @param promptMessage Messaggio di richiesta input
+     * @return Stringa inserita dall'utente
      */
     public static String getUserInput(String promptMessage) {
         System.out.print("\n" + IO.replaceText(32, "> ") + promptMessage);
@@ -67,14 +85,13 @@ public class IO {
         return INPUT.nextLine();
     }
 
-
     /**
-     * Chiede un input all'utente (testo)
+     * Richiede input testuale all'utente con controllo lunghezza minima e massima.
      *
-     * @param promptMessage Richiesta di input
-     * @param maxLength     Limite massimo di lunghezza
-     * @param minLength     Limite minimo di lunghezza
-     * @return Input in formato stringa
+     * @param promptMessage Messaggio di richiesta input
+     * @param minLength     Lunghezza minima accettata
+     * @param maxLength     Lunghezza massima accettata
+     * @return Stringa inserita conforme ai limiti di lunghezza
      */
     public static String getUserInput(String promptMessage, int minLength, int maxLength) {
         String input = "";
@@ -86,16 +103,16 @@ public class IO {
     }
 
     /**
-     * Chiede un input all'utente (numero non decimale)
+     * Richiede input numerico intero non decimale all'utente.
      *
-     * @param promptMessage Richiesta di input
-     * @return Input in formato integer
+     * @param promptMessage Messaggio di richiesta input
+     * @return Integer corrispondente all'input valido
      */
     public static Integer getInt(String promptMessage) {
         String input = getUserInput(promptMessage);
 
         while (!input.matches("^-?\\d+$")) {
-            IO.printErrorMessage("Invalid input");
+            IO.printErrorMessage("Input non valido");
             input = getUserInput(promptMessage);
         }
 
@@ -103,54 +120,45 @@ public class IO {
     }
 
     /**
-     * Simile al getInt nella classe IO, ma tarato specificamente per array e liste
-     * I numeri validi vanno da 0 -> max+1 (usato principalmente nei menu, 0 usato per annullare)
+     * Richiede input numerico intero con validità limitata per menu (0..max).
      *
-     * @param prompt Richiesta di input
-     * @param max    Numero massimo considerato valido (generalmente la dimensione della lista o array)
-     * @return Numero intero valido (fra 0 e max+1)
+     * @param prompt Messaggio di richiesta input
+     * @param max    Valore massimo valido
+     * @return Intero valido nell'intervallo [0..max]
      */
     public static int getInt(String prompt, int max) {
         int sel = getInt(prompt);
         while (sel < 0 || sel >= max + 1)
-            sel = getInt("Invalid, " + prompt);
+            sel = getInt("Input non valido, " + prompt);
 
         return sel - 1;
     }
 
-    // Utilities
-
-
     /**
-     * Formatta del testo usando il codice colore ANSI<br>
-     * <a href="https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797"> Documentazione su github.com</a>
+     * Applica formattazione ANSI colore a testo.
      *
-     * @param colorCode Codice colore
+     * @param colorCode Codice colore ANSI
      * @param text      Testo da formattare
-     * @return Testo formattato
+     * @return Testo colorato con codice ANSI
      */
     public static String replaceText(int colorCode, String text) {
         return "\u001B[" + colorCode + "m" + text + "\u001B[0m";
     }
 
-
     /**
-     * Stampa il separatore di riga per una tabella, composto da "-"
-     * <br><br>Formula: (qta * 4) +1
+     * Genera una linea separatrice composta da '-' per tabelle.
      *
-     * @param qta numero di "-" da stampare
+     * @param qta Numero di elementi della tabella da separare
+     * @return Stringa composta da "-" della lunghezza calcolata
      */
     private static String printRow(int qta) {
         return "-".repeat(Math.max(0, (qta * 4) + 1));
     }
 
-
-    // Messages
-
     /**
-     * Stampa un messaggio di errore, già formattato
+     * Stampa messaggio di errore formattato in rosso.
      *
-     * @param msg Messaggio di errore da formattare e stampare
+     * @param msg Messaggio di errore
      */
     public static void printErrorMessage(String msg) {
         if (msg == null) return;
@@ -158,18 +166,17 @@ public class IO {
     }
 
     /**
-     * Stampa un messaggio di errore, già formattato
+     * Stampa messaggio di successo formattato in ciano.
      *
-     * @param msg Messaggio di errore da formattare e stampare
+     * @param msg Messaggio di successo
      */
     public static void printSuccessrMessage(String msg) {
         if (msg == null) return;
         System.out.print("\n" + IO.replaceText(36, "! ") + msg);
     }
 
-
     /**
-     * Ripulisce lo schermo utilizzando comandi di sistema o caratteri ANSI
+     * Pulisce la schermata console usando comandi di sistema o sequenze ANSI.
      */
     public static void clearScreen() {
         try {
@@ -180,7 +187,7 @@ public class IO {
                 System.out.flush();
             }
         } catch (Exception e) {
-            System.out.println("Unable to clear screen.");
+            System.out.println("Impossibile pulire lo schermo.");
         }
     }
 }
