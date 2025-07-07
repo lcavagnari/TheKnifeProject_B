@@ -97,7 +97,7 @@ public class IO {
      * @return Stringa inserita conforme ai limiti di lunghezza
      */
     public static String getUserInput(String promptMessage, int minLength, int maxLength) {
-        String input = "";
+        String input;
         do {
             input = getUserInput(promptMessage);
         } while (input.length() < minLength || input.length() > maxLength);
