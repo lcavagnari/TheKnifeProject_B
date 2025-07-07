@@ -2,84 +2,36 @@ package it.uninsubria.laboratorioa.objects.enums;
 
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
- * Enum che rappresenta le categorie di riconoscimenti Michelin ottenibili da un ristorante.
- * I valori includono le classiche stelle, il Bib Gourmand e i ristoranti selezionati.
- * <p>
- * Ogni valore è associato a un intero che rappresenta il codice persistente.
- * <p>
- * @author Luca Cavagnari
- * @version 1.0
+ * Enum che rappresenta i premi assegnati ad un ristorante dalla guida Michelin.
  */
 public enum Award {
 
-    NONE(0),
-    ONE_STAR(1),
-    TWO_STARS(2),
-    THREE_STARS(3),
-    BIB_GOURMAND(4),
-    SELECTED_RESTAURANTS(5);
-
     /**
-     * Mappa ausiliaria per ottenere un valore `Award` a partire da un intero.
+     * Nessun premio
      */
-    private static final Map<Integer, Award> BY_VALUE = new HashMap<>();
-
-    static {
-        for (Award a : values()) {
-            BY_VALUE.put(a.value, a);
-        }
-    }
-
+    NONE(""),
     /**
-     * Valore intero associato all'enum.
+     * 1 stella Michelin
      */
+    ONE_STAR("1"),
+    /**
+     * 2 stelle Michelin
+     */
+    TWO_STARS("2"),
+    /**
+     * 3 stelle Michelin
+     */
+    THREE_STARS("3"),
+    /**
+     * Bib Gourmand
+     */
+    BIB_GOURMAND("bib");
+
     @Getter
-    private final int value;
+    private final String value;
 
-    /**
-     * Costruttore privato che associa il valore intero al tipo di premio.
-     *
-     * @param value valore intero rappresentativo del premio
-     */
-    Award(int value) {
+    Award(String value) {
         this.value = value;
-    }
-
-    /**
-     * Restituisce l'istanza `Award` corrispondente al valore intero specificato.
-     * Se il valore non è valido, restituisce `Award.NONE`.
-     *
-     * @param val valore intero
-     * @return valore dell'enum corrispondente oppure `NONE`
-     */
-    public static Award fromInt(int val) {
-        return BY_VALUE.getOrDefault(val, Award.NONE);
-    }
-
-    /**
-     * Restituisce una rappresentazione testuale leggibile del premio.
-     *
-     * @return nome leggibile del premio
-     */
-    @Override
-    public String toString() {
-        switch (value) {
-            case 4 -> {
-                return "Bib Gourmand";
-            }
-            case 5 -> {
-                return "Selected Restaurants";
-            }
-            case 1 -> {
-                return "1 star";
-            }
-            default -> {
-                return value + " stars";
-            }
-        }
     }
 }
