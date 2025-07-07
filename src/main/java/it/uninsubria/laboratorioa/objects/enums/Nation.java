@@ -5,6 +5,9 @@ import lombok.Getter;
 /**
  * Enum che rappresenta le Nazioni supportate dal sistema.
  * Ogni nazione è associata a un codice ISO 3166-1 alpha-2.
+ * <p>
+ * @author Luca Cavagnari
+ * @version 1.0
  */
 @Getter
 public enum Nation {

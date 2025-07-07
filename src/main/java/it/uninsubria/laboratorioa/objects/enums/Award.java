@@ -4,6 +4,9 @@ import lombok.Getter;
 
 /**
  * Enum che rappresenta i premi assegnati ad un ristorante dalla guida Michelin.
+ * <p>
+ * @author Luca Cavagnari
+ * @version 1.0
  */
 public enum Award {
 
