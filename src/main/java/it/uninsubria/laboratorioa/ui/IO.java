@@ -7,6 +7,9 @@ import java.util.Scanner;
  * Contiene metodi statici per leggere input da tastiera, formattare output e gestire menu testuali.<p>
  * Utilizza Scanner per lettura standard input.<p>
  * Supporta formati booleani personalizzati, gestione menu, messaggi di errore e pulizia schermo.
+ * <p>
+ * @author Luca Cavagnari
+ * @version 1.0
  */
 public class IO {
 
@@ -39,7 +42,7 @@ public class IO {
      * @param footer Testo footer opzionale, può essere null
      * @param items  Array di voci menu da stampare
      */
-    public static void printMenu(String title, String footer, String[] items) {
+    public static void printMenu(String title, String footer, String... items) {
         if (items.length == 0) return;
         else if (title != null) System.out.println(title + "\n");
 
