@@ -18,6 +18,58 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class Menus {
 
+    /*
+    Ecco l’elenco essenziale e minimale delle funzioni richieste dal professore, dedotte dalle specifiche e dalla struttura del progetto:
+
+---
+
+# Funzioni Basiche e Minimali Richieste
+
+### 1. **Login Utente**
+
+* Permette a un utente registrato di autenticarsi nel sistema.
+
+### 2. **Registrazione Utente**
+
+* Permette la creazione di un nuovo utente (cliente o proprietario).
+
+### 3. **Ricerca Ristorante**
+
+* Consente la ricerca di ristoranti tramite filtri base (nome, nazione, tipo di cucina).
+
+### 4. **Visualizzazione Dettagli Ristorante**
+
+* Mostra informazioni dettagliate del ristorante selezionato (nome, indirizzo, servizi, recensioni, ecc.).
+
+### 5. **Modifica Dati Ristorante (solo Owner)**
+
+* Permette al proprietario del ristorante di modificare qualsiasi campo del proprio ristorante.
+
+### 6. **Aggiunta Recensione (Cliente)**
+
+* Consente al cliente autenticato di aggiungere una recensione a un ristorante.
+
+### 7. **Modifica e Cancellazione Recensione (Cliente)**
+
+* Permette al cliente di modificare o cancellare le proprie recensioni esistenti.
+
+### 8. **Salvataggio Automatico**
+
+* Tutte le modifiche devono essere automaticamente salvate su file JSON.
+
+---
+
+# Note
+
+* Le operazioni di modifica sono **protette**: solo l’owner può modificare il proprio ristorante, solo il cliente può modificare/cancellare le proprie recensioni.
+* La UI deve gestire chiaramente questi permessi e mostrare solo le opzioni valide.
+* Il sistema deve gestire i dati persistenti in file JSON (salvataggio e caricamento).
+* Errori di input o mancanze devono essere gestite con messaggi semplici all’utente.
+
+---
+
+     */
+
     /**
      * Metodo principale del menu dell'applicazione.
      * <p>

@@ -2,8 +2,20 @@ package it.uninsubria.laboratorioa.ui;
 
 import lombok.experimental.UtilityClass;
 
+
+/**
+ * Classe di utility per la gestione del login e della registrazione utenti.
+ * <p>
+ * Contiene metodi statici per facilitare le operazioni di autenticazione e
+ * gestione degli utenti nel sistema.
+ * </p>
+ *
+ * @author Luca Cavagnari
+ * @version 1.0
+ */
 @UtilityClass
 public class Login {
+    /*
     private static void register() {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
@@ -55,5 +67,7 @@ public class Login {
 
         IO.getUserInput("Registration successful! Press Enter to return to main menu.");
     }
+
+     */
 }
 

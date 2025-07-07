@@ -1,7 +1,7 @@
-import it.uninsubria.laboratorioa.handlers.DataHandler;
+import it.uninsubria.laboratorioa.utils.Loader;
 
 public class LoadTest {
     public static void main(String[] args) {
-        DataHandler.loadFromFile();
+        Loader.loadFromFile();
     }
 }

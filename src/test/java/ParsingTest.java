@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @UtilityClass
-class Generators {
+class Generators extends ParsingTest {
     private static final String CONSONANTS = "bcdfghjklmnpqrstvwxyz";
     private static final String VOWELS = "aeiou";
 

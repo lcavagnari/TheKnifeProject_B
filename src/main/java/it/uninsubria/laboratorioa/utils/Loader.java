@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa.handlers;
+package it.uninsubria.laboratorioa.utils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,7 +12,6 @@ import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import it.uninsubria.laboratorioa.objects.users.Client;
 import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.objects.users.User;
-import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
@@ -33,7 +32,7 @@ import java.util.*;
  * @version 1.0
  */
 @UtilityClass
-public class DataHandler {
+public class Loader {
 
     /**
      * Cartella radice che contiene tutti i dati del sistema.
