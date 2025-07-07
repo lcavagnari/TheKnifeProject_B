@@ -34,7 +34,7 @@ public class IO {
     }
 
     /**
-     * Chiede un input al giocatore (yes/no)
+     * Chiede un input all'utente (yes/no)
      *
      * @param promptMessage Richiesta di input
      * @return Input in formato boolean
@@ -54,7 +54,7 @@ public class IO {
     }
 
     /**
-     * Chiede un input al giocatore (testo)
+     * Chiede un input all'utente (testo)
      *
      * @param promptMessage Richiesta di input
      * @return Input in formato stringa
@@ -69,7 +69,24 @@ public class IO {
 
 
     /**
-     * Chiede un input al giocatore (numero non decimale)
+     * Chiede un input all'utente (testo)
+     *
+     * @param promptMessage Richiesta di input
+     * @param maxLength     Limite massimo di lunghezza
+     * @param minLength     Limite minimo di lunghezza
+     * @return Input in formato stringa
+     */
+    public static String getUserInput(String promptMessage, int minLength, int maxLength) {
+        String input = "";
+        do {
+            input = getUserInput(promptMessage);
+        } while (input.length() < minLength || input.length() > maxLength);
+
+        return input;
+    }
+
+    /**
+     * Chiede un input all'utente (numero non decimale)
      *
      * @param promptMessage Richiesta di input
      * @return Input in formato integer

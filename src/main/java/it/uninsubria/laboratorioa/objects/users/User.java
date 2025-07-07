@@ -45,16 +45,19 @@ public abstract class User extends JsonEntity {
 
          */
 
+
         //this.dateOfBirth = birth;
         this.dateOfBirth = dateOfBirth;
         build();
     }
 
     public User(String username, String name, String lastName, Location location, LocalDate dateOfBirth, String password, String salt) {
-        this.username = (username == null || username.length() < 4) ? "user" : username.substring(0, 16);
+        this.username = (username == null || username.length() < 4) ? null : username.substring(0, 16);
         this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
-        this.lastName = (lastName == null || lastName.length() < 4) ? "nome" : lastName.substring(0, 24);
-        this.hasher = new PasswordHasher(password, salt);
+        this.lastName = (lastName == null || lastName.length() < 4) ? null : lastName.substring(0, 24);
+
+        if (salt != null) this.hasher = new PasswordHasher(password, salt);
+        else this.hasher = new PasswordHasher(password);
 
         this.location = location;
 
@@ -64,9 +67,15 @@ public abstract class User extends JsonEntity {
         }
 
         this.dateOfBirth = birth;
+
+
         build();
     }
 
+    public boolean verifyPassword(String other) {
+        if (other == null || other.length() < 8) return false;
+        else return hasher.verify(other.toCharArray());
+    }
 
     @Override
     protected void build() {
@@ -157,6 +166,7 @@ public abstract class User extends JsonEntity {
 
             String attemptHash = run(attempt, saltBytes);
             Arrays.fill(attempt, '\0');
+
             return Objects.equals(pHash, attemptHash);
         }
     }

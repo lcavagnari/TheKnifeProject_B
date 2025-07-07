@@ -1,15 +1,14 @@
 package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.objects.users.User;
-import it.uninsubria.laboratorioa.utils.Constants;
 import lombok.Getter;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
 public class Review extends JsonEntity {
-    private final LocalDate timestamp;
+    private final LocalDateTime timestamp;
     private final Restaurant restaurant;
     private final User user;
 
@@ -17,7 +16,7 @@ public class Review extends JsonEntity {
     private String text;
     private String reply;
 
-    public Review(Restaurant restaurant, User user, int value, LocalDate timestamp, String text) {
+    public Review(Restaurant restaurant, User user, int value, LocalDateTime timestamp, String text, String reply) {
         super(UUID.randomUUID());
         this.timestamp = timestamp;
         this.restaurant = restaurant;
@@ -25,6 +24,20 @@ public class Review extends JsonEntity {
 
         this.value = value;
         this.text = text;
+        this.reply = reply;
+
+        build();
+    }
+
+    public Review(Restaurant restaurant, User user, int value, LocalDateTime timestamp, String text) {
+        super(UUID.randomUUID());
+        this.timestamp = timestamp;
+        this.restaurant = restaurant;
+        this.user = user;
+
+        this.value = value;
+        this.text = text;
+        this.reply = null;
 
         build();
     }
@@ -35,7 +48,7 @@ public class Review extends JsonEntity {
         this.value = value;
         this.text = text;
 
-        this.timestamp = LocalDate.now();
+        this.timestamp = LocalDateTime.now();
     }
 
     public void setValue(int value) {
@@ -61,9 +74,8 @@ public class Review extends JsonEntity {
 
     @Override
     protected void build() {
-        this.jsonObject.put("timestamp", Constants.TIMESTAMP_FORMAT.format(timestamp))
+        this.jsonObject.put("timestamp", timestamp.toString())
                 .put("user", user.getId().toString())
-                .put("restaurant", restaurant.getId().toString())
                 .put("value", value)
                 .put("text", text)
                 .put("reply", reply);

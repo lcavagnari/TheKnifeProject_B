@@ -45,7 +45,7 @@ public class DataHandler {
 
     private void loadRestaurants(File[] rFiles) {
         if (rFiles == null) return;
-        
+
         for (File f : rFiles) {
             try {
                 ObjectMapper mapper = new ObjectMapper();
@@ -78,7 +78,7 @@ public class DataHandler {
                         locNode.path("latitude").asDouble(),
                         locNode.path("longitude").asDouble(),
                         locNode.path("address").asText()
-                        );
+                );
 
                 // === Price Range ===
                 String price = jsonNode.get("priceRange").asText();
@@ -89,7 +89,8 @@ public class DataHandler {
                 for (JsonNode node : jsonNode.path("cuisinesTypes")) {
                     try {
                         cuisines.add(CuisineType.valueOf(node.asText().toUpperCase()));
-                    } catch (IllegalArgumentException ignored) {}
+                    } catch (IllegalArgumentException ignored) {
+                    }
                 }
 
                 // === Services ===
@@ -128,7 +129,7 @@ public class DataHandler {
 
                     String reply = node.get("reply").asText();
 
-                    Review r = new Review(restaurant,usersById.get(uId),value, time,text, reply);
+                    Review r = new Review(restaurant, usersById.get(uId), value, time, text, reply);
                     restaurant.addReview(r);
                 }
 
@@ -141,7 +142,7 @@ public class DataHandler {
                 continue;
             }
         }
-        
+
     }
 
     private void loadUsers(File[] uFiles) {
@@ -191,16 +192,16 @@ public class DataHandler {
                     }
 
                     user = new Client(
-                            username,passwordHash,salt,
-                            name,lastName,
-                            loc,dateOfBirth,
+                            username, passwordHash, salt,
+                            name, lastName,
+                            loc, dateOfBirth,
                             favourites
-                            );
+                    );
                 }
 
 
-                usersById.put(UUID.fromString(id),user);
-                usersByName.put(username,user);
+                usersById.put(UUID.fromString(id), user);
+                usersByName.put(username, user);
 
             } catch (IOException | IllegalArgumentException e) {
                 System.err.println("ERROR while parsing " + f.getName() + ", cause:" + e.getMessage());

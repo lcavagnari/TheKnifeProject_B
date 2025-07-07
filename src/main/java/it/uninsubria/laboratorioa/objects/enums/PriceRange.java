@@ -29,6 +29,7 @@ public enum PriceRange {
         this.maxPrice = maxPrice;
     }
 
+
     public static PriceRange byDollarAmount(int amount) {
         return SYMBOL_MAP.getOrDefault(amount, MODERATE);
     }

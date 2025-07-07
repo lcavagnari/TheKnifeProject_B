@@ -33,7 +33,7 @@ public class Restaurant extends JsonEntity {
     private final boolean hasOnlineBooking;
     private final Award award;
     private final boolean greenStar;
-    private String name;
+    private final String name;
 
     public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location loc, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes,
@@ -102,6 +102,7 @@ public class Restaurant extends JsonEntity {
                 .put("name", name)
                 .put("address", description)
                 .put("phone", phone)
+                .put("priceRange", priceRange.getSymbol())
                 .put("award", award.getValue())
                 .put("greenStar", greenStar);
 
@@ -120,18 +121,12 @@ public class Restaurant extends JsonEntity {
         jsonObject.set("reviews", reviewsArray);
     }
 
-    public boolean setName(String newName) {
-        if (newName == null || newName.isBlank()) return false;
-        this.name = newName;
-        rebuild();
-        return true;
-    }
 
     public void addReview(Review r) {
         if (r == null || reviews.containsValue(r)) return;
         reviews.put(r.id, r);
         reviewsArray.add(r.jsonObject);
-        rebuild();
+
     }
 
     public void removeReview(Review r) {
@@ -139,7 +134,7 @@ public class Restaurant extends JsonEntity {
         reviews.remove(r.id);
         reviewsArray.removeAll();
         reviews.values().forEach(rv -> reviewsArray.add(rv.jsonObject));
-        rebuild();
+        build();
     }
 
     @Override
