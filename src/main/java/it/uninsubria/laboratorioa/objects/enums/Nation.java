@@ -264,7 +264,7 @@ public enum Nation {
     /**
      * Turchia
      */
-    TÜRKIYE("TR"),
+    TURKIYE("TR"),
     /**
      * USA
      */

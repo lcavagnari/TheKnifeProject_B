@@ -372,7 +372,7 @@ public enum CuisineType {
     /** Cucina portoghese */
     PORTUGUESE,
     /** Cucina provenzale francese */
-    PROVENÇAL,
+    PROVENCAL,
     /** Cucina portoricana */
     PUERTO_RICAN,
     /** Pesce palla */
@@ -430,7 +430,7 @@ public enum CuisineType {
     /** Piccoli piatti */
     SMALL_EATS,
     /** Smørrebrød – cucina danese */
-    SMØRREBRØD,
+    SMORREBRED,
     /** Soba – tipo di noodle giapponesi */
     SOBA,
     /** Cucina sudafricana */
