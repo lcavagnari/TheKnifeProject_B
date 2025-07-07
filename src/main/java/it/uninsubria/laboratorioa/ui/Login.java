@@ -55,6 +55,5 @@ public class Login {
 
         IO.getUserInput("Registration successful! Press Enter to return to main menu.");
     }
-
 }
 

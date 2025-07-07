@@ -1,7 +1,6 @@
 package it.uninsubria.laboratorioa.ui;
 
 public class Menus {
-
     public static void mainMenu() {
         while (true) {
             IO.clearScreen();
@@ -138,5 +137,4 @@ public class Menus {
         System.out.println("Goodbye!");
         System.exit(0);
     }
-
 }
