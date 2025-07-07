@@ -240,7 +240,7 @@ Per contribuire al progetto:
 ---  
 ## 📄 Licenza
 
-Questo progetto è rilasciato sotto licenza MIT. Consultare il file `LICENSE` per i dettagli.
+Questo progetto è rilasciato sotto licenza MIT. Consultare il file [`LICENSE`](LICENSE) per i dettagli.
   
 ---  
 
