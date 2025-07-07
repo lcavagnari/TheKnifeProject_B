@@ -5,6 +5,25 @@
 *.zip
 
 
+
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+/material_theme_project_new.xml
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+### IntelliJ IDEA ###
+*.iws
+*.iml
+*.ipr
 target/*
 ./target
 ./out
@@ -14,3 +33,33 @@ target/*
 .idea/libraries/
 /dependency-reduced-pom.xml
 /.idea/git_toolbox_prj.xml
+
+
+### Eclipse ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### VS Code ###
+.vscode/
+
+### Mac OS ###
+.DS_Store
+/encodings.xml
+/jarRepositories.xml
+/modules.xml
+/compiler.xml
