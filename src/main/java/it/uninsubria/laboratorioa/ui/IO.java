@@ -169,13 +169,13 @@ public class IO {
     }
 
     /**
-     * Stampa messaggio di successo formattato in ciano.
+     * Stampa messaggio di successo formattato in verde.
      *
      * @param msg Messaggio di successo
      */
     public static void printSuccessrMessage(String msg) {
         if (msg == null) return;
-        System.out.print("\n" + IO.replaceText(36, "! ") + msg);
+        System.out.print("\n" + IO.replaceText(32, "! ") + msg);
     }
 
     /**
