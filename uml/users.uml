@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>it.uninsubria.laboratorioa.objects.users</OriginalElement>
+  <nodes>
+    <node x="-233.0" y="1060.0">it.uninsubria.laboratorioa.objects.enums.PriceRange</node>
+    <node x="47.0" y="1060.0">it.uninsubria.laboratorioa.objects.enums.Nation</node>
+    <node x="424.0" y="1060.0">it.uninsubria.laboratorioa.objects.enums.CuisineType</node>
+    <node x="934.0" y="626.0">it.uninsubria.laboratorioa.objects.Review</node>
+    <node x="60.0" y="314.0">it.uninsubria.laboratorioa.objects.users.Client</node>
+    <node x="497.0" y="381.0">it.uninsubria.laboratorioa.objects.Restaurant</node>
+    <node x="20.0" y="696.0">it.uninsubria.laboratorioa.objects.users.User</node>
+    <node x="20.0" y="40.0">it.uninsubria.laboratorioa.objects.Location</node>
+    <node x="60.0" y="482.0">it.uninsubria.laboratorioa.objects.users.Owner</node>
+    <node x="236.0" y="1060.0">it.uninsubria.laboratorioa.objects.enums.Award</node>
+    <node x="-222.0" y="736.0">it.uninsubria.laboratorioa.objects.JsonEntity</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="it.uninsubria.laboratorioa.objects.users.Client" target="it.uninsubria.laboratorioa.objects.users.User" relationship="GENERALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="270.0" y="472.0" />
+      <point x="25.0" y="472.0" />
+      <point x="25.0" y="676.0" />
+      <point x="-206.0" y="-0.0" />
+    </edge>
+    <edge source="it.uninsubria.laboratorioa.objects.users.Owner" target="it.uninsubria.laboratorioa.objects.users.User" relationship="GENERALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="273.5" y="676.0" />
+      <point x="25.0" y="676.0" />
+      <point x="-206.0" y="-0.0" />
+    </edge>
+    <edge source="it.uninsubria.laboratorioa.objects.Restaurant" target="it.uninsubria.laboratorioa.objects.JsonEntity" relationship="GENERALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="710.5" y="995.0" />
+      <point x="0.0" y="995.0" />
+      <point x="0.0" y="1010.0" />
+      <point x="0.0" y="134.5" />
+    </edge>
+    <edge source="it.uninsubria.laboratorioa.objects.Location" target="it.uninsubria.laboratorioa.objects.JsonEntity" relationship="GENERALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="200.5" y="304.0" />
+      <point x="0.0" y="304.0" />
+      <point x="0.0" y="1010.0" />
+      <point x="0.0" y="134.5" />
+    </edge>
+    <edge source="it.uninsubria.laboratorioa.objects.users.User" target="it.uninsubria.laboratorioa.objects.JsonEntity" relationship="GENERALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="231.0" y="995.0" />
+      <point x="0.0" y="995.0" />
+      <point x="0.0" y="1010.0" />
+      <point x="0.0" y="134.5" />
+    </edge>
+    <edge source="it.uninsubria.laboratorioa.objects.Review" target="it.uninsubria.laboratorioa.objects.JsonEntity" relationship="GENERALIZATION">
+      <point x="0.0" y="-0.0" />
+      <point x="1155.0" y="995.0" />
+      <point x="0.0" y="995.0" />
+      <point x="0.0" y="1010.0" />
+      <point x="0.0" y="134.5" />
+    </edge>
+  </edges>
+  <settings layout="Compact" zoom="0.6359143327841845" showDependencies="false" x="587.0" y="647.0" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

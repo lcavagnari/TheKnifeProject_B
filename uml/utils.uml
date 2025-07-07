@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>it.uninsubria.laboratorioa.utils</OriginalElement>
+  <nodes>
+    <node x="-67.0" y="380.0">it.uninsubria.laboratorioa.utils.Constants</node>
+    <node x="-67.0" y="-15.0">it.uninsubria.laboratorioa.utils.Loader</node>
+  </nodes>
+  <notes />
+  <edges />
+  <settings layout="Wide" zoom="1.5" showDependencies="false" x="122.5" y="226.5" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+    <Category>Properties</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
