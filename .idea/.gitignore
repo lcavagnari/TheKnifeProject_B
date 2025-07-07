@@ -13,14 +13,12 @@ target/
 !**/src/test/**/target/
 
 ### IntelliJ IDEA ###
-.idea/modules.xml
-.idea/misc.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
+.idea/*
 .idea/libraries/
 *.iws
 *.iml
 *.ipr
+
 
 ### Eclipse ###
 .apt_generated
@@ -46,8 +44,6 @@ build/
 
 ### Mac OS ###
 .DS_Store
-/data/companies/
-/.idea/encodings.xml
 /encodings.xml
 /jarRepositories.xml
 /modules.xml

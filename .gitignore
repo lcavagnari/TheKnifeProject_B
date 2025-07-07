@@ -4,14 +4,13 @@
 *.jar
 *.zip
 
+
 target/*
 ./target
 ./out
 
-.idea/modules.xml
-.idea/misc.xml
-.idea/jarRepositories.xml
-.idea/compiler.xml
+.idea/
+.idea/*
 .idea/libraries/
 /dependency-reduced-pom.xml
-/.idea/artifacts/TheKnifeProject_jar.xml
+/.idea/git_toolbox_prj.xml
