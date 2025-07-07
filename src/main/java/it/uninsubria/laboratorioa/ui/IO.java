@@ -39,7 +39,7 @@ public class IO {
      * @param footer Testo footer opzionale, può essere null
      * @param items  Array di voci menu da stampare
      */
-    public static void printMenu(String title, String footer, String[] items) {
+    public static void printMenu(String title, String footer, String... items) {
         if (items.length == 0) return;
         else if (title != null) System.out.println(title + "\n");
 

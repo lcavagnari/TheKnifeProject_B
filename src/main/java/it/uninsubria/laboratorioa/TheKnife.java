@@ -1,7 +1,9 @@
 package it.uninsubria.laboratorioa;
 
+import it.uninsubria.laboratorioa.ui.Menus;
+
 public class TheKnife {
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
+        Menus.mainMenu();
     }
 }

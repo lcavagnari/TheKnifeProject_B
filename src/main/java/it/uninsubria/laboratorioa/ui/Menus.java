@@ -1,10 +1,35 @@
 package it.uninsubria.laboratorioa.ui;
 
+import lombok.experimental.UtilityClass;
+
+/**
+ * Classe che gestisce i menu principali dell'applicazione.
+ * <p>
+ * Contiene metodi statici per la navigazione dell'interfaccia utente,
+ * come login, registrazione, ricerca di ristoranti e gestione preferiti.
+ * <p>
+ * Tutti i metodi sono attualmente commentati e servono come struttura
+ * base per l'implementazione futura dell'interfaccia.
+ * </p>
+ *
+ * @author Luca Cavagnari
+ * @version 1.0
+ */
+@UtilityClass
 public class Menus {
+
+    /**
+     * Metodo principale del menu dell'applicazione.
+     * <p>
+     * Mostra un menu con le opzioni di login, registrazione,
+     * ricerca di ristoranti e uscita.
+     * <p>
+     * Al momento, le azioni sono segnaposto (WIP).
+     */
     public static void mainMenu() {
         while (true) {
             IO.clearScreen();
-            IO.printMenu("Welcome to the Restaurant App", "Choose an option:",
+            IO.printMenu("Welcome to the The Knife", "Choose an option:",
                     "Login",
                     "Register",
                     "Search for a Restaurant",
@@ -12,14 +37,33 @@ public class Menus {
             int choice = IO.getInt("Enter choice:", 4);
 
             switch (choice) {
-                case 0 -> login();
-                case 1 -> register();
-                case 2 -> searchRestaurant();
+                case 0 -> System.out.println("WIP");
+                case 1 -> System.out.println("WIP 2");
+                case 2 -> System.out.println("WIP 3");
                 case 3 -> exit();
             }
+        /*
+        switch (choice) {
+            case 0 -> login();
+            case 1 -> register();
+            case 2 -> searchRestaurant();
+            case 3 -> exit();
+        }
+         */
         }
     }
 
+    /**
+     * Metodo che termina l'applicazione stampando un messaggio di saluto.
+     */
+    private static void exit() {
+        IO.clearScreen();
+        System.out.println("Goodbye!");
+        System.exit(0);
+    }
+
+
+    /*
     private static void login() {
         IO.clearScreen();
         String username = IO.getUserInput("Enter username:");
@@ -131,10 +175,5 @@ public class Menus {
             viewRestaurantDetails(favourites.get(choice));
         }
     }
-
-    private static void exit() {
-        IO.clearScreen();
-        System.out.println("Goodbye!");
-        System.exit(0);
-    }
+     */
 }
