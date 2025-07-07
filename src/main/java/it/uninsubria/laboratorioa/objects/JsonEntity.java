@@ -18,7 +18,7 @@ import java.util.UUID;
  * Fornisce metodi per salvare, ricostruire e rappresentare l'entità.<p>
  * Utilizza {@link ObjectMapper} configurato per serializzazione e deserializzazione sicura.<p>
  * <p>
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 public abstract class JsonEntity {

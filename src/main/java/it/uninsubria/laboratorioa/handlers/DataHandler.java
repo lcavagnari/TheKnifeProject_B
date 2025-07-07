@@ -29,7 +29,7 @@ import java.util.*;
  * Gestisce la deserializzazione delle entità `User`, `Owner`, `Client` e `Restaurant` e
  * le inserisce in strutture dati statiche per un accesso efficiente tramite ID, nome o proprietario.
  * <p>
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 @UtilityClass

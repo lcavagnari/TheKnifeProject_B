@@ -11,7 +11,7 @@ import java.util.Map;
  * <p>
  * Ogni valore è associato a un intero che rappresenta il codice persistente.
  * <p>
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 public enum Award {

@@ -15,7 +15,7 @@ import java.util.UUID;
  * Fornisce metodi per aggiungere e rimuovere ristoranti preferiti.<p>
  * Estende la classe {@link User} aggiungendo funzionalità specifiche del cliente.<p>
  *
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 public class Client extends User {

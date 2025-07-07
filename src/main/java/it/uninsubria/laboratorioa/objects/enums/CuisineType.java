@@ -8,7 +8,7 @@ package it.uninsubria.laboratorioa.objects.enums;
  * <p>
  * Nota: i valori di questo enum vengono utilizzati per la serializzazione/deserializzazione e il filtraggio.
  * <p>
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 public enum CuisineType {

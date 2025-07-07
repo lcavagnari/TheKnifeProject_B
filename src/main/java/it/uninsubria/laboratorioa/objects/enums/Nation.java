@@ -7,7 +7,7 @@ import lombok.Getter;
  * Utilizzato per localizzazioni e identificazioni di nazionalità.<p>
  * Alcune voci rappresentano regioni o città speciali con codice ISO approssimato.<p>
  *
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 @Getter

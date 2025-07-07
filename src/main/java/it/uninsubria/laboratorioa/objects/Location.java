@@ -9,7 +9,7 @@ import lombok.Setter;
  * Estende {@link JsonEntity} per serializzazione JSON e salvataggio.<p>
  * Contiene latitudine e longitudine per la localizzazione precisa.<p>
  * <p>
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 @Getter

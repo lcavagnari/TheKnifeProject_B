@@ -21,7 +21,7 @@ import java.util.Objects;
  * Gestisce la sicurezza della password tramite hashing e salting.<p>
  * Estende {@link JsonEntity} per la serializzazione JSON.<p>
  * <p>
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 @Getter

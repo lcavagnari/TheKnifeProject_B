@@ -14,7 +14,7 @@ import java.util.Set;
  * Fornisce metodi per aggiungere e rimuovere ristoranti.<p>
  * Estende la classe {@link User} aggiungendo funzionalità specifiche del proprietario.<p>
  *
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 @Getter

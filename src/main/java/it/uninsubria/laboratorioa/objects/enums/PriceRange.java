@@ -11,7 +11,7 @@ import java.util.Map;
  * Ogni fascia ha un intervallo di prezzo e un simbolo associato per rappresentazione testuale.<p>
  * Metodo statico permette di ottenere la fascia in base al numero di simboli '$'.<p>
  *
- * Autore: Luke
+ * @author Luca Cavagnari
  * @version 1.0
  */
 @Getter
