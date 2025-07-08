@@ -81,6 +81,7 @@ public class IO {
      * @return Stringa inserita dall'utente
      */
     public static String getMenuUserInput(String promptMessage) {
+        INPUT.nextLine();
         System.out.print(IO.replaceText(32, "> ") + promptMessage);
         while (!INPUT.hasNext()) INPUT.nextLine();
 

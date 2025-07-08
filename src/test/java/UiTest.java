@@ -7,8 +7,6 @@ import java.util.Set;
 public class UiTest {
 
     public static void main(String[] args) {
-        //new GuestMenus().openMenu();
-
-        IO.getLocationInput(false);
+        new GuestMenus().openMenu();
     }
 }

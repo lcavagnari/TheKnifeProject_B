@@ -65,7 +65,12 @@ public class Login {
             }
         }
 
-        Location location = IO.getLocationInput(true);
+        Location location = null;
+        try {
+            location = IO.getLocationInput(true);
+        } catch (AbortOperationException ignored) {
+
+        }
 
         LocalDate dateOfBirth = null;
         while (dateOfBirth == null) {
