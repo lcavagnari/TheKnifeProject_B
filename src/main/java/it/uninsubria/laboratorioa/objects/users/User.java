@@ -3,6 +3,7 @@ package it.uninsubria.laboratorioa.objects.users;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratorioa.objects.JsonEntity;
 import it.uninsubria.laboratorioa.objects.Location;
+import it.uninsubria.laboratorioa.objects.enums.UserRole;
 import it.uninsubria.laboratorioa.utils.IO;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -297,5 +298,5 @@ public abstract class User extends JsonEntity {
         }
     }
 
-    public abstract String getRole();
+    public abstract UserRole getRole();
 }

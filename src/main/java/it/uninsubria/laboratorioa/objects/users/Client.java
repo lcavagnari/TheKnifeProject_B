@@ -3,6 +3,7 @@ package it.uninsubria.laboratorioa.objects.users;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.Restaurant;
+import it.uninsubria.laboratorioa.objects.enums.UserRole;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -145,7 +146,7 @@ public class Client extends User {
     }
 
     @Override
-    public String getRole() {
-        return "client";
+    public UserRole getRole() {
+        return UserRole.CLIENT;
     }
 }

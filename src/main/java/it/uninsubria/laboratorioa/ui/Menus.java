@@ -2,6 +2,7 @@ package it.uninsubria.laboratorioa.ui;
 
 import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.Review;
+import it.uninsubria.laboratorioa.objects.enums.UserRole;
 import it.uninsubria.laboratorioa.objects.users.User;
 import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
 import it.uninsubria.laboratorioa.utils.IO;
@@ -93,20 +94,14 @@ public class Menus {
         while (true) {
             IO.clearScreen();
 
-            String[] defaultOptions = new String[] {"Login",
-                    "Register",
-                    "Search for a Restaurant",
-                    "Browse Restaurants",
-                    "Exit"};
-
-            if (user != null) {
-                // Inserisci azioni utenti
-                // "Search for a Restaurant", "View Favourites", "Logout"
-            }
-
             IO.printMenu(
                     "\n|============= The Knife Main menu =============|",
                     "|===================================================|",
+                    "Login",
+                    "Register",
+                    "Search for a Restaurant",
+                    "Browse Restaurants",
+                    "Exit"
                     );
             int choice = IO.getInt("Enter choice:", 4);
 
@@ -188,6 +183,8 @@ public class Menus {
         IO.getUserInput("[REGISTER] Feature not yet implemented. Press enter to continue.");
     }
 
+
+
     private static void searchRestaurant() {
         IO.clearScreen();
         String name = IO.getUserInput("Enter restaurant name:");
@@ -234,7 +231,17 @@ public class Menus {
     private static void userMenu(User user) {
         while (true) {
             IO.clearScreen();
-
+    /*
+                if (user != null) {
+                if (user.getRole().equals(UserRole.CLIENT)) {
+                    // Inserisci azioni utenti
+                    // "Search for a Restaurant", "View Favourites", "Logout"
+                } else {
+                    // Inserisci azioni owner
+                    // "Search for a Restaurant", "views owned restaurants", "view latest reviews (chronological order of last week)", "Logout"
+                }
+            }
+     */
 
             int choice = IO.getInt("Enter choice:", 3);
 

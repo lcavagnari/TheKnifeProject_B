@@ -4,6 +4,7 @@ import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.enums.Award;
 import it.uninsubria.laboratorioa.objects.enums.PriceRange;
+import it.uninsubria.laboratorioa.objects.enums.UserRole;
 import lombok.Getter;
 
 import java.time.LocalDate;
@@ -178,7 +179,7 @@ public class Owner extends User {
 
 
     @Override
-    public String getRole() {
-        return "owner";
+    public UserRole getRole() {
+        return UserRole.OWNER;
     }
 }
