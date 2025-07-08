@@ -2,14 +2,11 @@ package it.uninsubria.laboratorioa.ui;
 
 import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.Review;
-import it.uninsubria.laboratorioa.objects.enums.Award;
-import it.uninsubria.laboratorioa.objects.enums.CuisineType;
-import it.uninsubria.laboratorioa.objects.enums.Nation;
-import it.uninsubria.laboratorioa.objects.enums.PriceRange;
+import it.uninsubria.laboratorioa.objects.users.User;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Scanner;
+import java.util.UUID;
 
 /**
  * Classe di utilità per Input/Output da console.<p>
@@ -169,6 +166,17 @@ public class IO {
         return Math.max(sel - 1, 0);
     }
 
+
+    /**
+     * Richiede e interpreta un valore Enum da input utente.<p>
+     * Valori inseriti vengono normalizzati in MAIUSCOLO e con spazi sostituiti da underscore.
+     *
+     * @param enumType Classe dell'enum da parsare
+     * @param promptMessage Messaggio di richiesta all'utente
+     * @param <T> Tipo Enum da restituire
+     * @return Istanza Enum parsata da input
+     * @throws IllegalArgumentException se il valore inserito non è tra quelli accettati
+     */
     public static <T extends Enum<T>> T parseEnum(Class<T> enumType, String promptMessage) {
         String input = getUserInput(promptMessage);
 
@@ -182,9 +190,26 @@ public class IO {
     }
 
 
+    public static UUID parseUUID(String uuid) {
+        try {
+            return UUID.fromString(uuid);
+        } catch (IllegalArgumentException ignored) {
+            return null;
+        }
+    }
+
 
     // Validators
 
+
+    /**
+     * Verifica uno o più valori stringa rispetto a un pattern regex, sollevando eccezioni in caso di input non valido.
+     *
+     * @param regex Pattern per la verifica
+     * @param values Valori stringa da validare
+     * @return true se tutti i valori sono validi
+     * @throws IllegalArgumentException se uno o più valori sono null, vuoti o non corrispondenti alla regex
+     */
     public static boolean validateString(final String regex, String... values)  {
         for (String s : values) {
             if (s == null || s.isBlank())
@@ -197,7 +222,13 @@ public class IO {
     }
 
 
-
+    /**
+     * Verifica l'oggetto Location e i suoi campi, verificandone non nullità e limiti geografici corretti.
+     *
+     * @param loc Oggetto Location da validare
+     * @return true se la location è valida
+     * @throws IllegalArgumentException se uno dei campi è nullo o fuori dai limiti accettati
+     */
     public static boolean validateLocation(Location loc) {
         if (loc == null)
             throw new IllegalArgumentException("Impossibile determinare posizione, riprovare più tardi");
@@ -222,38 +253,52 @@ public class IO {
 
 
     /**
-     * Validates one or more dates for non-nullity and temporal correctness (no future dates).
-     * Throws IllegalArgumentException with precise message upon violation.
+     * Verifica una data, verificando non nullità e che rientri in un intervallo temporale specificato.
      *
-     * @param dates Varargs LocalDateTime[] dates to validate
-     * @return true if all dates are valid
-     * @throws IllegalArgumentException if:
-     *    - input array is null or empty
-     *    - any date is null
-     *    - any date is in the future compared to now
+     * @param max Data massima accettabile (inclusa)
+     * @param min Data minima accettabile (inclusa)
+     * @param date Data da validare
+     * @return true se la data è valida
+     * @throws IllegalArgumentException se la data è nulla o fuori dall'intervallo [min, max]
      */
-    public static boolean validateDates(LocalDateTime max, LocalDateTime min,LocalDateTime... dates) {
-        if (dates == null || dates.length == 0) {
+    public static boolean validateDates(LocalDateTime max, LocalDateTime min, LocalDateTime date) {
+        if (date == null)
             throw new IllegalArgumentException("Impossibile verificare data, riprovare più tardi");
-        }
 
-        for (LocalDateTime date : dates) {
-            if (date == null)
-                throw new IllegalArgumentException("Impossibile determinare data, riprovare");
-
-            if (date.isAfter(max) || date.isBefore(min))
-                throw new IllegalArgumentException("Data fuori da intervalli accettabili ("+max.toString()+"), riprovare");
-        }
+        if (date.isAfter(max) || date.isBefore(min))
+            throw new IllegalArgumentException("Data fuori da intervalli accettabili ("+max.toString()+"), riprovare");
 
         return true;
     }
 
-    public static boolean validateDates(LocalDateTime... dates) {
-        return validateDates(LocalDateTime.MAX,LocalDateTime.MIN,dates);
+    public static boolean validateDates(LocalDateTime date) {
+        return validateDates(LocalDateTime.MAX,LocalDateTime.MIN,date);
     }
 
+    /**
+     * Verifica la validità dell'id
+     * @param id
+     * @return
+     */
+    public static boolean validateUUID(UUID id) {
+        if (id == null)
+            throw new IllegalArgumentException("Impossibile ottenere id utente, riprovare più tardi");
 
-    public static void validateReview(Review r) {
+        return true;
+    }
+
+    /**
+     * Validates one or more dates for non-nullity and temporal correctness (no future dates).
+     * Throws IllegalArgumentException with precise message upon violation.
+     *
+     * @param r Varargs LocalDateTime[] dates to validate
+     * @return true if all dates are valid
+     * @throws IllegalArgumentException if:
+     *                                  - input array is null or empty
+     *                                  - any date is null
+     *                                  - any date is in the future compared to now
+     */
+    public static boolean validateReview(Review r) {
         if (r == null)
             throw new IllegalArgumentException("Recensione non può essere nulla.");
 
@@ -261,10 +306,36 @@ public class IO {
         if (r.getValue() < 1 || r.getValue() > 5)
             throw new IllegalArgumentException("Valutazione deve essere compresa tra 1 e 5.");
 
+        validateUUID(r.getId());
         validateString("^[\\p{L}0-9 \\-']{4,200}$",r.getText(),r.getReply());
         validateDates(r.getTimestamp());
+        return false;
     }
 
+
+    /**
+     * Verifica un utente controllando i campi obbligatori e formati corretti.
+     *
+     * @param user Utente da validare
+     * @return true se l'utente è valido
+     * @throws IllegalArgumentException se l'utente è nullo o i campi non rispettano i vincoli
+     */
+    public static boolean validateUser(User user) {
+        if (user == null)
+            throw new IllegalArgumentException("Impossibile ottenere utente, riprovare più tardi");
+
+        validateUUID(user.getId());
+
+        validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName(),user.getName());
+
+        validateString("^[a-zA-Z][\\w.]{1,14}[a-zA-Z0-9]$",user.getUsername());
+
+        validateLocation(user.getLocation());
+
+        validateDates(LocalDateTime.MIN,LocalDateTime.now(), user.getDateOfBirth().atStartOfDay());
+
+        return true;
+    }
 
 
 

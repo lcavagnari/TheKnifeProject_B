@@ -107,7 +107,7 @@ public abstract class User extends JsonEntity {
      * @param salt salt usato nell'hash
      */
     public User(String username, String name, String lastName, Location location, LocalDate dateOfBirth, String password, String salt) {
-        this.username = (username == null || username.length() < 4) ? null : username.substring(0, 16);
+        this.username = (username == null || username.length() < 3) ? null : username.substring(0, 16);
         this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
         this.lastName = (lastName == null || lastName.length() < 4) ? null : lastName.substring(0, 24);
 

@@ -115,6 +115,8 @@ public class Menus {
     private static void exit() {
         IO.clearScreen();
         System.out.println("Goodbye!");
+
+        IO.closeScanner();
         System.exit(0);
     }
 
