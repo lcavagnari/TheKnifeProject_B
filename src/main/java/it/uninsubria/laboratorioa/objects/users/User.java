@@ -121,9 +121,9 @@ public abstract class User extends JsonEntity {
 
         this.location = location;
 
-        LocalDate birth = (dateOfBirth == null) ? LocalDate.MIN : dateOfBirth;
+        LocalDate birth = (dateOfBirth == null) ? LocalDate.now().minusDays(1) : dateOfBirth;
         if (dateOfBirth.isBefore(LocalDate.MIN) || dateOfBirth.isAfter(LocalDate.now().plusDays(1))) {
-            birth = LocalDate.MIN;
+            birth = LocalDate.now().minusDays(1);
         }
 
         this.dateOfBirth = birth;

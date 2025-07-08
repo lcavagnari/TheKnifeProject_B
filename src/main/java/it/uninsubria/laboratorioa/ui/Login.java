@@ -11,7 +11,6 @@ import lombok.experimental.UtilityClass;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-
 /**
  * Classe di utility per la gestione del login e della registrazione utenti.
  * <p>
@@ -25,65 +24,54 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class Login {
 
-
-
     public static User register() {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
 
-        boolean isOWner = IO.getBooleanInput("Benvenuto! sei un gestore o un cliente? [Si - Gestore, No - Cliente]: ");
+        boolean isOwner = IO.getBooleanInput("Benvenuto! Sei un gestore o un cliente? [Sì - Gestore, No - Cliente]:");
 
         String username = null;
         while (username == null) {
             try {
-                username = IO.getUserInput("Enter desired username (min 4 chars):").trim();
+                username = IO.getUserInput("Scegli un nome utente [4-16 caratteri]:").trim();
                 if (Loader.getUsersByName().containsKey(username))
                     throw new IllegalArgumentException("Username non disponibile");
 
-                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", username);
+                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{3,39}$", username);
             } catch (IllegalArgumentException ex) {
                 username = null;
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
-                IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
+                IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? " Reason: " + e.getReason() : ""));
                 return null;
             }
         }
 
-
-        String firstName = null;
-        String lastName = null;
+        String firstName = null, lastName = null;
         while (firstName == null || lastName == null) {
             try {
-                firstName = IO.getUserInput("Enter desired username (min 4 chars):").trim();
-                lastName = IO.getUserInput("Enter desired username (min 4 chars):").trim();
+                firstName = IO.getUserInput("Inserisci il tuo nome:").trim();
+                lastName = IO.getUserInput("Inserisci il tuo cognome:").trim();
 
                 IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", firstName);
                 IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", lastName);
-
             } catch (IllegalArgumentException ex) {
                 firstName = null;
                 lastName = null;
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
-                IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
+                IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? " Reason: " + e.getReason() : ""));
                 return null;
             }
         }
 
-
         Location location = IO.getLocationInput(true);
-
 
         LocalDate dateOfBirth = null;
         while (dateOfBirth == null) {
             try {
-                dateOfBirth = LocalDate.parse(
-                        IO.getUserInput("Inserisci la tua data di nascita (YYYY-MM-DD)")
-                );
-
+                dateOfBirth = LocalDate.parse(IO.getUserInput("Inserisci la tua data di nascita (YYYY-MM-DD):"));
                 IO.validateDates(LocalDateTime.MIN, LocalDateTime.now(), dateOfBirth.atStartOfDay());
-
             } catch (IllegalArgumentException ex) {
                 dateOfBirth = null;
                 IO.printErrorMessage(ex.getMessage());
@@ -93,77 +81,72 @@ public class Login {
             }
         }
 
-
         String password = null;
         while (password == null) {
             try {
-                password = IO.getUserInput("Enter desired username (min 4 chars):").trim();
-                if (Loader.getUsersByName().containsKey(username))
-                    throw new IllegalArgumentException("Username non disponibile");
-
-                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", username);
-                break;
+                password = IO.getUserInput("Inserisci una password (min 4 caratteri):").trim();
+                IO.validateString(".{4,}", password);
             } catch (IllegalArgumentException ex) {
+                password = null;
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
-                IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
+                IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? " Reason: " + e.getReason() : ""));
                 return null;
             }
         }
 
         try {
-            User user = (isOWner) ? new Owner(username, password, firstName, lastName, location, dateOfBirth) : new Client(username, password, firstName, lastName, location, dateOfBirth);
+            User user = isOwner
+                    ? new Owner(username, password, firstName, lastName, location, dateOfBirth)
+                    : new Client(username, password, firstName, lastName, location, dateOfBirth);
 
             if (IO.validateUser(user))
-                IO.getUserInput("Registration successful! Press Enter to return to main menu.");
+                IO.getUserInput("Registrazione completata! Premi Invio per tornare al menu principale.");
 
-            Loader.getUsersByName().put(username,user);
-            Loader.getUsersById().put(user.getId(),user);
+            Loader.getUsersByName().put(username, user);
+            Loader.getUsersById().put(user.getId(), user);
             user.save();
 
             return user;
 
         } catch (IllegalArgumentException ex) {
-            IO.printErrorMessage(ex.getMessage()+ " ritorno al menu principale");
+            IO.printErrorMessage(ex.getMessage() + ". Ritorno al menu principale.");
             return null;
         }
     }
-
 
     public static User login() {
         IO.clearScreen();
 
         int attempts = 0;
-        while(true) {
-            String username = IO.getUserInput("Enter username:");
-            String password = IO.getUserInput("Enter password:");
+        while (true) {
+            if (attempts >= 4) throw new AbortOperationException("Raggiunto limite massimo di tentativi");
 
-            if (attempts >= 4) throw new AbortOperationException("raggiunnto limite tentativi");
+            String username = IO.getUserInput("Inserisci il nome utente:");
+            String password = IO.getUserInput("Inserisci la password:");
 
             try {
-                // Placeholder for user authentication logic
                 User user = Loader.getUsersByName().get(username);
                 if (user == null)
-                    throw new IllegalArgumentException("Impossiibile reperire user con tale nome");
+                    throw new IllegalArgumentException("Utente non trovato");
 
                 if (user.verifyPassword(password)) {
-                    IO.printSuccessrMessage("Login successful!");
-                    IO.getUserInput("Press Enter to continue.");
+                    IO.printSuccessrMessage("Login effettuato con successo!");
+                    IO.getUserInput("Premi Invio per continuare.");
                     return user;
-
                 } else {
-                    IO.printErrorMessage("Utente o password errati.");
-                    IO.getUserInput("Premere enter");
+                    IO.printErrorMessage("Username o password errati.");
+                    IO.getUserInput("Premi Invio per riprovare.");
                     attempts++;
                 }
+
             } catch (IllegalArgumentException ex) {
                 IO.printErrorMessage(ex.getMessage());
-
+                attempts++;
             } catch (AbortOperationException e) {
-                IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
+                IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? " Reason: " + e.getReason() : ""));
                 return null;
             }
         }
     }
 }
-

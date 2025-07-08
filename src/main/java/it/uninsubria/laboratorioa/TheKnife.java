@@ -1,5 +1,6 @@
 package it.uninsubria.laboratorioa;
 
+import it.uninsubria.laboratorioa.ui.GuestMenus;
 import it.uninsubria.laboratorioa.ui.Menus;
 import it.uninsubria.laboratorioa.utils.Loader;
 
@@ -8,6 +9,6 @@ public class TheKnife {
         System.out.println("Loading The Knife...");
 
         Loader.loadFromFile();
-        Menus.mainMenu();
+        new GuestMenus().openMenu();
     }
 }

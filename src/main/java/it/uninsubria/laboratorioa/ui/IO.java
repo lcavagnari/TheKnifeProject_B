@@ -191,7 +191,7 @@ public class IO {
         System.out.println("Nazione: Nome completo della nazione");
         System.out.println("Esempio: Via Ottorino Rossi 9, Bizzozero, Italia");
         System.out.println("Città: Nome delle città");
-        if (skippable) IO.printErrorMessage("\nDigitare '::skip' per saltare questo passaggio.");
+        if (skippable) IO.printErrorMessage("\nDigitare '::skip' per saltare questo passaggio.\n");
 
         while (location == null) {
             try {
@@ -204,8 +204,8 @@ public class IO {
                 if (fields == null || fields.length < 3)
                     throw new IllegalArgumentException("input non valido");
 
-                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", fields[1]);
-                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", fields[0]);
+                //IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", fields[1]);
+                IO.validateString("^[\\p{L^[\\p{L}0-9\\s,'\\-./#():]{2,39}$}0-9\\s,'\\-./#():]{1,39}$", fields[0]);
 
                 location = new Location(
                         Nation.valueOf(fields[2].trim().replace(" ", "_")),
