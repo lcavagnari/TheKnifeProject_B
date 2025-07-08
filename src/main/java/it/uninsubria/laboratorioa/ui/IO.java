@@ -47,7 +47,7 @@ public class IO {
         else if (title != null) System.out.println(title + "\n");
 
         for (int i = 0; i < items.length; i++)
-            if (items[i] != null || Objects.equals(items[i],"")) System.out.println((i + 1) + " - " + items[i]);
+            if (items[i] != null || Objects.equals(items[i],"")) System.out.println("│ "+(i + 1) + " - " + items[i]);
 
         if (footer != null) System.out.println("\n" + footer + "\n");
         else System.out.println();

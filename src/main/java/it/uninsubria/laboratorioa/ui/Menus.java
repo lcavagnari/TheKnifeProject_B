@@ -92,6 +92,7 @@ public class Menus {
     private static void browseRestaurants() {
         Map<String, Restaurant> list = Loader.getRestaurantsByName();
         if (list.isEmpty()) {
+            IO.clearScreen();
             IO.printErrorMessage("Nessun ristorante disponibile al momento.");
             return;
         }
@@ -108,16 +109,13 @@ public class Menus {
                     options
             );
 
-            //System.out.println("\n");
             System.out.println("0 - Torna indietro\n");
-
-
 
             int sel = IO.getMenuInt("Seleziona un ristorante da visualizzare ['0' per tornare indietro]:");
             if (sel == 0) return;
             else if (sel <= 0 || sel > list.size()) continue;
 
-            Menus.viewRestaurantDetails(null, list.get(sel-1));
+            Menus.viewRestaurantDetails(null, list.get(sel - 1));
         }
     }
 
@@ -185,7 +183,7 @@ public class Menus {
         }
 
         IO.clearScreen();
-        System.out.println("─── Recensioni ricevute negli ultimi 7 giorni ───\n");
+        System.out.println("┌─── Recensioni ricevute negli ultimi 7 giorni ───┐\n");
         for (Review r : recent) {
             System.out.println(r);
             System.out.println("-".repeat(60));
@@ -201,6 +199,7 @@ public class Menus {
     private static void viewOwnedRestaurants(Owner owner) {
         List<Restaurant> list = new ArrayList<>(owner.getRestaurantsById().values());
         if (list.isEmpty()) {
+            IO.clearScreen();
             IO.printErrorMessage("Non hai ristoranti registrati.");
             IO.getUserInput("Premi invio per tornare.");
             return;
@@ -210,11 +209,12 @@ public class Menus {
             IO.clearScreen();
             IO.printMenu(
                     "\n┌───────────── Ristoranti di " + owner.getUsername() + " ─────────────┐",
-                    "└───────────────────────────────────────────────────└",
+                    "",
                     list.stream().map(Restaurant::getName).toArray(String[]::new)
             );
 
-            IO.printMenu("", "", "Torna indietro");
+            System.out.println("│ 0 - Torna indietro\n");
+            System.out.println("\n└───────────────────────────────────────────────────┘");
 
             try {
                 int sel = IO.getInt("Seleziona un ristorante da visualizzare:");
@@ -330,7 +330,7 @@ public class Menus {
     /**
      * Mostra e consente la modifica dei dettagli di un ristorante da parte del proprietario.
      *
-     * @param owner proprietario autenticato
+     * @param owner      proprietario autenticato
      * @param restaurant ristorante da modificare
      */
     public static void viewOwnerRestaurantDetails(Owner owner, Restaurant restaurant) {
@@ -425,7 +425,7 @@ public class Menus {
      * Mostra i dettagli di un ristorante a un utente {@link Client},
      * permettendo di visualizzare, creare o modificare recensioni.
      *
-     * @param user utente autenticato (può essere null)
+     * @param user       utente autenticato (può essere null)
      * @param restaurant ristorante da visualizzare
      */
     public static void viewRestaurantDetails(Client user, Restaurant restaurant) {
@@ -460,10 +460,10 @@ public class Menus {
             String[] options = new String[1];
             if (usersReview != null) options = new String[]{
                     "Aggiorna testo recensione", "Aggiorna valore recensione",
-                    "Cancella recensione", "Torna indietro" };
+                    "Cancella recensione", "Torna indietro"};
 
-            else options = new String[] {
-                    "Aggiungi recensione","Torna indietro"
+            else options = new String[]{
+                    "Aggiungi recensione", "Torna indietro"
             };
 
 
@@ -479,10 +479,10 @@ public class Menus {
                 switch (choice) {
                     case 1 -> {
                         if (usersReview == null) {
-                            int value = IO.getInt("Che voto daresti al Ristorante '"+restaurant.getName()+"' ? [1-5]");
+                            int value = IO.getInt("Che voto daresti al Ristorante '" + restaurant.getName() + "' ? [1-5]");
                             String text = IO.getUserInput("Raccontaci della tua esperienza [4-200 caratteri]:");
 
-                            Review review = new Review(restaurant,user,value,text);
+                            Review review = new Review(restaurant, user, value, text);
                             break;
                         }
 
