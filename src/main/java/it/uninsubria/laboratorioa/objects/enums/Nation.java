@@ -28,39 +28,39 @@ public enum Nation {
     /**
      * Svizzera
      */
-    SWITZERLAND("CH"),
+    SVIZZERA("CH"),
     /**
      * Germania
      */
-    GERMANY("DE"),
+    GERMANIA("DE"),
     /**
      * Francia
      */
-    FRANCE("FR"),
+    FRANCIA("FR"),
     /**
      * Spagna
      */
-    SPAIN("ES"),
+    SPAGNA("ES"),
     /**
      * Portogallo
      */
-    PORTUGAL("PT"),
+    PORTOGALLO("PT"),
     /**
      * Italia
      */
-    ITALY("IT"),
+    ITALIA("IT"),
     /**
      * Regno Unito
      */
-    UNITED_KINGDOM("GB"),
+    REGNO_UNITO("GB"),
     /**
      * Stati Uniti d'America
      */
-    UNITED_STATES("US"),
+    STATI_UNITI("US"),
     /**
      * Brasile
      */
-    BRAZIL("BR"),
+    BRASILE("BR"),
     /**
      * Argentina
      */
@@ -68,7 +68,7 @@ public enum Nation {
     /**
      * Messico
      */
-    MEXICO("MX"),
+    MESSICO("MX"),
     /**
      * Perù
      */
@@ -80,7 +80,7 @@ public enum Nation {
     /**
      * Porto Rico
      */
-    PUERTO_RICO("PR"),
+    PORTO_RICO("PR"),
     /**
      * Venezuela
      */
@@ -92,19 +92,19 @@ public enum Nation {
     /**
      * Giappone
      */
-    JAPAN("JP"),
+    GIAPPONE("JP"),
     /**
      * Corea (generico)
      */
-    KOREA("KR"),
+    COREA("KR"),
     /**
      * Cina
      */
-    CHINA("CN"),
+    CINA("CN"),
     /**
      * Thailandia
      */
-    THAILAND("TH"),
+    THAILANDIA("TH"),
     /**
      * Vietnam
      */
@@ -112,7 +112,7 @@ public enum Nation {
     /**
      * Malesia
      */
-    MALAYSIA("MY"),
+    MALESIA("MY"),
     /**
      * Indonesia
      */
@@ -120,7 +120,7 @@ public enum Nation {
     /**
      * Filippine
      */
-    PHILIPPINES("PH"),
+    FILIPPINE("PH"),
     /**
      * Laos
      */
@@ -132,7 +132,7 @@ public enum Nation {
     /**
      * Cambogia
      */
-    CAMBODIA("KH"),
+    CAMBOGIA("KH"),
     /**
      * India
      */
@@ -152,7 +152,7 @@ public enum Nation {
     /**
      * Belgio
      */
-    BELGIUM("BE"),
+    BELGIO("BE"),
     /**
      * Canada
      */
@@ -160,23 +160,23 @@ public enum Nation {
     /**
      * Cina continentale
      */
-    CHINA_MAINLAND("CN"),
+    CINA_CONTINENTALE("CN"),
     /**
      * Croazia
      */
-    CROATIA("HR"),
+    CROAZIA("HR"),
     /**
      * Repubblica Ceca (nome breve)
      */
-    CZECHIA("CZ"),
+    CECHIA("CZ"),
     /**
      * Repubblica Ceca (nome completo)
      */
-    CZECH_REPUBLIC("CZ"),
+    REPUBBLICA_CECA("CZ"),
     /**
      * Danimarca
      */
-    DENMARK("DK"),
+    DANIMARCA("DK"),
     /**
      * Dubai (UAE)
      */
@@ -188,11 +188,11 @@ public enum Nation {
     /**
      * Finlandia
      */
-    FINLAND("FI"),
+    FINLANDIA("FI"),
     /**
      * Grecia
      */
-    GREECE("GR"),
+    GRECIA("GR"),
     /**
      * Hong Kong
      */
@@ -200,35 +200,35 @@ public enum Nation {
     /**
      * Hong Kong SAR (versione estesa)
      */
-    HONG_KONG_SAR_CHINA("HK"),
+    HONG_KONG_SAR_CINA("HK"),
     /**
      * Ungheria
      */
-    HUNGARY("HU"),
+    UNGHERIA("HU"),
     /**
      * Islanda
      */
-    ICELAND("IS"),
+    ISLANDA("IS"),
     /**
      * Irlanda
      */
-    IRELAND("IE"),
+    IRLANDA("IE"),
     /**
      * Lettonia
      */
-    LATVIA("LV"),
+    LETTONIA("LV"),
     /**
      * Lituania
      */
-    LITHUANIA("LT"),
+    LITUANIA("LT"),
     /**
      * Lussemburgo
      */
-    LUXEMBOURG("LU"),
+    LUSSEMBURGO("LU"),
     /**
      * Macao
      */
-    MACAU("MO"),
+    MACAO("MO"),
     /**
      * Malta
      */
@@ -236,7 +236,7 @@ public enum Nation {
     /**
      * Paesi Bassi
      */
-    NETHERLANDS("NL"),
+    PAESI_BASSI("NL"),
     /**
      * Qatar
      */
@@ -256,11 +256,11 @@ public enum Nation {
     /**
      * Corea del Sud
      */
-    SOUTH_KOREA("KR"),
+    COREA_DEL_SUD("KR"),
     /**
      * Svezia
      */
-    SWEDEN("SE"),
+    SVEZIA("SE"),
     /**
      * Taiwan
      */
@@ -268,7 +268,7 @@ public enum Nation {
     /**
      * Turchia
      */
-    TURKIYE("TR"),
+    TURCHIA("TR"),
     /**
      * USA
      */
@@ -288,11 +288,11 @@ public enum Nation {
     /**
      * Israele
      */
-    ISRAEL("IL"),
+    ISRAELE("IL"),
     /**
      * Libano
      */
-    LEBANON("LB"),
+    LIBANO("LB"),
     /**
      * Russia
      */
@@ -300,19 +300,15 @@ public enum Nation {
     /**
      * Polonia
      */
-    POLAND("PL"),
+    POLONIA("PL"),
     /**
      * Norvegia
      */
-    NORWAY("NO"),
+    NORVEGIA("NO"),
     /**
      * Scandinavia (approssimato come Svezia)
      */
-    SCANDINAVIA("SE"),
-    /**
-     * Turchia
-     */
-    TURKEY("TR");
+    SCANDINAVIA("SE");
 
     private final String isoCode;
 

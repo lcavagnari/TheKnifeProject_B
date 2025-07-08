@@ -204,11 +204,14 @@ public class IO {
                 if (fields == null || fields.length < 3)
                     throw new IllegalArgumentException("input non valido");
 
-                //IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", fields[1]);
-                IO.validateString("^[\\p{L^[\\p{L}0-9\\s,'\\-./#():]{2,39}$}0-9\\s,'\\-./#():]{1,39}$", fields[0]);
+                // Validazione Città
+                IO.validateString(fields[1]);
+
+                // Validazione indirizzo
+                IO.validateString("^[\\p{L}][\\p{L}'\\-. ]+\\s\\d+[a-zA-Z]?$", fields[0]);
 
                 location = new Location(
-                        Nation.valueOf(fields[2].trim().replace(" ", "_")),
+                        Nation.valueOf(fields[2].trim().toUpperCase().replace(" ", "_")),
                         fields[0],
                         -90 + (180 * rd.nextDouble()),
                         -180 + (360 * rd.nextDouble()),
@@ -216,7 +219,7 @@ public class IO {
                 );
             } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
                 location = null;
-                IO.printErrorMessage(ex.getMessage());
+                IO.printErrorMessage(ex.getMessage()+"\n");
             } catch (AbortOperationException e) {
                 if (e.getMessage() != null)
                     IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? "Reason: " + e.getReason() : ""));
