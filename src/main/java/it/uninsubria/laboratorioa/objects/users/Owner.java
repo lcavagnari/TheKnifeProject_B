@@ -123,7 +123,7 @@ public class Owner extends User {
     }
 
     public boolean modifyRestaurantPriceRange(Restaurant r, PriceRange newPriceRange) {
-        if (IO.va || !restaurantsById.containsKey(r.getId())) return false;
+        if (r == null || !restaurantsById.containsKey(r.getId())) return false;
 
         r.setPriceRange(newPriceRange);
         build();
