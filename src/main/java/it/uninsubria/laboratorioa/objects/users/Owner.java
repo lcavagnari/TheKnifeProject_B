@@ -176,9 +176,9 @@ public class Owner extends User {
         return r.toString();
     }
 
+
     @Override
-    protected void build() {
-        super.build();
-        jsonObject.put("role", "Owner");
+    public String getRole() {
+        return "owner";
     }
 }

@@ -123,8 +123,6 @@ public class Client extends User {
     public void build() {
         super.build();
 
-        jsonObject.put("role", "Client");
-
         if (favouritesArray != null) {
             favouritesArray.removeAll();
             favouriteRestourants.forEach(fav -> favouritesArray.add(fav.toString()));
@@ -144,5 +142,10 @@ public class Client extends User {
                 super.toString() +
                 ", favourites=" + favouriteRestourants +
                 '}';
+    }
+
+    @Override
+    public String getRole() {
+        return "client";
     }
 }

@@ -157,6 +157,8 @@ public abstract class User extends JsonEntity {
         jsonObject.put("dateOfBirth", dateOfBirth.toString());
         if (location != null) jsonObject.set("location", location.getJsonObject());
 
+        jsonObject.put("role", getRole());
+
         ObjectNode password = mapper.createObjectNode()
                 .put("salt", hasher.salt)
                 .put("password", hasher.pHash);
@@ -294,4 +296,6 @@ public abstract class User extends JsonEntity {
             return Objects.equals(pHash, attemptHash);
         }
     }
+
+    public abstract String getRole();
 }

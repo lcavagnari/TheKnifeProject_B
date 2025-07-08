@@ -1,8 +1,14 @@
 package it.uninsubria.laboratorioa.ui;
 
+import it.uninsubria.laboratorioa.objects.Restaurant;
+import it.uninsubria.laboratorioa.objects.Review;
 import it.uninsubria.laboratorioa.objects.users.User;
+import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
 import it.uninsubria.laboratorioa.utils.IO;
+import it.uninsubria.laboratorioa.utils.Loader;
 import lombok.experimental.UtilityClass;
+
+import java.util.*;
 
 /**
  * Classe che gestisce i menu principali dell'applicazione.
@@ -71,7 +77,8 @@ public class Menus {
 ---
 */
 
-    private static final User user = null;
+    private static User user = null;
+
 
     /**
      * Metodo principale del menu dell'applicazione.
@@ -86,28 +93,47 @@ public class Menus {
         while (true) {
             IO.clearScreen();
 
-            IO.printMenu("Welcome to the The Knife", "Choose an option:",
-                    "Login",
+            String[] defaultOptions = new String[] {"Login",
                     "Register",
                     "Search for a Restaurant",
-                    "Exit");
+                    "Browse Restaurants",
+                    "Exit"};
+
+            if (user != null) {
+                // Inserisci azioni utenti
+                // "Search for a Restaurant", "View Favourites", "Logout"
+            }
+
+            IO.printMenu(
+                    "\n|============= The Knife Main menu =============|",
+                    "|===================================================|",
+                    );
             int choice = IO.getInt("Enter choice:", 4);
 
             switch (choice) {
-                case 0 -> System.out.println("WIP");
-                case 1 -> System.out.println("WIP 2");
-                case 2 -> System.out.println("WIP 3");
-                case 3 -> exit();
+                case 0 -> login();
+                case 1 -> register();
+                case 2 -> searchRestaurant();
+                case 3 -> browseRestaurants();
+                case 4 -> exit();
             }
-        /*
-        switch (choice) {
-            case 0 -> login();
-            case 1 -> register();
-            case 2 -> searchRestaurant();
-            case 3 -> exit();
         }
-         */
+    }
+
+    private static void browseRestaurants() {
+        Map<String, Restaurant> restaurants = Loader.getRestaurantsByName();
+        if (restaurants == null || restaurants.isEmpty()) {
+            IO.printErrorMessage("Nessun ristorante disponibile al momento.");
+            return;
         }
+
+        String[] options = restaurants.keySet().toArray(new String[0]);
+
+        IO.printMenu(
+                "\n|============= Browse restaurants =============|",
+                "|===================================================|",
+                options
+        );
     }
 
     /**
@@ -124,25 +150,37 @@ public class Menus {
 
     private static void login() {
         IO.clearScreen();
-        String username = IO.getUserInput("Enter username:");
-        String password = IO.getUserInput("Enter password:");
 
-        // Placeholder for user authentication logic
-        RegisteredUser user = authenticate(username, password);
+        int attempts =0;
+        while(user == null) {
+            String username = IO.getUserInput("Enter username:");
+            String password = IO.getUserInput("Enter password:");
 
-        if (user != null) {
-            IO.printSuccessrMessage("Login successful!");
-            IO.getUserInput("Press Enter to continue.");
-            userMenu(user);
-        } else {
-            IO.printErrorMessage("Utente o password errati.");
-            IO.getUserInput("Premere enter");
+            if (attempts >= 4) throw new AbortOperationException("raggiunnto limite tentativi");
+
+            try {
+                // Placeholder for user authentication logic
+                User u = Loader.getUsersByName().get(username);
+                if (u == null)
+                    throw new IllegalArgumentException("Impossiibile reperire user con tale nome");
+
+                if (u.verifyPassword(password)) {
+                    IO.printSuccessrMessage("Login successful!");
+                    IO.getUserInput("Press Enter to continue.");
+                    user = u;
+
+                } else {
+                    IO.printErrorMessage("Utente o password errati.");
+                    IO.getUserInput("Premere enter");
+                }
+            } catch (IllegalArgumentException ex) {
+                IO.printErrorMessage(ex.getMessage());
+
+            } catch (AbortOperationException e) {
+                IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
+                break;
+            }
         }
-    }
-
-    private static RegisteredUser authenticate(String username, String password) {
-        // Replace with actual authentication logic
-        return null;
     }
 
     private static void register() {
@@ -175,7 +213,8 @@ public class Menus {
             IO.clearScreen();
             System.out.println(restaurant.toString());
 
-            List<Review> reviews = restaurant.getReviews();
+
+            Collection<Review> reviews = restaurant.getReviews().values();
             if (reviews == null || reviews.isEmpty()) {
                 System.out.println("No reviews available for this restaurant.\n");
             } else {
@@ -192,13 +231,10 @@ public class Menus {
         }
     }
 
-    private static void userMenu(RegisteredUser user) {
+    private static void userMenu(User user) {
         while (true) {
             IO.clearScreen();
-            IO.printMenu("User Menu - " + user.getUsername(), "Choose an option:",
-                    "Search for a Restaurant",
-                    "View Favourites",
-                    "Logout");
+
 
             int choice = IO.getInt("Enter choice:", 3);
 
@@ -213,7 +249,7 @@ public class Menus {
         }
     }
 
-    private static void viewFavourites(RegisteredUser user) {
+    private static void viewFavourites(User user) {
         List<Restaurant> favourites = List.copyOf(user.getFavourites());
 
         if (favourites.isEmpty()) {
