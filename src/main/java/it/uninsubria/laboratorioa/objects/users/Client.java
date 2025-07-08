@@ -25,8 +25,8 @@ public class Client extends User {
     /**
      * Insieme degli ID dei ristoranti preferiti dal cliente.
      */
-   @Getter
-   private final Set<UUID> favouriteRestourants;
+    @Getter
+    private final Set<UUID> favouriteRestourants;
 
     /**
      * Array JSON contenente gli ID dei ristoranti preferiti, usato per la serializzazione.

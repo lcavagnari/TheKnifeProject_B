@@ -220,7 +220,7 @@ public class IO {
                 );
             } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException ex) {
                 location = null;
-                IO.printErrorMessage(ex.getMessage()+"\n");
+                IO.printErrorMessage(ex.getMessage() + "\n");
             } catch (AbortOperationException e) {
                 if (e.getMessage() != null)
                     IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? "Reason: " + e.getReason() : ""));

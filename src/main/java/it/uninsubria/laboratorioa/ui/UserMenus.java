@@ -51,7 +51,6 @@ public class UserMenus extends Menus {
 
     /**
      * Visualizza i ristoranti preferiti dell'utente {@link Client}.
-     *
      */
     private void viewFavourites() {
         Set<UUID> favourites = client.getFavouriteRestourants();

@@ -119,7 +119,8 @@ public class Loader {
                 for (JsonNode node : jsonNode.path("cuisinesTypes")) {
                     try {
                         cuisines.add(CuisineType.valueOf(node.asText().toUpperCase()));
-                    } catch (IllegalArgumentException ignored) {}
+                    } catch (IllegalArgumentException ignored) {
+                    }
                 }
 
                 Set<String> services = new HashSet<>();

@@ -2,6 +2,7 @@ package it.uninsubria.laboratorioa.ui.exceptions;
 
 import lombok.Getter;
 
+
 public class AbortOperationException extends RuntimeException {
 
     @Getter

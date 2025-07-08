@@ -1,5 +1,3 @@
-
-
 package it.uninsubria.laboratorioa.ui;
 
 import it.uninsubria.laboratorioa.objects.Restaurant;
@@ -48,7 +46,7 @@ public class GuestMenus extends Menus {
                     try {
                         User user = Login.login();
                         if (user != null) {
-                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new UserMenus((Client) user); ;
+                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new UserMenus((Client) user);
                             menus.openMenu();
                         }
                     } catch (AbortOperationException e) {
@@ -59,7 +57,7 @@ public class GuestMenus extends Menus {
                     try {
                         User user = Login.register();
                         if (user != null) {
-                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new UserMenus((Client) user); ;
+                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new UserMenus((Client) user);
                             menus.openMenu();
                         }
                     } catch (AbortOperationException e) {

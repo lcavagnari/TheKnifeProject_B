@@ -209,6 +209,8 @@ public abstract class User extends JsonEntity {
                 ", password=" + hasher.pHash;
     }
 
+    public abstract UserRole getRole();
+
     /**
      * Classe statica interna per gestire l'hashing e la verifica della password.<p>
      * Usa algoritmo PBKDF2WithHmacSHA256 con salt e iterazioni.<p>
@@ -297,6 +299,4 @@ public abstract class User extends JsonEntity {
             return Objects.equals(pHash, attemptHash);
         }
     }
-
-    public abstract UserRole getRole();
 }

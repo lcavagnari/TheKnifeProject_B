@@ -172,15 +172,14 @@ public class Review extends JsonEntity {
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("│ ID:               ").append(id).append("\n");
-        sb.append("│ Timestamp:        ").append(timestamp).append("\n");
-        sb.append("│ User:             ").append(user != null ? user.getUsername() : "N/A").append("\n");
-        sb.append("│ Restaurant:       ").append(restaurant != null ? restaurant.getName() : "N/A").append("\n");
-        sb.append("│ Rating:           ").append(value).append(" / 5").append("\n");
-        sb.append("│ Text:             ").append(text != null && !text.isBlank() ? "\"" + text + "\"" : "N/A").append("\n");
-        sb.append("│ Reply:            ").append(reply != null && !reply.isBlank() ? "\"" + reply + "\"" : "None").append("\n");
-        return sb.toString();
+        String sb = "│ ID:               " + id + "\n" +
+                "│ Timestamp:        " + timestamp + "\n" +
+                "│ User:             " + (user != null ? user.getUsername() : "N/A") + "\n" +
+                "│ Restaurant:       " + (restaurant != null ? restaurant.getName() : "N/A") + "\n" +
+                "│ Rating:           " + value + " / 5" + "\n" +
+                "│ Text:             " + (text != null && !text.isBlank() ? "\"" + text + "\"" : "N/A") + "\n" +
+                "│ Reply:            " + (reply != null && !reply.isBlank() ? "\"" + reply + "\"" : "None") + "\n";
+        return sb;
     }
 
     /**
