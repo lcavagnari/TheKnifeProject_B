@@ -9,533 +9,1058 @@ package it.uninsubria.laboratorioa.objects.enums;
  * <p>
  * Nota: i valori di questo enum vengono utilizzati per la serializzazione/deserializzazione e il filtraggio.
  * <p>
+ *
  * @author Luca Cavagnari
  * @version 1.0
  */
 public enum CuisineType {
-    /** Cucina afgana tradizionale */
+    /**
+     * Cucina afgana tradizionale
+     */
     AFGHAN,
-    /** Cucina africana regionale */
+    /**
+     * Cucina africana regionale
+     */
     AFRICAN,
-    /** Cucina alpina tipica delle regioni montane */
+    /**
+     * Cucina alpina tipica delle regioni montane
+     */
     ALPINE,
-    /** Cucina alsaziana francese */
+    /**
+     * Cucina alsaziana francese
+     */
     ALSATIAN,
-    /** Cucina americana classica */
+    /**
+     * Cucina americana classica
+     */
     AMERICAN,
-    /** Cucina americana contemporanea */
+    /**
+     * Cucina americana contemporanea
+     */
     AMERICAN_CONTEMPORARY,
-    /** Cucina andalusa spagnola */
+    /**
+     * Cucina andalusa spagnola
+     */
     ANDALUSIAN,
-    /** Cucina pugliese italiana */
+    /**
+     * Cucina pugliese italiana
+     */
     APULIAN,
-    /** Cucina argentina */
+    /**
+     * Cucina argentina
+     */
     ARGENTINIAN,
-    /** Cucina armena */
+    /**
+     * Cucina armena
+     */
     ARMENIAN,
-    /** Cucina asiatica generica */
+    /**
+     * Cucina asiatica generica
+     */
     ASIAN,
-    /** Cucina asiatica contemporanea */
+    /**
+     * Cucina asiatica contemporanea
+     */
     ASIAN_CONTEMPORARY,
-    /** Influenze asiatiche miste */
+    /**
+     * Influenze asiatiche miste
+     */
     ASIAN_INFLUENCES,
-    /** Cucina asturiana spagnola */
+    /**
+     * Cucina asturiana spagnola
+     */
     ASTURIAN,
-    /** Cucina australiana contemporanea */
+    /**
+     * Cucina australiana contemporanea
+     */
     AUSTRALIAN_CONTEMPORARY,
-    /** Cucina austriaca */
+    /**
+     * Cucina austriaca
+     */
     AUSTRIAN,
-    /** Panetteria e prodotti da forno */
+    /**
+     * Panetteria e prodotti da forno
+     */
     BAKERY,
-    /** Cucina balinese dell'isola di Bali */
+    /**
+     * Cucina balinese dell'isola di Bali
+     */
     BALINESE,
-    /** Cucina balcanica */
+    /**
+     * Cucina balcanica
+     */
     BALKAN,
-    /** Cucina barbecue tipica di grigliate */
+    /**
+     * Cucina barbecue tipica di grigliate
+     */
     BARBECUE,
-    /** Cucina basca spagnola */
+    /**
+     * Cucina basca spagnola
+     */
     BASQUE,
-    /** Cucina bavarese tedesca */
+    /**
+     * Cucina bavarese tedesca
+     */
     BAVARIAN,
-    /** Specialità a base di manzo */
+    /**
+     * Specialità a base di manzo
+     */
     BEEF,
-    /** Cucina di Pechino, Cina */
+    /**
+     * Cucina di Pechino, Cina
+     */
     BEIJING,
-    /** Cucina belga */
+    /**
+     * Cucina belga
+     */
     BELGIAN,
-    /** Cucina brasiliana */
+    /**
+     * Cucina brasiliana
+     */
     BRAZILIAN,
-    /** Cucina bretone francese */
+    /**
+     * Cucina bretone francese
+     */
     BRETON,
-    /** Cucina britannica contemporanea */
+    /**
+     * Cucina britannica contemporanea
+     */
     BRITISH_CONTEMPORARY,
-    /** Bulgogi coreano */
+    /**
+     * Bulgogi coreano
+     */
     BULGOGI,
-    /** Cucina borgognona francese */
+    /**
+     * Cucina borgognona francese
+     */
     BURGUNDIAN,
-    /** Cucina birmana */
+    /**
+     * Cucina birmana
+     */
     BURMESE,
-    /** Cucina cajun della Louisiana */
+    /**
+     * Cucina cajun della Louisiana
+     */
     CAJUN,
-    /** Cucina calabrese italiana */
+    /**
+     * Cucina calabrese italiana
+     */
     CALABRIAN,
-    /** Cucina californiana */
+    /**
+     * Cucina californiana
+     */
     CALIFORNIAN,
-    /** Cucina cambogiana */
+    /**
+     * Cucina cambogiana
+     */
     CAMBODIAN,
-    /** Cucina campana italiana */
+    /**
+     * Cucina campana italiana
+     */
     CAMPANIAN,
-    /** Cucina cantonese */
+    /**
+     * Cucina cantonese
+     */
     CANTONESE,
-    /** Carni arrosto cantonese */
+    /**
+     * Carni arrosto cantonese
+     */
     CANTONESE_ROAST_MEATS,
-    /** Cucina caraibica */
+    /**
+     * Cucina caraibica
+     */
     CARIBBEAN,
-    /** Cucina castigliana spagnola */
+    /**
+     * Cucina castigliana spagnola
+     */
     CASTILIAN,
-    /** Cucina catalana spagnola */
+    /**
+     * Cucina catalana spagnola
+     */
     CATALAN,
-    /** Cucina dell’Asia centrale */
+    /**
+     * Cucina dell’Asia centrale
+     */
     CENTRAL_ASIAN,
-    /** Cucina Chao Zhou cinese */
+    /**
+     * Cucina Chao Zhou cinese
+     */
     CHAO_ZHOU,
-    /** Specialità di formaggi */
+    /**
+     * Specialità di formaggi
+     */
     CHEESE,
-    /** Specialità a base di pollo */
+    /**
+     * Specialità a base di pollo
+     */
     CHICKEN_SPECIALITIES,
-    /** Cucina cinese generica */
+    /**
+     * Cucina cinese generica
+     */
     CHINESE,
-    /** Cucina cinese contemporanea */
+    /**
+     * Cucina cinese contemporanea
+     */
     CHINESE_CONTEMPORARY,
-    /** Cucina Chiu Chow cinese */
+    /**
+     * Cucina Chiu Chow cinese
+     */
     CHIU_CHOW,
-    /** Cucina Chueotang coreana */
+    /**
+     * Cucina Chueotang coreana
+     */
     CHUEOTANG,
-    /** Cucina classica */
+    /**
+     * Cucina classica
+     */
     CLASSIC,
-    /** Cucina francese classica */
+    /**
+     * Cucina francese classica
+     */
     CLASSIC_FRENCH,
-    /** Cucina colombiana */
+    /**
+     * Cucina colombiana
+     */
     COLOMBIAN,
-    /** Congee – porridge di riso cinese */
+    /**
+     * Congee – porridge di riso cinese
+     */
     CONGEE,
-    /** Cucina contemporanea generica */
+    /**
+     * Cucina contemporanea generica
+     */
     CONTEMPORARY,
-    /** Cucina corsa */
+    /**
+     * Cucina corsa
+     */
     CORSICAN,
-    /** Cucina casalinga di campagna */
+    /**
+     * Cucina casalinga di campagna
+     */
     COUNTRY_COOKING,
-    /** Specialità a base di granchio */
+    /**
+     * Specialità a base di granchio
+     */
     CRAB_SPECIALITIES,
-    /** Cucina creativa */
+    /**
+     * Cucina creativa
+     */
     CREATIVE,
-    /** Cucina britannica creativa */
+    /**
+     * Cucina britannica creativa
+     */
     CREATIVE_BRITISH,
-    /** Cucina francese creativa */
+    /**
+     * Cucina francese creativa
+     */
     CREATIVE_FRENCH,
-    /** Cucina creola */
+    /**
+     * Cucina creola
+     */
     CREOLE,
-    /** Cucina croata */
+    /**
+     * Cucina croata
+     */
     CROATIAN,
-    /** Cucina cubana */
+    /**
+     * Cucina cubana
+     */
     CUBAN,
-    /** Cucina al curry */
+    /**
+     * Cucina al curry
+     */
     CURRY,
-    /** Cucina ceca */
+    /**
+     * Cucina ceca
+     */
     CZECH,
-    /** Cucina danese */
+    /**
+     * Cucina danese
+     */
     DANISH,
-    /** Gastronomia, specialità da deli */
+    /**
+     * Gastronomia, specialità da deli
+     */
     DELI,
-    /** Dim sum cinese */
+    /**
+     * Dim sum cinese
+     */
     DIM_SUM,
-    /** Cucina doganitang coreana */
+    /**
+     * Cucina doganitang coreana
+     */
     DOGANITANG,
-    /** Cucina Dongbei cinese */
+    /**
+     * Cucina Dongbei cinese
+     */
     DONGBEI,
-    /** Cucina Dubu coreana */
+    /**
+     * Cucina Dubu coreana
+     */
     DUBU,
-    /** Specialità a base di anatra */
+    /**
+     * Specialità a base di anatra
+     */
     DUCK_SPECIALITIES,
-    /** Specialità di ravioli */
+    /**
+     * Specialità di ravioli
+     */
     DUMPLINGS,
-    /** Dwaeji Gukbap – zuppa di maiale coreana */
+    /**
+     * Dwaeji Gukbap – zuppa di maiale coreana
+     */
     DWAEJI_GUKBAP,
-    /** Cucina dell'Europa orientale */
+    /**
+     * Cucina dell'Europa orientale
+     */
     EASTERN_EUROPEAN,
-    /** Cucina egiziana */
+    /**
+     * Cucina egiziana
+     */
     EGYPTIAN,
-    /** Cucina emiliana italiana */
+    /**
+     * Cucina emiliana italiana
+     */
     EMILIAN,
-    /** Cucina degli Emirati Arabi */
+    /**
+     * Cucina degli Emirati Arabi
+     */
     EMIRATI,
-    /** Cucina inglese */
+    /**
+     * Cucina inglese
+     */
     ENGLISH,
-    /** Cucina etiope */
+    /**
+     * Cucina etiope
+     */
     ETHIOPIAN,
-    /** Cucina europea generica */
+    /**
+     * Cucina europea generica
+     */
     EUROPEAN,
-    /** Cucina europea contemporanea */
+    /**
+     * Cucina europea contemporanea
+     */
     EUROPEAN_CONTEMPORARY,
-    /** Cucina "farm to table" – a chilometro zero */
+    /**
+     * Cucina "farm to table" – a chilometro zero
+     */
     FARM_TO_TABLE,
-    /** Cucina filippina */
+    /**
+     * Cucina filippina
+     */
     FILIPINO,
-    /** Cucina finlandese */
+    /**
+     * Cucina finlandese
+     */
     FINNISH,
-    /** Cucina fiamminga */
+    /**
+     * Cucina fiamminga
+     */
     FLEMISH,
-    /** Fondue – specialità svizzera */
+    /**
+     * Fondue – specialità svizzera
+     */
     FONDUE,
-    /** Cucina francese */
+    /**
+     * Cucina francese
+     */
     FRENCH,
-    /** Cucina francese contemporanea */
+    /**
+     * Cucina francese contemporanea
+     */
     FRENCH_CONTEMPORARY,
-    /** Anguilla di acqua dolce */
+    /**
+     * Anguilla di acqua dolce
+     */
     FRESHWATER_EEL,
-    /** Cucina friulana italiana */
+    /**
+     * Cucina friulana italiana
+     */
     FRIULIAN,
-    /** Fugu – pesce palla giapponese */
+    /**
+     * Fugu – pesce palla giapponese
+     */
     FUGU,
-    /** Cucina Fujian cinese */
+    /**
+     * Cucina Fujian cinese
+     */
     FUJIAN,
-    /** Cucina fusion */
+    /**
+     * Cucina fusion
+     */
     FUSION,
-    /** Cucina galiziana spagnola */
+    /**
+     * Cucina galiziana spagnola
+     */
     GALICIAN,
-    /** Gastropub – cucina da pub */
+    /**
+     * Gastropub – cucina da pub
+     */
     GASTROPUB,
-    /** Gejang – specialità coreana di granchi marinati */
+    /**
+     * Gejang – specialità coreana di granchi marinati
+     */
     GEJANG,
-    /** Cucina tedesca */
+    /**
+     * Cucina tedesca
+     */
     GERMAN,
-    /** Gomtang – zuppa coreana */
+    /**
+     * Gomtang – zuppa coreana
+     */
     GOMTANG,
-    /** Cucina greca */
+    /**
+     * Cucina greca
+     */
     GREEK,
-    /** Grigliate generiche */
+    /**
+     * Grigliate generiche
+     */
     GRILLS,
-    /** Cucina hainanese cinese */
+    /**
+     * Cucina hainanese cinese
+     */
     HAINANESE,
-    /** Cucina hakkanese cinese */
+    /**
+     * Cucina hakkanese cinese
+     */
     HAKKANENESE,
-    /** Cucina Hang Zhou cinese */
+    /**
+     * Cucina Hang Zhou cinese
+     */
     HANG_ZHOU,
-    /** Cucina casalinga */
+    /**
+     * Cucina casalinga
+     */
     HOME_COOKING,
-    /** Hotpot – piatto cinese */
+    /**
+     * Hotpot – piatto cinese
+     */
     HOTPOT,
-    /** Cucina Huaiyang cinese */
+    /**
+     * Cucina Huaiyang cinese
+     */
     HUAIYANG,
-    /** Cucina Hubei cinese */
+    /**
+     * Cucina Hubei cinese
+     */
     HUBEI,
-    /** Cucina Hui cinese */
+    /**
+     * Cucina Hui cinese
+     */
     HUI,
-    /** Cucina hunanese cinese */
+    /**
+     * Cucina hunanese cinese
+     */
     HUNANESE,
-    /** Cucina ungherese */
+    /**
+     * Cucina ungherese
+     */
     HUNGARIAN,
-    /** Cucina indiana */
+    /**
+     * Cucina indiana
+     */
     INDIAN,
-    /** Cucina vegetariana indiana */
+    /**
+     * Cucina vegetariana indiana
+     */
     INDIAN_VEGETARIAN,
-    /** Cucina indonesiana */
+    /**
+     * Cucina indonesiana
+     */
     INDONESIAN,
-    /** Cucina innovativa */
+    /**
+     * Cucina innovativa
+     */
     INNOVATIVE,
-    /** Cucina internazionale */
+    /**
+     * Cucina internazionale
+     */
     INTERNATIONAL,
-    /** Cucina irlandese */
+    /**
+     * Cucina irlandese
+     */
     IRISH,
-    /** Cucina Isan thailandese */
+    /**
+     * Cucina Isan thailandese
+     */
     ISAN,
-    /** Cucina israeliana */
+    /**
+     * Cucina israeliana
+     */
     ISRAELI,
-    /** Cucina italiana */
+    /**
+     * Cucina italiana
+     */
     ITALIAN,
-    /** Cucina italo-americana */
+    /**
+     * Cucina italo-americana
+     */
     ITALIAN_AMERICAN,
-    /** Cucina italiana contemporanea */
+    /**
+     * Cucina italiana contemporanea
+     */
     ITALIAN_CONTEMPORARY,
-    /** Izakaya – cucina giapponese informale */
+    /**
+     * Izakaya – cucina giapponese informale
+     */
     IZAKAYA,
-    /** Cucina giamaicana */
+    /**
+     * Cucina giamaicana
+     */
     JAMAICAN,
-    /** Cucina giapponese */
+    /**
+     * Cucina giapponese
+     */
     JAPAN,
-    /** Cucina giapponese */
+    /**
+     * Cucina giapponese
+     */
     JAPANESE,
-    /** Cucina giapponese contemporanea */
+    /**
+     * Cucina giapponese contemporanea
+     */
     JAPANESE_CONTEMPORARY,
-    /** Steakhouse giapponese */
+    /**
+     * Steakhouse giapponese
+     */
     JAPANESE_STEAKHOUSE,
-    /** Cucina Jiangzhe cinese */
+    /**
+     * Cucina Jiangzhe cinese
+     */
     JIANGZHE,
-    /** Jokbal – specialità coreana a base di maiale */
+    /**
+     * Jokbal – specialità coreana a base di maiale
+     */
     JOKBAL,
-    /** Kalguksu – zuppa coreana */
+    /**
+     * Kalguksu – zuppa coreana
+     */
     KALGUKSU,
-    /** Cucina coreana */
+    /**
+     * Cucina coreana
+     */
     KOREAN,
-    /** Cucina coreana contemporanea */
+    /**
+     * Cucina coreana contemporanea
+     */
     KOREAN_CONTEMPORARY,
-    /** Kushiage – cibo fritto giapponese */
+    /**
+     * Kushiage – cibo fritto giapponese
+     */
     KUSHIAGE,
-    /** Cucina Kyoto giapponese */
+    /**
+     * Cucina Kyoto giapponese
+     */
     KYOTO,
-    /** Specialità a base di agnello */
+    /**
+     * Specialità a base di agnello
+     */
     LAMB_SPECIALITIES,
-    /** Cucina laotiana */
+    /**
+     * Cucina laotiana
+     */
     LAO,
-    /** Cucina latino-americana */
+    /**
+     * Cucina latino-americana
+     */
     LATIN_AMERICAN,
-    /** Cucina libanese */
+    /**
+     * Cucina libanese
+     */
     LEBANESE,
-    /** Cucina ligure italiana */
+    /**
+     * Cucina ligure italiana
+     */
     LIGURIAN,
-    /** Cucina lombarda italiana */
+    /**
+     * Cucina lombarda italiana
+     */
     LOMBARDIAN,
-    /** Cucina lionese francese */
+    /**
+     * Cucina lionese francese
+     */
     LYONNAISE,
-    /** Cucina macanese */
+    /**
+     * Cucina macanese
+     */
     MACANESE,
-    /** Cucina malese */
+    /**
+     * Cucina malese
+     */
     MALAYSIAN,
-    /** Mandu – ravioli coreani */
+    /**
+     * Mandu – ravioli coreani
+     */
     MANDU,
-    /** Mantuano – cucina italiana */
+    /**
+     * Mantuano – cucina italiana
+     */
     MANTUAN,
-    /** Cucina mediterranea */
+    /**
+     * Cucina mediterranea
+     */
     MEDITERRANEAN,
-    /** Memil Guksu – piatto coreano */
+    /**
+     * Memil Guksu – piatto coreano
+     */
     MEMIL_GUKSU,
-    /** Cucina messicana */
+    /**
+     * Cucina messicana
+     */
     MEXICAN,
-    /** Cucina medio-orientale */
+    /**
+     * Cucina medio-orientale
+     */
     MIDDLE_EASTERN,
-    /** Cucina milanese italiana */
+    /**
+     * Cucina milanese italiana
+     */
     MILANESE,
-    /** Cucina moderna */
+    /**
+     * Cucina moderna
+     */
     MODERN,
-    /** Cucina britannica moderna */
+    /**
+     * Cucina britannica moderna
+     */
     MODERN_BRITISH,
-    /** Cucina francese moderna */
+    /**
+     * Cucina francese moderna
+     */
     MODERN_FRENCH,
-    /** Cucina marocchina */
+    /**
+     * Cucina marocchina
+     */
     MOROCCAN,
-    /** Naengmyeon – piatto coreano */
+    /**
+     * Naengmyeon – piatto coreano
+     */
     NAENGMYEON,
-    /** Nakagyo-ku – zona gastronomica giapponese */
+    /**
+     * Nakagyo-ku – zona gastronomica giapponese
+     */
     NAKAGYO_KU,
-    /** Cucina nepalese */
+    /**
+     * Cucina nepalese
+     */
     NEPALI,
-    /** Cucina Ningbo cinese */
+    /**
+     * Cucina Ningbo cinese
+     */
     NINGBO,
-    /** Piatti a base di noodle */
+    /**
+     * Piatti a base di noodle
+     */
     NOODLES,
-    /** Cucina nordafricana */
+    /**
+     * Cucina nordafricana
+     */
     NORTH_AFRICAN,
-    /** Cucina nordamericana */
+    /**
+     * Cucina nordamericana
+     */
     NORTH_AMERICAN,
-    /** Cucina thailandese settentrionale */
+    /**
+     * Cucina thailandese settentrionale
+     */
     NORTHERN_THAI,
-    /** Cucina norvegese */
+    /**
+     * Cucina norvegese
+     */
     NORWEGIAN,
-    /** Obanzai – cucina tradizionale giapponese */
+    /**
+     * Obanzai – cucina tradizionale giapponese
+     */
     OBANZAI,
-    /** Oden – piatto giapponese */
+    /**
+     * Oden – piatto giapponese
+     */
     ODEN,
-    /** Okonomiyaki – piatto giapponese */
+    /**
+     * Okonomiyaki – piatto giapponese
+     */
     OKONOMIYAKI,
-    /** Onigiri – polpette di riso giapponesi */
+    /**
+     * Onigiri – polpette di riso giapponesi
+     */
     ONIGIRI,
-    /** Cucina biologica */
+    /**
+     * Cucina biologica
+     */
     ORGANIC,
-    /** Specialità a base di ostriche */
+    /**
+     * Specialità a base di ostriche
+     */
     OYSTER_SPECIALITIES,
-    /** Cucina pakistana */
+    /**
+     * Cucina pakistana
+     */
     PAKISTANI,
-    /** Cucina peranakan */
+    /**
+     * Cucina peranakan
+     */
     PERANAKAN,
-    /** Cucina persiana */
+    /**
+     * Cucina persiana
+     */
     PERSIAN,
-    /** Cucina peruviana */
+    /**
+     * Cucina peruviana
+     */
     PERUVIAN,
-    /** Cucina piemontese italiana */
+    /**
+     * Cucina piemontese italiana
+     */
     PIEDMONTESE,
-    /** Pizza italiana */
+    /**
+     * Pizza italiana
+     */
     PIZZA,
-    /** Cucina polacca */
+    /**
+     * Cucina polacca
+     */
     POLISH,
-    /** Specialità a base di maiale */
+    /**
+     * Specialità a base di maiale
+     */
     PORK,
-    /** Cucina portoghese */
+    /**
+     * Cucina portoghese
+     */
     PORTUGUESE,
-    /** Cucina provenzale francese */
+    /**
+     * Cucina provenzale francese
+     */
     PROVENCAL,
-    /** Cucina portoricana */
+    /**
+     * Cucina portoricana
+     */
     PUERTO_RICAN,
-    /** Pesce palla */
+    /**
+     * Pesce palla
+     */
     PUFFERFISH,
-    /** Raclette – specialità svizzera */
+    /**
+     * Raclette – specialità svizzera
+     */
     RACLETTE,
-    /** Ramen – piatto giapponese */
+    /**
+     * Ramen – piatto giapponese
+     */
     RAMEN,
-    /** Cucina regionale generica */
+    /**
+     * Cucina regionale generica
+     */
     REGIONAL,
-    /** Cucina europea regionale */
+    /**
+     * Cucina europea regionale
+     */
     REGIONAL_EUROPEAN,
-    /** Piatti a base di riso */
+    /**
+     * Piatti a base di riso
+     */
     RICE_DISHES,
-    /** Cucina romana italiana */
+    /**
+     * Cucina romana italiana
+     */
     ROMAN,
-    /** Cucina russa */
+    /**
+     * Cucina russa
+     */
     RUSSIAN,
-    /** Cucina sarda italiana */
+    /**
+     * Cucina sarda italiana
+     */
     SARDINIAN,
-    /** Cucina savoiarda francese */
+    /**
+     * Cucina savoiarda francese
+     */
     SAVOYARD,
-    /** Cucina scandinava */
+    /**
+     * Cucina scandinava
+     */
     SCANDINAVIAN,
-    /** Cucina scozzese */
+    /**
+     * Cucina scozzese
+     */
     SCOTTISH,
-    /** Specialità di mare */
+    /**
+     * Specialità di mare
+     */
     SEAFOOD,
-    /** Cucina stagionale */
+    /**
+     * Cucina stagionale
+     */
     SEASONAL,
-    /** Seolleongtang – zuppa coreana */
+    /**
+     * Seolleongtang – zuppa coreana
+     */
     SEOLLEONGTANG,
-    /** Cucina Shaanxi cinese */
+    /**
+     * Cucina Shaanxi cinese
+     */
     SHAANXI,
-    /** Shabu-shabu – piatto giapponese */
+    /**
+     * Shabu-shabu – piatto giapponese
+     */
     SHABU_SHABU,
-    /** Cucina Shandong cinese */
+    /**
+     * Cucina Shandong cinese
+     */
     SHANDONG,
-    /** Cucina shanghainese cinese */
+    /**
+     * Cucina shanghainese cinese
+     */
     SHANGHAINESE,
-    /** Cucina da condividere */
+    /**
+     * Cucina da condividere
+     */
     SHARING,
-    /** Specialità di molluschi */
+    /**
+     * Specialità di molluschi
+     */
     SHELLFISH_SPECIALITIES,
-    /** Shojin – cucina buddhista giapponese */
+    /**
+     * Shojin – cucina buddhista giapponese
+     */
     SHOJIN,
-    /** Cucina Shun Tak */
+    /**
+     * Cucina Shun Tak
+     */
     SHUN_TAK,
-    /** Cucina Sichuan cinese */
+    /**
+     * Cucina Sichuan cinese
+     */
     SICHUAN,
-    /** Cucina siciliana italiana */
+    /**
+     * Cucina siciliana italiana
+     */
     SICILIAN,
-    /** Cucina singaporiana */
+    /**
+     * Cucina singaporiana
+     */
     SINGAPOREAN,
-    /** Piccoli piatti */
+    /**
+     * Piccoli piatti
+     */
     SMALL_EATS,
-    /** Smørrebrød – cucina danese */
+    /**
+     * Smørrebrød – cucina danese
+     */
     SMORREBRED,
-    /** Soba – tipo di noodle giapponesi */
+    /**
+     * Soba – tipo di noodle giapponesi
+     */
     SOBA,
-    /** Cucina sudafricana */
+    /**
+     * Cucina sudafricana
+     */
     SOUTH_AFRICAN,
-    /** Cucina sudamericana */
+    /**
+     * Cucina sudamericana
+     */
     SOUTH_AMERICAN,
-    /** Cucina del sud-est asiatico */
+    /**
+     * Cucina del sud-est asiatico
+     */
     SOUTH_EAST_ASIAN,
-    /** Cucina del sud degli Stati Uniti */
+    /**
+     * Cucina del sud degli Stati Uniti
+     */
     SOUTHERN,
-    /** Cucina thailandese meridionale */
+    /**
+     * Cucina thailandese meridionale
+     */
     SOUTHERN_THAI,
-    /** Cucina del sud dell’India */
+    /**
+     * Cucina del sud dell’India
+     */
     SOUTH_INDIAN,
-    /** Cucina tirolese meridionale */
+    /**
+     * Cucina tirolese meridionale
+     */
     SOUTH_TYROLEAN,
-    /** Cucina spagnola */
+    /**
+     * Cucina spagnola
+     */
     SPANISH,
-    /** Cucina spagnola contemporanea */
+    /**
+     * Cucina spagnola contemporanea
+     */
     SPANISH_CONTEMPORARY,
-    /** Cucina dello Sri Lanka */
+    /**
+     * Cucina dello Sri Lanka
+     */
     SRI_LANKAN,
-    /** Steakhouse – ristorante di bistecche */
+    /**
+     * Steakhouse – ristorante di bistecche
+     */
     STEAKHOUSE,
-    /** Cibo da strada */
+    /**
+     * Cibo da strada
+     */
     STREET_FOOD,
-    /** Sujebi – zuppa coreana */
+    /**
+     * Sujebi – zuppa coreana
+     */
     SUJEBI,
-    /** Sukiyaki – piatto giapponese */
+    /**
+     * Sukiyaki – piatto giapponese
+     */
     SUKIYAKI,
-    /** Sushi – cucina giapponese */
+    /**
+     * Sushi – cucina giapponese
+     */
     SUSHI,
-    /** Cucina sveva */
+    /**
+     * Cucina sveva
+     */
     SWABIAN,
-    /** Cucina svedese */
+    /**
+     * Cucina svedese
+     */
     SWEDISH,
-    /** Cucina svizzera */
+    /**
+     * Cucina svizzera
+     */
     SWISS,
-    /** Cucina taiwanese */
+    /**
+     * Cucina taiwanese
+     */
     TAIWANESE,
-    /** Cucina taiwanese contemporanea */
+    /**
+     * Cucina taiwanese contemporanea
+     */
     TAIWANESE_CONTEMPORARY,
-    /** Cucina Taizhou cinese */
+    /**
+     * Cucina Taizhou cinese
+     */
     TAIZHOU,
-    /** Tempura – fritto giapponese */
+    /**
+     * Tempura – fritto giapponese
+     */
     TEMPURA,
-    /** Cucina Teochew cinese */
+    /**
+     * Cucina Teochew cinese
+     */
     TEOCHEW,
-    /** Teppanyaki – cucina giapponese alla piastra */
+    /**
+     * Teppanyaki – cucina giapponese alla piastra
+     */
     TEPPANYAKI,
-    /** Cucina Tex-Mex */
+    /**
+     * Cucina Tex-Mex
+     */
     TEX_MEX,
-    /** Cucina thailandese */
+    /**
+     * Cucina thailandese
+     */
     THAI,
-    /** Cucina thai-cinese */
+    /**
+     * Cucina thai-cinese
+     */
     THAI_CHINESE,
-    /** Cucina thailandese contemporanea */
+    /**
+     * Cucina thailandese contemporanea
+     */
     THAI_CONTEMPORARY,
-    /** Cucina tibetana */
+    /**
+     * Cucina tibetana
+     */
     TIBETAN,
-    /** Tonkatsu – cotoletta di maiale giapponese */
+    /**
+     * Tonkatsu – cotoletta di maiale giapponese
+     */
     TONKATSU,
-    /** Cucina tradizionale */
+    /**
+     * Cucina tradizionale
+     */
     TRADITIONAL,
-    /** Cucina britannica tradizionale */
+    /**
+     * Cucina britannica tradizionale
+     */
     TRADITIONAL_BRITISH,
-    /** Cucina turca */
+    /**
+     * Cucina turca
+     */
     TURKISH,
-    /** Cucina toscana italiana */
+    /**
+     * Cucina toscana italiana
+     */
     TUSCAN,
-    /** Udon – noodle giapponesi */
+    /**
+     * Udon – noodle giapponesi
+     */
     UDON,
-    /** Cucina umbra italiana */
+    /**
+     * Cucina umbra italiana
+     */
     UMBRIAN,
-    /** Unagi – anguilla giapponese */
+    /**
+     * Unagi – anguilla giapponese
+     */
     UNAGI,
-    /** Cucina vegana */
+    /**
+     * Cucina vegana
+     */
     VEGAN,
-    /** Cucina vegetariana */
+    /**
+     * Cucina vegetariana
+     */
     VEGETARIAN,
-    /** Cucina veneziana italiana */
+    /**
+     * Cucina veneziana italiana
+     */
     VENETIAN,
-    /** Cucina venezuelana */
+    /**
+     * Cucina venezuelana
+     */
     VENEZUELAN,
-    /** Cucina vietnamita */
+    /**
+     * Cucina vietnamita
+     */
     VIETNAMESE,
-    /** Cucina vietnamita contemporanea */
+    /**
+     * Cucina vietnamita contemporanea
+     */
     VIETNAMESE_CONTEMPORARY,
-    /** Cucina occidentale */
+    /**
+     * Cucina occidentale
+     */
     WESTERN,
-    /** Cucina mondiale, fusion di vari stili */
+    /**
+     * Cucina mondiale, fusion di vari stili
+     */
     WORLD,
-    /** Cucina Xibei cinese */
+    /**
+     * Cucina Xibei cinese
+     */
     XIBEI,
-    /** Cucina Xinjiang cinese */
+    /**
+     * Cucina Xinjiang cinese
+     */
     XINJIANG,
-    /** Yakitori – spiedini giapponesi */
+    /**
+     * Yakitori – spiedini giapponesi
+     */
     YAKITORI,
-    /** Yoshoku – cucina giapponese occidentale */
+    /**
+     * Yoshoku – cucina giapponese occidentale
+     */
     YOSHOKU,
-    /** Yukhoe – specialità coreana di carne cruda */
+    /**
+     * Yukhoe – specialità coreana di carne cruda
+     */
     YUKHOE,
-    /** Cucina Yunnan cinese */
+    /**
+     * Cucina Yunnan cinese
+     */
     YUNNANESE,
-    /** Cucina Zhejiang cinese */
+    /**
+     * Cucina Zhejiang cinese
+     */
     ZHEJIANG;
 
     @Override

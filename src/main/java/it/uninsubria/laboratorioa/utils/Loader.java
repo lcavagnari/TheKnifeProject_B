@@ -28,6 +28,7 @@ import java.util.*;
  * Gestisce la deserializzazione delle entità `User`, `Owner`, `Client` e `Restaurant` e
  * le inserisce in strutture dati statiche per un accesso efficiente tramite ID, nome o proprietario.
  * <p>
+ *
  * @author Luca Cavagnari
  * @version 1.0
  */
@@ -118,7 +119,8 @@ public class Loader {
                 for (JsonNode node : jsonNode.path("cuisinesTypes")) {
                     try {
                         cuisines.add(CuisineType.valueOf(node.asText().toUpperCase()));
-                    } catch (IllegalArgumentException ignored) {}
+                    } catch (IllegalArgumentException ignored) {
+                    }
                 }
 
                 Set<String> services = new HashSet<>();

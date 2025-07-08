@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratorioa.utils.Constants;
+import it.uninsubria.laboratorioa.utils.IO;
 import lombok.Getter;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import java.util.UUID;
  * Fornisce metodi per salvare, ricostruire e rappresentare l'entità.<p>
  * Utilizza {@link ObjectMapper} configurato per serializzazione e deserializzazione sicura.<p>
  * <p>
+ *
  * @author Luca Cavagnari
  * @version 1.0
  */
@@ -86,6 +88,8 @@ public abstract class JsonEntity {
         this.jsonObject = mapper.createObjectNode();
         if (id != null)
             jsonObject.put("id", String.valueOf(id));
+
+        IO.validateUUID(id);
     }
 
     /**

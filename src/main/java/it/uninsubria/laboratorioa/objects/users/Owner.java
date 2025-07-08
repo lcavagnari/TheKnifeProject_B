@@ -7,7 +7,10 @@ import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * Classe che rappresenta un utente di tipo Proprietario (Owner).<p>
@@ -43,8 +46,8 @@ public class Owner extends User {
 
         if (restaurants == null || restaurants.isEmpty()) return;
         for (Restaurant r : restaurants) {
-            restaurantsById.put(r.getId(),r);
-            restaurantsByName.put(r.getName(),r);
+            restaurantsById.put(r.getId(), r);
+            restaurantsByName.put(r.getName(), r);
         }
     }
 
@@ -71,7 +74,8 @@ public class Owner extends User {
     }
 
     public boolean renameRestaurant(UUID id, String newName) {
-        if (id == null || newName == null || newName.isBlank() || !newName.matches("[\\p{L}0-9 \\-']{4,30}$") || !restaurantsById.containsKey(id)) return false;
+        if (id == null || newName == null || newName.isBlank() || !newName.matches("[\\p{L}0-9 \\-']{4,30}$") || !restaurantsById.containsKey(id))
+            return false;
 
         Restaurant r = restaurantsById.get(id);
         if (r == null) {

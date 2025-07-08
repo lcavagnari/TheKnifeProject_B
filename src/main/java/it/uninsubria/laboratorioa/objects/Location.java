@@ -9,6 +9,7 @@ import lombok.Setter;
  * Estende {@link JsonEntity} per serializzazione JSON e salvataggio.<p>
  * Contiene latitudine e longitudine per la localizzazione precisa.<p>
  * <p>
+ *
  * @author Luca Cavagnari
  * @version 1.0
  */
@@ -45,11 +46,11 @@ public class Location extends JsonEntity {
      * Costruttore completo con tutti i campi.<p>
      * Rimuove il campo "id" da jsonObject prima di ricostruire la rappresentazione JSON.<p>
      *
-     * @param nation  nazione di appartenenza
-     * @param city    nome della città
-     * @param latitude latitudine geografica
+     * @param nation    nazione di appartenenza
+     * @param city      nome della città
+     * @param latitude  latitudine geografica
      * @param longitude longitudine geografica
-     * @param address indirizzo completo
+     * @param address   indirizzo completo
      */
     public Location(Nation nation, String city, double latitude, double longitude, String address) {
         this.nation = nation;

@@ -7,8 +7,9 @@ import java.util.Map;
 
 /**
  * Enum che rappresenta le categorie di riconoscimenti Michelin ottenibili da un ristorante.
- *
+ * <p>
  * Autore: Luca Cavagnari
+ *
  * @version 1.0
  */
 public enum Award {
@@ -36,12 +37,6 @@ public enum Award {
     SELECTED_RESTAURANTS(5);
 
     /**
-     * Valore intero associato all'enum.
-     */
-    @Getter
-    private final int value;
-
-    /**
      * Mappa ausiliaria per ottenere un valore `Award` a partire da un intero.
      */
     private static final Map<Integer, Award> BY_VALUE = new HashMap<>();
@@ -51,6 +46,12 @@ public enum Award {
             BY_VALUE.put(a.value, a);
         }
     }
+
+    /**
+     * Valore intero associato all'enum.
+     */
+    @Getter
+    private final int value;
 
     /**
      * Costruttore che associa il valore intero al tipo di premio.

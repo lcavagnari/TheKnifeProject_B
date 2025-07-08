@@ -3,6 +3,7 @@ package it.uninsubria.laboratorioa.objects.users;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratorioa.objects.JsonEntity;
 import it.uninsubria.laboratorioa.objects.Location;
+import it.uninsubria.laboratorioa.utils.IO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -21,6 +22,7 @@ import java.util.Objects;
  * Gestisce la sicurezza della password tramite hashing e salting.<p>
  * Estende {@link JsonEntity} per la serializzazione JSON.<p>
  * <p>
+ *
  * @author Luca Cavagnari
  * @version 1.0
  */
@@ -65,11 +67,11 @@ public abstract class User extends JsonEntity {
      * Esegue validazioni di base su username, nome e cognome.<p>
      * Costruisce l'oggetto JSON.<p>
      *
-     * @param username nome utente
-     * @param password password in chiaro
-     * @param name nome
-     * @param lastName cognome
-     * @param location posizione geografica
+     * @param username    nome utente
+     * @param password    password in chiaro
+     * @param name        nome
+     * @param lastName    cognome
+     * @param location    posizione geografica
      * @param dateOfBirth data di nascita
      */
     public User(String username, String password, String name, String lastName, Location location, LocalDate dateOfBirth) {
@@ -89,6 +91,8 @@ public abstract class User extends JsonEntity {
          */
         //this.dateOfBirth = birth;
         this.dateOfBirth = dateOfBirth;
+
+        IO.validateUser(this);
         build();
     }
 
@@ -98,13 +102,13 @@ public abstract class User extends JsonEntity {
      * Valida data di nascita.<p>
      * Costruisce l'oggetto JSON.<p>
      *
-     * @param username nome utente
-     * @param name nome
-     * @param lastName cognome
-     * @param location posizione geografica
+     * @param username    nome utente
+     * @param name        nome
+     * @param lastName    cognome
+     * @param location    posizione geografica
      * @param dateOfBirth data di nascita
-     * @param password password hashata
-     * @param salt salt usato nell'hash
+     * @param password    password hashata
+     * @param salt        salt usato nell'hash
      */
     public User(String username, String name, String lastName, Location location, LocalDate dateOfBirth, String password, String salt) {
         this.username = (username == null || username.length() < 3) ? null : username.substring(0, 16);
@@ -241,7 +245,7 @@ public abstract class User extends JsonEntity {
          * Costruttore che riceve un salt esistente e calcola l'hash della password.<p>
          *
          * @param password password in chiaro
-         * @param salt salt esistente in formato stringa
+         * @param salt     salt esistente in formato stringa
          */
         public PasswordHasher(String password, String salt) {
             byte[] saltBytes = salt.getBytes();
@@ -256,7 +260,7 @@ public abstract class User extends JsonEntity {
         /**
          * Esegue l'hashing della password usando PBKDF2 con il salt e iterazioni.<p>
          *
-         * @param password password in char array
+         * @param password  password in char array
          * @param saltBytes salt in byte array
          * @return hash codificato in Base64
          */

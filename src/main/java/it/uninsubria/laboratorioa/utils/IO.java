@@ -16,6 +16,7 @@ import java.util.UUID;
  * Utilizza Scanner per lettura standard input.<p>
  * Supporta formati booleani personalizzati, gestione menu, messaggi di errore e pulizia schermo.
  * <p>
+ *
  * @author Luca Cavagnari
  * @version 1.0
  */
@@ -89,7 +90,7 @@ public class IO {
      * @return Stringa inserita dall'utente
      */
     public static String getUserInput(String promptMessage) {
-        System.out.print("\n" + IO.replaceText(32, "> ") + promptMessage+". Digita '::annulla' per cancellare");
+        System.out.print("\n" + IO.replaceText(32, "> ") + promptMessage + ". Digita '::annulla' per cancellare");
         while (!INPUT.hasNext()) INPUT.nextLine();
 
         String input = INPUT.nextLine();
@@ -124,11 +125,11 @@ public class IO {
      * @return Stringa inserita dall'utente
      */
     public static String getPhoneNumber(String promptMessage) {
-        String input = getUserInput(promptMessage,10,15);
+        String input = getUserInput(promptMessage, 10, 15);
 
         while (!input.matches("\\+\\d{13,15}")) {
             IO.printErrorMessage("Valore non valido");
-            input = getUserInput(promptMessage,10,15);
+            input = getUserInput(promptMessage, 10, 15);
         }
 
         return input;
@@ -173,9 +174,9 @@ public class IO {
      * Richiede e interpreta un valore Enum da input utente.<p>
      * Valori inseriti vengono normalizzati in MAIUSCOLO e con spazi sostituiti da underscore.
      *
-     * @param enumType Classe dell'enum da parsare
+     * @param enumType      Classe dell'enum da parsare
      * @param promptMessage Messaggio di richiesta all'utente
-     * @param <T> Tipo Enum da restituire
+     * @param <T>           Tipo Enum da restituire
      * @return Istanza Enum parsata da input
      * @throws IllegalArgumentException se il valore inserito non è tra quelli accettati
      */
@@ -212,7 +213,7 @@ public class IO {
      * @return true se tutti i valori sono validi
      * @throws IllegalArgumentException se uno o più valori sono null, vuoti o non corrispondenti alla regex
      */
-    public static boolean validateString(final String regex, String value)  {
+    public static boolean validateString(final String regex, String value) {
         if (value == null || value.isBlank())
             throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
         if (!value.matches(regex))
@@ -220,7 +221,7 @@ public class IO {
         return true;
     }
 
-    public static boolean validateString(String value)  {
+    public static boolean validateString(String value) {
         return validateString("^[\\p{L}0-9 \\-']{4,200}$", value);
     }
 
@@ -257,8 +258,8 @@ public class IO {
     /**
      * Verifica una data, verificando non nullità e che rientri in un intervallo temporale specificato.
      *
-     * @param max Data massima accettabile (inclusa)
-     * @param min Data minima accettabile (inclusa)
+     * @param max  Data massima accettabile (inclusa)
+     * @param min  Data minima accettabile (inclusa)
      * @param date Data da validare
      * @return true se la data è valida
      * @throws IllegalArgumentException se la data è nulla o fuori dall'intervallo [min, max]
@@ -268,17 +269,18 @@ public class IO {
             throw new IllegalArgumentException("Impossibile verificare data, riprovare più tardi");
 
         if (date.isAfter(max) || date.isBefore(min))
-            throw new IllegalArgumentException("Data fuori da intervalli accettabili ("+max.toString()+"), riprovare");
+            throw new IllegalArgumentException("Data fuori da intervalli accettabili (" + max.toString() + "), riprovare");
 
         return true;
     }
 
     public static boolean validateDates(LocalDateTime date) {
-        return validateDates(LocalDateTime.MAX,LocalDateTime.MIN,date);
+        return validateDates(LocalDateTime.MAX, LocalDateTime.MIN, date);
     }
 
     /**
      * Verifica la validità dell'id
+     *
      * @param id
      * @return
      */
@@ -309,8 +311,8 @@ public class IO {
             throw new IllegalArgumentException("Valutazione deve essere compresa tra 1 e 5.");
 
         validateUUID(r.getId());
-        validateString("^[\\p{L}0-9 \\-']{4,200}$",r.getText());
-        validateString("^[\\p{L}0-9 \\-']{4,200}$",r.getReply());
+        validateString("^[\\p{L}0-9 \\-']{4,200}$", r.getText());
+        validateString("^[\\p{L}0-9 \\-']{4,200}$", r.getReply());
         validateDates(r.getTimestamp());
         return false;
     }
@@ -332,11 +334,11 @@ public class IO {
         validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName());
         validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName());
 
-        validateString("^[a-zA-Z][\\w.]{1,14}[a-zA-Z0-9]$",user.getUsername());
+        validateString("^[a-zA-Z][\\w.]{1,14}[a-zA-Z0-9]$", user.getUsername());
 
         validateLocation(user.getLocation());
 
-        validateDates(LocalDateTime.MIN,LocalDateTime.now(), user.getDateOfBirth().atStartOfDay());
+        validateDates(LocalDateTime.MIN, LocalDateTime.now(), user.getDateOfBirth().atStartOfDay());
 
         return true;
     }
@@ -347,11 +349,11 @@ public class IO {
             throw new IllegalArgumentException("Impossibile ottenere dati ristorante, riprovare più tardi");
 
         validateUUID(r.getId());
-        validateString("^[\\p{L}][\\p{L}'\\- ]{1,40}$",r.getName());
+        validateString("^[\\p{L}][\\p{L}'\\- ]{1,40}$", r.getName());
         validateString(r.getDescription());
 
-        validateString("^(https?://)?[\\w.-]+(\\.[a-z]{2,})+.*$",r.getWebsiteUrl());
-        validateString("^\\+\\d{8,15}$",r.getPhone());
+        validateString("^(https?://)?[\\w.-]+(\\.[a-z]{2,})+.*$", r.getWebsiteUrl());
+        validateString("^\\+\\d{8,15}$", r.getPhone());
 
         validateUser(r.getOwner());
 

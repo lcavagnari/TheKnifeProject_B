@@ -9,6 +9,7 @@ import java.util.Map;
  * Enum che rappresenta le fasce di prezzo di un ristorante.
  * Ogni fascia è associata a un simbolo e a un intervallo di prezzi.
  * <p>
+ *
  * @author Luca Cavagnari
  * @version 1.0
  */

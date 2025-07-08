@@ -35,11 +35,11 @@ public class Client extends User {
      * Inizializza l'array JSON e l'insieme dei preferiti.<p>
      * Invoca il metodo {@link #build()} per costruire la rappresentazione JSON.<p>
      *
-     * @param username nome utente
-     * @param password password in chiaro
-     * @param name nome
-     * @param lastName cognome
-     * @param location posizione geografica
+     * @param username    nome utente
+     * @param password    password in chiaro
+     * @param name        nome
+     * @param lastName    cognome
+     * @param location    posizione geografica
      * @param dateOfBirth data di nascita
      */
     public Client(String username, String password, String name, String lastName, Location location, LocalDate dateOfBirth) {
@@ -56,12 +56,12 @@ public class Client extends User {
      * Inizializza l'array JSON e l'insieme dei preferiti.<p>
      * Invoca il metodo {@link #build()} per costruire la rappresentazione JSON.<p>
      *
-     * @param username nome utente
-     * @param password password hashata
-     * @param salt salt usato nell'hash
-     * @param name nome
-     * @param lastName cognome
-     * @param location posizione geografica
+     * @param username    nome utente
+     * @param password    password hashata
+     * @param salt        salt usato nell'hash
+     * @param name        nome
+     * @param lastName    cognome
+     * @param location    posizione geografica
      * @param dateOfBirth data di nascita
      */
     public Client(String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth) {
@@ -77,13 +77,13 @@ public class Client extends User {
      * Costruttore con password hashata, salt e lista di ristoranti preferiti.<p>
      * Inizializza l'array JSON.<p>
      *
-     * @param username nome utente
-     * @param password password hashata
-     * @param salt salt usato nell'hash
-     * @param name nome
-     * @param lastName cognome
-     * @param location posizione geografica
-     * @param dateOfBirth data di nascita
+     * @param username             nome utente
+     * @param password             password hashata
+     * @param salt                 salt usato nell'hash
+     * @param name                 nome
+     * @param lastName             cognome
+     * @param location             posizione geografica
+     * @param dateOfBirth          data di nascita
      * @param favouriteRestourants insieme di UUID dei ristoranti preferiti
      */
     public Client(String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants) {

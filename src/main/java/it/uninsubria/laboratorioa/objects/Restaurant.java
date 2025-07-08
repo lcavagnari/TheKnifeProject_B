@@ -120,20 +120,20 @@ public class Restaurant extends JsonEntity {
      * Inizializza e popola gli array JSON per serializzazione.<p>
      * Costruisce la rappresentazione JSON chiamando {@link #build()}.
      *
-     * @param name          nome del ristorante
-     * @param description   descrizione
-     * @param websiteUrl    URL sito web
-     * @param owner         proprietario
-     * @param phone         telefono
-     * @param location           posizione geografica
-     * @param priceRange    fascia di prezzo
-     * @param hasDelivery   flag consegna a domicilio
+     * @param name             nome del ristorante
+     * @param description      descrizione
+     * @param websiteUrl       URL sito web
+     * @param owner            proprietario
+     * @param phone            telefono
+     * @param location         posizione geografica
+     * @param priceRange       fascia di prezzo
+     * @param hasDelivery      flag consegna a domicilio
      * @param hasOnlineBooking flag prenotazioni online
-     * @param award         premio assegnato
-     * @param greenStar     flag Stella Verde
-     * @param cuisinesTypes insieme tipi cucina
-     * @param reviews       mappa recensioni
-     * @param services      insieme servizi
+     * @param award            premio assegnato
+     * @param greenStar        flag Stella Verde
+     * @param cuisinesTypes    insieme tipi cucina
+     * @param reviews          mappa recensioni
+     * @param services         insieme servizi
      */
     public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes,
@@ -174,19 +174,19 @@ public class Restaurant extends JsonEntity {
      * Inizializza la mappa recensioni vuota.<p>
      * Non costruisce la rappresentazione JSON automaticamente.
      *
-     * @param name          nome del ristorante
-     * @param description   descrizione
-     * @param websiteUrl    URL sito web
-     * @param owner         proprietario
-     * @param phone         telefono
-     * @param location           posizione geografica
-     * @param priceRange    fascia di prezzo
-     * @param hasDelivery   flag consegna a domicilio
+     * @param name             nome del ristorante
+     * @param description      descrizione
+     * @param websiteUrl       URL sito web
+     * @param owner            proprietario
+     * @param phone            telefono
+     * @param location         posizione geografica
+     * @param priceRange       fascia di prezzo
+     * @param hasDelivery      flag consegna a domicilio
      * @param hasOnlineBooking flag prenotazioni online
-     * @param award         premio assegnato
-     * @param greenStar     flag Stella Verde
-     * @param cuisinesTypes insieme tipi cucina
-     * @param services      insieme servizi
+     * @param award            premio assegnato
+     * @param greenStar        flag Stella Verde
+     * @param cuisinesTypes    insieme tipi cucina
+     * @param services         insieme servizi
      */
     public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes, Set<String> services) {
@@ -215,7 +215,6 @@ public class Restaurant extends JsonEntity {
 
         IO.validateRestaurant(this);
     }
-
 
 
     /**

@@ -71,7 +71,7 @@ public class Menus {
 ---
 */
 
-    private static User user = null;
+    private static final User user = null;
 
     /**
      * Metodo principale del menu dell'applicazione.
