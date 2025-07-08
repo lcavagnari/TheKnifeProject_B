@@ -90,27 +90,13 @@ public class IO {
      * @return Stringa inserita dall'utente
      */
     public static String getUserInput(String promptMessage) {
-        System.out.print("\n" + IO.replaceText(32, "> ") + promptMessage);
+        System.out.print("\n" + IO.replaceText(32, "> ") + promptMessage+". Digita '::annulla' per cancellare");
         while (!INPUT.hasNext()) INPUT.nextLine();
 
+        String input = INPUT.nextLine();
+        if (input.equals("::annulla")) throw new AbortOperationException("ricevuto comando di interruzione da utente");
+
         System.out.println();
-        return INPUT.nextLine();
-    }
-
-    /**
-     * Richiede input testuale all'utente.
-     *
-     * @param promptMessage Messaggio di richiesta input
-     * @return Stringa inserita dall'utente
-     */
-    public static String getPhoneNumber(String promptMessage) {
-        String input = getUserInput(promptMessage,10,15);
-
-        while (!input.matches("\\+\\d{13,15}")) {
-            IO.printErrorMessage("Valore non valido");
-            input = getUserInput(promptMessage,10,15);
-        }
-
         return input;
     }
 
@@ -128,6 +114,23 @@ public class IO {
         do {
             input = getUserInput(promptMessage);
         } while (input.length() < minLength || input.length() > maxLength);
+
+        return input;
+    }
+
+    /**
+     * Richiede input testuale all'utente.
+     *
+     * @param promptMessage Messaggio di richiesta input
+     * @return Stringa inserita dall'utente
+     */
+    public static String getPhoneNumber(String promptMessage) {
+        String input = getUserInput(promptMessage,10,15);
+
+        while (!input.matches("\\+\\d{13,15}")) {
+            IO.printErrorMessage("Valore non valido");
+            input = getUserInput(promptMessage,10,15);
+        }
 
         return input;
     }
@@ -166,68 +169,33 @@ public class IO {
         return Math.max(sel - 1, 0);
     }
 
+    public static <T extends Enum<T>> T parseEnum(Class<T> enumType, String promptMessage) {
+        String input = getUserInput(promptMessage);
 
-    public static Award parseAward(String input) {
-        if (input == null || input.isBlank())
-            throw new IllegalArgumentException("Valore Award nullo o vuoto.");
-        try {
-            return Award.valueOf(input.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Valore Award non valido: " + input);
+        while (true) {
+            try {
+                return Enum.valueOf(enumType, input.trim().toUpperCase().replace(" ", "_"));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Valore non valido, riprovare");
+            }
         }
     }
 
-    public static CuisineType parseCuisineType(String input) {
-        if (input == null || input.isBlank())
-            throw new IllegalArgumentException("Valore CuisineType nullo o vuoto.");
-        try {
-            return CuisineType.valueOf(input.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Valore CuisineType non valido: " + input);
-        }
-    }
-
-    public static PriceRange parsePriceRange(String input) {
-        if (input == null || input.isBlank())
-            throw new IllegalArgumentException("Valore PriceRange nullo o vuoto.");
-        try {
-            return PriceRange.valueOf(input.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Valore PriceRange non valido: " + input);
-        }
-    }
-
-    // Sostituisci Enum4 con il quarto enum effettivo
-    public static Nation parseNation(String input) {
-        if (input == null || input.isBlank())
-            throw new IllegalArgumentException("Valore Enum4 nullo o vuoto.");
-        try {
-            return Enum4.valueOf(input.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Valore Enum4 non valido: " + input);
-        }
-    }
 
 
     // Validators
 
-    public static boolean validateString(String value, final String regex)  {
-        if (value == null || value.isBlank())
-            throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
-        if (!value.matches(regex))
-            throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha lunghezza non consentita (4-30).");
+    public static boolean validateString(final String regex, String... values)  {
+        for (String s : values) {
+            if (s == null || s.isBlank())
+                throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
+            if (!s.matches(regex))
+                throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha lunghezza non consentita (4-30).");
 
+        }
         return true;
     }
 
-    public static boolean validateString(String value, final String regex, String invalidValueErrorMessage)  {
-        if (value == null || value.isBlank())
-            throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
-        if (!value.matches(regex))
-            throw new IllegalArgumentException(invalidValueErrorMessage);
-
-        return true;
-    }
 
 
     public static boolean validateLocation(Location loc) {
@@ -252,17 +220,6 @@ public class IO {
         return true;
     }
 
-    /**
-     * Verifica una o più date per non nullità e correttezza temporale (nessuna data futura consentita).
-     * Solleva IllegalArgumentException con messaggi precisi in caso di violazione.
-     *
-     * @param dates Varargs di LocalDateTime da validare
-     * @return true se tutte le date sono valide
-     * @throws IllegalArgumentException se una data è nulla o futura
-     */
-    public static boolean validateDates(LocalDate max, LocalDate... dates) {
-        return validateDates(max,dates);
-    }
 
     /**
      * Validates one or more dates for non-nullity and temporal correctness (no future dates).
@@ -275,7 +232,7 @@ public class IO {
      *    - any date is null
      *    - any date is in the future compared to now
      */
-    public static boolean validateDates(LocalDateTime max,LocalDateTime... dates) {
+    public static boolean validateDates(LocalDateTime max, LocalDateTime min,LocalDateTime... dates) {
         if (dates == null || dates.length == 0) {
             throw new IllegalArgumentException("Impossibile verificare data, riprovare più tardi");
         }
@@ -284,12 +241,17 @@ public class IO {
             if (date == null)
                 throw new IllegalArgumentException("Impossibile determinare data, riprovare");
 
-            if (date.isAfter(max) || date.isBefore(LocalDateTime.MIN))
+            if (date.isAfter(max) || date.isBefore(min))
                 throw new IllegalArgumentException("Data fuori da intervalli accettabili ("+max.toString()+"), riprovare");
         }
 
         return true;
     }
+
+    public static boolean validateDates(LocalDateTime... dates) {
+        return validateDates(LocalDateTime.MAX,LocalDateTime.MIN,dates);
+    }
+
 
     public static void validateReview(Review r) {
         if (r == null)
@@ -299,13 +261,8 @@ public class IO {
         if (r.getValue() < 1 || r.getValue() > 5)
             throw new IllegalArgumentException("Valutazione deve essere compresa tra 1 e 5.");
 
-        validateString(r.getText(),"^[\\p{L}0-9 \\-']{4,200}$");
-
-        if (r.date == null)
-            throw new IllegalArgumentException("Data recensione non può essere nulla.");
-
-        if (r.date.isAfter(java.time.LocalDate.now()))
-            throw new IllegalArgumentException("Data recensione non può essere futura.");
+        validateString("^[\\p{L}0-9 \\-']{4,200}$",r.getText(),r.getReply());
+        validateDates(r.getTimestamp());
     }
 
 
