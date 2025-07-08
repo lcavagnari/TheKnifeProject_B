@@ -1,7 +1,7 @@
 package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.objects.users.User;
-import it.uninsubria.laboratorioa.utils.IO;
+import it.uninsubria.laboratorioa.ui.IO;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -68,6 +68,7 @@ public class Review extends JsonEntity {
         this.text = text;
         this.reply = reply;
 
+        IO.validateReview(this);
         build();
     }
 
@@ -78,12 +79,11 @@ public class Review extends JsonEntity {
      * @param restaurant ristorante associato
      * @param user       utente autore
      * @param value      valutazione numerica
-     * @param timestamp  data e ora recensione
      * @param text       testo recensione
      */
-    public Review(Restaurant restaurant, User user, int value, LocalDateTime timestamp, String text) {
+    public Review(Restaurant restaurant, int value, User user, String text) {
         super(UUID.randomUUID());
-        this.timestamp = timestamp;
+        this.timestamp = LocalDateTime.now();
         this.restaurant = restaurant;
         this.user = user;
 
@@ -173,7 +173,6 @@ public class Review extends JsonEntity {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("┌────────────────────── Review Info ──────────────────────┐\n");
         sb.append("│ ID:               ").append(id).append("\n");
         sb.append("│ Timestamp:        ").append(timestamp).append("\n");
         sb.append("│ User:             ").append(user != null ? user.getUsername() : "N/A").append("\n");
@@ -181,7 +180,6 @@ public class Review extends JsonEntity {
         sb.append("│ Rating:           ").append(value).append(" / 5").append("\n");
         sb.append("│ Text:             ").append(text != null && !text.isBlank() ? "\"" + text + "\"" : "N/A").append("\n");
         sb.append("│ Reply:            ").append(reply != null && !reply.isBlank() ? "\"" + reply + "\"" : "None").append("\n");
-        sb.append("└─────────────────────────────────────────────────────────┘");
         return sb.toString();
     }
 

@@ -1,11 +1,17 @@
-import it.uninsubria.laboratorioa.ui.Menus;
-import it.uninsubria.laboratorioa.utils.Loader;
+import java.util.HashSet;
+import java.util.Set;
 
 public class UiTest {
 
     public static void main(String[] args) {
-        System.out.println("Hello, World!");
-        Loader.loadFromFile();
-        Menus.mainMenu();
+        Set<String> s = new HashSet<>();
+
+        s.add("1");
+        s.add("2");
+        s.add("3");
+
+        HashSet s1 = new HashSet(s);
+
+        s.addAll(s1);
     }
 }

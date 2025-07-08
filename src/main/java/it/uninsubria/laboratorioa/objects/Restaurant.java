@@ -5,7 +5,7 @@ import it.uninsubria.laboratorioa.objects.enums.Award;
 import it.uninsubria.laboratorioa.objects.enums.CuisineType;
 import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import it.uninsubria.laboratorioa.objects.users.Owner;
-import it.uninsubria.laboratorioa.utils.IO;
+import it.uninsubria.laboratorioa.ui.IO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;

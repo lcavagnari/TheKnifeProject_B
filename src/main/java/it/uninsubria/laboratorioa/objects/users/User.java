@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratorioa.objects.JsonEntity;
 import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.enums.UserRole;
-import it.uninsubria.laboratorioa.utils.IO;
+import it.uninsubria.laboratorioa.ui.IO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
