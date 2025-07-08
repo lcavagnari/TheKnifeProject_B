@@ -90,7 +90,8 @@ public class IO {
      * @return Stringa inserita dall'utente
      */
     public static String getUserInput(String promptMessage) {
-        System.out.print("\n" + IO.replaceText(32, "> ") + promptMessage + ". Digita '::annulla' per cancellare");
+        System.out.println("\nDigita '::annulla' per cancellare");
+        System.out.print(IO.replaceText(32, "> ") + promptMessage);
         while (!INPUT.hasNext()) INPUT.nextLine();
 
         String input = INPUT.nextLine();
