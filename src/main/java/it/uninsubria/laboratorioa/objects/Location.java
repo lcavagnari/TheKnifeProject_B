@@ -1,6 +1,7 @@
 package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.objects.enums.Nation;
+import it.uninsubria.laboratorioa.utils.IO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -60,6 +61,8 @@ public class Location extends JsonEntity {
         this.address = address;
 
         this.jsonObject.remove("id");
+
+        IO.validateLocation(this);
         build();
     }
 

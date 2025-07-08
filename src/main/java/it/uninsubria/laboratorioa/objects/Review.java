@@ -1,6 +1,7 @@
 package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.objects.users.User;
+import it.uninsubria.laboratorioa.utils.IO;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -90,6 +91,7 @@ public class Review extends JsonEntity {
         this.text = text;
         this.reply = null;
 
+        IO.validateReview(this);
         build();
     }
 

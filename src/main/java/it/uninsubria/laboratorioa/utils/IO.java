@@ -217,7 +217,7 @@ public class IO {
         if (value == null || value.isBlank())
             throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
         if (!value.matches(regex))
-            throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha lunghezza non consentita (4-30).");
+            throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha un numero di caratteri non consentito (4-200).");
         return true;
     }
 
@@ -310,9 +310,11 @@ public class IO {
         if (r.getValue() < 1 || r.getValue() > 5)
             throw new IllegalArgumentException("Valutazione deve essere compresa tra 1 e 5.");
 
+        if (r.getReply() != null && !r.getReply().matches("^[\\p{L}0-9 \\-']{4,200}$"))
+            throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha un numero di caratteri non consentito (4-200).");
+
         validateUUID(r.getId());
         validateString("^[\\p{L}0-9 \\-']{4,200}$", r.getText());
-        validateString("^[\\p{L}0-9 \\-']{4,200}$", r.getReply());
         validateDates(r.getTimestamp());
         return false;
     }
