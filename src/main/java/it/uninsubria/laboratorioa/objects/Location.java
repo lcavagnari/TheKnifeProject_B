@@ -86,13 +86,14 @@ public class Location extends JsonEntity {
      */
     @Override
     public String toString() {
-        return "Location{" +
-                "nation=" + nation +
-                ", city='" + city + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
-                ", address='" + address + '\'' +
-                '}';
+        return String.format(
+                "%s, %s (%s) [lat=%.5f, lon=%.5f]",
+                address,
+                city,
+                nation.name().replace("_", " "),
+                latitude,
+                longitude
+        );
     }
 
     /**
