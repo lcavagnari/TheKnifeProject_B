@@ -2,13 +2,14 @@ package it.uninsubria.laboratorioa.ui;
 
 import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.Review;
-import it.uninsubria.laboratorioa.objects.enums.UserRole;
+import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.objects.users.User;
 import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
 import it.uninsubria.laboratorioa.utils.IO;
 import it.uninsubria.laboratorioa.utils.Loader;
 import lombok.experimental.UtilityClass;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 /**
@@ -102,7 +103,7 @@ public class Menus {
                     "Search for a Restaurant",
                     "Browse Restaurants",
                     "Exit"
-                    );
+            );
             int choice = IO.getInt("Enter choice:", 4);
 
             switch (choice) {
@@ -143,66 +144,175 @@ public class Menus {
     }
 
 
-    private static void login() {
+    private static void searchRestaurant() {
         IO.clearScreen();
 
-        int attempts =0;
-        while(user == null) {
-            String username = IO.getUserInput("Enter username:");
-            String password = IO.getUserInput("Enter password:");
-
-            if (attempts >= 4) throw new AbortOperationException("raggiunnto limite tentativi");
-
+        Restaurant r = null;
+        while (r == null) {
             try {
-                // Placeholder for user authentication logic
-                User u = Loader.getUsersByName().get(username);
-                if (u == null)
-                    throw new IllegalArgumentException("Impossiibile reperire user con tale nome");
+                String name = IO.getUserInput("Enter restaurant name:");
+                IO.validateString(name);
 
-                if (u.verifyPassword(password)) {
-                    IO.printSuccessrMessage("Login successful!");
-                    IO.getUserInput("Press Enter to continue.");
-                    user = u;
+                if (!Loader.getRestaurantsByName().containsKey(name))
+                    throw new IllegalArgumentException("Nessun ristorante trovato, riprovare");
 
-                } else {
-                    IO.printErrorMessage("Utente o password errati.");
-                    IO.getUserInput("Premere enter");
-                }
+                r = Loader.getRestaurantsByName().get(name);
+
             } catch (IllegalArgumentException ex) {
                 IO.printErrorMessage(ex.getMessage());
 
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
-                break;
+                return;
+            }
+        }
+
+        viewRestaurantDetails(r);
+    }
+
+    // Mostra le recensioni degli ultimi 7 giorni per i ristoranti dell'owner, in ordine cronologico
+    private static void viewOwnerLatestReviews(Owner owner) {
+        Map<UUID,Restaurant> restaurants = owner.getRestaurantsById();
+
+        List<Review> recent = restaurants.entrySet().stream()
+                .flatMap(r -> r.getValue().getReviews().values().stream())
+                .filter(r -> r.getTimestamp() != null && r.getTimestamp().isAfter(LocalDateTime.now().minusDays(7)))
+                .sorted(Comparator.comparing(Review::getTimestamp))
+                .toList();
+
+        if (recent.isEmpty()) {
+            IO.printErrorMessage("Nessuna recensione negli ultimi 7 giorni.");
+            IO.getUserInput("Premere 'Enter' per tornare al menu principale.");
+            return;
+        }
+
+        IO.clearScreen();
+        System.out.println("=== Recensioni ricevute negli ultimi 7 giorni ===\n");
+        for (Review r : recent) {
+            System.out.println(r);
+            System.out.println("-".repeat(60));
+        }
+        IO.getUserInput("\nPremi invio per tornare.");
+    }
+
+    // Mostra i ristoranti di proprietà dell’owner
+    private static void viewOwnedRestaurants(User user) {
+        if (!(user instanceof Owner owner)) {
+            IO.printErrorMessage("Accesso negato: funzione riservata ai gestori.");
+            return;
+        }
+
+        List<Restaurant> list = new ArrayList<>(owner.getRestaurantsById().values());
+        if (list == null || list.isEmpty()) {
+            IO.printErrorMessage("Non hai ristoranti registrati.");
+            IO.getUserInput("Premi invio per tornare.");
+            return;
+        }
+
+        while (true) {
+            IO.clearScreen();
+            IO.printMenu(
+                    "\n|============= Owned resturants of "+user.getUsername()+" =============|",
+                    "|===================================================|",
+                    list.toArray(new String[0])
+            );
+
+            IO.printMenu("", "", "Torna indietro");
+
+            try {
+                int sel = IO.getInt("Seleziona un ristorante da visualizzare:", list.size());
+                Menus.viewRestaurantDetails(list.get(sel));
+            } catch (AbortOperationException e) {
+                IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
+                return;
             }
         }
     }
 
-    private static void register() {
-        IO.clearScreen();
-        IO.getUserInput("[REGISTER] Feature not yet implemented. Press enter to continue.");
+
+    private static void userMenu(User user) {
+        while (true) {
+            IO.clearScreen();
+
+            IO.printMenu(
+                    "\n|============= The Knife Main menu =============|",
+                    "|===================================================|",
+                    "Search for a Restaurant",
+                    "Browse Restaurants",
+                    "View Favourites",
+                    "Logout",
+                    "Exit"
+            );
+            int choice = IO.getInt("Enter choice:", 3);
+
+            switch (choice) {
+                case 1 -> searchRestaurant();
+                case 2 -> browseRestaurants();
+                case 3 -> viewFavourites(user);
+                case 4 -> {
+                    IO.getUserInput("Procedura di logout completata. Premere 'Enter' per tornare al menu principale.");
+                    return;
+                }
+                case 5 -> exit();
+
+                default -> {
+                    IO.printErrorMessage("Opzione non valida");
+                }
+            }
+        }
+    }
+
+
+    private static void ownerMenu(User user) {
+        while (true) {
+            IO.clearScreen();
+
+            IO.printMenu(
+                    "\n|============= The Knife Main menu =============|",
+                    "|===================================================|",
+                    "Search for a Restaurant", "views owned restaurants", "view latest reviews", "Logout","Exit"
+            );
+            int choice = IO.getInt("Enter choice:", 3);
+
+            switch (choice) {
+                case 1 -> searchRestaurant();
+                case 2 -> viewOwnedRestaurants();
+                case 2 -> viewOwnerLatestReviews();
+                case 4 -> {
+                    IO.getUserInput("Procedura di logout completata. Premere 'Enter' per tornare al menu principale.");
+                    return;
+                }
+                case 5 -> exit();
+
+                default -> {
+                    IO.printErrorMessage("Opzione non valida");
+                }
+            }
+        }
     }
 
 
 
-    private static void searchRestaurant() {
-        IO.clearScreen();
-        String name = IO.getUserInput("Enter restaurant name:");
-        // Mocked list - Replace with real search logic
-        List<Restaurant> found = List.of();
+    private static void viewFavourites(User user) {
+        List<Restaurant> favourites = List.copyOf(user.getFavourites());
 
-        if (found.isEmpty()) {
-            IO.printErrorMessage("No restaurant found with that name.");
+        if (favourites.isEmpty()) {
+            IO.printErrorMessage("You have no favourite restaurants.");
             IO.getUserInput("Press Enter to return.");
             return;
         }
 
-        for (int i = 0; i < found.size(); i++) {
-            System.out.println("[" + (i + 1) + "] " + found.get(i));
-        }
+        while (true) {
+            IO.clearScreen();
+            for (int i = 0; i < favourites.size(); i++) {
+                System.out.println("[" + (i + 1) + "] " + favourites.get(i));
+            }
+            IO.printMenu("", "", "Back");
 
-        int selection = IO.getInt("Select restaurant to view details:", found.size());
-        viewRestaurantDetails(found.get(selection));
+            int choice = IO.getInt("Select a restaurant to view details or 0 to go back:", favourites.size());
+            if (choice == -1) return;
+            viewRestaurantDetails(favourites.get(choice));
+        }
     }
 
     public static void viewRestaurantDetails(Restaurant restaurant) {
@@ -225,56 +335,6 @@ public class Menus {
             IO.printMenu("", "", "Back to search");
             int choice = IO.getInt("Enter choice:", 1);
             if (choice == 0) return;
-        }
-    }
-
-    private static void userMenu(User user) {
-        while (true) {
-            IO.clearScreen();
-    /*
-                if (user != null) {
-                if (user.getRole().equals(UserRole.CLIENT)) {
-                    // Inserisci azioni utenti
-                    // "Search for a Restaurant", "View Favourites", "Logout"
-                } else {
-                    // Inserisci azioni owner
-                    // "Search for a Restaurant", "views owned restaurants", "view latest reviews (chronological order of last week)", "Logout"
-                }
-            }
-     */
-
-            int choice = IO.getInt("Enter choice:", 3);
-
-            switch (choice) {
-                case 0 -> searchRestaurant();
-                case 1 -> viewFavourites(user);
-                case 2 -> {
-                    IO.getUserInput("Logged out. Press Enter to return to main menu.");
-                    return;
-                }
-            }
-        }
-    }
-
-    private static void viewFavourites(User user) {
-        List<Restaurant> favourites = List.copyOf(user.getFavourites());
-
-        if (favourites.isEmpty()) {
-            IO.printErrorMessage("You have no favourite restaurants.");
-            IO.getUserInput("Press Enter to return.");
-            return;
-        }
-
-        while (true) {
-            IO.clearScreen();
-            for (int i = 0; i < favourites.size(); i++) {
-                System.out.println("[" + (i + 1) + "] " + favourites.get(i));
-            }
-            IO.printMenu("", "", "Back");
-
-            int choice = IO.getInt("Select a restaurant to view details or 0 to go back:", favourites.size());
-            if (choice == -1) return;
-            viewRestaurantDetails(favourites.get(choice));
         }
     }
 }
