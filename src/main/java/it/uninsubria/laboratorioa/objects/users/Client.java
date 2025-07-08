@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.enums.UserRole;
+import lombok.Getter;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -24,7 +25,8 @@ public class Client extends User {
     /**
      * Insieme degli ID dei ristoranti preferiti dal cliente.
      */
-    private final Set<UUID> favouriteRestourants;
+   @Getter
+   private final Set<UUID> favouriteRestourants;
 
     /**
      * Array JSON contenente gli ID dei ristoranti preferiti, usato per la serializzazione.

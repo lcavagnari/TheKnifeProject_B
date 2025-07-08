@@ -30,7 +30,7 @@ public class Login {
 
     private static final Random rd = new Random();
 
-    public static void register() {
+    public static User register() {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
 
@@ -49,7 +49,7 @@ public class Login {
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
-                return;
+                return null;
             }
         }
 
@@ -66,7 +66,7 @@ public class Login {
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
-                return;
+                return null;
             }
         }
 
@@ -82,7 +82,7 @@ public class Login {
 
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
-                return;
+                return null;
             }
         }
 
@@ -119,7 +119,7 @@ public class Login {
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
-                return;
+                return null;
             }
         }
 
@@ -137,7 +137,7 @@ public class Login {
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? " Reason: " + e.getReason() : ""));
-                return;
+                return null;
             }
         }
 
@@ -155,7 +155,7 @@ public class Login {
                 IO.printErrorMessage(ex.getMessage());
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage()+((e.getReason() != null) ? "Reason: "+e.getReason() : ""));
-                return;
+                return null;
             }
         }
 
@@ -167,13 +167,15 @@ public class Login {
 
             user.save();
 
+            return user;
+
         } catch (IllegalArgumentException ex) {
             IO.printErrorMessage(ex.getMessage()+ " ritorno al menu principale");
         }
     }
 
 
-    private static User login() {
+    public static User login() {
         IO.clearScreen();
 
         int attempts =0;

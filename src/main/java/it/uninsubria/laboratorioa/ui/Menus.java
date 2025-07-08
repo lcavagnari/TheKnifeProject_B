@@ -2,6 +2,8 @@ package it.uninsubria.laboratorioa.ui;
 
 import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.Review;
+import it.uninsubria.laboratorioa.objects.enums.UserRole;
+import it.uninsubria.laboratorioa.objects.users.Client;
 import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.objects.users.User;
 import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
@@ -28,60 +30,6 @@ import java.util.*;
 @UtilityClass
 public class Menus {
 
-    /*
-    Ecco l’elenco essenziale e minimale delle funzioni richieste dal professore, dedotte dalle specifiche e dalla struttura del progetto:
-
----
-
-# Funzioni Basiche e Minimali Richieste
-
-### 1. **Login Utente**
-
-* Permette a un utente registrato di autenticarsi nel sistema.
-
-### 2. **Registrazione Utente**
-
-* Permette la creazione di un nuovo utente (cliente o proprietario).
-
-### 3. **Ricerca Ristorante**
-
-* Consente la ricerca di ristoranti tramite filtri base (nome, nazione, tipo di cucina).
-
-### 4. **Visualizzazione Dettagli Ristorante**
-
-* Mostra informazioni dettagliate del ristorante selezionato (nome, indirizzo, servizi, recensioni, ecc.).
-
-### 5. **Modifica Dati Ristorante (solo Owner)**
-
-* Permette al proprietario del ristorante di modificare qualsiasi campo del proprio ristorante.
-
-### 6. **Aggiunta Recensione (Cliente)**
-
-* Consente al cliente autenticato di aggiungere una recensione a un ristorante.
-
-### 7. **Modifica e Cancellazione Recensione (Cliente)**
-
-* Permette al cliente di modificare o cancellare le proprie recensioni esistenti.
-
-### 8. **Salvataggio Automatico**
-
-* Tutte le modifiche devono essere automaticamente salvate su file JSON.
-
----
-
-# Note
-
-* Le operazioni di modifica sono **protette**: solo l’owner può modificare il proprio ristorante, solo il cliente può modificare/cancellare le proprie recensioni.
-* La UI deve gestire chiaramente questi permessi e mostrare solo le opzioni valide.
-* Il sistema deve gestire i dati persistenti in file JSON (salvataggio e caricamento).
-* Errori di input o mancanze devono essere gestite con messaggi semplici all’utente.
-
----
-*/
-
-    private static User user = null;
-
-
     /**
      * Metodo principale del menu dell'applicazione.
      * <p>
@@ -107,8 +55,20 @@ public class Menus {
             int choice = IO.getInt("Enter choice:", 4);
 
             switch (choice) {
-                case 0 -> login();
-                case 1 -> register();
+                case 0 -> {
+                    User user = Login.login();
+                    if (user != null) {
+                        if (user.getRole().equals(UserRole.OWNER)) ownerMenu((Owner) user);
+                        else userMenu((Client) user);
+                    }
+                }
+                case 1 -> {
+                    User user = Login.register();
+                    if (user != null) {
+                        if (user.getRole().equals(UserRole.OWNER)) ownerMenu((Owner) user);
+                        else userMenu((Client) user);
+                    }
+                }
                 case 2 -> searchRestaurant();
                 case 3 -> browseRestaurants();
                 case 4 -> exit();
@@ -230,7 +190,7 @@ public class Menus {
     }
 
 
-    private static void userMenu(User user) {
+    private static void userMenu(Client user) {
         while (true) {
             IO.clearScreen();
 
@@ -263,7 +223,7 @@ public class Menus {
     }
 
 
-    private static void ownerMenu(User user) {
+    private static void ownerMenu(Owner owner) {
         while (true) {
             IO.clearScreen();
 
@@ -276,8 +236,8 @@ public class Menus {
 
             switch (choice) {
                 case 1 -> searchRestaurant();
-                case 2 -> viewOwnedRestaurants();
-                case 2 -> viewOwnerLatestReviews();
+                case 2 -> viewOwnedRestaurants(owner);
+                case 3 -> viewOwnerLatestReviews(owner);
                 case 4 -> {
                     IO.getUserInput("Procedura di logout completata. Premere 'Enter' per tornare al menu principale.");
                     return;
@@ -293,27 +253,36 @@ public class Menus {
 
 
 
-    private static void viewFavourites(User user) {
-        List<Restaurant> favourites = List.copyOf(user.getFavourites());
+    private static void viewFavourites(Client user) {
+        Set<UUID> favourites = user.getFavouriteRestourants();
 
-        if (favourites.isEmpty()) {
+        if (favourites == null || favourites.isEmpty()) {
             IO.printErrorMessage("You have no favourite restaurants.");
             IO.getUserInput("Press Enter to return.");
             return;
         }
 
+        List<Restaurant> restaurants = Loader.getRestaurantsById().entrySet().stream()
+                .filter(e -> favourites.contains(e.getKey()))
+                .map(Map.Entry::getValue)
+                .toList();
+
         while (true) {
             IO.clearScreen();
-            for (int i = 0; i < favourites.size(); i++) {
-                System.out.println("[" + (i + 1) + "] " + favourites.get(i));
+
+            for (int i = 0; i < restaurants.size(); i++) {
+                System.out.println("[" + (i + 1) + "] " + restaurants.get(i).getName());
             }
+
             IO.printMenu("", "", "Back");
 
-            int choice = IO.getInt("Select a restaurant to view details or 0 to go back:", favourites.size());
-            if (choice == -1) return;
-            viewRestaurantDetails(favourites.get(choice));
+            int choice = IO.getInt("Select a restaurant to view details or 0 to go back:", restaurants.size());
+            if (choice == 0) return;
+
+            viewRestaurantDetails(restaurants.get(choice - 1));
         }
     }
+
 
     public static void viewRestaurantDetails(Restaurant restaurant) {
         while (true) {

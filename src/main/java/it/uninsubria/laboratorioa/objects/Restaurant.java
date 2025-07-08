@@ -341,22 +341,38 @@ public class Restaurant extends JsonEntity {
      */
     @Override
     public String toString() {
-        return "Restaurant{" +
-                "\ncuisinesTypes=" + cuisinesTypes +
-                "\nservices=" + services +
-                "\nreviews=" + reviews +
-                "\nname='" + name + '\'' +
-                "\ndescription='" + description + '\'' +
-                "\nwebsiteUrl='" + websiteUrl + '\'' +
-                "\nphone='" + phone + '\'' +
-                "\nloc=" + location +
-                "\npriceRange=" + priceRange +
-                "\nhasDelivery=" + hasDelivery +
-                "\nhasOnlineBooking=" + hasOnlineBooking +
-                "\naward=" + award +
-                "\ngreenStar=" + greenStar +
-                "\nid=" + id +
-                "\nsaveFile=" + saveFile +
-                '}';
+        StringBuilder sb = new StringBuilder();
+        sb.append("┌─────────────── Restaurant Info ────────────────┐\n");
+        sb.append("│ Name:              ").append(name).append("\n");
+        sb.append("│ Description:       ").append(description).append("\n");
+        sb.append("│ Website:           ").append(websiteUrl).append("\n");
+        sb.append("│ Phone:             ").append(phone).append("\n");
+        sb.append("│ Location:          ").append(location).append("\n");
+        sb.append("│ Price Range:       ").append(priceRange).append("\n");
+        sb.append("│ Delivery:          ").append(hasDelivery ? "✔️" : "❌").append("\n");
+        sb.append("│ Online Booking:    ").append(hasOnlineBooking ? "✔️" : "❌").append("\n");
+        sb.append("│ Award:             ").append(award).append("\n");
+        sb.append("│ Green Star:        ").append(greenStar ? "✔️" : "❌").append("\n");
+        sb.append("│ Owner ID:          ").append(owner != null ? owner.getId() : "N/A").append("\n");
+
+        sb.append("│ Cuisine Types:     ");
+        if (cuisinesTypes.isEmpty()) sb.append("None\n");
+        else sb.append(cuisinesTypes).append("\n");
+
+        sb.append("│ Services:          ");
+        if (services.isEmpty()) sb.append("None\n");
+        else sb.append(services).append("\n");
+
+        sb.append("│ Reviews Count:     ").append(reviews.size()).append("\n");
+        if (!reviews.isEmpty()) {
+            sb.append("│ Reviews IDs:       ")
+                    .append(reviews.keySet().stream().map(UUID::toString).toList())
+                    .append("\n");
+        }
+
+        sb.append("│ ID:                ").append(id).append("\n");
+        sb.append("│ SaveFile:          ").append(saveFile).append("\n");
+        sb.append("└───────────────────────────────────────────────┘");
+        return sb.toString();
     }
 }
