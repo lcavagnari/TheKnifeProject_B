@@ -7,7 +7,9 @@ import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import it.uninsubria.laboratorioa.objects.users.Owner;
 import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.Setter;
 
+import javax.naming.InvalidNameException;
 import java.util.*;
 
 /**
@@ -21,6 +23,7 @@ import java.util.*;
  * @version 1.0
  */
 @Getter
+@Setter
 public class Restaurant extends JsonEntity {
 
     /**
@@ -59,57 +62,57 @@ public class Restaurant extends JsonEntity {
     /**
      * Descrizione del ristorante.
      */
-    private final String description;
+    private String description;
 
     /**
      * URL del sito web del ristorante.
      */
-    private final String websiteUrl;
+    private String websiteUrl;
 
     /**
      * Numero di telefono del ristorante.
      */
-    private final String phone;
+    private String phone;
 
     /**
      * Proprietario del ristorante.
      */
-    private final Owner owner;
+    private Owner owner;
 
     /**
      * Posizione geografica del ristorante.
      */
-    private final Location loc;
+    private Location location;
 
     /**
      * Fascia di prezzo del ristorante.
      */
-    private final PriceRange priceRange;
+    private PriceRange priceRange;
 
     /**
      * Flag indicante se il ristorante offre consegna a domicilio.
      */
-    private final boolean hasDelivery;
+    private boolean hasDelivery;
 
     /**
      * Flag indicante se il ristorante offre prenotazioni online.
      */
-    private final boolean hasOnlineBooking;
+    private boolean hasOnlineBooking;
 
     /**
      * Premio assegnato al ristorante.
      */
-    private final Award award;
+    private Award award;
 
     /**
      * Flag indicante se il ristorante possiede la Stella Verde Michelin.
      */
-    private final boolean greenStar;
+    private boolean greenStar;
 
     /**
      * Nome del ristorante.
      */
-    private final String name;
+    private String name;
 
     /**
      * Costruttore completo per inizializzare tutte le proprietà.<p>
@@ -122,7 +125,7 @@ public class Restaurant extends JsonEntity {
      * @param websiteUrl    URL sito web
      * @param owner         proprietario
      * @param phone         telefono
-     * @param loc           posizione geografica
+     * @param location           posizione geografica
      * @param priceRange    fascia di prezzo
      * @param hasDelivery   flag consegna a domicilio
      * @param hasOnlineBooking flag prenotazioni online
@@ -132,7 +135,7 @@ public class Restaurant extends JsonEntity {
      * @param reviews       mappa recensioni
      * @param services      insieme servizi
      */
-    public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location loc, PriceRange priceRange,
+    public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes,
                       Map<UUID, Review> reviews, Set<String> services) {
 
@@ -142,7 +145,7 @@ public class Restaurant extends JsonEntity {
         this.description = (description == null || description.isBlank()) ? "" : description;
         this.websiteUrl = (websiteUrl == null || websiteUrl.isBlank()) ? "" : websiteUrl;
         this.phone = (phone == null || phone.isBlank()) ? "" : phone;
-        this.loc = loc;
+        this.location = location;
         this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
         this.hasDelivery = hasDelivery;
         this.hasOnlineBooking = hasOnlineBooking;
@@ -176,7 +179,7 @@ public class Restaurant extends JsonEntity {
      * @param websiteUrl    URL sito web
      * @param owner         proprietario
      * @param phone         telefono
-     * @param loc           posizione geografica
+     * @param location           posizione geografica
      * @param priceRange    fascia di prezzo
      * @param hasDelivery   flag consegna a domicilio
      * @param hasOnlineBooking flag prenotazioni online
@@ -185,7 +188,7 @@ public class Restaurant extends JsonEntity {
      * @param cuisinesTypes insieme tipi cucina
      * @param services      insieme servizi
      */
-    public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location loc, PriceRange priceRange,
+    public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes, Set<String> services) {
 
         super("restaurants");
@@ -193,7 +196,7 @@ public class Restaurant extends JsonEntity {
         this.description = (description == null || description.isBlank()) ? "" : description;
         this.websiteUrl = (websiteUrl == null || websiteUrl.isBlank()) ? "" : websiteUrl;
         this.phone = (phone == null || phone.isBlank()) ? "" : phone;
-        this.loc = loc;
+        this.location = location;
         this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
         this.hasDelivery = hasDelivery;
         this.hasOnlineBooking = hasOnlineBooking;
@@ -211,12 +214,14 @@ public class Restaurant extends JsonEntity {
         this.servicesArray = mapper.createArrayNode();
     }
 
+
+
     /**
      * Ricostruisce l'oggetto JSON del ristorante con tutti i dati aggiornati.<p>
      * Imposta proprietà base, location, tipi di cucina, servizi e recensioni.<p>
      */
     @Override
-    protected void build() {
+    public void build() {
         jsonObject.put("owner", owner.getId().toString())
                 .put("name", name)
                 .put("address", description)
@@ -225,7 +230,7 @@ public class Restaurant extends JsonEntity {
                 .put("award", award.getValue())
                 .put("greenStar", greenStar);
 
-        if (loc != null) jsonObject.set("location", loc.jsonObject);
+        if (location != null) jsonObject.set("location", location.jsonObject);
 
         cuisinesTypesArray.removeAll();
         cuisinesTypes.forEach(c -> cuisinesTypesArray.add(c.toString()));
@@ -238,6 +243,13 @@ public class Restaurant extends JsonEntity {
         reviewsArray.removeAll();
         reviews.forEach((u, r) -> reviewsArray.add(r.jsonObject));
         jsonObject.set("reviews", reviewsArray);
+    }
+
+    public static void validateName(String name)  {
+        if (name == null || name.isBlank())
+            throw new IllegalArgumentException("Il nome non può essere nullo o vuoto.");
+        if (!name.matches("^[\\p{L}0-9 \\-']{4,30}$"))
+            throw new IllegalArgumentException("Il nome contiene caratteri non validi o ha lunghezza non consentita (4-30).");
     }
 
     /**
@@ -266,6 +278,36 @@ public class Restaurant extends JsonEntity {
         build();
     }
 
+    // Service collection mutations
+    public boolean addService(String service) {
+        if (service == null || service.isBlank()) return false;
+        boolean added = services.add(service);
+
+        if (added) build();
+        return added;
+    }
+
+    public boolean removeService(String service) {
+        if (service == null || service.isBlank()) return false;
+        boolean removed = services.remove(service);
+        if (removed) build();
+        return removed;
+    }
+
+    public boolean addCuisineType(CuisineType c) {
+        if (c == null) return false;
+        boolean added = cuisinesTypes.add(c);
+        if (added) build();
+        return added;
+    }
+
+    public boolean removeCuisineType(CuisineType c) {
+        if (c == null) return false;
+        boolean removed = cuisinesTypes.remove(c);
+        if (removed) build();
+        return removed;
+    }
+
     /**
      * Confronta due oggetti Restaurant per uguaglianza basandosi su tutti i campi.<p>
      *
@@ -277,7 +319,7 @@ public class Restaurant extends JsonEntity {
         if (this == o) return true;
         if (!(o instanceof Restaurant that)) return false;
         if (!super.equals(o)) return false;
-        return greenStar == that.greenStar && hasDelivery == that.hasDelivery && hasOnlineBooking == that.hasOnlineBooking && award == that.award && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(websiteUrl, that.websiteUrl) && Objects.equals(phone, that.phone) && Objects.equals(loc, that.loc) && priceRange == that.priceRange && Objects.equals(cuisinesTypes, that.cuisinesTypes) && Objects.equals(services, that.services) && Objects.equals(reviews, that.reviews);
+        return greenStar == that.greenStar && hasDelivery == that.hasDelivery && hasOnlineBooking == that.hasOnlineBooking && award == that.award && Objects.equals(name, that.name) && Objects.equals(description, that.description) && Objects.equals(websiteUrl, that.websiteUrl) && Objects.equals(phone, that.phone) && Objects.equals(location, that.location) && priceRange == that.priceRange && Objects.equals(cuisinesTypes, that.cuisinesTypes) && Objects.equals(services, that.services) && Objects.equals(reviews, that.reviews);
     }
 
     /**
@@ -287,7 +329,7 @@ public class Restaurant extends JsonEntity {
      */
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), name, description, websiteUrl, phone, loc, priceRange, hasDelivery, hasOnlineBooking, award, greenStar, cuisinesTypes, services, reviews);
+        return Objects.hash(super.hashCode(), name, description, websiteUrl, phone, location, priceRange, hasDelivery, hasOnlineBooking, award, greenStar, cuisinesTypes, services, reviews);
     }
 
     /**
@@ -305,7 +347,7 @@ public class Restaurant extends JsonEntity {
                 "\ndescription='" + description + '\'' +
                 "\nwebsiteUrl='" + websiteUrl + '\'' +
                 "\nphone='" + phone + '\'' +
-                "\nloc=" + loc +
+                "\nloc=" + location +
                 "\npriceRange=" + priceRange +
                 "\nhasDelivery=" + hasDelivery +
                 "\nhasOnlineBooking=" + hasOnlineBooking +
