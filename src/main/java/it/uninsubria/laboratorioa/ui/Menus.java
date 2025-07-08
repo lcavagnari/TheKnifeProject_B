@@ -1,5 +1,6 @@
 package it.uninsubria.laboratorioa.ui;
 
+import it.uninsubria.laboratorioa.objects.users.User;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -67,8 +68,9 @@ public class Menus {
 * Errori di input o mancanze devono essere gestite con messaggi semplici all’utente.
 
 ---
+*/
 
-     */
+    private static User user = null;
 
     /**
      * Metodo principale del menu dell'applicazione.
@@ -78,12 +80,11 @@ public class Menus {
      * <p>
      * Al momento, le azioni sono segnaposto (WIP).
      * <p>
-     * @author Luca Cavagnari
-     * @version 1.0
      */
     public static void mainMenu() {
         while (true) {
             IO.clearScreen();
+
             IO.printMenu("Welcome to the The Knife", "Choose an option:",
                     "Login",
                     "Register",
@@ -118,7 +119,6 @@ public class Menus {
     }
 
 
-    /*
     private static void login() {
         IO.clearScreen();
         String username = IO.getUserInput("Enter username:");
@@ -128,11 +128,12 @@ public class Menus {
         RegisteredUser user = authenticate(username, password);
 
         if (user != null) {
-            IO.getUserInput("Login successful! Press Enter to continue.");
+            IO.printSuccessrMessage("Login successful!");
+            IO.getUserInput("Press Enter to continue.");
             userMenu(user);
         } else {
-            IO.printErrorMessage("Invalid credentials. Press Enter to return to the main menu.");
-            IO.getUserInput("");
+            IO.printErrorMessage("Utente o password errati.");
+            IO.getUserInput("Premere enter");
         }
     }
 
@@ -230,5 +231,4 @@ public class Menus {
             viewRestaurantDetails(favourites.get(choice));
         }
     }
-     */
 }

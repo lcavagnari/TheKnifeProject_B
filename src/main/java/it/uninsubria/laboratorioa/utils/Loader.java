@@ -63,12 +63,6 @@ public class Loader {
     private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
 
     /**
-     * Mappa dei ristoranti indicizzati per ID del proprietario.
-     */
-    @Getter
-    private final static Map<UUID, Restaurant> restaurantsByOwnerId = new HashMap<>();
-
-    /**
      * Mappa degli utenti indicizzati per ID.
      */
     @Getter
@@ -163,7 +157,6 @@ public class Loader {
 
                 restaurantsById.put(id, restaurant);
                 restaurantsByName.put(name, restaurant);
-                restaurantsByOwnerId.put(ownerId, restaurant);
 
             } catch (IOException e) {
                 System.out.println("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
@@ -217,7 +210,7 @@ public class Loader {
                     );
                 } else {
                     Set<UUID> favourites = new HashSet<>();
-                    JsonNode favouritesNode = jsonNode.get("cuisines");
+                    JsonNode favouritesNode = jsonNode.get("favourites");
                     if (favouritesNode != null && favouritesNode.isArray()) {
                         for (JsonNode fav : favouritesNode)
                             favourites.add(UUID.fromString(fav.asText()));
