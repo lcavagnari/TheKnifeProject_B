@@ -1,5 +1,7 @@
 package it.uninsubria.laboratorioa.objects.enums;
 
+import lombok.Getter;
+
 import java.util.HashMap;
 import java.util.Map;
 

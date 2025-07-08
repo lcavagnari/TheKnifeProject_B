@@ -208,7 +208,7 @@ public abstract class User extends JsonEntity {
      */
     final static class PasswordHasher {
         private static final int SALT_LENGTH = 16;
-        private static final int ITERATIONS = 1000;
+        private static final int ITERATIONS = 10000;
         private static final int KEY_LENGTH = 256;
 
         /**

@@ -51,10 +51,6 @@
                                     <shadedPattern>it.uninsubria.laboratorioa.lib.jackson</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.apache.commons.io</pattern>
-                                    <shadedPattern>it.uninsubria.laboratorioa.libs.apache.commons.io</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.google.i18n.phonenumbers</pattern>
                                     <shadedPattern>it.uninsubria.laboratorioa.libs.phonenumbers</shadedPattern>
                                 </relocation>
@@ -142,11 +138,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.16.1</version>
-        </dependency>
 
     </dependencies>
 </project>

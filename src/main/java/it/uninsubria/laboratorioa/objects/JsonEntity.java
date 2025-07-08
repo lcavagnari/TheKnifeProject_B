@@ -59,7 +59,7 @@ public abstract class JsonEntity {
 
     /**
      * Costruttore principale che crea una nuova entità con UUID casuale.<p>
-     * Inizializza la struttura JSON e i riferimenti al file di salvataggio.<p>
+     * Inizializza la struttura JSON e i riferimenti al file di salvataggio.
      *
      * @param folderName nome della cartella di salvataggio relativa a Constants.ROOT
      */
@@ -75,7 +75,7 @@ public abstract class JsonEntity {
 
     /**
      * Costruttore che inizializza l'entità con un UUID esistente.<p>
-     * La cartella e il file di salvataggio rimangono nulli.<p>
+     * La cartella e il file di salvataggio rimangono nulli.
      *
      * @param id UUID esistente
      */
