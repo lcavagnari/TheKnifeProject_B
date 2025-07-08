@@ -102,6 +102,21 @@ public class IO {
 
 
     /**
+     * Richiede input testuale all'utente, specifico per i menu.
+     *
+     * @param promptMessage Messaggio di richiesta input
+     * @return Stringa inserita dall'utente
+     */
+    public static String getMenuInput(String promptMessage) {
+        System.out.print("\n" + IO.replaceText(32, "> ") + promptMessage);
+        while (!INPUT.hasNext()) INPUT.nextLine();
+
+        System.out.println();
+        return INPUT.nextLine();
+    }
+
+
+    /**
      * Richiede input testuale all'utente con controllo lunghezza minima e massima.
      *
      * @param promptMessage Messaggio di richiesta input
