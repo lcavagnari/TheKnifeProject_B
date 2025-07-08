@@ -1,5 +1,14 @@
 package it.uninsubria.laboratorioa.ui;
 
+import it.uninsubria.laboratorioa.objects.Location;
+import it.uninsubria.laboratorioa.objects.Review;
+import it.uninsubria.laboratorioa.objects.enums.Award;
+import it.uninsubria.laboratorioa.objects.enums.CuisineType;
+import it.uninsubria.laboratorioa.objects.enums.Nation;
+import it.uninsubria.laboratorioa.objects.enums.PriceRange;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Scanner;
 
 /**
@@ -64,7 +73,7 @@ public class IO {
 
         // Usa regex per controllare se input sia "sì" o "no", o "s" / "n"
         while (!input.matches("\\b(s[iì]|no)\\b|\\b[sn]\\b")) {
-            printErrorMessage("Input non valido, riprova: ");
+            printErrorMessage("Valore non valido, riprova: ");
             input = getUserInput(promptMessage).toLowerCase();
         }
 
@@ -87,6 +96,24 @@ public class IO {
         System.out.println();
         return INPUT.nextLine();
     }
+
+    /**
+     * Richiede input testuale all'utente.
+     *
+     * @param promptMessage Messaggio di richiesta input
+     * @return Stringa inserita dall'utente
+     */
+    public static String getPhoneNumber(String promptMessage) {
+        String input = getUserInput(promptMessage,10,15);
+
+        while (!input.matches("\\+\\d{13,15}")) {
+            IO.printErrorMessage("Valore non valido");
+            input = getUserInput(promptMessage,10,15);
+        }
+
+        return input;
+    }
+
 
     /**
      * Richiede input testuale all'utente con controllo lunghezza minima e massima.
@@ -115,7 +142,7 @@ public class IO {
         String input = getUserInput(promptMessage);
 
         while (!input.matches("^-?\\d+$")) {
-            IO.printErrorMessage("Input non valido");
+            IO.printErrorMessage("Valore non valido");
             input = getUserInput(promptMessage);
         }
 
@@ -131,11 +158,158 @@ public class IO {
      */
     public static int getInt(String prompt, int max) {
         int sel = getInt(prompt);
-        while (sel < 0 || sel >= max + 1)
-            sel = getInt("Input non valido, " + prompt);
+        while (sel < 0 || sel >= max + 1) {
+            IO.printErrorMessage("Valore non valido");
+            sel = getInt(prompt);
+        }
 
-        return sel - 1;
+        return Math.max(sel - 1, 0);
     }
+
+
+    public static Award parseAward(String input) {
+        if (input == null || input.isBlank())
+            throw new IllegalArgumentException("Valore Award nullo o vuoto.");
+        try {
+            return Award.valueOf(input.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Valore Award non valido: " + input);
+        }
+    }
+
+    public static CuisineType parseCuisineType(String input) {
+        if (input == null || input.isBlank())
+            throw new IllegalArgumentException("Valore CuisineType nullo o vuoto.");
+        try {
+            return CuisineType.valueOf(input.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Valore CuisineType non valido: " + input);
+        }
+    }
+
+    public static PriceRange parsePriceRange(String input) {
+        if (input == null || input.isBlank())
+            throw new IllegalArgumentException("Valore PriceRange nullo o vuoto.");
+        try {
+            return PriceRange.valueOf(input.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Valore PriceRange non valido: " + input);
+        }
+    }
+
+    // Sostituisci Enum4 con il quarto enum effettivo
+    public static Nation parseNation(String input) {
+        if (input == null || input.isBlank())
+            throw new IllegalArgumentException("Valore Enum4 nullo o vuoto.");
+        try {
+            return Enum4.valueOf(input.trim().toUpperCase());
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Valore Enum4 non valido: " + input);
+        }
+    }
+
+
+    // Validators
+
+    public static boolean validateString(String value, final String regex)  {
+        if (value == null || value.isBlank())
+            throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
+        if (!value.matches(regex))
+            throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha lunghezza non consentita (4-30).");
+
+        return true;
+    }
+
+    public static boolean validateString(String value, final String regex, String invalidValueErrorMessage)  {
+        if (value == null || value.isBlank())
+            throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
+        if (!value.matches(regex))
+            throw new IllegalArgumentException(invalidValueErrorMessage);
+
+        return true;
+    }
+
+
+    public static boolean validateLocation(Location loc) {
+        if (loc == null)
+            throw new IllegalArgumentException("Impossibile determinare posizione, riprovare più tardi");
+
+        if (loc.getNation() == null)
+            throw new IllegalArgumentException("Impossibile determinare nazione: input non valido");
+
+        if (loc.getCity() == null || loc.getCity().isBlank())
+            throw new IllegalArgumentException("Impossibile determinare città: input non valido");
+
+        if (loc.getAddress() == null || loc.getAddress().isBlank())
+            throw new IllegalArgumentException("Impossibile determinare indirizzo: input non valido");
+
+        if (loc.getLatitude() < -90.0 || loc.getLatitude() > 90.0)
+            throw new IllegalArgumentException("Impossibile determinare latitudine: input fuori da valori accettabili (-90°,+90°).");
+
+        if (loc.getLongitude() < -180.0 || loc.getLongitude() > 180.0)
+            throw new IllegalArgumentException("Impossibile determinare longitudine: input fuori da valori accettabili (-180°,+180°)");
+
+        return true;
+    }
+
+    /**
+     * Verifica una o più date per non nullità e correttezza temporale (nessuna data futura consentita).
+     * Solleva IllegalArgumentException con messaggi precisi in caso di violazione.
+     *
+     * @param dates Varargs di LocalDateTime da validare
+     * @return true se tutte le date sono valide
+     * @throws IllegalArgumentException se una data è nulla o futura
+     */
+    public static boolean validateDates(LocalDate max, LocalDate... dates) {
+        return validateDates(max,dates);
+    }
+
+    /**
+     * Validates one or more dates for non-nullity and temporal correctness (no future dates).
+     * Throws IllegalArgumentException with precise message upon violation.
+     *
+     * @param dates Varargs LocalDateTime[] dates to validate
+     * @return true if all dates are valid
+     * @throws IllegalArgumentException if:
+     *    - input array is null or empty
+     *    - any date is null
+     *    - any date is in the future compared to now
+     */
+    public static boolean validateDates(LocalDateTime max,LocalDateTime... dates) {
+        if (dates == null || dates.length == 0) {
+            throw new IllegalArgumentException("Impossibile verificare data, riprovare più tardi");
+        }
+
+        for (LocalDateTime date : dates) {
+            if (date == null)
+                throw new IllegalArgumentException("Impossibile determinare data, riprovare");
+
+            if (date.isAfter(max) || date.isBefore(LocalDateTime.MIN))
+                throw new IllegalArgumentException("Data fuori da intervalli accettabili ("+max.toString()+"), riprovare");
+        }
+
+        return true;
+    }
+
+    public static void validateReview(Review r) {
+        if (r == null)
+            throw new IllegalArgumentException("Recensione non può essere nulla.");
+
+
+        if (r.getValue() < 1 || r.getValue() > 5)
+            throw new IllegalArgumentException("Valutazione deve essere compresa tra 1 e 5.");
+
+        validateString(r.getText(),"^[\\p{L}0-9 \\-']{4,200}$");
+
+        if (r.date == null)
+            throw new IllegalArgumentException("Data recensione non può essere nulla.");
+
+        if (r.date.isAfter(java.time.LocalDate.now()))
+            throw new IllegalArgumentException("Data recensione non può essere futura.");
+    }
+
+
+
 
     /**
      * Applica formattazione ANSI colore a testo.
