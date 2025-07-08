@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa.ui;
+package it.uninsubria.laboratorioa.ui.exceptions;
 
 public class AbortOperationException extends RuntimeException {
 

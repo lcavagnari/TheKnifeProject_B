@@ -1,8 +1,10 @@
-package it.uninsubria.laboratorioa.ui;
+package it.uninsubria.laboratorioa.utils;
 
 import it.uninsubria.laboratorioa.objects.Location;
+import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.Review;
 import it.uninsubria.laboratorioa.objects.users.User;
+import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
 
 import java.time.LocalDateTime;
 import java.util.Scanner;
@@ -206,21 +208,21 @@ public class IO {
      * Verifica uno o più valori stringa rispetto a un pattern regex, sollevando eccezioni in caso di input non valido.
      *
      * @param regex Pattern per la verifica
-     * @param values Valori stringa da validare
+     * @param value Valori stringa da validare
      * @return true se tutti i valori sono validi
      * @throws IllegalArgumentException se uno o più valori sono null, vuoti o non corrispondenti alla regex
      */
-    public static boolean validateString(final String regex, String... values)  {
-        for (String s : values) {
-            if (s == null || s.isBlank())
-                throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
-            if (!s.matches(regex))
-                throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha lunghezza non consentita (4-30).");
-
-        }
+    public static boolean validateString(final String regex, String value)  {
+        if (value == null || value.isBlank())
+            throw new IllegalArgumentException("Il valore inserito non può essere vuoto.");
+        if (!value.matches(regex))
+            throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha lunghezza non consentita (4-30).");
         return true;
     }
 
+    public static boolean validateString(String value)  {
+        return validateString("^[\\p{L}0-9 \\-']{4,200}$", value);
+    }
 
     /**
      * Verifica l'oggetto Location e i suoi campi, verificandone non nullità e limiti geografici corretti.
@@ -307,7 +309,8 @@ public class IO {
             throw new IllegalArgumentException("Valutazione deve essere compresa tra 1 e 5.");
 
         validateUUID(r.getId());
-        validateString("^[\\p{L}0-9 \\-']{4,200}$",r.getText(),r.getReply());
+        validateString("^[\\p{L}0-9 \\-']{4,200}$",r.getText());
+        validateString("^[\\p{L}0-9 \\-']{4,200}$",r.getReply());
         validateDates(r.getTimestamp());
         return false;
     }
@@ -326,7 +329,8 @@ public class IO {
 
         validateUUID(user.getId());
 
-        validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName(),user.getName());
+        validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName());
+        validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName());
 
         validateString("^[a-zA-Z][\\w.]{1,14}[a-zA-Z0-9]$",user.getUsername());
 
@@ -338,6 +342,21 @@ public class IO {
     }
 
 
+    public static boolean validateRestaurant(Restaurant r) {
+        if (r == null)
+            throw new IllegalArgumentException("Impossibile ottenere dati ristorante, riprovare più tardi");
+
+        validateUUID(r.getId());
+        validateString("^[\\p{L}][\\p{L}'\\- ]{1,40}$",r.getName());
+        validateString(r.getDescription());
+
+        validateString("^(https?://)?[\\w.-]+(\\.[a-z]{2,})+.*$",r.getWebsiteUrl());
+        validateString("^\\+\\d{8,15}$",r.getPhone());
+
+        validateUser(r.getOwner());
+
+        return true;
+    }
 
     /**
      * Applica formattazione ANSI colore a testo.

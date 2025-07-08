@@ -5,11 +5,11 @@ import it.uninsubria.laboratorioa.objects.enums.Award;
 import it.uninsubria.laboratorioa.objects.enums.CuisineType;
 import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import it.uninsubria.laboratorioa.objects.users.Owner;
+import it.uninsubria.laboratorioa.utils.IO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.naming.InvalidNameException;
 import java.util.*;
 
 /**
@@ -212,6 +212,8 @@ public class Restaurant extends JsonEntity {
         this.reviewsArray = mapper.createArrayNode();
         this.cuisinesTypesArray = mapper.createArrayNode();
         this.servicesArray = mapper.createArrayNode();
+
+        IO.validateRestaurant(this);
     }
 
 
@@ -245,13 +247,6 @@ public class Restaurant extends JsonEntity {
         jsonObject.set("reviews", reviewsArray);
     }
 
-    public static void validateName(String name)  {
-        if (name == null || name.isBlank())
-            throw new IllegalArgumentException("Il nome non può essere nullo o vuoto.");
-        if (!name.matches("^[\\p{L}0-9 \\-']{4,30}$"))
-            throw new IllegalArgumentException("Il nome contiene caratteri non validi o ha lunghezza non consentita (4-30).");
-    }
-
     /**
      * Aggiunge una recensione al ristorante se non è già presente.<p>
      * Aggiunge la recensione anche all'array JSON.<p>
@@ -259,7 +254,8 @@ public class Restaurant extends JsonEntity {
      * @param r recensione da aggiungere
      */
     public void addReview(Review r) {
-        if (r == null || reviews.containsValue(r)) return;
+        if (!IO.validateReview(r) || !reviews.containsKey(r.id)) return;
+
         reviews.put(r.id, r);
         reviewsArray.add(r.jsonObject);
     }
@@ -271,7 +267,7 @@ public class Restaurant extends JsonEntity {
      * @param r recensione da rimuovere
      */
     public void removeReview(Review r) {
-        if (r == null || !reviews.containsValue(r)) return;
+        if (!IO.validateReview(r) || !reviews.containsValue(r)) return;
         reviews.remove(r.id);
         reviewsArray.removeAll();
         reviews.values().forEach(rv -> reviewsArray.add(rv.jsonObject));
@@ -280,31 +276,38 @@ public class Restaurant extends JsonEntity {
 
     // Service collection mutations
     public boolean addService(String service) {
-        if (service == null || service.isBlank()) return false;
-        boolean added = services.add(service);
+        if (!IO.validateString(service)) return false;
 
+        boolean added = services.add(service);
         if (added) build();
+
         return added;
     }
 
     public boolean removeService(String service) {
-        if (service == null || service.isBlank()) return false;
+        if (!IO.validateString(service)) return false;
+
         boolean removed = services.remove(service);
         if (removed) build();
+
         return removed;
     }
 
     public boolean addCuisineType(CuisineType c) {
         if (c == null) return false;
+
         boolean added = cuisinesTypes.add(c);
         if (added) build();
+
         return added;
     }
 
     public boolean removeCuisineType(CuisineType c) {
         if (c == null) return false;
+
         boolean removed = cuisinesTypes.remove(c);
         if (removed) build();
+
         return removed;
     }
 
