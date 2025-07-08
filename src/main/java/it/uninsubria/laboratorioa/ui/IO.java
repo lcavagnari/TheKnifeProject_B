@@ -47,7 +47,7 @@ public class IO {
         else if (title != null) System.out.println(title + "\n");
 
         for (int i = 0; i < items.length; i++)
-            if (items[i] != null || Objects.equals(items[i],"")) System.out.println("│ "+(i + 1) + " - " + items[i]);
+            if (items[i] != null || Objects.equals(items[i], "")) System.out.println("│ " + (i + 1) + " - " + items[i]);
 
         if (footer != null) System.out.println("\n" + footer + "\n");
         else System.out.println();
@@ -299,7 +299,6 @@ public class IO {
     }
 
 
-
     public static UUID parseUUID(String uuid) {
         try {
             return UUID.fromString(uuid);
@@ -371,7 +370,7 @@ public class IO {
      * @return true se la data è valida
      * @throws IllegalArgumentException se la data è nulla o fuori dall'intervallo [min, max]
      */
-    public static boolean validateDates(LocalDateTime max, LocalDateTime min, LocalDateTime date) throws IllegalArgumentException {
+    public static boolean validateDates(LocalDateTime min, LocalDateTime max, LocalDateTime date) throws IllegalArgumentException {
         if (date == null)
             throw new IllegalArgumentException("Impossibile verificare data, riprovare più tardi");
 
@@ -382,7 +381,7 @@ public class IO {
     }
 
     public static boolean validateDates(LocalDateTime date) throws IllegalArgumentException {
-        return validateDates(LocalDateTime.MAX, LocalDateTime.MIN, date);
+        return validateDates(LocalDateTime.MIN, LocalDateTime.MAX, date);
     }
 
     /**
@@ -447,7 +446,7 @@ public class IO {
 
         if (user.getLocation() != null) validateLocation(user.getLocation());
 
-        validateDates(LocalDateTime.MIN, LocalDateTime.now(), user.getDateOfBirth().atStartOfDay());
+        validateDates(LocalDateTime.MIN, LocalDateTime.now().plusDays(1), user.getDateOfBirth().atStartOfDay());
 
         return true;
     }
