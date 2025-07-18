@@ -105,7 +105,7 @@ public class Loader {
 
                 JsonNode locNode = jsonNode.path("location");
                 Location loc = new Location(
-                        Nation.valueOf(locNode.path("nation").asText()),
+                        Nation.valueOf(locNode.path("nation").asText().toUpperCase().replace(" ","_")),
                         locNode.path("city").asText(),
                         locNode.path("latitude").asDouble(),
                         locNode.path("longitude").asDouble(),
@@ -191,7 +191,7 @@ public class Loader {
 
                 JsonNode location = jsonNode.path("location");
                 Location loc = new Location(
-                        Nation.valueOf(location.path("nation").asText()),
+                        Nation.valueOf(location.path("nation").asText().toUpperCase().replace(" ","_").replace("_MAINLAND","")),
                         location.path("city").asText(),
                         location.path("latitude").asDouble(),
                         location.path("longitude").asDouble(),

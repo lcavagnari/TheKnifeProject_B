@@ -43,7 +43,7 @@ class Generators extends ParsingTest {
     );
 
     @Getter
-    private static final SecureRandom rd = new SecureRandom();
+    private static final Random rd = new SecureRandom();
 
     public static String generateRandomName(int minLen, int maxLen) {
         if (minLen < 2 || maxLen < minLen) {
@@ -134,7 +134,7 @@ class Generators extends ParsingTest {
 
 public class ParsingTest {
 
-    private static final SecureRandom rd = Generators.getRd();
+    private static final Random rd = Generators.getRd();
 
     private static String[] retrieveLocData(String address, String location) {
         String[] cityAndNation = location.split(",");
@@ -276,8 +276,8 @@ public class ParsingTest {
 
         // Generazione casuale owner
 
-        String firstName = Generators.generateRandomName(4, 20);
-        String lastName = Generators.generateRandomName(4, 24);
+        String firstName = Generators.generateRandomName(5, 20);
+        String lastName = Generators.generateRandomName(5, 24);
         String userName = Generators.generateUsername(8);
         String password = Generators.generatePassword(10);
         LocalDate birthdate = Generators.generateRandomBirthdate(20, 80);
@@ -329,6 +329,7 @@ public class ParsingTest {
                             companies.add(createRestaurant(fields));
 
                         } catch (Exception ignored) {
+                            System.out.println(ignored.getMessage());
                         }
                     });
         } catch (IOException | SecurityException e) {

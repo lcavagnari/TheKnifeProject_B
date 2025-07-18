@@ -93,7 +93,7 @@ public abstract class User extends JsonEntity {
         //this.dateOfBirth = birth;
         this.dateOfBirth = dateOfBirth;
 
-        IO.validateUser(this);
+        //IO.validateUser(this);
         build();
     }
 
@@ -112,9 +112,9 @@ public abstract class User extends JsonEntity {
      * @param salt        salt usato nell'hash
      */
     public User(String username, String name, String lastName, Location location, LocalDate dateOfBirth, String password, String salt) {
-        this.username = (username == null || username.length() < 3) ? null : username.substring(0, 16);
-        this.name = (name == null || name.length() < 4) ? "nome" : name.substring(0, 20);
-        this.lastName = (lastName == null || lastName.length() < 4) ? null : lastName.substring(0, 24);
+        this.username = (username == null || username.length() < 3) ? null : username;
+        this.name = (name == null || name.length() < 4) ? "nome" : name;
+        this.lastName = (lastName == null || lastName.length() < 4) ? null : lastName;
 
         if (salt != null) this.hasher = new PasswordHasher(password, salt);
         else this.hasher = new PasswordHasher(password);

@@ -213,7 +213,7 @@ public class Restaurant extends JsonEntity {
         this.cuisinesTypesArray = mapper.createArrayNode();
         this.servicesArray = mapper.createArrayNode();
 
-        IO.validateRestaurant(this);
+        //IO.validateRestaurant(this);
     }
 
 
