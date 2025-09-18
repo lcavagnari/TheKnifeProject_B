@@ -17,6 +17,7 @@ import lombok.experimental.UtilityClass;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.*;
@@ -110,19 +111,19 @@ public class CsvParser {
 
         for (String c : cuisines) {
             String[] parts = c.toUpperCase()
-                    .replace(" CUISINE", "")
-                    .replace(" INFLUENCES", "")
-                    .replace("-", "_")
-                    .replace("&", "AND")
-                    .split(",|AND");
+                .replace(" CUISINE", "")
+                .replace(" INFLUENCES", "")
+                .replace("-", "_")
+                .replace("&", "AND")
+                .split(",|AND");
 
             for (String part : parts) {
                 String key = part.trim().replace(" ", "_");
+
                 try {
                     cuisineTypes.add(CuisineType.valueOf(key));
-                } catch (IllegalArgumentException ignored) {
-                    // Skip unknown values
-                }
+
+                } catch (IllegalArgumentException ignored) {}
             }
         }
 
@@ -168,64 +169,57 @@ public class CsvParser {
 
         // Costruzione dell'oggetto
 
-        Restaurant c = new Restaurant(,
-                // Nome
-                fields[0],                                         // Descrizione
-                fields[13],                                          // Url pagina web
-                fields[9],
-                null,                          // Contatto telefonico con prefisso nazionale
-                nationalPrefix + fields[7],                                           // Posizione geografica
-                location,       // Fascia di prezzo
-                PriceRange.byDollarAmount(fields[3].length()),                                   // Disponibilità alla consegna a domicilio
-                rd.nextBoolean(),                                   // Disponibilità per la prenotazione online
-                rd.nextBoolean(),                                              // Stelle Michelin
-                award,                                           // "Green Star", certificato Michelin di sostenibilità
-                greenStar,                                        // Stili culinari offerti
-                cuisineTypes,                                             // Servizi offerti o regole
-                services);
-
+        Restaurant c = new Restaurant(
+                UUID.randomUUID(),                                               // Identificatore
+                fields[0],                                                       // Nome
+                fields[13],                                                      // Descrizione
+                fields[9],                                                       // Url pagina web
+                null,                                                            // Proprietario del ristorante
+                nationalPrefix + fields[7],                                      // Contatto telefonico con prefisso nazionale
+                location,                                                        // Posizione geografica
+                PriceRange.byDollarAmount(fields[3].length()),                   // Fascia di prezzo
+                rd.nextBoolean(),                                                // Disponibilità per la prenotazione online
+                rd.nextBoolean(),                                                // Disponibilità alla consegna a domicilio
+                award,                                                           // Stelle Michelin
+                greenStar,                                                       // "Green Star", certificato Michelin di sostenibilità
+                cuisineTypes,                                                    // Stili culinari offerti
+                services                                                         // Lista di servizi offerti dal ristorante
+        );
 
         return c;
     }
 
 
-
-    private final static ObjectMapper mapper = new ObjectMapper();
     /**
      * index:      0	   1		2     3	      4		   5		6		  7		   8	  9		  10	  11			12					13   <br>
      * field csv: Name,Address,Location,Price,Cuisine,Longitude,Latitude,PhoneNumber,Url,WebsiteUrl,Award,GreenStar,FacilitiesAndServices,Description
      * <br>
      *
      */
-    public static void parseFromDataset(String path) {
-        File f;
-        try {
-            f = new File(Paths.get(path).toUri());
+    public static void parseFromDataset(Path path) {
+        if (path == null) return;
 
-            if (!f.exists() || !f.isFile() || !f.getName().endsWith(".csv")) {
-                IO.printErrorMessage("File or path "+path+" does not exist, check and try again.");
-                return;
-            }
-        } catch (Exception ignored) {
-            IO.printErrorMessage("File or path "+path+" does not exist, check and try again.");
-            return;
-        }
-
+        final ObjectMapper mapper = new ObjectMapper();
         ArrayNode restaurants = mapper.createArrayNode();
-        try (Stream<String> lines = Files.lines(f.toPath())) {
-            List<String> t = new ArrayList<>();
-            lines.skip(1) // Optional: skip header
-                    .map(line -> line.split(";"))
-                    .forEach(fields -> {
-                        try {
-                            Restaurant r = createRestaurant(fields);
 
-                            r.build();
-                            restaurants.add(r.getJsonObject());
+        try (Stream<String> lines = Files.lines(path)) {
+            for (String line : lines.skip(1).toList()) {
+                String[] fields = line.split(";");
 
-                        } catch (Exception ignored) {}
-                    });
+                try {
+                    Restaurant r = createRestaurant(fields);
 
+                    r.build();
+                    restaurants.add(r.getJsonObject());
+
+                } catch (Exception ignored) {
+                    System.out.println(ignored.getMessage());
+                    ignored.printStackTrace();
+                    break;
+                }
+            }
+
+            // Scrittura su file
             mapper.writerWithDefaultPrettyPrinter().writeValue(new File(Constants.ROOT,"michelin_my_maps.json"), restaurants);
 
         } catch (IOException | SecurityException e) {
