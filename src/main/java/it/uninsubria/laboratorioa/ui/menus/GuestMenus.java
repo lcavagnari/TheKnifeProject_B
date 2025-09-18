@@ -1,4 +1,4 @@
-package it.uninsubria.laboratorioa.ui;
+package it.uninsubria.laboratorioa.ui.menus;
 
 import it.uninsubria.laboratorioa.objects.Restaurant;
 import it.uninsubria.laboratorioa.objects.Review;
@@ -6,6 +6,9 @@ import it.uninsubria.laboratorioa.objects.enums.UserRole;
 import it.uninsubria.laboratorioa.objects.users.Client;
 import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.objects.users.User;
+import it.uninsubria.laboratorioa.ui.IO;
+import it.uninsubria.laboratorioa.ui.Login;
+import it.uninsubria.laboratorioa.ui.Menus;
 import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
 
 import java.util.Comparator;

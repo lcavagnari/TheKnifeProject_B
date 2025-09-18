@@ -1,8 +1,4 @@
-import it.uninsubria.laboratorioa.ui.GuestMenus;
-import it.uninsubria.laboratorioa.ui.IO;
-
-import java.util.HashSet;
-import java.util.Set;
+import it.uninsubria.laboratorioa.ui.menus.GuestMenus;
 
 public class UiTest {
 

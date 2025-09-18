@@ -1,6 +1,6 @@
 package it.uninsubria.laboratorioa;
 
-import it.uninsubria.laboratorioa.ui.GuestMenus;
+import it.uninsubria.laboratorioa.ui.menus.GuestMenus;
 import it.uninsubria.laboratorioa.ui.IO;
 import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
 import it.uninsubria.laboratorioa.utils.Constants;
