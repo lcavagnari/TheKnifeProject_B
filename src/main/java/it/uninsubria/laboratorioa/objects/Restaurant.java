@@ -204,7 +204,7 @@ public class Restaurant extends JsonEntity {
      */
     @Override
     public void build() {
-        jsonObject.put("owner", owner.getId().toString())
+        jsonObject.put("owner", (owner != null) ? owner.getId().toString() : "")
                 .put("name", name)
                 .put("address", description)
                 .put("phone", phone)
