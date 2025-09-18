@@ -12,6 +12,7 @@ import it.uninsubria.laboratorioa.objects.enums.PriceRange;
 import it.uninsubria.laboratorioa.objects.users.Client;
 import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.objects.users.User;
+import it.uninsubria.laboratorioa.ui.IO;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
@@ -20,6 +21,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Classe di utilità responsabile del caricamento e della gestione dei dati dell'applicazione
@@ -143,10 +145,13 @@ public class Loader {
 
             } catch (IOException e) {
                 System.out.println("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
+                return;
             } catch (SecurityException e) {
                 System.out.println("Accesso negato al file " + f.getName());
+                return;
             }
         }
+
     }
 
     /**
@@ -214,35 +219,36 @@ public class Loader {
                 usersByName.put(username, user);
 
             } catch (IOException | IllegalArgumentException e) {
-                System.err.println("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
+                IO.printErrorMessage("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
+                return;
             } catch (SecurityException e) {
-                System.err.println("Accesso negato al file " + f.getName());
+                IO.printErrorMessage("Accesso negato al file " + f.getName());
+                return;
             }
+
         }
+
     }
 
-    private void loadMichelin() {
-        File f = new File(Constants.ROOT,"michelin_my_maps.json");
-
+    private void loadMichelin(File f) {
         try {
             JsonNode jsonNode = new ObjectMapper().readTree(f);
             if (!jsonNode.isArray()) throw new IOException();
 
             for (JsonNode node : jsonNode) {
                 try {
+                    UUID id = UUID.fromString(node.path("id").asText());
+                    String name = node.path("name").asText();
+                    String description = node.path("address").asText();
+                    String websiteUrl = node.path("websiteUrl").asText("");
+                    String phone = node.path("phone").asText();
 
-                    UUID id = UUID.fromString(jsonNode.path("id").asText());
-                    String name = jsonNode.path("name").asText();
-                    String description = jsonNode.path("address").asText();
-                    String websiteUrl = jsonNode.path("websiteUrl").asText("");
-                    String phone = jsonNode.path("phone").asText();
+                    Award award = Award.fromInt(node.path("award").asInt());
+                    boolean greenStar = node.path("greenStar").asBoolean();
+                    boolean hasDelivery = node.path("hasDelivery").asBoolean(false);
+                    boolean hasBooking = node.path("hasOnlineBooking").asBoolean(false);
 
-                    Award award = Award.fromInt(jsonNode.path("award").asInt());
-                    boolean greenStar = jsonNode.path("greenStar").asBoolean();
-                    boolean hasDelivery = jsonNode.path("hasDelivery").asBoolean(false);
-                    boolean hasBooking = jsonNode.path("hasOnlineBooking").asBoolean(false);
-
-                    JsonNode locNode = jsonNode.path("location");
+                    JsonNode locNode = node.path("location");
                     Location loc = new Location(
                             Nation.valueOf(locNode.path("nation").asText().toUpperCase().replace(" ","_")),
                             locNode.path("city").asText(),
@@ -251,18 +257,18 @@ public class Loader {
                             locNode.path("address").asText()
                     );
 
-                    String price = jsonNode.get("priceRange").asText();
+                    String price = node.get("priceRange").asText();
                     PriceRange priceRange = PriceRange.byDollarAmount(price.length());
 
                     Set<CuisineType> cuisines = new HashSet<>();
-                    for (JsonNode cuisine : jsonNode.path("cuisinesTypes")) {
+                    for (JsonNode cuisine : node.path("cuisinesTypes")) {
                         try {
                             cuisines.add(CuisineType.valueOf(cuisine.asText().toUpperCase()));
                         } catch (IllegalArgumentException ignored) {}
                     }
 
                     Set<String> services = new HashSet<>();
-                    for (JsonNode service : jsonNode.path("services"))
+                    for (JsonNode service : node.path("services"))
                         services.add(service.asText());
 
                     Restaurant restaurant = new Restaurant(
@@ -282,10 +288,11 @@ public class Loader {
             }
 
         } catch (IOException | IllegalArgumentException e) {
-            System.err.println("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
+            IO.printErrorMessage("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
         } catch (SecurityException e) {
-            System.err.println("Accesso negato al file " + f.getName());
+            IO.printErrorMessage("Accesso negato al file " + f.getName());
         }
+
     }
 
     /**
@@ -293,19 +300,45 @@ public class Loader {
      * I file devono trovarsi nelle directory configurate via `Constants.ROOT`.
      */
     public void loadFromFile() {
-        File[] restaurants;
-        File[] users;
         try {
             if (!ROOT.exists()) return;
 
-            restaurants = RESTAURANTS_ROOT.listFiles();
-            users = USERS_ROOT.listFiles();
+            File[] restaurants = RESTAURANTS_ROOT.listFiles();
+            File[] users = USERS_ROOT.listFiles();
+            File michelin = new File(Constants.ROOT, "michelin_my_maps.json");
 
-            loadUsers(users);
-            loadRestaurants(restaurants);
+            List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+            // Michelin - completamente indipendente, può andare in parallelo
+            if (michelin.exists()) {
+                CompletableFuture<Void> michelinFuture = CompletableFuture
+                        .runAsync(() -> loadMichelin(michelin))
+                        .exceptionally(ex -> {
+                            IO.printErrorMessage("Errore caricamento Michelin: " + ex.getMessage());
+                            return null;
+                        });
+                futures.add(michelinFuture);
+            }
+
+            // Users prima, poi restaurants (restaurants dipende da users)
+            CompletableFuture<Void> usersAndRestaurantsFuture = CompletableFuture
+                    .runAsync(() -> loadUsers(users))
+                    .thenRunAsync(() -> loadRestaurants(restaurants))
+                    .exceptionally(ex -> {
+                        IO.printErrorMessage("Errore caricamento users/restaurants: " + ex.getMessage());
+                        return null;
+                    });
+            
+            futures.add(usersAndRestaurantsFuture);
+
+            // Aspetta che tutte le operazioni terminino
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
         } catch (SecurityException ex) {
             System.out.println("Accesso negato");
+            
+        } catch (Exception ex) {
+            IO.printErrorMessage("Errore durante il caricamento: " + ex.getMessage());
         }
     }
 }
