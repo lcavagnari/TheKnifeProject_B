@@ -101,7 +101,7 @@ public class IO {
         while (!INPUT.hasNext()) INPUT.nextLine();
 
         String input = INPUT.nextLine();
-        if (input.equals("::annulla")) throw new AbortOperationException("ricevuto comando di interruzione da utente");
+        if (input.equals(AbortOperationException.getCANCEL_COMMAND())) throw new AbortOperationException("ricevuto comando di interruzione da utente");
 
         System.out.println();
         return input;

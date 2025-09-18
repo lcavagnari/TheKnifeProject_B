@@ -5,8 +5,10 @@ import lombok.Getter;
 
 public class AbortOperationException extends RuntimeException {
 
+    @Getter private static final String CANCEL_COMMAND = "::annulla";
+
     @Getter
-    final String reason;
+    private final String reason;
 
     public AbortOperationException(String reason) {
         super("Operazione annullata");
