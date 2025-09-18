@@ -136,7 +136,7 @@ public class Login {
                     throw new IllegalArgumentException("Utente non trovato");
 
                 if (user.verifyPassword(password)) {
-                    IO.printSuccessrMessage("Login effettuato con successo!");
+                    IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
                     return user;
                 } else {

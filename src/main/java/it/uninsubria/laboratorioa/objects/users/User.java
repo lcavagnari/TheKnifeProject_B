@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratorioa.objects.JsonEntity;
 import it.uninsubria.laboratorioa.objects.Location;
 import it.uninsubria.laboratorioa.objects.enums.UserRole;
-import it.uninsubria.laboratorioa.ui.IO;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,6 +15,7 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Objects;
+import java.util.UUID;
 
 /**
  * Classe astratta che rappresenta un utente del sistema.<p>
@@ -63,6 +63,7 @@ public abstract class User extends JsonEntity {
      */
     private LocalDate dateOfBirth;
 
+
     /**
      * Costruttore che inizializza un utente con password in chiaro.<p>
      * Esegue validazioni di base su username, nome e cognome.<p>
@@ -103,15 +104,16 @@ public abstract class User extends JsonEntity {
      * Valida data di nascita.<p>
      * Costruisce l'oggetto JSON.<p>
      *
+     * @param id          identificativo
      * @param username    nome utente
+     * @param password    password hashata
+     * @param salt        salt usato nell'hash
      * @param name        nome
      * @param lastName    cognome
      * @param location    posizione geografica
      * @param dateOfBirth data di nascita
-     * @param password    password hashata
-     * @param salt        salt usato nell'hash
      */
-    public User(String username, String name, String lastName, Location location, LocalDate dateOfBirth, String password, String salt) {
+    public User(UUID id, String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth) {
         this.username = (username == null || username.length() < 3) ? null : username;
         this.name = (name == null || name.length() < 4) ? "nome" : name;
         this.lastName = (lastName == null || lastName.length() < 4) ? null : lastName;

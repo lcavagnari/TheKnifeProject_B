@@ -59,6 +59,25 @@ public abstract class JsonEntity {
     @Getter
     protected ObjectNode jsonObject;
 
+
+    /**
+     * Costruttore principale che crea una nuova entità con UUID casuale.<p>
+     * Inizializza la struttura JSON e i riferimenti al file di salvataggio.
+     *
+     * @param folderName nome della cartella di salvataggio relativa a Constants.ROOT
+     */
+    public JsonEntity(UUID id, String folderName) {
+        this.jsonObject = mapper.createObjectNode();
+        this.id = id;
+
+        jsonObject.put("id", String.valueOf(id));
+
+        this.saveFolder = new File(Constants.ROOT, folderName);
+        this.saveFile = new File(saveFolder, id + ".json");
+
+        IO.validateUUID(id);
+    }
+
     /**
      * Costruttore principale che crea una nuova entità con UUID casuale.<p>
      * Inizializza la struttura JSON e i riferimenti al file di salvataggio.
@@ -125,20 +144,13 @@ public abstract class JsonEntity {
      * Chiama {@link #build()} per rigenerare il contenuto.<p>
      */
     public void rebuild() {
-        jsonObject.removeAll();        // Purga dati vecchi
+        // Purga dati vecchi
+        jsonObject.removeAll();
 
         jsonObject.put("id", String.valueOf(id));
 
-        build();                      // Invoca il builder della sottoclasse
-    }
-
-    /**
-     * Restituisce la rappresentazione JSON formattata in stringa leggibile.<p>
-     *
-     * @return stringa JSON formattata
-     */
-    public String toPrettyString() {
-        return jsonObject.toPrettyString();
+        // Invoca il builder della sottoclasse
+        build();
     }
 
     /**

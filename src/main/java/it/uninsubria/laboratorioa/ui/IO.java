@@ -508,9 +508,9 @@ public class IO {
      *
      * @param msg Messaggio di successo
      */
-    public static void printSuccessrMessage(String msg) {
+    public static void printSuccessMessage(String msg) {
         if (msg == null) return;
-        System.out.print("\n" + IO.replaceText(32, "! ") + msg);
+        System.out.print("\n" + IO.replaceText(32, " ⩥ ") + msg);
     }
 
     /**

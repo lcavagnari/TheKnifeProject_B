@@ -91,63 +91,63 @@ public class OwnerMenus extends Menus {
                 switch (choice) {
                     case 1 -> {
                         restaurant.setName(IO.getUserInput("Nuovo nome:"));
-                        IO.printSuccessrMessage("Nome aggiornato.");
+                        IO.printSuccessMessage("Nome aggiornato.");
                     }
                     case 2 -> {
                         restaurant.setDescription(IO.getUserInput("Nuova descrizione:"));
-                        IO.printSuccessrMessage("Descrizione aggiornata.");
+                        IO.printSuccessMessage("Descrizione aggiornata.");
                     }
                     case 3 -> {
                         restaurant.setWebsiteUrl(IO.getUserInput("Nuovo sito web:"));
-                        IO.printSuccessrMessage("Website aggiornato.");
+                        IO.printSuccessMessage("Website aggiornato.");
                     }
                     case 4 -> {
                         restaurant.setPhone(IO.getUserInput("Nuovo numero di telefono:"));
-                        IO.printSuccessrMessage("Telefono aggiornato.");
+                        IO.printSuccessMessage("Telefono aggiornato.");
                     }
                     case 5 -> {
                         Location location = IO.getLocationInput(false);
                         IO.validateLocation(location);
                         restaurant.setLocation(location);
-                        IO.printSuccessrMessage("Location aggiornata.");
+                        IO.printSuccessMessage("Location aggiornata.");
                     }
                     case 6 -> {
                         PriceRange range = IO.getEnumInput(PriceRange.class, "Inserisci nuova fascia di prezzo");
                         restaurant.setPriceRange(range);
-                        IO.printSuccessrMessage("Fascia di prezzo aggiornata.");
+                        IO.printSuccessMessage("Fascia di prezzo aggiornata.");
                     }
                     case 7 -> {
                         Award award = IO.getEnumInput(Award.class, "Nuovo premio:");
                         restaurant.setAward(award);
-                        IO.printSuccessrMessage("Premio aggiornato.");
+                        IO.printSuccessMessage("Premio aggiornato.");
                     }
                     case 8 -> {
                         restaurant.setGreenStar(IO.getBooleanInput("Ha la Stella Verde?"));
-                        IO.printSuccessrMessage("Stella verde aggiornata.");
+                        IO.printSuccessMessage("Stella verde aggiornata.");
                     }
                     case 9 -> {
                         restaurant.setHasDelivery(IO.getBooleanInput("Offre consegna a domicilio?"));
-                        IO.printSuccessrMessage("Opzione delivery aggiornata.");
+                        IO.printSuccessMessage("Opzione delivery aggiornata.");
                     }
                     case 10 -> {
                         restaurant.setHasOnlineBooking(IO.getBooleanInput("Offre prenotazione online?"));
-                        IO.printSuccessrMessage("Prenotazione online aggiornata.");
+                        IO.printSuccessMessage("Prenotazione online aggiornata.");
                     }
                     case 11 -> {
                         Set<CuisineType> cuisines = IO.getEnumSetInput(CuisineType.class, "Inserisci tipi di cucina:");
                         restaurant.getCuisinesTypes().clear();
                         restaurant.getCuisinesTypes().addAll(cuisines);
-                        IO.printSuccessrMessage("Tipi di cucina aggiornati.");
+                        IO.printSuccessMessage("Tipi di cucina aggiornati.");
                     }
                     case 12 -> {
                         Set<String> services = IO.parseValidatedStrings("Inserisci servizi:");
                         restaurant.getServices().clear();
                         restaurant.getServices().addAll(services);
-                        IO.printSuccessrMessage("Servizi aggiornati.");
+                        IO.printSuccessMessage("Servizi aggiornati.");
                     }
                     case 13 -> {
                         restaurant.build();
-                        IO.printSuccessrMessage("Modifiche salvate.");
+                        IO.printSuccessMessage("Modifiche salvate.");
                         return;
                     }
                     case 14 -> respondToReview(restaurant);
@@ -251,7 +251,7 @@ public class OwnerMenus extends Menus {
             Review selected = allReviews.get(sel - 1);
             String response = IO.getUserInput("Scrivi la tua risposta (max 300 caratteri):");
             selected.setReply(response);
-            IO.printSuccessrMessage("Risposta salvata.");
+            IO.printSuccessMessage("Risposta salvata.");
             IO.getUserInput("Premi invio per continuare.");
         }
     }

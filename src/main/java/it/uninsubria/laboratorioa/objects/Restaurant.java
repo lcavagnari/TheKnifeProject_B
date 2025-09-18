@@ -174,6 +174,7 @@ public class Restaurant extends JsonEntity {
      * Inizializza la mappa recensioni vuota.<p>
      * Non costruisce la rappresentazione JSON automaticamente.
      *
+     * @param id
      * @param name             nome del ristorante
      * @param description      descrizione
      * @param websiteUrl       URL sito web
@@ -188,10 +189,10 @@ public class Restaurant extends JsonEntity {
      * @param cuisinesTypes    insieme tipi cucina
      * @param services         insieme servizi
      */
-    public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
+    public Restaurant(UUID id, String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes, Set<String> services) {
 
-        super("restaurants");
+        super(id,"restaurants");
         this.name = (name == null || name.isBlank()) ? "Restaurant" : name;
         this.description = (description == null || description.isBlank()) ? "" : description;
         this.websiteUrl = (websiteUrl == null || websiteUrl.isBlank()) ? "" : websiteUrl;

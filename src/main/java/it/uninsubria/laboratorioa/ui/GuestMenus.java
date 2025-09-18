@@ -88,9 +88,9 @@ public class GuestMenus extends Menus {
 
             System.out.println("┌─────────────── ★Recensioni★ ────────────────┐\n");
             if (reviews == null || reviews.isEmpty()) {
-
                 System.out.println("│ No reviews available for this restaurant.");
                 System.out.println("└───────────────────────────────────────────┘");
+
             } else {
                 Review best = reviews.values().stream().max(Comparator.comparingInt(Review::getValue)).orElse(null);
                 Review worst = reviews.values().stream().min(Comparator.comparingInt(Review::getValue)).orElse(null);
@@ -98,6 +98,7 @@ public class GuestMenus extends Menus {
                 System.out.println("\n│ ★ Migliore:\n" + best);
                 System.out.println("\n│ ☆ Peggiore:\n" + worst);
                 System.out.println("└───────────────────────────────────────────┘");
+
             }
 
             IO.printMenu(
@@ -109,14 +110,12 @@ public class GuestMenus extends Menus {
             int choice = IO.getInt("Seleziona un'opzione:");
 
             try {
-                switch (choice) {
-                    case 1 -> {
-                        return;
-                    }
-                    default -> IO.printErrorMessage("Opzione non valida.");
-                }
+                if (choice == 1) return;
+                else IO.printErrorMessage("Opzione non valida.");
+
             } catch (IllegalArgumentException e) {
                 IO.printErrorMessage(e.getMessage());
+
             } catch (AbortOperationException e) {
                 IO.printErrorMessage("Abort: " + e.getMessage());
                 break;

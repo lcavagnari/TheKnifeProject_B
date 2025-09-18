@@ -41,39 +41,23 @@ public class Loader {
      */
     private static final File ROOT = Constants.ROOT;
 
-    /**
-     * Directory contenente i file JSON dei ristoranti.
-     */
+    /** Directory contenente i file JSON dei ristoranti. */
     private static final File RESTAURANTS_ROOT = new File(ROOT, "companies");
 
-    /**
-     * Directory contenente i file JSON degli utenti.
-     */
+    /** Directory contenente i file JSON degli utenti. */
     private static final File USERS_ROOT = new File(ROOT, "users");
 
-    /**
-     * Mappa dei ristoranti indicizzati per ID.
-     */
-    @Getter
-    private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
+    /** Mappa dei ristoranti indicizzati per ID. */
+    @Getter private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
 
-    /**
-     * Mappa dei ristoranti indicizzati per nome.
-     */
-    @Getter
-    private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
+    /** Mappa dei ristoranti indicizzati per nome. */
+    @Getter private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
 
-    /**
-     * Mappa degli utenti indicizzati per ID.
-     */
-    @Getter
-    private final static Map<UUID, User> usersById = new HashMap<>();
+    /** Mappa degli utenti indicizzati per ID. */
+    @Getter private final static Map<UUID, User> usersById = new HashMap<>();
 
-    /**
-     * Mappa degli utenti indicizzati per nome utente (username).
-     */
-    @Getter
-    private final static Map<String, User> usersByName = new HashMap<>();
+    /** Mappa degli utenti indicizzati per nome utente (username). */
+    @Getter private final static Map<String, User> usersByName = new HashMap<>();
 
     /**
      * Carica tutti i ristoranti dai file specificati e li deserializza in oggetti `Restaurant`.
@@ -86,8 +70,7 @@ public class Loader {
 
         for (File f : rFiles) {
             try {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode jsonNode = mapper.readTree(f);
+                JsonNode jsonNode = new ObjectMapper().readTree(f);
 
                 UUID id = UUID.fromString(jsonNode.path("id").asText());
                 String name = jsonNode.path("name").asText();
@@ -119,16 +102,15 @@ public class Loader {
                 for (JsonNode node : jsonNode.path("cuisinesTypes")) {
                     try {
                         cuisines.add(CuisineType.valueOf(node.asText().toUpperCase()));
-                    } catch (IllegalArgumentException ignored) {
-                    }
+                    } catch (IllegalArgumentException ignored) {}
                 }
 
                 Set<String> services = new HashSet<>();
-                for (JsonNode node : jsonNode.path("services")) {
+                for (JsonNode node : jsonNode.path("services"))
                     services.add(node.asText());
-                }
 
                 Restaurant restaurant = new Restaurant(
+                        id,
                         name,
                         description,
                         websiteUrl,
@@ -141,8 +123,7 @@ public class Loader {
                         award,
                         greenStar,
                         cuisines,
-                        services
-                );
+                        services);
 
                 for (JsonNode node : jsonNode.path("reviews")) {
                     UUID uId = UUID.fromString(node.path("user").asText());
@@ -205,21 +186,24 @@ public class Loader {
                 User user;
                 if (Objects.equals(jsonNode.get("role").asText(""), "Owner")) {
                     user = new Owner(
+                            UUID.fromString(id),
                             username,
                             passwordHash, salt,
                             name, lastName,
                             loc, dateOfBirth
                     );
+
                 } else {
                     Set<UUID> favourites = new HashSet<>();
                     JsonNode favouritesNode = jsonNode.get("favourites");
-                    if (favouritesNode != null && favouritesNode.isArray()) {
+                    if (favouritesNode != null && favouritesNode.isArray())
                         for (JsonNode fav : favouritesNode)
                             favourites.add(UUID.fromString(fav.asText()));
-                    }
 
                     user = new Client(
-                            username, passwordHash, salt,
+                            UUID.fromString(id),
+                            username,
+                            passwordHash, salt,
                             name, lastName,
                             loc, dateOfBirth,
                             favourites
@@ -234,6 +218,73 @@ public class Loader {
             } catch (SecurityException e) {
                 System.err.println("Accesso negato al file " + f.getName());
             }
+        }
+    }
+
+    private void loadMichelin() {
+        File f = new File(Constants.ROOT,"michelin_my_maps.json");
+
+        try {
+            JsonNode jsonNode = new ObjectMapper().readTree(f);
+            if (!jsonNode.isArray()) throw new IOException();
+
+            for (JsonNode node : jsonNode) {
+                try {
+
+                    UUID id = UUID.fromString(jsonNode.path("id").asText());
+                    String name = jsonNode.path("name").asText();
+                    String description = jsonNode.path("address").asText();
+                    String websiteUrl = jsonNode.path("websiteUrl").asText("");
+                    String phone = jsonNode.path("phone").asText();
+
+                    Award award = Award.fromInt(jsonNode.path("award").asInt());
+                    boolean greenStar = jsonNode.path("greenStar").asBoolean();
+                    boolean hasDelivery = jsonNode.path("hasDelivery").asBoolean(false);
+                    boolean hasBooking = jsonNode.path("hasOnlineBooking").asBoolean(false);
+
+                    JsonNode locNode = jsonNode.path("location");
+                    Location loc = new Location(
+                            Nation.valueOf(locNode.path("nation").asText().toUpperCase().replace(" ","_")),
+                            locNode.path("city").asText(),
+                            locNode.path("latitude").asDouble(),
+                            locNode.path("longitude").asDouble(),
+                            locNode.path("address").asText()
+                    );
+
+                    String price = jsonNode.get("priceRange").asText();
+                    PriceRange priceRange = PriceRange.byDollarAmount(price.length());
+
+                    Set<CuisineType> cuisines = new HashSet<>();
+                    for (JsonNode cuisine : jsonNode.path("cuisinesTypes")) {
+                        try {
+                            cuisines.add(CuisineType.valueOf(cuisine.asText().toUpperCase()));
+                        } catch (IllegalArgumentException ignored) {}
+                    }
+
+                    Set<String> services = new HashSet<>();
+                    for (JsonNode service : jsonNode.path("services"))
+                        services.add(service.asText());
+
+                    Restaurant restaurant = new Restaurant(
+                            id, name, description,
+                            websiteUrl, null,
+                            phone, loc,
+                            priceRange,
+                            hasDelivery, hasBooking,
+                            award, greenStar,
+                            cuisines, services
+                    );
+
+                    restaurantsById.put(id,restaurant);
+                    restaurantsByName.put(name,restaurant);
+
+                } catch (IllegalArgumentException ignored) {}
+            }
+
+        } catch (IOException | IllegalArgumentException e) {
+            System.err.println("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
+        } catch (SecurityException e) {
+            System.err.println("Accesso negato al file " + f.getName());
         }
     }
 

@@ -42,8 +42,8 @@ public class Owner extends User {
     @Getter
     private final Map<String, Restaurant> restaurantsByName = new HashMap<>();
 
-    public Owner(String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth, Set<Restaurant> restaurants) {
-        super(username, name, lastName, location, dateOfBirth, password, salt);
+    public Owner(UUID id, String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth, Set<Restaurant> restaurants) {
+        super(id,username, name, lastName,name,lastName,location,dateOfBirth);
 
         if (restaurants == null || restaurants.isEmpty()) return;
         for (Restaurant r : restaurants) {
@@ -52,8 +52,8 @@ public class Owner extends User {
         }
     }
 
-    public Owner(String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth) {
-        super(username, name, lastName, location, dateOfBirth, password, salt);
+    public Owner(UUID id, String username, String password, String salt, String name, String lastName, Location location, LocalDate dateOfBirth) {
+        super(id,username,password,salt,name,lastName,location,dateOfBirth);
     }
 
     public Owner(String username, String password, String name, String lastName, Location location, LocalDate dateOfBirth) {
