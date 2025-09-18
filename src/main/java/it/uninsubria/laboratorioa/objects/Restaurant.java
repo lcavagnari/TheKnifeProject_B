@@ -132,12 +132,12 @@ public class Restaurant extends JsonEntity {
      * @param award            premio assegnato
      * @param greenStar        flag Stella Verde
      * @param cuisinesTypes    insieme tipi cucina
-     * @param reviews          mappa recensioni
      * @param services         insieme servizi
+     * @param reviews          mappa recensioni
      */
     public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes,
-                      Map<UUID, Review> reviews, Set<String> services) {
+                      Set<String> services, Map<UUID, Review> reviews) {
 
         super("restaurants");
 
@@ -158,13 +158,13 @@ public class Restaurant extends JsonEntity {
         this.services = (services == null) ? new HashSet<>() : services;
         this.reviews = (reviews == null) ? new HashMap<>() : reviews;
 
-        this.reviewsArray = mapper.createArrayNode();
         this.cuisinesTypesArray = mapper.createArrayNode();
         this.servicesArray = mapper.createArrayNode();
+        this.reviewsArray = mapper.createArrayNode();
 
         this.cuisinesTypes.forEach(c -> cuisinesTypesArray.add(c.toString()));
-        this.services.forEach(servicesArray::add);
         this.reviews.forEach((u, r) -> reviewsArray.add(r.jsonObject));
+        this.services.forEach(servicesArray::add);
 
         build();
     }
@@ -192,27 +192,7 @@ public class Restaurant extends JsonEntity {
     public Restaurant(UUID id, String name, String description, String websiteUrl, Owner owner, String phone, Location location, PriceRange priceRange,
                       boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar, Set<CuisineType> cuisinesTypes, Set<String> services) {
 
-        super(id,"restaurants");
-        this.name = (name == null || name.isBlank()) ? "Restaurant" : name;
-        this.description = (description == null || description.isBlank()) ? "" : description;
-        this.websiteUrl = (websiteUrl == null || websiteUrl.isBlank()) ? "" : websiteUrl;
-        this.phone = (phone == null || phone.isBlank()) ? "" : phone;
-        this.location = location;
-        this.priceRange = (priceRange == null) ? PriceRange.MODERATE : priceRange;
-        this.hasDelivery = hasDelivery;
-        this.hasOnlineBooking = hasOnlineBooking;
-        this.award = (award == null) ? Award.NONE : award;
-        this.greenStar = greenStar;
-
-        this.owner = owner;
-
-        this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
-        this.services = (services == null) ? new HashSet<>() : services;
-        this.reviews = new HashMap<>();
-
-        this.reviewsArray = mapper.createArrayNode();
-        this.cuisinesTypesArray = mapper.createArrayNode();
-        this.servicesArray = mapper.createArrayNode();
+        this(name, description, websiteUrl, owner, phone, location, priceRange, hasDelivery, hasOnlineBooking, award, greenStar, cuisinesTypes, services, new HashMap<>());
 
         //IO.validateRestaurant(this);
     }
