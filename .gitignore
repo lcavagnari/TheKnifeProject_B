@@ -4,7 +4,7 @@
 *.jar
 *.zip
 
-
+/data
 
 # Default ignored files
 /shelf/
