@@ -58,7 +58,7 @@ public class OwnerMenus extends Menus {
             System.out.println(restaurant);
 
             Collection<Review> reviews = restaurant.getReviews().values();
-            if (reviews == null || reviews.isEmpty()) {
+            if (reviews.isEmpty()) {
                 System.out.println("No reviews available for this restaurant.\n");
             } else {
                 Review best = reviews.stream().max(Comparator.comparingInt(Review::getValue)).orElse(null);

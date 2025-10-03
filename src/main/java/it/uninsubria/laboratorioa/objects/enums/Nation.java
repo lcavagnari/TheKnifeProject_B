@@ -267,10 +267,6 @@ public enum Nation {
     /**
      * Turkey
      */
-    TÜRKIYE("TR"),
-    /**
-     * Turkey
-     */
     TURKEY("TR"),
     /**
      * Macau

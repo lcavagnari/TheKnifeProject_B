@@ -273,7 +273,7 @@ public class CsvParser {
 
         try (Stream<String> lines = Files.lines(path)) {
             // === PREPARAZIONE DATI ===
-            List<String> csvLines = lines.skip(1).collect(Collectors.toList());
+            List<String> csvLines = lines.skip(1).toList();
             System.out.println("Processando " + csvLines.size() + " ristoranti...");
 
             // === ELABORAZIONE PARALLELA ===
@@ -300,7 +300,7 @@ public class CsvParser {
             List<Restaurant> restaurants = restaurantFutures.stream()
                     .map(CompletableFuture::join)
                     .filter(Objects::nonNull)  // Filtra i ristoranti falliti
-                    .collect(Collectors.toList());
+                    .toList();
 
             System.out.println("✅ Elaborati " + restaurants.size() + "/" + csvLines.size() + " ristoranti");
 
@@ -356,12 +356,6 @@ public class CsvParser {
                 }
 
                 if (completed == total) break;
-
-                try {
-                    Thread.sleep(1000); // Check ogni secondo
-                } catch (InterruptedException e) {
-                    break;
-                }
             }
         });
     }
