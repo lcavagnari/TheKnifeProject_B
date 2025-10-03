@@ -63,10 +63,15 @@ public class CsvParser {
                 .replace(", ,", ",")
                 .replaceAll(",$", "");
 
+        nation = nation.trim()
+                .replaceAll("[\\s\\-]", "_")
+                .toUpperCase();
+
+
         // 0:nation , 1: city , 2:address
         return new String[]{
                 city,
-                nation.trim().replaceAll("[\\s\\-]", "_").toUpperCase(),
+                nation,
                 address
         };
     }
@@ -239,16 +244,30 @@ public class CsvParser {
     }
 
     private static Location createLocation(String[] locData, String[] fields) {
-        if (locData == null) {
-            return null;
+        if (locData == null) return null;
+
+        Nation nation;
+        String nationName = null;
+        try {
+            nationName = locData[1].trim().toUpperCase()
+                    .replace("_MAINLAND", "");
+
+            nation = Nation.valueOf(nationName);
+
+        } catch (IllegalArgumentException ex) {
+            nation = Nation.fromString(nationName);
+            if (nation == null) {
+                IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
+                IO.printErrorMessage("loc data " + Arrays.toString(locData));
+                IO.printErrorMessage(fields[6] + " " + fields[5]);
+                return null;
+            }
         }
 
         try {
-            String nation = locData[1].trim().toUpperCase().replace("_MAINLAND", "");
-
             // locData: 0=city, 1=nation, 2=address
             return new Location(
-                    Nation.valueOf(nation),
+                    nation,
                     locData[0],
                     Double.parseDouble(fields[5]),
                     Double.parseDouble(fields[6]),
@@ -347,7 +366,7 @@ public class CsvParser {
             int previousCompleted = 0;
 
             while (true) {
-                int completed = (int) futures.stream().mapToLong(f -> f.isDone() ? 1 : 0).sum();
+                int completed = (int) futures.stream().mapToLong(f -> (f.isDone() && !f.isCompletedExceptionally()) ? 1 : 0).sum();
 
                 if (completed != previousCompleted) {
                     System.out.println("Progresso: " + completed + "/" + total +
