@@ -18,9 +18,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -75,7 +75,7 @@ public class CsvParser {
     private static String getNationalPrefix(String phoneNumber, Nation nation) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         String regionCode = nation.getIsoCode();
-        if (regionCode == null || regionCode.isEmpty()) return "";
+        if (regionCode == null || phoneNumber == null || regionCode.isEmpty() || phoneNumber.isBlank()) return "";
 
         try {
             Phonenumber.PhoneNumber parsed = phoneUtil.parse(phoneNumber, regionCode);
@@ -88,142 +88,282 @@ public class CsvParser {
 
 
     private static Restaurant createRestaurant(String[] fields) {
-        // Lettura dati posizione
-        Location location = null;
-        try {
-            // 0: city , 1:nation , 2: address
-            String[] locData = retrieveLocData(fields[1], fields[2]);
+        // === OPERAZIONI ASINCRONE ===
+        // Avvia le operazioni costose in parallelo
+        CompletableFuture<String[]> locDataFuture = CompletableFuture
+                .supplyAsync(() -> retrieveLocData(fields[1], fields[2]))
+                .exceptionally(ex -> {
+                    IO.printErrorMessage("Errore caricamento location: " + ex.getMessage());
+                    return null;
+                });
 
-            location = new Location(
-                    Nation.valueOf(locData[1]),
+        CompletableFuture<Set<CuisineType>> cuisinesFuture = CompletableFuture
+                .supplyAsync(() -> parseCuisineTypes(fields[4]))
+                .exceptionally(ex -> {
+                    IO.printErrorMessage("Errore parsing cucine: " + ex.getMessage());
+                    return new HashSet<>();
+                });
+
+        CompletableFuture<Set<String>> servicesFuture = CompletableFuture
+                .supplyAsync(() -> parseServices(fields))
+                .exceptionally(ex -> {
+                    IO.printErrorMessage("Errore parsing servizi: " + ex.getMessage());
+                    return new HashSet<>();
+                });
+
+        // === OPERAZIONI SINCRONE (veloci) ===
+        Award award = parseAward(fields[10]);
+        boolean greenStar = parseGreenStar(fields[11]);
+
+        // === ATTESA E ASSEMBLAGGIO ===
+        // Aspetta che le operazioni asincrone terminino
+        CompletableFuture.allOf(locDataFuture, cuisinesFuture, servicesFuture).join();
+
+        // Raccogli i risultati
+        String[] locData = locDataFuture.join();
+        Set<CuisineType> cuisineTypes = cuisinesFuture.join();
+        Set<String> services = servicesFuture.join();
+
+        // Costruisci la Location
+        Location location = createLocation(locData, fields);
+
+        // Ottieni il prefisso nazionale
+        String nationalPrefix = (location != null) ?
+                getNationalPrefix(fields[7], location.getNation()) : "";
+
+        // === COSTRUZIONE FINALE ===
+        return new Restaurant(
+                UUID.randomUUID(),                                    // Identificatore
+                fields[0],                                           // Nome
+                fields[13],                                          // Descrizione
+                fields[9],                                           // Url pagina web
+                null,                                                // Proprietario del ristorante
+                nationalPrefix + fields[7],                          // Contatto telefonico
+                location,                                            // Posizione geografica
+                PriceRange.byDollarAmount(fields[3].length()),       // Fascia di prezzo
+                rd.nextBoolean(),                                    // Prenotazione online
+                rd.nextBoolean(),                                    // Consegna a domicilio
+                award,                                               // Stelle Michelin
+                greenStar,                                           // Green Star
+                cuisineTypes,                                        // Stili culinari
+                services                                             // Servizi offerti
+        );
+    }
+
+
+
+    // TODO: Sistemare qui la gestione degli input a cazzo nel dataset del diopo-
+    private static Set<CuisineType> parseCuisineTypes(String cuisinesField) {
+        Set<CuisineType> cuisineTypes = new HashSet<>();
+        if (cuisinesField == null || cuisinesField.isBlank()) return cuisineTypes;
+
+        // Split iniziale anche se manca lo spazio dopo la virgola
+        String[] cuisines = cuisinesField.split("\\s*,\\s*");
+
+
+        for (String c : cuisines) {
+            String normalised = c.toUpperCase()
+                    .replace(" ","_");
+
+            try {
+                cuisineTypes.add(CuisineType.valueOf(normalised));
+            } catch (IllegalArgumentException ignored) {
+
+            }
+        }
+
+        return cuisineTypes;
+    }
+
+
+    /*
+
+                // Normalizzazione
+            String normalized = c.toUpperCase()
+                    .replace(" ",", ")
+                    .replaceAll("CUISINE|INFLUENCES|COOKING", "").trim()
+                    .replace("-", "_")
+                    .replace("&", " AND ")
+                    .replace(" AND ", ","); // rende gli "AND" uniformi alle virgole
+
+            // Split finale
+            String[] parts = normalized.split("\\s*,\\s*");
+
+            for (String part : parts) {
+                String key = part.trim().replace(" ", "_");
+                if (!c.isEmpty()) {
+                    try {
+                        cuisineTypes.add(CuisineType.valueOf(c.toUpperCase().replace(" ","_")));
+                    } catch (IllegalArgumentException ignored) {
+                        try {
+                            if (!key.isEmpty()) cuisineTypes.add(CuisineType.valueOf(key));
+                        } catch (IllegalArgumentException ignored2) {}
+                    }
+                }
+            }
+     */
+
+    private static Set<String> parseServices(String[] fields) {
+        Set<String> services = new HashSet<>();
+
+        if (fields.length >= 14 && !fields[13].isBlank()) {
+            String[] serviceArray = fields[13].split(",");
+            services = Arrays.stream(serviceArray)
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .collect(Collectors.toSet());
+        }
+
+        return services;
+    }
+
+    private static Award parseAward(String ratingField) {
+        try {
+            String rating = ratingField.toLowerCase();
+            if (rating.matches("[0-9].*")) {
+                int val = Integer.parseInt(rating.replaceAll(" \\w*", ""));
+                return Award.fromInt(val);
+            } else {
+                return Award.valueOf(rating.toUpperCase().replace(" ", "_"));
+            }
+        } catch (NumberFormatException ex) {
+            return Award.NONE;
+        }
+    }
+
+    private static boolean parseGreenStar(String greenStarField) {
+        try {
+            return Integer.parseInt(greenStarField) == 1;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
+
+    private static Location createLocation(String[] locData, String[] fields) {
+        if (locData == null) {
+            return null;
+        }
+
+        try {
+            String nation = locData[1].trim().toUpperCase().replace("_MAINLAND", "");
+
+            // locData: 0=city, 1=nation, 2=address
+            return new Location(
+                    Nation.valueOf(nation),
                     locData[0],
                     Double.parseDouble(fields[5]),
                     Double.parseDouble(fields[6]),
                     locData[2]
             );
-
-        } catch (Exception ignored) {
+        } catch (Exception ex) {
+            IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
+            IO.printErrorMessage("loc data " + Arrays.toString(locData));
+            IO.printErrorMessage(fields[6] + " " + fields[5]);
+            return null;
         }
-
-        // stili di cucina
-        String[] cuisines = fields[4].split(", ");
-        Set<CuisineType> cuisineTypes = new HashSet<>();
-
-        for (String c : cuisines) {
-            String[] parts = c.toUpperCase()
-                .replace(" CUISINE", "")
-                .replace(" INFLUENCES", "")
-                .replace("-", "_")
-                .replace("&", "AND")
-                .split(",|AND");
-
-            for (String part : parts) {
-                String key = part.trim().replace(" ", "_");
-
-                try {
-                    cuisineTypes.add(CuisineType.valueOf(key));
-
-                } catch (IllegalArgumentException ignored) {}
-            }
-        }
-
-
-        // Accessi e servizi
-
-        Set<String> services = new HashSet<>();
-        if (fields.length >= 14 && !fields[13].isBlank()) {
-            String[] tmp = fields[13].split(",");
-
-            services = Arrays.stream(tmp).filter(Objects::nonNull).collect(Collectors.toSet());
-        }
-
-        // Ottieni il prefisso nazionale per il numero
-        String nationalPrefix = "";
-        if (location != null)
-            nationalPrefix = getNationalPrefix(fields[7], location.getNation());
-
-
-        // Ottieni il numero di stelle
-        Award award = Award.NONE;
-        try {
-            String rating = fields[10].toLowerCase();
-            if (rating.matches("[0-9].*")) {
-                int val = Integer.parseInt(rating.replaceAll(" \\w*", ""));
-                award = Award.fromInt(val);
-
-            } else award = Award.valueOf(rating.toUpperCase().replace(" ", "_"));
-
-        } catch (NumberFormatException ignored) {
-        }
-
-
-        // GreenStar parsing
-
-        boolean greenStar = false;
-        try {
-            greenStar = Integer.parseInt(fields[11]) == 1;
-
-        } catch (NumberFormatException ignored) {
-        }
-
-
-        // Costruzione dell'oggetto
-
-        Restaurant c = new Restaurant(
-                UUID.randomUUID(),                                               // Identificatore
-                fields[0],                                                       // Nome
-                fields[13],                                                      // Descrizione
-                fields[9],                                                       // Url pagina web
-                null,                                                            // Proprietario del ristorante
-                nationalPrefix + fields[7],                                      // Contatto telefonico con prefisso nazionale
-                location,                                                        // Posizione geografica
-                PriceRange.byDollarAmount(fields[3].length()),                   // Fascia di prezzo
-                rd.nextBoolean(),                                                // Disponibilità per la prenotazione online
-                rd.nextBoolean(),                                                // Disponibilità alla consegna a domicilio
-                award,                                                           // Stelle Michelin
-                greenStar,                                                       // "Green Star", certificato Michelin di sostenibilità
-                cuisineTypes,                                                    // Stili culinari offerti
-                services                                                         // Lista di servizi offerti dal ristorante
-        );
-
-        return c;
     }
 
 
     /**
-     * index:      0	   1		2     3	      4		   5		6		  7		   8	  9		  10	  11			12					13   <br>
+     * index:      0       1      2     3          4          5      6       7          8     9         10     11         12             13   <br>
      * field csv: Name,Address,Location,Price,Cuisine,Longitude,Latitude,PhoneNumber,Url,WebsiteUrl,Award,GreenStar,FacilitiesAndServices,Description
      * <br>
-     *
      */
     public static void parseFromDataset(Path path) {
         if (path == null) return;
 
-        final ObjectMapper mapper = new ObjectMapper();
-        ArrayNode restaurants = mapper.createArrayNode();
-
         try (Stream<String> lines = Files.lines(path)) {
-            for (String line : lines.skip(1).toList()) {
-                String[] fields = line.split(";");
+            // === PREPARAZIONE DATI ===
+            List<String> csvLines = lines.skip(1).collect(Collectors.toList());
+            System.out.println("Processando " + csvLines.size() + " ristoranti...");
+
+            // === ELABORAZIONE PARALLELA ===
+            List<CompletableFuture<Restaurant>> restaurantFutures = csvLines.stream()
+                    .map(line -> line.split(";"))
+                    .map(fields -> CompletableFuture
+                            .supplyAsync(() -> createRestaurant(fields))
+                            .exceptionally(ex -> {
+                                System.err.println("Errore processando ristorante " +
+                                        (fields.length > 0 ? fields[0] : "sconosciuto") +
+                                        ": " + ex.getMessage());
+                                return null; // Restaurant fallito
+                            })
+                    )
+                    .collect(Collectors.toList());
+
+            // Progress tracking (opzionale)
+            showProgressAsync(restaurantFutures);
+
+            // === ATTESA E RACCOLTA RISULTATI ===
+            System.out.println("Aspettando completamento elaborazione...");
+            CompletableFuture.allOf(restaurantFutures.toArray(new CompletableFuture[0])).join();
+
+            List<Restaurant> restaurants = restaurantFutures.stream()
+                    .map(CompletableFuture::join)
+                    .filter(Objects::nonNull)  // Filtra i ristoranti falliti
+                    .collect(Collectors.toList());
+
+            System.out.println("✅ Elaborati " + restaurants.size() + "/" + csvLines.size() + " ristoranti");
+
+            // === COSTRUZIONE JSON E SCRITTURA ===
+            CompletableFuture<Void> writeFileFuture = CompletableFuture.runAsync(() -> {
+                try {
+                    final ObjectMapper mapper = new ObjectMapper();
+                    ArrayNode restaurantsJson = mapper.createArrayNode();
+
+                    for (Restaurant r : restaurants) {
+                        try {
+                            r.build();
+                            restaurantsJson.add(r.getJsonObject());
+                        } catch (Exception ex) {
+                            System.err.println("Errore building JSON per " + r.getName() + ": " + ex.getMessage());
+                        }
+                    }
+
+                    // Scrittura su file
+                    mapper.writerWithDefaultPrettyPrinter()
+                            .writeValue(new File(Constants.ROOT, "michelin_my_maps.json"), restaurantsJson);
+
+                    System.out.println("✅ File michelin_my_maps.json scritto con successo!");
+
+                } catch (IOException ex) {
+                    System.err.println("❌ Errore scrittura file: " + ex.getMessage());
+                    throw new RuntimeException(ex);
+                }
+            });
+
+            writeFileFuture.join(); // Aspetta che la scrittura finisca
+
+        } catch (IOException | SecurityException e) {
+            System.err.println("❌ Error while parsing csv database: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Mostra il progresso dell'elaborazione in modo asincrono
+     */
+    private static void showProgressAsync(List<CompletableFuture<Restaurant>> futures) {
+        CompletableFuture.runAsync(() -> {
+            int total = futures.size();
+            int previousCompleted = 0;
+
+            while (true) {
+                int completed = (int) futures.stream().mapToLong(f -> f.isDone() ? 1 : 0).sum();
+
+                if (completed != previousCompleted) {
+                    System.out.println("Progresso: " + completed + "/" + total +
+                            " (" + (completed * 100 / total) + "%)");
+                    previousCompleted = completed;
+                }
+
+                if (completed == total) break;
 
                 try {
-                    Restaurant r = createRestaurant(fields);
-
-                    r.build();
-                    restaurants.add(r.getJsonObject());
-
-                } catch (Exception ignored) {
-                    System.out.println(ignored.getMessage());
-                    ignored.printStackTrace();
+                    Thread.sleep(1000); // Check ogni secondo
+                } catch (InterruptedException e) {
                     break;
                 }
             }
-
-            // Scrittura su file
-            mapper.writerWithDefaultPrettyPrinter().writeValue(new File(Constants.ROOT,"michelin_my_maps.json"), restaurants);
-
-        } catch (IOException | SecurityException e) {
-            System.out.println("Error while parsing csv database: " + e);
-        }
+        });
     }
 }

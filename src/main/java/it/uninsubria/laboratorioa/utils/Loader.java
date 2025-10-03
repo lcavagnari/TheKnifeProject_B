@@ -13,11 +13,16 @@ import it.uninsubria.laboratorioa.objects.users.Client;
 import it.uninsubria.laboratorioa.objects.users.Owner;
 import it.uninsubria.laboratorioa.objects.users.User;
 import it.uninsubria.laboratorioa.ui.IO;
+import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -48,6 +53,9 @@ public class Loader {
 
     /** Directory contenente i file JSON degli utenti. */
     private static final File USERS_ROOT = new File(ROOT, "users");
+
+    private static final File michelinData = new File(Constants.ROOT, "michelin_my_maps.json");
+    private static final File oldMichelinData = new File(Constants.ROOT, "michelin_my_maps.old.json");
 
     /** Mappa dei ristoranti indicizzati per ID. */
     @Getter private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
@@ -230,9 +238,16 @@ public class Loader {
 
     }
 
-    private void loadMichelin(File f) {
+    private void loadMichelin() {
         try {
-            JsonNode jsonNode = new ObjectMapper().readTree(f);
+            // Main output file missing, continuing from
+            if (!michelinData.exists() && oldMichelinData.exists()) {
+                IO.printErrorMessage("Backup copy of michelin data found. Rolling back to latest version. \n ");
+                Files.copy(oldMichelinData.toPath(), michelinData.toPath(), StandardCopyOption.ATOMIC_MOVE);
+                return;
+            }
+
+            JsonNode jsonNode = new ObjectMapper().readTree(michelinData);
             if (!jsonNode.isArray()) throw new IOException();
 
             for (JsonNode node : jsonNode) {
@@ -288,9 +303,9 @@ public class Loader {
             }
 
         } catch (IOException | IllegalArgumentException e) {
-            IO.printErrorMessage("ERRORE durante il parsing di " + f.getName() + ", causa: " + e.getMessage());
+            IO.printErrorMessage("ERRORE durante il parsing di " + michelinData.getName() + ", causa: " + e.getMessage());
         } catch (SecurityException e) {
-            IO.printErrorMessage("Accesso negato al file " + f.getName());
+            IO.printErrorMessage("Accesso negato al file " + michelinData.getName());
         }
 
     }
@@ -305,14 +320,13 @@ public class Loader {
 
             File[] restaurants = RESTAURANTS_ROOT.listFiles();
             File[] users = USERS_ROOT.listFiles();
-            File michelin = new File(Constants.ROOT, "michelin_my_maps.json");
 
             List<CompletableFuture<Void>> futures = new ArrayList<>();
 
             // Michelin - completamente indipendente, può andare in parallelo
-            if (michelin.exists()) {
+            if (michelinData.exists()) {
                 CompletableFuture<Void> michelinFuture = CompletableFuture
-                        .runAsync(() -> loadMichelin(michelin))
+                        .runAsync(Loader::loadMichelin)
                         .exceptionally(ex -> {
                             IO.printErrorMessage("Errore caricamento Michelin: " + ex.getMessage());
                             return null;
@@ -334,11 +348,60 @@ public class Loader {
             // Aspetta che tutte le operazioni terminino
             CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
 
+
+            System.out.print("");
+
         } catch (SecurityException ex) {
             System.out.println("Accesso negato");
             
         } catch (Exception ex) {
             IO.printErrorMessage("Errore durante il caricamento: " + ex.getMessage());
         }
+    }
+
+
+    public static void updateMichelinDataset(String path) {
+        path = (path != null && !path.isBlank()) ? path : "michelin_my_maps.csv";
+
+        Path inputPath;
+        try {
+            inputPath = Paths.get(path);
+
+            File dataset = new File(inputPath.toUri());
+
+            // input file not found or non in .csv format
+            if (!dataset.exists() || !dataset.isFile() || !dataset.getName().endsWith(".csv")) {
+                IO.printErrorMessage("File or path " + path + " does not exist or it is not supported by the program, please check and try again.");
+                return;
+
+                // dataset parsed at least once
+            } else if (michelinData.exists()) {
+
+                // parsed at least more than once, old version present
+                if (oldMichelinData.exists()) {
+                    IO.printErrorMessage("Backup copy of parsed dataset found. \nWarning: this procedure will overwrite current backup copy, make . \n ");
+                    IO.getUserInput("Type 'continue' and hit Enter to proceed");
+                }
+
+                Files.copy(michelinData.toPath(), oldMichelinData.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                michelinData.delete();
+            }
+
+        } catch (AbortOperationException ignored) {
+            IO.printErrorMessage("Operazione annullata");
+            return;
+
+        } catch (Exception ignored) {
+            IO.printErrorMessage("File or path " + path + " does not exist, check and try again.");
+            return;
+        }
+
+        IO.printErrorMessage("Updating michelin data from file...");
+
+        long timestamp = System.currentTimeMillis();
+        CsvParser.parseFromDataset(inputPath);
+
+        IO.clearScreen();
+        IO.printSuccessMessage("Update completed in " + ((System.currentTimeMillis() - timestamp) + "ms"));
     }
 }
