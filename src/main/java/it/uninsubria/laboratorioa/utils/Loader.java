@@ -48,26 +48,42 @@ public class Loader {
      */
     private static final File ROOT = Constants.ROOT;
 
-    /** Directory contenente i file JSON dei ristoranti. */
+    /**
+     * Directory contenente i file JSON dei ristoranti.
+     */
     private static final File RESTAURANTS_ROOT = new File(ROOT, "companies");
 
-    /** Directory contenente i file JSON degli utenti. */
+    /**
+     * Directory contenente i file JSON degli utenti.
+     */
     private static final File USERS_ROOT = new File(ROOT, "users");
 
     private static final File michelinData = new File(Constants.ROOT, "michelin_my_maps.json");
     private static final File oldMichelinData = new File(Constants.ROOT, "michelin_my_maps.old.json");
 
-    /** Mappa dei ristoranti indicizzati per ID. */
-    @Getter private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
+    /**
+     * Mappa dei ristoranti indicizzati per ID.
+     */
+    @Getter
+    private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
 
-    /** Mappa dei ristoranti indicizzati per nome. */
-    @Getter private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
+    /**
+     * Mappa dei ristoranti indicizzati per nome.
+     */
+    @Getter
+    private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
 
-    /** Mappa degli utenti indicizzati per ID. */
-    @Getter private final static Map<UUID, User> usersById = new HashMap<>();
+    /**
+     * Mappa degli utenti indicizzati per ID.
+     */
+    @Getter
+    private final static Map<UUID, User> usersById = new HashMap<>();
 
-    /** Mappa degli utenti indicizzati per nome utente (username). */
-    @Getter private final static Map<String, User> usersByName = new HashMap<>();
+    /**
+     * Mappa degli utenti indicizzati per nome utente (username).
+     */
+    @Getter
+    private final static Map<String, User> usersByName = new HashMap<>();
 
     /**
      * Carica tutti i ristoranti dai file specificati e li deserializza in oggetti `Restaurant`.
@@ -98,7 +114,7 @@ public class Loader {
 
                 JsonNode locNode = jsonNode.path("location");
                 Location loc = new Location(
-                        Nation.valueOf(locNode.path("nation").asText().toUpperCase().replace(" ","_")),
+                        Nation.valueOf(locNode.path("nation").asText().toUpperCase().replace(" ", "_")),
                         locNode.path("city").asText(),
                         locNode.path("latitude").asDouble(),
                         locNode.path("longitude").asDouble(),
@@ -112,7 +128,8 @@ public class Loader {
                 for (JsonNode node : jsonNode.path("cuisinesTypes")) {
                     try {
                         cuisines.add(CuisineType.valueOf(node.asText().toUpperCase()));
-                    } catch (IllegalArgumentException ignored) {}
+                    } catch (IllegalArgumentException ignored) {
+                    }
                 }
 
                 Set<String> services = new HashSet<>();
@@ -185,7 +202,7 @@ public class Loader {
 
                 JsonNode location = jsonNode.path("location");
                 Location loc = new Location(
-                        Nation.valueOf(location.path("nation").asText().toUpperCase().replace(" ","_").replace("_MAINLAND","")),
+                        Nation.valueOf(location.path("nation").asText().toUpperCase().replace(" ", "_").replace("_MAINLAND", "")),
                         location.path("city").asText(),
                         location.path("latitude").asDouble(),
                         location.path("longitude").asDouble(),
@@ -265,7 +282,7 @@ public class Loader {
 
                     JsonNode locNode = node.path("location");
                     Location loc = new Location(
-                            Nation.valueOf(locNode.path("nation").asText().toUpperCase().replace(" ","_")),
+                            Nation.valueOf(locNode.path("nation").asText().toUpperCase().replace(" ", "_")),
                             locNode.path("city").asText(),
                             locNode.path("latitude").asDouble(),
                             locNode.path("longitude").asDouble(),
@@ -279,7 +296,8 @@ public class Loader {
                     for (JsonNode cuisine : node.path("cuisinesTypes")) {
                         try {
                             cuisines.add(CuisineType.valueOf(cuisine.asText().toUpperCase()));
-                        } catch (IllegalArgumentException ignored) {}
+                        } catch (IllegalArgumentException ignored) {
+                        }
                     }
 
                     Set<String> services = new HashSet<>();
@@ -296,10 +314,11 @@ public class Loader {
                             cuisines, services
                     );
 
-                    restaurantsById.put(id,restaurant);
-                    restaurantsByName.put(name,restaurant);
+                    restaurantsById.put(id, restaurant);
+                    restaurantsByName.put(name, restaurant);
 
-                } catch (IllegalArgumentException ignored) {}
+                } catch (IllegalArgumentException ignored) {
+                }
             }
 
         } catch (IOException | IllegalArgumentException e) {
@@ -342,7 +361,7 @@ public class Loader {
                         IO.printErrorMessage("Errore caricamento users/restaurants: " + ex.getMessage());
                         return null;
                     });
-            
+
             futures.add(usersAndRestaurantsFuture);
 
             // Aspetta che tutte le operazioni terminino
@@ -353,7 +372,7 @@ public class Loader {
 
         } catch (SecurityException ex) {
             System.out.println("Accesso negato");
-            
+
         } catch (Exception ex) {
             IO.printErrorMessage("Errore durante il caricamento: " + ex.getMessage());
         }

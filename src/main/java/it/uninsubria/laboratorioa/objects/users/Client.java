@@ -81,7 +81,7 @@ public class Client extends User {
      * Costruttore con password hashata, salt e lista di ristoranti preferiti.<p>
      * Inizializza l'array JSON.<p>
      *
-     * @param id          identificativo
+     * @param id                   identificativo
      * @param username             nome utente
      * @param password             password hashata
      * @param salt                 salt usato nell'hash

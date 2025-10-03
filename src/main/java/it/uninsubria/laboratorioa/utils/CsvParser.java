@@ -151,7 +151,6 @@ public class CsvParser {
     }
 
 
-
     // TODO: Sistemare qui la gestione degli input a cazzo nel dataset del diopo-
     private static Set<CuisineType> parseCuisineTypes(String cuisinesField) {
         Set<CuisineType> cuisineTypes = new HashSet<>();
@@ -163,7 +162,7 @@ public class CsvParser {
 
         for (String c : cuisines) {
             String normalised = c.toUpperCase()
-                    .replace(" ","_");
+                    .replace(" ", "_");
 
             try {
                 cuisineTypes.add(CuisineType.valueOf(normalised));

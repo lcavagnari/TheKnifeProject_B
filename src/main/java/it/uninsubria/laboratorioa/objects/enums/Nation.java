@@ -12,157 +12,309 @@ import lombok.Getter;
 @Getter
 public enum Nation {
 
-    /** Afghanistan */
+    /**
+     * Afghanistan
+     */
     AFGHANISTAN("AF"),
-    /** African continent (approximate) */
+    /**
+     * African continent (approximate)
+     */
     AFRICA("AF"),
-    /** Austria */
+    /**
+     * Austria
+     */
     AUSTRIA("AT"),
-    /** Switzerland */
+    /**
+     * Switzerland
+     */
     SWITZERLAND("CH"),
-    /** Germany */
+    /**
+     * Germany
+     */
     GERMANY("DE"),
-    /** France */
+    /**
+     * France
+     */
     FRANCE("FR"),
-    /** Spain */
+    /**
+     * Spain
+     */
     SPAIN("ES"),
-    /** Portugal */
+    /**
+     * Portugal
+     */
     PORTUGAL("PT"),
-    /** Italy */
+    /**
+     * Italy
+     */
     ITALY("IT"),
-    /** United Kingdom */
+    /**
+     * United Kingdom
+     */
     UNITED_KINGDOM("GB"),
-    /** United States of America */
+    /**
+     * United States of America
+     */
     UNITED_STATES("US"),
-    /** Brazil */
+    /**
+     * Brazil
+     */
     BRAZIL("BR"),
-    /** Argentina */
+    /**
+     * Argentina
+     */
     ARGENTINA("AR"),
-    /** Mexico */
+    /**
+     * Mexico
+     */
     MEXICO("MX"),
-    /** Peru */
+    /**
+     * Peru
+     */
     PERU("PE"),
-    /** Colombia */
+    /**
+     * Colombia
+     */
     COLOMBIA("CO"),
-    /** Puerto Rico */
+    /**
+     * Puerto Rico
+     */
     PUERTO_RICO("PR"),
-    /** Venezuela */
+    /**
+     * Venezuela
+     */
     VENEZUELA("VE"),
-    /** Cuba */
+    /**
+     * Cuba
+     */
     CUBA("CU"),
-    /** Japan */
+    /**
+     * Japan
+     */
     JAPAN("JP"),
-    /** Korea (generic) */
+    /**
+     * Korea (generic)
+     */
     KOREA("KR"),
-    /** China */
+    /**
+     * China
+     */
     CHINA("CN"),
-    /** Thailand */
+    /**
+     * Thailand
+     */
     THAILAND("TH"),
-    /** Vietnam */
+    /**
+     * Vietnam
+     */
     VIETNAM("VN"),
-    /** Malaysia */
+    /**
+     * Malaysia
+     */
     MALAYSIA("MY"),
-    /** Indonesia */
+    /**
+     * Indonesia
+     */
     INDONESIA("ID"),
-    /** Philippines */
+    /**
+     * Philippines
+     */
     PHILIPPINES("PH"),
-    /** Laos */
+    /**
+     * Laos
+     */
     LAOS("LA"),
-    /** Myanmar */
+    /**
+     * Myanmar
+     */
     MYANMAR("MM"),
-    /** Cambodia */
+    /**
+     * Cambodia
+     */
     CAMBODIA("KH"),
-    /** India */
+    /**
+     * India
+     */
     INDIA("IN"),
-    /** Pakistan */
+    /**
+     * Pakistan
+     */
     PAKISTAN("PK"),
-    /** Abu Dhabi (UAE) */
+    /**
+     * Abu Dhabi (UAE)
+     */
     ABU_DHABI("AE"),
-    /** Andorra */
+    /**
+     * Andorra
+     */
     ANDORRA("AD"),
-    /** Belgium */
+    /**
+     * Belgium
+     */
     BELGIUM("BE"),
-    /** Canada */
+    /**
+     * Canada
+     */
     CANADA("CA"),
-    /** Mainland China */
+    /**
+     * Mainland China
+     */
     MAINLAND_CHINA("CN"),
-    /** Croatia */
+    /**
+     * Croatia
+     */
     CROATIA("HR"),
-    /** Czechia (short name) */
+    /**
+     * Czechia (short name)
+     */
     CZECHIA("CZ"),
-    /** Czech Republic (full name) */
+    /**
+     * Czech Republic (full name)
+     */
     CZECH_REPUBLIC("CZ"),
-    /** Denmark */
+    /**
+     * Denmark
+     */
     DENMARK("DK"),
-    /** Dubai (UAE) */
+    /**
+     * Dubai (UAE)
+     */
     DUBAI("AE"),
-    /** Estonia */
+    /**
+     * Estonia
+     */
     ESTONIA("EE"),
-    /** Finland */
+    /**
+     * Finland
+     */
     FINLAND("FI"),
-    /** Greece */
+    /**
+     * Greece
+     */
     GREECE("GR"),
-    /** Hong Kong */
+    /**
+     * Hong Kong
+     */
     HONG_KONG("HK"),
-    /** Hong Kong SAR (extended name) */
+    /**
+     * Hong Kong SAR (extended name)
+     */
     HONG_KONG_SAR_CHINA("HK"),
-    /** Hungary */
+    /**
+     * Hungary
+     */
     HUNGARY("HU"),
-    /** Iceland */
+    /**
+     * Iceland
+     */
     ICELAND("IS"),
-    /** Ireland */
+    /**
+     * Ireland
+     */
     IRELAND("IE"),
-    /** Latvia */
+    /**
+     * Latvia
+     */
     LATVIA("LV"),
-    /** Lithuania */
+    /**
+     * Lithuania
+     */
     LITHUANIA("LT"),
-    /** Luxembourg */
+    /**
+     * Luxembourg
+     */
     LUXEMBOURG("LU"),
-    /** Macao */
+    /**
+     * Macao
+     */
     MACAO("MO"),
-    /** Malta */
+    /**
+     * Malta
+     */
     MALTA("MT"),
-    /** Netherlands */
+    /**
+     * Netherlands
+     */
     NETHERLANDS("NL"),
-    /** Qatar */
+    /**
+     * Qatar
+     */
     QATAR("QA"),
-    /** Serbia */
+    /**
+     * Serbia
+     */
     SERBIA("RS"),
-    /** Singapore */
+    /**
+     * Singapore
+     */
     SINGAPORE("SG"),
-    /** Slovenia */
+    /**
+     * Slovenia
+     */
     SLOVENIA("SI"),
-    /** South Korea */
+    /**
+     * South Korea
+     */
     SOUTH_KOREA("KR"),
-    /** Sweden */
+    /**
+     * Sweden
+     */
     SWEDEN("SE"),
-    /** Taiwan */
+    /**
+     * Taiwan
+     */
     TAIWAN("TW"),
-    /** Turkey */
+    /**
+     * Turkey
+     */
     TÜRKIYE("TR"),
-    /** Turkey */
+    /**
+     * Turkey
+     */
     TURKEY("TR"),
-    /** Macau */
+    /**
+     * Macau
+     */
     MACAU("MA"),
-    /** USA */
+    /**
+     * USA
+     */
     USA("US"),
-    /** Sri Lanka */
+    /**
+     * Sri Lanka
+     */
     SRI_LANKA("LK"),
-    /** Nepal */
+    /**
+     * Nepal
+     */
     NEPAL("NP"),
-    /** Iran */
+    /**
+     * Iran
+     */
     IRAN("IR"),
-    /** Israel */
+    /**
+     * Israel
+     */
     ISRAEL("IL"),
-    /** Lebanon */
+    /**
+     * Lebanon
+     */
     LEBANON("LB"),
-    /** Russia */
+    /**
+     * Russia
+     */
     RUSSIA("RU"),
-    /** Poland */
+    /**
+     * Poland
+     */
     POLAND("PL"),
-    /** Norway */
+    /**
+     * Norway
+     */
     NORWAY("NO"),
-    /** Scandinavia (approximated as Sweden) */
+    /**
+     * Scandinavia (approximated as Sweden)
+     */
     SCANDINAVIA("SE");
 
     private final String isoCode;

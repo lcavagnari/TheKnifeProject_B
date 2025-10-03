@@ -1,17 +1,8 @@
 package it.uninsubria.laboratorioa;
 
-import it.uninsubria.laboratorioa.ui.menus.GuestMenus;
 import it.uninsubria.laboratorioa.ui.IO;
-import it.uninsubria.laboratorioa.ui.exceptions.AbortOperationException;
-import it.uninsubria.laboratorioa.utils.Constants;
-import it.uninsubria.laboratorioa.utils.CsvParser;
+import it.uninsubria.laboratorioa.ui.menus.GuestMenus;
 import it.uninsubria.laboratorioa.utils.Loader;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 
 public class TheKnife {
 

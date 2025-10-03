@@ -1,7 +1,6 @@
 package it.uninsubria.laboratorioa.objects;
 
 import it.uninsubria.laboratorioa.objects.enums.Nation;
-import it.uninsubria.laboratorioa.ui.IO;
 import lombok.Getter;
 import lombok.Setter;
 
