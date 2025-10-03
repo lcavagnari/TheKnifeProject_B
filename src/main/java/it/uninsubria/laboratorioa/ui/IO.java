@@ -97,11 +97,12 @@ public class IO {
      * @return Stringa inserita dall'utente
      */
     public static String getUserInput(String promptMessage) throws AbortOperationException {
-        System.out.print(IO.replaceText(32, "> ") + promptMessage);
+        System.out.print(IO.replaceText(32, "> ") + promptMessage + " ");
         while (!INPUT.hasNext()) INPUT.nextLine();
 
         String input = INPUT.nextLine();
-        if (input.equals(AbortOperationException.getCANCEL_COMMAND())) throw new AbortOperationException("ricevuto comando di interruzione da utente");
+        if (input.equals(AbortOperationException.getCANCEL_COMMAND()))
+            throw new AbortOperationException("ricevuto comando di interruzione da utente");
 
         System.out.println();
         return input;
