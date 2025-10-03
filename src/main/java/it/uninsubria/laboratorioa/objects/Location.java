@@ -62,7 +62,7 @@ public class Location extends JsonEntity {
 
         this.jsonObject.remove("id");
 
-        IO.validateLocation(this);
+        //IO.validateLocation(this);
         build();
     }
 

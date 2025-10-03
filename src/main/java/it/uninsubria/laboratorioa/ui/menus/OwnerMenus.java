@@ -253,6 +253,7 @@ public class OwnerMenus extends Menus {
             Review selected = allReviews.get(sel - 1);
             String response = IO.getUserInput("Scrivi la tua risposta (max 300 caratteri):");
             selected.setReply(response);
+
             IO.printSuccessMessage("Risposta salvata.");
             IO.getUserInput("Premi invio per continuare.");
         }
