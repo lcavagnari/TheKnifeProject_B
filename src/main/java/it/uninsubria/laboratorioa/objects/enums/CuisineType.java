@@ -59,10 +59,6 @@ public enum CuisineType {
      */
     ASIAN,
     /**
-     * Cucina asiatica contemporanea
-     */
-    ASIAN_CONTEMPORARY,
-    /**
      * Influenze asiatiche miste
      */
     ASIAN_INFLUENCES,
@@ -70,10 +66,6 @@ public enum CuisineType {
      * Cucina asturiana spagnola
      */
     ASTURIAN,
-    /**
-     * Cucina australiana contemporanea
-     */
-    AUSTRALIAN_CONTEMPORARY,
     /**
      * Cucina austriaca
      */
@@ -122,10 +114,6 @@ public enum CuisineType {
      * Cucina bretone francese
      */
     BRETON,
-    /**
-     * Cucina britannica contemporanea
-     */
-    BRITISH_CONTEMPORARY,
     /**
      * Bulgogi coreano
      */
@@ -199,10 +187,6 @@ public enum CuisineType {
      */
     CHINESE,
     /**
-     * Cucina cinese contemporanea
-     */
-    CHINESE_CONTEMPORARY,
-    /**
      * Cucina Chiu Chow cinese
      */
     CHIU_CHOW,
@@ -214,10 +198,6 @@ public enum CuisineType {
      * Cucina classica
      */
     CLASSIC,
-    /**
-     * Cucina francese classica
-     */
-    CLASSIC_FRENCH,
     /**
      * Cucina colombiana
      */
@@ -237,7 +217,7 @@ public enum CuisineType {
     /**
      * Cucina casalinga di campagna
      */
-    COUNTRY_COOKING,
+    COUNTRY,
     /**
      * Specialità a base di granchio
      */
@@ -246,14 +226,6 @@ public enum CuisineType {
      * Cucina creativa
      */
     CREATIVE,
-    /**
-     * Cucina britannica creativa
-     */
-    CREATIVE_BRITISH,
-    /**
-     * Cucina francese creativa
-     */
-    CREATIVE_FRENCH,
     /**
      * Cucina creola
      */
@@ -339,10 +311,6 @@ public enum CuisineType {
      */
     EUROPEAN,
     /**
-     * Cucina europea contemporanea
-     */
-    EUROPEAN_CONTEMPORARY,
-    /**
      * Cucina "farm to table" – a chilometro zero
      */
     FARM_TO_TABLE,
@@ -366,10 +334,6 @@ public enum CuisineType {
      * Cucina francese
      */
     FRENCH,
-    /**
-     * Cucina francese contemporanea
-     */
-    FRENCH_CONTEMPORARY,
     /**
      * Anguilla di acqua dolce
      */
@@ -623,13 +587,9 @@ public enum CuisineType {
      */
     MODERN,
     /**
-     * Cucina britannica moderna
+     * Cucina britannica
      */
-    MODERN_BRITISH,
-    /**
-     * Cucina francese moderna
-     */
-    MODERN_FRENCH,
+    BRITISH,
     /**
      * Cucina marocchina
      */
@@ -901,7 +861,7 @@ public enum CuisineType {
     /**
      * Cibo da strada
      */
-    STREET_FOOD,
+    STREET,
     /**
      * Sujebi – zuppa coreana
      */
@@ -959,14 +919,6 @@ public enum CuisineType {
      */
     THAI,
     /**
-     * Cucina thai-cinese
-     */
-    THAI_CHINESE,
-    /**
-     * Cucina thailandese contemporanea
-     */
-    THAI_CONTEMPORARY,
-    /**
      * Cucina tibetana
      */
     TIBETAN,
@@ -978,10 +930,6 @@ public enum CuisineType {
      * Cucina tradizionale
      */
     TRADITIONAL,
-    /**
-     * Cucina britannica tradizionale
-     */
-    TRADITIONAL_BRITISH,
     /**
      * Cucina turca
      */
@@ -1023,10 +971,6 @@ public enum CuisineType {
      */
     VIETNAMESE,
     /**
-     * Cucina vietnamita contemporanea
-     */
-    VIETNAMESE_CONTEMPORARY,
-    /**
      * Cucina occidentale
      */
     WESTERN,
@@ -1058,10 +1002,13 @@ public enum CuisineType {
      * Cucina Yunnan cinese
      */
     YUNNANESE,
+
+    ZHOU,
     /**
      * Cucina Zhejiang cinese
      */
     ZHEJIANG;
+
 
     @Override
     public String toString() {
