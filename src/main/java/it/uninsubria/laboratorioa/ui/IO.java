@@ -13,34 +13,33 @@ import java.util.*;
 /**
  * Classe di utilità per Input/Output da console.<p>
  * Contiene metodi statici per leggere input da tastiera, formattare output e gestire menu testuali.<p>
- * Utilizza Scanner per lettura standard input.<p>
+ * Utilizza Scanner per la lettura dallo standard input.<p>
  * Supporta formati booleani personalizzati, gestione menu, messaggi di errore e pulizia schermo.
- * <p>
  *
  * @author Luca Cavagnari
- * @version 1.0
+ * @version 1.1
  */
 public class IO {
 
-    /**
-     * Istanza Scanner condivisa per lettura input da tastiera.
-     */
+    /** Istanza Scanner condivisa per la lettura da tastiera. */
     private static final Scanner INPUT = new Scanner(System.in);
+
+    /** Generatore casuale utilizzato in alcune operazioni di input simulato. */
     private static final Random rd = new Random();
 
     /**
-     * Chiude lo Scanner per input.
+     * Chiude lo scanner condiviso per liberare le risorse di input.
      */
     public static void closeScanner() {
         INPUT.close();
     }
 
     /**
-     * Stampa un menu testuale con titolo, lista voci e footer opzionali.
+     * Stampa un menu testuale con titolo, voci numerate e footer opzionale.
      *
-     * @param title  Titolo del menu, può essere null
-     * @param footer Testo footer opzionale, può essere null
-     * @param items  Array di voci menu da stampare
+     * @param title  titolo del menu (può essere null)
+     * @param footer testo footer opzionale (può essere null)
+     * @param items  array di voci del menu da stampare
      */
     public static void printMenu(String title, String footer, String... items) {
         if (items.length == 0) return;
@@ -54,47 +53,45 @@ public class IO {
     }
 
     /**
-     * Richiede input booleano yes/no all'utente con validazione.
+     * Richiede input booleano all’utente (sì/no) con validazione.
      *
-     * @param promptMessage Messaggio di richiesta input
-     * @return true se input valido "yes" o "y", false se "no" o "n"
+     * @param promptMessage messaggio di richiesta input
+     * @return true se l’input è "s" o "sì", false se "n" o "no"
+     * @throws AbortOperationException se viene inserito il comando di annullamento
      */
     public static boolean getBooleanInput(String promptMessage) throws AbortOperationException {
         String input = getUserInput(promptMessage).toLowerCase();
 
-        // Usa regex per controllare se input sia "sì" o "no", o "s" / "n"
         while (!input.matches("\\b(s[iì]|no)\\b|\\b[sn]\\b")) {
             printErrorMessage("Valore non valido, riprova: ");
             input = getUserInput(promptMessage).toLowerCase();
         }
 
-        // Sostituisce s oppure sì con True
         String bool = input.replaceAll("\\bs.{1,2}\\b|s", "True");
         return Boolean.parseBoolean(bool);
     }
 
-
     /**
-     * Richiede input testuale all'utente.
+     * Richiede un input testuale da menu.
      *
-     * @param promptMessage Messaggio di richiesta input
-     * @return Stringa inserita dall'utente
+     * @param promptMessage messaggio di richiesta input
+     * @return stringa inserita dall’utente
      */
     public static String getMenuUserInput(String promptMessage) {
         INPUT.nextLine();
         System.out.print(IO.replaceText(32, "> ") + promptMessage);
         while (!INPUT.hasNext()) INPUT.nextLine();
-
         System.out.println();
         return INPUT.nextLine();
     }
 
     /**
-     * Richiede input testuale all'utente.
-     * Possibilità di annullare l'operazione con '::annulla'
+     * Richiede input testuale all’utente.
+     * Permette di annullare l’operazione digitando ‘::annulla’.
      *
-     * @param promptMessage Messaggio di richiesta input
-     * @return Stringa inserita dall'utente
+     * @param promptMessage messaggio di richiesta input
+     * @return stringa inserita dall’utente
+     * @throws AbortOperationException se viene richiesto l’annullamento
      */
     public static String getUserInput(String promptMessage) throws AbortOperationException {
         System.out.print(IO.replaceText(32, "> ") + promptMessage + " ");
@@ -108,15 +105,15 @@ public class IO {
         return input;
     }
 
-
     /**
-     * Richiede input testuale all'utente con controllo lunghezza minima e massima.
-     * Possibilità di annullare l'operazione con '::annulla'
+     * Richiede input testuale con controllo di lunghezza minima e massima.
+     * Permette l’annullamento tramite ‘::annulla’.
      *
-     * @param promptMessage Messaggio di richiesta input
-     * @param minLength     Lunghezza minima accettata
-     * @param maxLength     Lunghezza massima accettata
-     * @return Stringa inserita conforme ai limiti di lunghezza
+     * @param promptMessage messaggio di richiesta input
+     * @param minLength     lunghezza minima accettata
+     * @param maxLength     lunghezza massima accettata
+     * @return stringa conforme ai limiti
+     * @throws AbortOperationException se viene richiesto l’annullamento
      */
     public static String getUserInput(String promptMessage, int minLength, int maxLength) throws AbortOperationException {
         String input;
@@ -128,9 +125,10 @@ public class IO {
     }
 
     /**
-     * Richiede input testuale all'utente.
+     * Richiede un numero di telefono valido con prefisso nazionale.
      *
-     * @return Stringa inserita dall'utente
+     * @return numero di telefono in formato internazionale
+     * @throws AbortOperationException se viene richiesto l’annullamento
      */
     public static String getPhoneNumberInput() throws AbortOperationException {
         String input = getUserInput("Inserire numero di telefono con prefisso nazionale:", 10, 15);
@@ -143,12 +141,11 @@ public class IO {
         return input;
     }
 
-
     /**
-     * Richiede input numerico intero non decimale all'utente.
+     * Richiede input numerico intero (non decimale) all’utente per menu.
      *
-     * @param promptMessage Messaggio di richiesta input
-     * @return Integer corrispondente all'input valido
+     * @param promptMessage messaggio di richiesta input
+     * @return valore intero valido
      */
     public static Integer getMenuInt(String promptMessage) {
         String input = getMenuUserInput(promptMessage);
@@ -162,10 +159,10 @@ public class IO {
     }
 
     /**
-     * Richiede input numerico intero non decimale all'utente.
+     * Richiede input numerico intero (non decimale) all’utente.
      *
-     * @param promptMessage Messaggio di richiesta input
-     * @return Integer corrispondente all'input valido
+     * @param promptMessage messaggio di richiesta input
+     * @return valore intero valido
      */
     public static Integer getInt(String promptMessage) {
         String input = getUserInput(promptMessage);
@@ -178,27 +175,21 @@ public class IO {
         return Integer.parseInt(input);
     }
 
-
     /**
-     * Ottiene la posizione geografica di un entità tramite input utente
+     * Ottiene la posizione geografica di un’entità tramite input utente.
      *
-     * @param skippable
-     * @return
-     * @throws AbortOperationException
+     * @param skippable true se è possibile saltare l’inserimento digitando ‘::skip’
+     * @return istanza {@link Location} creata da input utente, oppure null se saltata
+     * @throws AbortOperationException se l’utente interrompe l’operazione
      */
     public static Location getLocationInput(boolean skippable) throws AbortOperationException {
         Location location = null;
-        System.out.println("Adesso puoi insrire l'indirizzo, ricodati di seguire il seguente template");
-        System.out.println("Indirizzo: indirizzo completo di numero civico, senza città o nazione");
-        System.out.println("Nazione: Nome completo della nazione");
+        System.out.println("Puoi inserire l'indirizzo seguendo il formato indicato:");
         System.out.println("Esempio: Via Ottorino Rossi 9, Bizzozero, Italia");
-        System.out.println("Città: Nome delle città");
         if (skippable) IO.printErrorMessage("\nDigitare '::skip' per saltare questo passaggio.\n");
 
         while (location == null) {
             try {
-
-                // indirizzo, città, nazione
                 String addrees = IO.getUserInput("Inserisci l'indirizzo nel seguente formato [indirizzo, città, nazione]: ").trim();
                 if (addrees.equals("::skip") && skippable) throw new AbortOperationException();
 
@@ -206,10 +197,7 @@ public class IO {
                 if (fields == null || fields.length < 3)
                     throw new IllegalArgumentException("input non valido");
 
-                // Validazione Città
                 IO.validateString(fields[1]);
-
-                // Validazione indirizzo
                 IO.validateString("^[\\p{L}][\\p{L}'\\-. ]+\\s\\d+[a-zA-Z]?$", fields[0]);
 
                 location = new Location(
@@ -228,19 +216,17 @@ public class IO {
                 return null;
             }
         }
-
         return location;
     }
 
     /**
-     * Richiede e interpreta un valore Enum da input utente.<p>
-     * Valori inseriti vengono normalizzati in MAIUSCOLO e con spazi sostituiti da underscore.
+     * Richiede e interpreta un valore Enum da input utente.<br>
+     * L’input viene normalizzato in MAIUSCOLO e gli spazi sostituiti da underscore.
      *
-     * @param enumType      Classe dell'enum da parsare
-     * @param promptMessage Messaggio di richiesta all'utente
-     * @param <T>           Tipo Enum da restituire
-     * @return Istanza Enum parsata da input
-     * @throws IllegalArgumentException se il valore inserito non è tra quelli accettati
+     * @param enumType      classe dell’enum
+     * @param promptMessage messaggio di richiesta
+     * @param <T>           tipo Enum
+     * @return valore Enum parsato da input, o null se interrotto
      */
     public static <T extends Enum<T>> T getEnumInput(Class<T> enumType, String promptMessage) {
         while (true) {
@@ -249,7 +235,6 @@ public class IO {
                 return Enum.valueOf(enumType, input.trim().toUpperCase().replace(" ", "_"));
             } catch (IllegalArgumentException e) {
                 IO.printErrorMessage("Valore non valido, riprovare");
-
             } catch (AbortOperationException e) {
                 IO.printErrorMessage("Abort: " + e.getMessage());
                 return null;
@@ -257,7 +242,14 @@ public class IO {
         }
     }
 
-
+    /**
+     * Permette l’inserimento di un insieme di valori Enum tramite input multiplo.
+     *
+     * @param enumClass classe dell’enum
+     * @param prompt    messaggio iniziale
+     * @param <E>       tipo Enum
+     * @return set di valori Enum inseriti
+     */
     public static <E extends Enum<E>> Set<E> getEnumSetInput(Class<E> enumClass, String prompt) {
         Set<E> result = new HashSet<>();
         System.out.println(prompt + " Scrivi '::stop' per terminare.");
@@ -272,7 +264,6 @@ public class IO {
 
             } catch (IllegalArgumentException e) {
                 IO.printErrorMessage("Valore non valido. Riprova.");
-
             } catch (AbortOperationException e) {
                 IO.printErrorMessage("Abort: " + e.getMessage());
                 break;
@@ -281,6 +272,12 @@ public class IO {
         return result;
     }
 
+    /**
+     * Permette di inserire e validare più stringhe, terminando con ‘::stop’.
+     *
+     * @param prompt messaggio iniziale
+     * @return insieme di stringhe validate
+     */
     public static Set<String> parseValidatedStrings(String prompt) {
         Set<String> result = new HashSet<>();
         System.out.println(prompt + " Scrivi '::stop' per terminare.");
@@ -303,7 +300,12 @@ public class IO {
         return result;
     }
 
-
+    /**
+     * Converte una stringa UUID in oggetto UUID.
+     *
+     * @param uuid stringa UUID
+     * @return UUID valido o null se invalido
+     */
     public static UUID parseUUID(String uuid) {
         try {
             return UUID.fromString(uuid);
@@ -312,17 +314,15 @@ public class IO {
         }
     }
 
-
-    // Validators
-
+    // VALIDATORS
 
     /**
-     * Verifica uno o più valori stringa rispetto a un pattern regex, sollevando eccezioni in caso di input non valido.
+     * Verifica uno o più valori stringa rispetto a un pattern regex.
      *
-     * @param regex Pattern per la verifica
-     * @param value Valori stringa da validare
-     * @return true se tutti i valori sono validi
-     * @throws IllegalArgumentException se uno o più valori sono null, vuoti o non corrispondenti alla regex
+     * @param regex pattern di validazione
+     * @param value valore da controllare
+     * @return true se valido
+     * @throws IllegalArgumentException se nullo o non conforme
      */
     public static boolean validateString(final String regex, String value) throws IllegalArgumentException {
         if (value == null || value.isBlank())
@@ -332,131 +332,108 @@ public class IO {
         return true;
     }
 
+    /** Variante di {@link #validateString(String, String)} con regex predefinita. */
     public static boolean validateString(String value) throws IllegalArgumentException {
         return validateString("^[\\p{L}0-9 \\-']{4,200}$", value);
     }
 
     /**
-     * Verifica l'oggetto Location e i suoi campi, verificandone non nullità e limiti geografici corretti.
+     * Verifica la correttezza di una Location.
      *
-     * @param loc Oggetto Location da validare
-     * @return true se la location è valida
-     * @throws IllegalArgumentException se uno dei campi è nullo o fuori dai limiti accettati
+     * @param loc oggetto Location
+     * @return true se valida
      */
     public static boolean validateLocation(Location loc) throws IllegalArgumentException {
         if (loc == null)
             throw new IllegalArgumentException("Impossibile determinare posizione, riprovare più tardi");
-
         if (loc.getNation() == null)
             throw new IllegalArgumentException("Impossibile determinare nazione: input non valido");
-
         if (loc.getCity() == null || loc.getCity().isBlank())
             throw new IllegalArgumentException("Impossibile determinare città: input non valido");
-
         if (loc.getAddress() == null || loc.getAddress().isBlank())
             throw new IllegalArgumentException("Impossibile determinare indirizzo: input non valido");
-
         if (loc.getLatitude() < -90.0 || loc.getLatitude() > 90.0)
-            throw new IllegalArgumentException("Impossibile determinare latitudine: input fuori da valori accettabili (-90°,+90°).");
-
+            throw new IllegalArgumentException("Latitudine fuori intervallo (-90,+90)");
         if (loc.getLongitude() < -180.0 || loc.getLongitude() > 180.0)
-            throw new IllegalArgumentException("Impossibile determinare longitudine: input fuori da valori accettabili (-180°,+180°)");
-
+            throw new IllegalArgumentException("Longitudine fuori intervallo (-180,+180)");
         return true;
     }
 
-
     /**
-     * Verifica una data, verificando non nullità e che rientri in un intervallo temporale specificato.
-     *
-     * @param max  Data massima accettabile (inclusa)
-     * @param min  Data minima accettabile (inclusa)
-     * @param date Data da validare
-     * @return true se la data è valida
-     * @throws IllegalArgumentException se la data è nulla o fuori dall'intervallo [min, max]
+     * Verifica che la data sia compresa in un intervallo.
      */
     public static boolean validateDates(LocalDateTime min, LocalDateTime max, LocalDateTime date) throws IllegalArgumentException {
         if (date == null)
             throw new IllegalArgumentException("Impossibile verificare data, riprovare più tardi");
-
         if (date.isAfter(max) || date.isBefore(min))
-            throw new IllegalArgumentException("Data fuori da intervalli accettabili (" + max.toString() + "), riprovare");
-
+            throw new IllegalArgumentException("Data fuori da intervallo accettabile");
         return true;
     }
 
+    /** Variante senza intervallo (qualsiasi data valida). */
     public static boolean validateDates(LocalDateTime date) throws IllegalArgumentException {
         return validateDates(LocalDateTime.MIN, LocalDateTime.MAX, date);
     }
 
     /**
-     * Verifica la validità dell'id
+     * Verifica la validità di un identificativo UUID.
      *
-     * @param id
-     * @return
+     * @param id identificatore da controllare
+     * @return true se valido
+     * @throws IllegalArgumentException se nullo
      */
     public static boolean validateUUID(UUID id) throws IllegalArgumentException {
         if (id == null)
             throw new IllegalArgumentException("Impossibile ottenere id utente, riprovare più tardi");
-
         return true;
     }
 
     /**
-     * Validates one or more dates for non-nullity and temporal correctness (no future dates).
-     * Throws IllegalArgumentException with precise message upon violation.
+     * Verifica la correttezza di un oggetto Review.
      *
-     * @param r Varargs LocalDateTime[] dates to validate
-     * @return true if all dates are valid
-     * @throws IllegalArgumentException if:
-     *                                  - input array is null or empty
-     *                                  - any date is null
-     *                                  - any date is in the future compared to now
+     * @param r recensione da validare
+     * @return true se valida
      */
     public static boolean validateReview(Review r) throws IllegalArgumentException {
         if (r == null)
             throw new IllegalArgumentException("Recensione non può essere nulla.");
-
-
         if (r.getValue() < 1 || r.getValue() > 5)
             throw new IllegalArgumentException("Valutazione deve essere compresa tra 1 e 5.");
-
         if (r.getReply() != null && !r.getReply().matches("^[\\p{L}0-9 \\-']{4,200}$"))
-            throw new IllegalArgumentException("Il valore inserito contiene caratteri non validi o ha un numero di caratteri non consentito (4-200).");
+            throw new IllegalArgumentException("Risposta non valida (4-200 caratteri).");
 
         validateUUID(r.getId());
         validateString("^[\\p{L}0-9 \\-']{4,200}$", r.getText());
         validateDates(r.getTimestamp());
-        return false;
+        return true;
     }
 
-
     /**
-     * Verifica un utente controllando i campi obbligatori e formati corretti.
+     * Verifica la correttezza di un utente.
      *
-     * @param user Utente da validare
-     * @return true se l'utente è valido
-     * @throws IllegalArgumentException se l'utente è nullo o i campi non rispettano i vincoli
+     * @param user utente da validare
+     * @return true se valido
      */
     public static boolean validateUser(User user) throws IllegalArgumentException {
         if (user == null)
             throw new IllegalArgumentException("Impossibile ottenere utente, riprovare più tardi");
 
         validateUUID(user.getId());
-
         validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName());
-        validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName());
-
         validateString("^[a-zA-Z][\\w.]{1,14}[a-zA-Z0-9]$", user.getUsername());
 
         if (user.getLocation() != null) validateLocation(user.getLocation());
-
         validateDates(LocalDateTime.MIN, LocalDateTime.now().plusDays(1), user.getDateOfBirth().atStartOfDay());
-
         return true;
     }
 
-
+    /**
+     * Verifica la correttezza di un ristorante.
+     *
+     * @param r ristorante da validare
+     * @return true se valido
+     * @throws IllegalArgumentException se uno dei campi non è conforme
+     */
     public static boolean validateRestaurant(Restaurant r) throws IllegalArgumentException {
         if (r == null)
             throw new IllegalArgumentException("Impossibile ottenere dati ristorante, riprovare più tardi");
@@ -464,40 +441,37 @@ public class IO {
         validateUUID(r.getId());
         validateString("^[\\p{L}][\\p{L}'\\- ]{1,40}$", r.getName());
         validateString(r.getDescription());
-
         validateString("^(https?://)?[\\w.-]+(\\.[a-z]{2,})+.*$", r.getWebsiteUrl());
         validateString("^\\+\\d{8,15}$", r.getPhone());
-
         validateUser(r.getOwner());
-
         return true;
     }
 
     /**
-     * Applica formattazione ANSI colore a testo.
+     * Applica formattazione ANSI per il colore del testo.
      *
-     * @param colorCode Codice colore ANSI
-     * @param text      Testo da formattare
-     * @return Testo colorato con codice ANSI
+     * @param colorCode codice colore ANSI
+     * @param text      testo da colorare
+     * @return testo colorato
      */
     public static String replaceText(int colorCode, String text) {
         return "\u001B[" + colorCode + "m" + text + "\u001B[0m";
     }
 
     /**
-     * Genera una linea separatrice composta da '-' per tabelle.
+     * Genera una riga separatrice composta da trattini.
      *
-     * @param qta Numero di elementi della tabella da separare
-     * @return Stringa composta da "-" della lunghezza calcolata
+     * @param qta numero di elementi della tabella
+     * @return stringa di separazione
      */
     private static String printRow(int qta) {
         return "-".repeat(Math.max(0, (qta * 4) + 1));
     }
 
     /**
-     * Stampa messaggio di errore formattato in rosso.
+     * Stampa un messaggio di errore colorato in rosso.
      *
-     * @param msg Messaggio di errore
+     * @param msg messaggio di errore
      */
     public static void printErrorMessage(String msg) {
         if (msg == null) return;
@@ -505,9 +479,9 @@ public class IO {
     }
 
     /**
-     * Stampa messaggio di successo formattato in verde.
+     * Stampa un messaggio di successo colorato in verde.
      *
-     * @param msg Messaggio di successo
+     * @param msg messaggio di successo
      */
     public static void printSuccessMessage(String msg) {
         if (msg == null) return;
@@ -515,7 +489,7 @@ public class IO {
     }
 
     /**
-     * Pulisce la schermata console usando comandi di sistema o sequenze ANSI.
+     * Pulisce la schermata della console (Windows o Unix-like).
      */
     public static void clearScreen() {
         try {

@@ -58,6 +58,9 @@ public class Loader {
      */
     private static final File USERS_ROOT = new File(ROOT, "users");
 
+    /**
+     * File contenente i dati di michelin
+     */
     private static final File michelinData = new File(Constants.ROOT, "michelin_my_maps.json");
     private static final File oldMichelinData = new File(Constants.ROOT, "michelin_my_maps.old.json");
 

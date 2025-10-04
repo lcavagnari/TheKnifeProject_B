@@ -14,9 +14,21 @@ import java.time.LocalDateTime;
 /**
  * Classe di utility per la gestione del login e della registrazione utenti.
  * <p>
- * Contiene metodi statici per facilitare le operazioni di autenticazione e
- * gestione degli utenti nel sistema.
+ * Fornisce metodi statici per facilitare le operazioni di autenticazione e
+ * creazione di utenti nel sistema (clienti o gestori). I metodi interagiscono
+ * con la console tramite {@link IO} e con lo storage in-memory/file tramite {@link Loader}.
  * </p>
+ *
+ * <h2>Side effects</h2>
+ * <ul>
+ *   <li><b>register()</b>: inserisce l'utente creato nelle mappe di {@link Loader}
+ *       (username→utente e id→utente) e invoca {@link User#save()}.</li>
+ *   <li><b>login()</b>: nessuna modifica allo stato persistente, ma può lanciare
+ *       {@link AbortOperationException} se superato il numero massimo di tentativi.</li>
+ * </ul>
+ *
+ * <p>I metodi possono propagare eccezioni di validazione come {@link IllegalArgumentException}
+ * originate dai metodi di {@link IO} o da controlli locali.</p>
  *
  * @author Luca Cavagnari
  * @version 1.0
@@ -24,6 +36,31 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class Login {
 
+    /**
+     * Avvia una procedura guidata di registrazione utente.
+     * <p>
+     * Passi principali:
+     * <ol>
+     *   <li>Scelta del tipo utente: gestore ({@link Owner}) o cliente ({@link Client}).</li>
+     *   <li>Raccolta e validazione di username, nome, cognome, location (facoltativa) e data di nascita.</li>
+     *   <li>Impostazione e validazione della password.</li>
+     *   <li>Creazione dell’istanza {@link User}, salvataggio su {@link Loader} e persistenza via {@link User#save()}.</li>
+     * </ol>
+     * </p>
+     *
+     * <h3>Input/Output</h3>
+     * Interagisce con l’utente via console usando i metodi di {@link IO}. L’utente può annullare
+     * in vari passaggi usando il comando previsto da {@link AbortOperationException#getCANCEL_COMMAND()}.
+     *
+     * @return l’utente creato e registrato; {@code null} se l’operazione viene annullata o fallisce la validazione
+     *
+     * @throws AbortOperationException se l’utente richiede esplicitamente l’annullamento in uno dei prompt obbligatori
+     *                                 (l’eccezione può essere intercettata internamente e tradotta in {@code null}
+     *                                 in base al punto della procedura)
+     * @throws IllegalArgumentException se alcuni campi non rispettano i vincoli di validazione
+     *                                  (può essere intercettata e trasformata in ri-prompt; in caso di errore finale
+     *                                  viene mostrato un messaggio e restituito {@code null})
+     */
     public static User register() {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
@@ -69,7 +106,7 @@ public class Login {
         try {
             location = IO.getLocationInput(true);
         } catch (AbortOperationException ignored) {
-
+            // Inserimento location opzionale, si prosegue con null
         }
 
         LocalDate dateOfBirth = null;
@@ -120,6 +157,28 @@ public class Login {
         }
     }
 
+    /**
+     * Esegue la procedura di autenticazione tramite username e password.
+     * <p>
+     * La funzione consente fino a 4 tentativi complessivi. In caso di credenziali errate
+     * viene mostrato un messaggio e viene richiesto un nuovo tentativo; al superamento
+     * del limite viene sollevata {@link AbortOperationException}.
+     * </p>
+     *
+     * <h3>Flusso</h3>
+     * <ol>
+     *   <li>Richiesta username e password.</li>
+     *   <li>Verifica esistenza utente in {@link Loader#getUsersByName()}.</li>
+     *   <li>Verifica password tramite {@link User#verifyPassword(String)}.</li>
+     *   <li>In caso di successo: messaggio, conferma su Invio, ritorno dell’utente.</li>
+     * </ol>
+     *
+     * @return l’utente autenticato; {@code null} se l’operazione viene annullata dall’utente durante i prompt
+     *
+     * @throws AbortOperationException se viene superato il numero massimo di tentativi (4)
+     * @throws IllegalArgumentException se l’username non esiste o altri controlli falliscono
+     *                                  (l’eccezione è gestita internamente per riprovare, ma può emergere in casi non previsti)
+     */
     public static User login() {
         IO.clearScreen();
 

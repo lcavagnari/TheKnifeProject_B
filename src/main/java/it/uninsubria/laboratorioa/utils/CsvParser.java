@@ -24,11 +24,42 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Parser/trasformatore per il dataset CSV Michelin dell’applicazione.
+ * <p>
+ * Responsabilità:
+ * <ul>
+ *   <li>Parsing robusto di righe CSV “sporche” (address/location/phone formati in modo irregolare).</li>
+ *   <li>Normalizzazione di città, nazione, indirizzo, premi, green star, cucine e servizi.</li>
+ *   <li>Costruzione di entità {@link Restaurant} e serializzazione JSON per esportazione.</li>
+ *   <li>Esecuzione parallela (asimmetrica) delle parti costose per aumentare il throughput.</li>
+ * </ul>
+ * </p>
+ * <p><b>Nota:</b> i metodi pubblici non sollevano eccezioni non controllate verso l’esterno; gli errori
+ * vengono loggati su console con messaggi chiari. I metodi privati possono gestire/ritornare fallback
+ * coerenti (es. {@code null} o set vuoti) in caso di input non valido.</p>
+ */
 @UtilityClass
 public class CsvParser {
 
+    /** Sorgente casuale per campi sintetici (es. flag booleani). */
     private final static SecureRandom rd = new SecureRandom();
 
+    /**
+     * Estrae e normalizza tripla <i>(city, nation, address)</i> a partire dai campi grezzi.
+     * <p>
+     * Gestisce casi anomali:
+     * <ul>
+     *   <li>Location con più virgole (città composte).</li>
+     *   <li>Location con sola nazione (città dedotta dall’indirizzo).</li>
+     *   <li>Rimozione di ridondanze dall’indirizzo finale.</li>
+     * </ul>
+     * </p>
+     *
+     * @param address  stringa indirizzo dal CSV (potenzialmente contenente città/nazione in coda)
+     * @param location stringa location dal CSV (tipicamente “City, Nation” ma può variare)
+     * @return array di 3 elementi: [0]=city, [1]=nation (UPPER_SNAKE_CASE), [2]=address ripulito
+     */
     private static String[] retrieveLocData(String address, String location) {
         String[] cityAndNation = location.split(",");
         String city;
@@ -67,26 +98,25 @@ public class CsvParser {
                 .replaceAll("[\\s\\-]", "_")
                 .toUpperCase();
 
-
-        // 0:nation , 1: city , 2:address
-        return new String[]{
-                city,
-                nation,
-                address
-        };
+        // 0: city, 1: nation, 2: address
+        return new String[]{ city, nation, address };
     }
 
+    /**
+     * Costruisce una {@link Location} valida dai dati normalizzati e dai campi CSV originali.
+     *
+     * @param locData tripla [city, nation, address] prodotta da {@link #retrieveLocData(String, String)}
+     * @param fields  riga CSV splittata; in particolare usa latitude/longitude
+     * @return location valida; {@code null} se il mapping della nazione o il parsing lat/lon fallisce
+     */
     private static Location createLocation(String[] locData, String[] fields) {
         if (locData == null) return null;
 
         Nation nation;
         String nationName = null;
         try {
-            nationName = locData[1].trim().toUpperCase()
-                    .replace("_MAINLAND", "");
-
+            nationName = locData[1].trim().toUpperCase().replace("_MAINLAND", "");
             nation = Nation.valueOf(nationName);
-
         } catch (IllegalArgumentException ex) {
             nation = Nation.fromString(nationName);
             if (nation == null) {
@@ -114,6 +144,14 @@ public class CsvParser {
         }
     }
 
+    /**
+     * Ricava il prefisso telefonico internazionale a partire da un numero “grezzo”
+     * e dalla nazione dedotta.
+     *
+     * @param phoneNumber numero come in CSV (potrebbe essere locale)
+     * @param nation      nazione di riferimento (per parsing/region)
+     * @return prefisso internazionale nel formato “+CC”; stringa vuota se non determinabile
+     */
     private static String getNationalPrefix(String phoneNumber, Nation nation) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
         String regionCode = nation.getIsoCode();
@@ -128,9 +166,13 @@ public class CsvParser {
         }
     }
 
-
-
-    // TODO: Sistemare qui la gestione degli input a cazzo nel dataset del diopo-
+    /**
+     * Parsing “soft” dell’elenco servizi (field FacilitiesAndServices).
+     * <p>Divide su virgola, trimma e filtra null/blank.</p>
+     *
+     * @param facilitiesAndServices campo CSV dei servizi
+     * @return insieme di servizi normalizzati minimalmente
+     */
     private static Set<String> parseServices(String facilitiesAndServices) {
         Set<String> services = new HashSet<>();
 
@@ -145,6 +187,13 @@ public class CsvParser {
         return services;
     }
 
+    /**
+     * Converte il campo “Award” in {@link Award}.
+     * <p>Gestisce sia interi (es. “1”, “2”, …) sia stringhe (es. “BIB GOURMAND”).</p>
+     *
+     * @param ratingField campo premi dal CSV
+     * @return award corrispondente; {@link Award#NONE} in caso di input non interpretabile
+     */
     private static Award parseAward(String ratingField) {
         try {
             String rating = ratingField.toLowerCase();
@@ -159,6 +208,12 @@ public class CsvParser {
         }
     }
 
+    /**
+     * Interpreta il campo “GreenStar” come boolean (1 = true).
+     *
+     * @param greenStarField campo CSV GreenStar
+     * @return true se 1, altrimenti false
+     */
     private static boolean parseGreenStar(String greenStarField) {
         try {
             return Integer.parseInt(greenStarField) == 1;
@@ -167,32 +222,47 @@ public class CsvParser {
         }
     }
 
+    /**
+     * Parsing e normalizzazione dei tipi di cucina.
+     * <p>Divide su virgole con/without spazi, upper-case e underscore.</p>
+     *
+     * @param cuisinesField campo CSV con le cucine
+     * @return insieme di {@link CuisineType}; ignora i valori non mappabili
+     */
     private static Set<CuisineType> parseCuisineTypes(String cuisinesField) {
         Set<CuisineType> cuisineTypes = new HashSet<>();
         if (cuisinesField == null || cuisinesField.isBlank()) return cuisineTypes;
 
-        // Split iniziale anche se manca lo spazio dopo la virgola
         String[] cuisines = cuisinesField.split("\\s*,\\s*");
-
-
         for (String c : cuisines) {
-            String normalised = c.toUpperCase()
-                    .replace(" ", "_");
-
+            String normalised = c.toUpperCase().replace(" ", "_");
             try {
                 cuisineTypes.add(CuisineType.valueOf(normalised));
             } catch (IllegalArgumentException ignored) {
-
+                // Silenziosamente ignora cucine non note all'enum
             }
         }
-
         return cuisineTypes;
     }
 
-
+    /**
+     * Costruisce un {@link Restaurant} a partire da una riga CSV splittata.
+     * <p>
+     * Esegue in parallelo:
+     * <ul>
+     *   <li>Parsing/normalizzazione location.</li>
+     *   <li>Parsing cucine.</li>
+     *   <li>Parsing servizi.</li>
+     * </ul>
+     * e aggrega i risultati, calcolando inoltre premio e green star.
+     * </p>
+     *
+     * @param fields riga CSV splittata su “;” secondo il layout documentato
+     * @return istanza popolata di {@link Restaurant} (owner null); mai {@code null} se i dati minimi ci sono,
+     *         può restituire valore valido con location {@code null} se non ricostruibile
+     */
     private static Restaurant createRestaurant(String[] fields) {
         // === OPERAZIONI ASINCRONE ===
-        // Avvia le operazioni costose in parallelo
         CompletableFuture<String[]> locDataFuture = CompletableFuture
                 .supplyAsync(() -> retrieveLocData(fields[1], fields[2]))
                 .exceptionally(ex -> {
@@ -214,49 +284,71 @@ public class CsvParser {
                     return new HashSet<>();
                 });
 
-        // === OPERAZIONI SINCRONE (veloci) ===
+        // === OPERAZIONI SINCRONE ===
         Award award = parseAward(fields[10]);
         boolean greenStar = parseGreenStar(fields[11]);
 
         // === ATTESA E ASSEMBLAGGIO ===
-        // Aspetta che le operazioni asincrone terminino
         CompletableFuture.allOf(locDataFuture, cuisinesFuture, servicesFuture).join();
 
-        // Raccogli i risultati
         String[] locData = locDataFuture.join();
         Set<CuisineType> cuisineTypes = cuisinesFuture.join();
         Set<String> services = servicesFuture.join();
 
-        // Costruisci la Location
         Location location = createLocation(locData, fields);
 
-        // Ottieni il prefisso nazionale
-        String nationalPrefix = (location != null) ?
-                getNationalPrefix(fields[7], location.getNation()) : "";
+        // Prefisso nazionale per il telefono
+        String nationalPrefix = (location != null) ? getNationalPrefix(fields[7], location.getNation()) : "";
 
         // === COSTRUZIONE FINALE ===
         return new Restaurant(
-                UUID.randomUUID(),                                    // Identificatore
-                fields[0],                                           // Nome
-                fields[13],                                          // Descrizione
-                fields[9],                                           // Url pagina web
-                null,                                                // Proprietario del ristorante
-                nationalPrefix + fields[7],                          // Contatto telefonico
-                location,                                            // Posizione geografica
-                PriceRange.byDollarAmount(fields[3].length()),       // Fascia di prezzo
-                rd.nextBoolean(),                                    // Prenotazione online
-                rd.nextBoolean(),                                    // Consegna a domicilio
-                award,                                               // Stelle Michelin
-                greenStar,                                           // Green Star
-                cuisineTypes,                                        // Stili culinari
-                services                                             // Servizi offerti
+                UUID.randomUUID(),                              // Identificatore
+                fields[0],                                      // Nome
+                fields[13],                                     // Descrizione
+                fields[9],                                      // Url pagina web
+                null,                                           // Proprietario
+                nationalPrefix + fields[7],                     // Telefono
+                location,                                       // Posizione
+                PriceRange.byDollarAmount(fields[3].length()),  // Fascia di prezzo
+                rd.nextBoolean(),                               // Prenotazione online (sintetico)
+                rd.nextBoolean(),                               // Consegna a domicilio (sintetico)
+                award,                                          // Stelle Michelin
+                greenStar,                                      // Green Star
+                cuisineTypes,                                   // Tipi di cucina
+                services                                        // Servizi
         );
     }
 
     /**
-     * index:      0       1      2     3          4          5      6       7          8     9         10     11         12             13   <br>
-     * field csv: Name,Address,Location,Price,Cuisine,Longitude,Latitude,PhoneNumber,Url,WebsiteUrl,Award,GreenStar,FacilitiesAndServices,Description
-     * <br>
+     * Parsing del dataset CSV Michelin e serializzazione JSON risultante.
+     * <p>
+     * Layout dei campi (indice → campo):
+     * <pre>
+     * 0  Name
+     * 1  Address
+     * 2  Location
+     * 3  Price
+     * 4  Cuisine
+     * 5  Longitude
+     * 6  Latitude
+     * 7  PhoneNumber
+     * 8  Url
+     * 9  WebsiteUrl
+     * 10 Award
+     * 11 GreenStar
+     * 12 FacilitiesAndServices
+     * 13 Description
+     * </pre>
+     * </p>
+     * <p>Il metodo:</p>
+     * <ol>
+     *   <li>Legge tutte le righe (skip header).</li>
+     *   <li>Avvia in parallelo la costruzione dei {@link Restaurant}.</li>
+     *   <li>Attende il completamento e costruisce un array JSON tramite {@code ObjectMapper}.</li>
+     *   <li>Scrive il file <code>michelin_my_maps.json</code> in {@link Constants#ROOT}.</li>
+     * </ol>
+     *
+     * @param path percorso del file CSV; se {@code null} il metodo termina senza effetto
      */
     public static void parseFromDataset(Path path) {
         if (path == null) return;
@@ -275,21 +367,21 @@ public class CsvParser {
                                 System.err.println("Errore processando ristorante " +
                                         (fields.length > 0 ? fields[0] : "sconosciuto") +
                                         ": " + ex.getMessage());
-                                return null; // Restaurant fallito
+                                return null;
                             })
                     )
                     .collect(Collectors.toList());
 
-            // Progress tracking (opzionale)
+            // Tracking (non bloccante)
             showProgressAsync(restaurantFutures);
 
             // === ATTESA E RACCOLTA RISULTATI ===
-            System.out.println("Aspettando completamento elaborazione...");
+            System.out.println("Attesa completamento elaborazione...");
             CompletableFuture.allOf(restaurantFutures.toArray(new CompletableFuture[0])).join();
 
             List<Restaurant> restaurants = restaurantFutures.stream()
                     .map(CompletableFuture::join)
-                    .filter(Objects::nonNull)  // Filtra i ristoranti falliti
+                    .filter(Objects::nonNull)
                     .toList();
 
             System.out.println("✅ Elaborati " + restaurants.size() + "/" + csvLines.size() + " ristoranti");
@@ -309,7 +401,6 @@ public class CsvParser {
                         }
                     }
 
-                    // Scrittura su file
                     mapper.writerWithDefaultPrettyPrinter()
                             .writeValue(new File(Constants.ROOT, "michelin_my_maps.json"), restaurantsJson);
 
@@ -321,7 +412,7 @@ public class CsvParser {
                 }
             });
 
-            writeFileFuture.join(); // Aspetta che la scrittura finisca
+            writeFileFuture.join();
 
         } catch (IOException | SecurityException e) {
             System.err.println("❌ Error while parsing csv database: " + e.getMessage());
@@ -329,7 +420,10 @@ public class CsvParser {
     }
 
     /**
-     * Mostra il progresso dell'elaborazione in modo asincrono
+     * Mostra l’avanzamento complessivo dell’elaborazione in un task separato.
+     * <p>Non blocca il thread chiamante; stampa “completed/total (%)”.</p>
+     *
+     * @param futures elenco dei task di costruzione {@link Restaurant}
      */
     private static void showProgressAsync(List<CompletableFuture<Restaurant>> futures) {
         CompletableFuture.runAsync(() -> {
@@ -337,7 +431,9 @@ public class CsvParser {
             int previousCompleted = 0;
 
             while (true) {
-                int completed = (int) futures.stream().mapToLong(f -> (f.isDone() && !f.isCompletedExceptionally()) ? 1 : 0).sum();
+                int completed = (int) futures.stream()
+                        .mapToLong(f -> (f.isDone() && !f.isCompletedExceptionally()) ? 1 : 0)
+                        .sum();
 
                 if (completed != previousCompleted) {
                     System.out.println("Progresso: " + completed + "/" + total +

@@ -11,15 +11,39 @@ import it.uninsubria.laboratorioa.utils.Loader;
 
 import java.util.*;
 
+/**
+ * Classe che gestisce i menu e le operazioni disponibili per gli utenti di tipo {@link Client}.<p>
+ * Estende {@link Menus} fornendo funzionalità specifiche per i clienti.<p>
+ * Permette di cercare ristoranti, visualizzare preferiti, creare e gestire recensioni.<p>
+ * <p>
+ * Autore: Luke
+ *
+ * @version 1.0
+ */
 public class UserMenus extends Menus {
 
+    /**
+     * Riferimento al client correntemente autenticato.<p>
+     * Utilizzato per accedere ai ristoranti preferiti e alle recensioni personali.
+     */
     private final Client client;
 
+    /**
+     * Costruttore che inizializza il menu per un client specifico.<p>
+     * Invoca il costruttore della superclasse passando il client come utente base.
+     *
+     * @param client il cliente per cui creare il menu
+     */
     public UserMenus(Client client) {
         super(client);
         this.client = client;
     }
 
+    /**
+     * Apre il menu principale per il client.<p>
+     * Presenta le opzioni disponibili e gestisce la navigazione tra le diverse funzionalità.<p>
+     * Il ciclo continua finché l'utente non sceglie di disconnettersi o uscire dall'applicazione.
+     */
     @Override
     public void openMenu() {
         while (true) {
@@ -52,7 +76,10 @@ public class UserMenus extends Menus {
     }
 
     /**
-     * Visualizza i ristoranti preferiti dell'utente {@link Client}.
+     * Visualizza i ristoranti preferiti dell'utente {@link Client}.<p>
+     * Recupera gli UUID dei ristoranti preferiti e li carica dal {@link Loader}.<p>
+     * Mostra un menu interattivo per selezionare un ristorante e visualizzarne i dettagli.<p>
+     * Se non ci sono preferiti, viene mostrato un messaggio informativo.
      */
     private void viewFavourites() {
         Set<UUID> favourites = client.getFavouriteRestourants();
@@ -85,10 +112,17 @@ public class UserMenus extends Menus {
     }
 
     /**
-     * Mostra i dettagli di un ristorante a un utente {@link Client},
-     * permettendo di visualizzare, creare o modificare recensioni.
+     * Mostra i dettagli di un ristorante a un utente {@link Client}.<p>
+     * Visualizza le informazioni complete del ristorante, incluse le recensioni migliori e peggiori.<p>
+     * Permette al client di:<p>
+     * - Creare una nuova recensione se non ne ha ancora scritta una<p>
+     * - Modificare il testo della propria recensione esistente<p>
+     * - Modificare il voto della propria recensione esistente<p>
+     * - Cancellare la propria recensione<p>
+     * <p>
+     * Le operazioni vengono gestite con validazione e messaggi di errore appropriati.
      *
-     * @param restaurant ristorante da visualizzare
+     * @param restaurant ristorante da visualizzare e per cui gestire le recensioni
      */
     @Override
     public void viewRestaurantDetails(Restaurant restaurant) {

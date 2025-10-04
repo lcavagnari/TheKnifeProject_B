@@ -254,7 +254,14 @@ public class Restaurant extends JsonEntity {
         build();
     }
 
-    // Service collection mutations
+    /**
+     * Aggiunge un servizio alla collezione dei servizi offerti dal ristorante.<p>
+     * Il servizio viene validato tramite {@link IO#validateString(String)} prima dell'inserimento.<p>
+     * Se l'aggiunta ha successo, ricostruisce la rappresentazione JSON del ristorante.
+     *
+     * @param service il servizio da aggiungere (es. "WiFi", "Parking")
+     * @return true se il servizio è stato aggiunto con successo, false se validazione fallisce o servizio già presente
+     */
     public boolean addService(String service) {
         if (!IO.validateString(service)) return false;
 
@@ -264,6 +271,14 @@ public class Restaurant extends JsonEntity {
         return added;
     }
 
+    /**
+     * Rimuove un servizio dalla collezione dei servizi offerti dal ristorante.<p>
+     * Il servizio viene validato tramite {@link IO#validateString(String)} prima della rimozione.<p>
+     * Se la rimozione ha successo, ricostruisce la rappresentazione JSON del ristorante.
+     *
+     * @param service il servizio da rimuovere
+     * @return true se il servizio è stato rimosso con successo, false se validazione fallisce o servizio non presente
+     */
     public boolean removeService(String service) {
         if (!IO.validateString(service)) return false;
 
@@ -273,6 +288,13 @@ public class Restaurant extends JsonEntity {
         return removed;
     }
 
+    /**
+     * Aggiunge un tipo di cucina alla collezione delle cucine servite dal ristorante.<p>
+     * Se l'aggiunta ha successo, ricostruisce la rappresentazione JSON del ristorante.
+     *
+     * @param c il tipo di cucina da aggiungere
+     * @return true se il tipo di cucina è stato aggiunto con successo, false se nullo o già presente
+     */
     public boolean addCuisineType(CuisineType c) {
         if (c == null) return false;
 
@@ -282,6 +304,13 @@ public class Restaurant extends JsonEntity {
         return added;
     }
 
+    /**
+     * Rimuove un tipo di cucina dalla collezione delle cucine servite dal ristorante.<p>
+     * Se la rimozione ha successo, ricostruisce la rappresentazione JSON del ristorante.
+     *
+     * @param c il tipo di cucina da rimuovere
+     * @return true se il tipo di cucina è stato rimosso con successo, false se nullo o non presente
+     */
     public boolean removeCuisineType(CuisineType c) {
         if (c == null) return false;
 

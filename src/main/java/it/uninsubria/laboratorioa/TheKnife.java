@@ -6,7 +6,10 @@ import it.uninsubria.laboratorioa.utils.Loader;
 
 public class TheKnife {
 
-
+    /**
+     * Metodo principale
+     * @param args Argomenti cli
+     */
     public static void main(String[] args) {
         if (args.length > 1 && args[0].equals("--update")) {
             Loader.updateMichelinDataset(args[1]);
