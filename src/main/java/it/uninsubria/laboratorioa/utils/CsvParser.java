@@ -131,12 +131,11 @@ public class CsvParser {
 
 
     // TODO: Sistemare qui la gestione degli input a cazzo nel dataset del diopo-
-
-    private static Set<String> parseServices(String[] fields) {
+    private static Set<String> parseServices(String facilitiesAndServices) {
         Set<String> services = new HashSet<>();
 
-        if (fields.length >= 14 && !fields[13].isBlank()) {
-            String[] serviceArray = fields[13].split(",");
+        if (facilitiesAndServices != null && !facilitiesAndServices.isBlank()) {
+            String[] serviceArray = facilitiesAndServices.split(",");
             services = Arrays.stream(serviceArray)
                     .filter(Objects::nonNull)
                     .map(String::trim)
@@ -167,8 +166,6 @@ public class CsvParser {
             return false;
         }
     }
-
-
 
     private static Set<CuisineType> parseCuisineTypes(String cuisinesField) {
         Set<CuisineType> cuisineTypes = new HashSet<>();
@@ -211,7 +208,7 @@ public class CsvParser {
                 });
 
         CompletableFuture<Set<String>> servicesFuture = CompletableFuture
-                .supplyAsync(() -> parseServices(fields))
+                .supplyAsync(() -> parseServices(fields[12]))
                 .exceptionally(ex -> {
                     IO.printErrorMessage("Errore parsing servizi: " + ex.getMessage());
                     return new HashSet<>();
