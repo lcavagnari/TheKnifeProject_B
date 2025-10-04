@@ -76,6 +76,43 @@ public class CsvParser {
         };
     }
 
+    private static Location createLocation(String[] locData, String[] fields) {
+        if (locData == null) return null;
+
+        Nation nation;
+        String nationName = null;
+        try {
+            nationName = locData[1].trim().toUpperCase()
+                    .replace("_MAINLAND", "");
+
+            nation = Nation.valueOf(nationName);
+
+        } catch (IllegalArgumentException ex) {
+            nation = Nation.fromString(nationName);
+            if (nation == null) {
+                IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
+                IO.printErrorMessage("loc data " + Arrays.toString(locData));
+                IO.printErrorMessage(fields[6] + " " + fields[5]);
+                return null;
+            }
+        }
+
+        try {
+            // locData: 0=city, 1=nation, 2=address
+            return new Location(
+                    nation,
+                    locData[0],
+                    Double.parseDouble(fields[5]),
+                    Double.parseDouble(fields[6]),
+                    locData[2]
+            );
+        } catch (Exception ex) {
+            IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
+            IO.printErrorMessage("loc data " + Arrays.toString(locData));
+            IO.printErrorMessage(fields[6] + " " + fields[5]);
+            return null;
+        }
+    }
 
     private static String getNationalPrefix(String phoneNumber, Nation nation) {
         PhoneNumberUtil phoneUtil = PhoneNumberUtil.getInstance();
@@ -89,6 +126,70 @@ public class CsvParser {
         } catch (NumberParseException e) {
             return "";
         }
+    }
+
+
+
+    // TODO: Sistemare qui la gestione degli input a cazzo nel dataset del diopo-
+
+    private static Set<String> parseServices(String[] fields) {
+        Set<String> services = new HashSet<>();
+
+        if (fields.length >= 14 && !fields[13].isBlank()) {
+            String[] serviceArray = fields[13].split(",");
+            services = Arrays.stream(serviceArray)
+                    .filter(Objects::nonNull)
+                    .map(String::trim)
+                    .collect(Collectors.toSet());
+        }
+
+        return services;
+    }
+
+    private static Award parseAward(String ratingField) {
+        try {
+            String rating = ratingField.toLowerCase();
+            if (rating.matches("[0-9].*")) {
+                int val = Integer.parseInt(rating.replaceAll(" \\w*", ""));
+                return Award.fromInt(val);
+            } else {
+                return Award.valueOf(rating.toUpperCase().replace(" ", "_"));
+            }
+        } catch (NumberFormatException ex) {
+            return Award.NONE;
+        }
+    }
+
+    private static boolean parseGreenStar(String greenStarField) {
+        try {
+            return Integer.parseInt(greenStarField) == 1;
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+    }
+
+
+
+    private static Set<CuisineType> parseCuisineTypes(String cuisinesField) {
+        Set<CuisineType> cuisineTypes = new HashSet<>();
+        if (cuisinesField == null || cuisinesField.isBlank()) return cuisineTypes;
+
+        // Split iniziale anche se manca lo spazio dopo la virgola
+        String[] cuisines = cuisinesField.split("\\s*,\\s*");
+
+
+        for (String c : cuisines) {
+            String normalised = c.toUpperCase()
+                    .replace(" ", "_");
+
+            try {
+                cuisineTypes.add(CuisineType.valueOf(normalised));
+            } catch (IllegalArgumentException ignored) {
+
+            }
+        }
+
+        return cuisineTypes;
     }
 
 
@@ -154,133 +255,6 @@ public class CsvParser {
                 services                                             // Servizi offerti
         );
     }
-
-
-    // TODO: Sistemare qui la gestione degli input a cazzo nel dataset del diopo-
-    private static Set<CuisineType> parseCuisineTypes(String cuisinesField) {
-        Set<CuisineType> cuisineTypes = new HashSet<>();
-        if (cuisinesField == null || cuisinesField.isBlank()) return cuisineTypes;
-
-        // Split iniziale anche se manca lo spazio dopo la virgola
-        String[] cuisines = cuisinesField.split("\\s*,\\s*");
-
-
-        for (String c : cuisines) {
-            String normalised = c.toUpperCase()
-                    .replace(" ", "_");
-
-            try {
-                cuisineTypes.add(CuisineType.valueOf(normalised));
-            } catch (IllegalArgumentException ignored) {
-
-            }
-        }
-
-        return cuisineTypes;
-    }
-
-
-    /*
-
-                // Normalizzazione
-            String normalized = c.toUpperCase()
-                    .replace(" ",", ")
-                    .replaceAll("CUISINE|INFLUENCES|COOKING", "").trim()
-                    .replace("-", "_")
-                    .replace("&", " AND ")
-                    .replace(" AND ", ","); // rende gli "AND" uniformi alle virgole
-
-            // Split finale
-            String[] parts = normalized.split("\\s*,\\s*");
-
-            for (String part : parts) {
-                String key = part.trim().replace(" ", "_");
-                if (!c.isEmpty()) {
-                    try {
-                        cuisineTypes.add(CuisineType.valueOf(c.toUpperCase().replace(" ","_")));
-                    } catch (IllegalArgumentException ignored) {
-                        try {
-                            if (!key.isEmpty()) cuisineTypes.add(CuisineType.valueOf(key));
-                        } catch (IllegalArgumentException ignored2) {}
-                    }
-                }
-            }
-     */
-
-    private static Set<String> parseServices(String[] fields) {
-        Set<String> services = new HashSet<>();
-
-        if (fields.length >= 14 && !fields[13].isBlank()) {
-            String[] serviceArray = fields[13].split(",");
-            services = Arrays.stream(serviceArray)
-                    .filter(Objects::nonNull)
-                    .map(String::trim)
-                    .collect(Collectors.toSet());
-        }
-
-        return services;
-    }
-
-    private static Award parseAward(String ratingField) {
-        try {
-            String rating = ratingField.toLowerCase();
-            if (rating.matches("[0-9].*")) {
-                int val = Integer.parseInt(rating.replaceAll(" \\w*", ""));
-                return Award.fromInt(val);
-            } else {
-                return Award.valueOf(rating.toUpperCase().replace(" ", "_"));
-            }
-        } catch (NumberFormatException ex) {
-            return Award.NONE;
-        }
-    }
-
-    private static boolean parseGreenStar(String greenStarField) {
-        try {
-            return Integer.parseInt(greenStarField) == 1;
-        } catch (NumberFormatException ex) {
-            return false;
-        }
-    }
-
-    private static Location createLocation(String[] locData, String[] fields) {
-        if (locData == null) return null;
-
-        Nation nation;
-        String nationName = null;
-        try {
-            nationName = locData[1].trim().toUpperCase()
-                    .replace("_MAINLAND", "");
-
-            nation = Nation.valueOf(nationName);
-
-        } catch (IllegalArgumentException ex) {
-            nation = Nation.fromString(nationName);
-            if (nation == null) {
-                IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
-                IO.printErrorMessage("loc data " + Arrays.toString(locData));
-                IO.printErrorMessage(fields[6] + " " + fields[5]);
-                return null;
-            }
-        }
-
-        try {
-            // locData: 0=city, 1=nation, 2=address
-            return new Location(
-                    nation,
-                    locData[0],
-                    Double.parseDouble(fields[5]),
-                    Double.parseDouble(fields[6]),
-                    locData[2]
-            );
-        } catch (Exception ex) {
-            IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
-            IO.printErrorMessage("loc data " + Arrays.toString(locData));
-            IO.printErrorMessage(fields[6] + " " + fields[5]);
-            return null;
-        }
-    }
-
 
     /**
      * index:      0       1      2     3          4          5      6       7          8     9         10     11         12             13   <br>
