@@ -206,7 +206,7 @@ public class Restaurant extends JsonEntity {
     public void build() {
         jsonObject.put("owner", (owner != null) ? owner.getId().toString() : "")
                 .put("name", name)
-                .put("address", description)
+                .put("description", description)
                 .put("phone", phone)
                 .put("priceRange", priceRange.getSymbol())
                 .put("award", award.getValue())
