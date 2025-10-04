@@ -314,6 +314,9 @@ public enum Nation {
      */
     SCANDINAVIA("SE");
 
+    /**
+     * Mappa degli alias per i nomi delle nazioni
+     */
     private static final Map<String, Nation> ALIAS_MAP = Map.<String, Nation>ofEntries(
             // Afghanistan
             Map.entry("af", AFGHANISTAN),
@@ -552,6 +555,7 @@ public enum Nation {
             Map.entry("norge", NORWAY),
             Map.entry("noreg", NORWAY)
     );
+
     private final String isoCode;
 
     Nation(String isoCode) {
@@ -569,6 +573,9 @@ public enum Nation {
         return ALIAS_MAP.getOrDefault(identifier.toLowerCase().trim(), null);
     }
 
+    /**
+     * @return Nome nazione capitalizzato
+     */
     @Override
     public String toString() {
         return name().charAt(0) + name().substring(1).toLowerCase();
