@@ -570,7 +570,9 @@ public enum Nation {
      */
     public static Nation fromString(String identifier) {
         if (identifier == null) return null;
-        return ALIAS_MAP.getOrDefault(identifier.toLowerCase().trim(), null);
+
+        String s = identifier.toLowerCase().trim();
+        return ALIAS_MAP.getOrDefault(s, null);
     }
 
     /**
