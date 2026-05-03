@@ -105,7 +105,7 @@ java -jar TheKnifeProject-1.0.jar
 
 ## 📚 Documentazione
 
-Visibile attraverso la [Javadoc](https://the-knife-project.vercel.app/)
+Visibile attraverso la [Javadoc](https://theknifeproject.projectdocshub.vercel.app/)
 
   
 ---  
