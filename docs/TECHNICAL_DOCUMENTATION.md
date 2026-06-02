@@ -17,7 +17,7 @@ This section describes how the application starts and decides between update-mod
 ### Diagram: Startup Activity Flow
 ```mermaid
 flowchart TD
-    A([Start app]) --> B{--update flag?}
+    A([Start app]) --> B{"--update flag?"}
     B -- Yes --> C[updateMichelinDataset(path?)]
     C --> Z([Exit])
     B -- No --> D[print "Loading The Knife..."]
