@@ -42,6 +42,9 @@ public class CsvParser {
 
     private final static SecureRandom rd = new SecureRandom();
 
+    private final static RestaurantDAO RESTAURANT_DAO = new RestaurantDAO();
+    private final static LocationDAO LOCATION_DAO = new LocationDAO();
+
     private static String[] retrieveLocData(String address, String location) {
         String[] cityAndNation = location.split(",");
         String city;
@@ -213,9 +216,6 @@ public class CsvParser {
         if (path == null)
             return;
 
-        LocationDAO locationDAO = new LocationDAO();
-        RestaurantDAO restaurantDAO = new RestaurantDAO();
-
         try (Stream<String> lines = Files.lines(path)) {
             List<String> csvLines = lines.skip(1).toList();
             System.out.println("Processando " + csvLines.size() + " ristoranti...");
@@ -232,11 +232,10 @@ public class CsvParser {
                 for (Restaurant r : restaurants) {
                     try {
                         if (r.getLocation() != null)
-                            locationDAO.save(r.getLocation());
-                        restaurantDAO.save(r);
+                            LOCATION_DAO.save(r.getLocation());
+                        RESTAURANT_DAO.save(r);
                     } catch (Exception ex) {
-                        System.err
-                                .println("Errore salvataggio su database per " + r.getName() + ": " + ex.getMessage());
+                        IO.printErrorMessage("Errore salvataggio su database per " + r.getName() + ": " + ex.getMessage());
                     }
                 }
                 System.out.println("✅ Ristoranti salvati su database!");
@@ -253,7 +252,7 @@ public class CsvParser {
             CompletableFuture.allOf(persistFuture, cacheFuture).join();
 
         } catch (IOException | SecurityException e) {
-            System.err.println("❌ Error while parsing csv database: " + e.getMessage());
+            IO.printErrorMessage("❌ Error while parsing csv database: " + e.getMessage());
         }
     }
 }
