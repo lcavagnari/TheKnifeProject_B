@@ -1,3 +1,5 @@
+package it.uninsubria.laboratoriob.test;
+
 import it.uninsubria.laboratoriob.utils.Loader;
 
 public class LoadTest {
