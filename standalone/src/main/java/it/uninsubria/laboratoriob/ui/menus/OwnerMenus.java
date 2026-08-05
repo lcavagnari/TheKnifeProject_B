@@ -1,15 +1,17 @@
 package it.uninsubria.laboratoriob.ui.menus;
 
+import it.uninsubria.laboratoriob.Validators;
+import it.uninsubria.laboratoriob.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.enums.Award;
+import it.uninsubria.laboratoriob.enums.CuisineType;
+import it.uninsubria.laboratoriob.enums.PriceRange;
 import it.uninsubria.laboratoriob.objects.Location;
+import it.uninsubria.laboratoriob.objects.Owner;
 import it.uninsubria.laboratoriob.objects.Restaurant;
 import it.uninsubria.laboratoriob.objects.Review;
-import it.uninsubria.laboratoriob.objects.enums.Award;
-import it.uninsubria.laboratoriob.objects.enums.CuisineType;
-import it.uninsubria.laboratoriob.objects.enums.PriceRange;
-import it.uninsubria.laboratoriob.objects.users.Owner;
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.ui.Menus;
-import it.uninsubria.laboratoriob.ui.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -141,7 +143,7 @@ public class OwnerMenus extends Menus {
                     }
                     case 5 -> {
                         Location location = IO.getLocationInput(false);
-                        IO.validateLocation(location);
+                        Validators.validateLocation(location);
                         restaurant.setLocation(location);
                         IO.printSuccessMessage("Location aggiornata.");
                     }
@@ -180,7 +182,7 @@ public class OwnerMenus extends Menus {
                         IO.printSuccessMessage("Servizi aggiornati.");
                     }
                     case 13 -> {
-                        restaurant.build();
+                        new RestaurantDAO().update(restaurant);
                         IO.printSuccessMessage("Modifiche salvate.");
                         return;
                     }

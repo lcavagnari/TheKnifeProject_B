@@ -1,8 +1,9 @@
 package it.uninsubria.laboratoriob.ui;
 
+import it.uninsubria.laboratoriob.Validators;
 import it.uninsubria.laboratoriob.objects.Restaurant;
-import it.uninsubria.laboratoriob.objects.users.User;
-import it.uninsubria.laboratoriob.ui.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.objects.User;
+import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.utils.Loader;
 
 import java.util.Map;
@@ -26,7 +27,7 @@ import java.util.Map;
  * @see IO
  * @see Loader
  * @see it.uninsubria.laboratoriob.objects.Restaurant
- * @see it.uninsubria.laboratoriob.objects.users.User
+ * @see User
  */
 public abstract class Menus {
 
@@ -46,7 +47,7 @@ public abstract class Menus {
     /**
      * Avvia una ricerca di un ristorante per nome.
      * <p>
-     * Il metodo richiede un input testuale all’utente, convalidato tramite {@link IO#validateString(String)}.
+     * Il metodo richiede un input testuale all’utente, convalidato tramite {@link Validators#validateString(String)}.
      * Se il ristorante esiste in {@link Loader#getRestaurantsByName()}, ne visualizza i dettagli
      * tramite {@link #viewRestaurantDetails(Restaurant)}. In caso di errore o annullamento,
      * viene mostrato un messaggio e il metodo termina senza eccezioni propagate.
@@ -61,7 +62,7 @@ public abstract class Menus {
         while (r == null) {
             try {
                 String name = IO.getUserInput("Enter restaurant name:");
-                IO.validateString(name);
+                Validators.validateString(name);
 
                 if (!Loader.getRestaurantsByName().containsKey(name))
                     throw new IllegalArgumentException("Nessun ristorante trovato, riprovare");

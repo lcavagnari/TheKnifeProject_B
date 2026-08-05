@@ -1,15 +1,11 @@
 package it.uninsubria.laboratoriob.ui.menus;
 
-import it.uninsubria.laboratoriob.objects.Restaurant;
-import it.uninsubria.laboratoriob.objects.Review;
-import it.uninsubria.laboratoriob.objects.enums.UserRole;
-import it.uninsubria.laboratoriob.objects.users.Client;
-import it.uninsubria.laboratoriob.objects.users.Owner;
-import it.uninsubria.laboratoriob.objects.users.User;
+import it.uninsubria.laboratoriob.enums.UserRole;
+import it.uninsubria.laboratoriob.objects.*;
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.ui.Login;
 import it.uninsubria.laboratoriob.ui.Menus;
-import it.uninsubria.laboratoriob.ui.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 
 import java.util.Comparator;
 import java.util.Map;
