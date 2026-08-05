@@ -2,6 +2,7 @@ package it.uninsubria.laboratoriob;
 
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.ui.menus.GuestMenus;
+import it.uninsubria.laboratoriob.utils.Database;
 import it.uninsubria.laboratoriob.utils.Loader;
 
 public class TheKnife {
@@ -25,5 +26,6 @@ public class TheKnife {
 
         Loader.initialiseMaps();
         new GuestMenus().openMenu();
+        Database.shutdown();
     }
 }

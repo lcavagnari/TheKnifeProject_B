@@ -1,34 +1,56 @@
 package it.uninsubria.laboratoriob.utils;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+import lombok.experimental.UtilityClass;
+
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
-/**
- * Centralizza la gestione della connessione al database.
- * <p>
- */
+@UtilityClass
 public final class Database {
 
-    private static final String URL = "PLACEHOLDER";
-    private static final String USERNAME = "";
-    private static final String PASSWORD = "";
-    private static Connection sharedConnection = null;
+    private static final String URL = "jdbc:postgresql://localhost:5432/mydb";
+    private static final String USERNAME = "testuser";
+    private static final String PASSWORD = "test1234";
 
-    private Database() {
+    private static final HikariDataSource ds;
+
+    static {
+        HikariConfig config = new HikariConfig();
+
+        config.setJdbcUrl(URL);
+        config.setUsername(USERNAME);
+        config.setPassword(PASSWORD);
+
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+
+        config.setMaximumPoolSize(10);
+        config.setConnectionTimeout(30000);
+        config.setMinimumIdle(2);
+
+        ds = new HikariDataSource(config);
     }
 
     /**
-     * Restituisce una connessione al database condivisa.
-     * <p>
+     * Restituisce una connessione dal connection pool.
      *
-     * @return connessione attiva al database
-     * @throws SQLException in caso di errore di connessione
+     * @return connessione attiva
+     * @throws SQLException se la connessione non è disponibile
      */
-    public static synchronized Connection getConnection() throws SQLException {
-        if (sharedConnection == null || sharedConnection.isClosed()) {
-            sharedConnection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
+    public static Connection getConnection() throws SQLException {
+        return ds.getConnection();
+    }
+
+    /**
+     * Chiude il connection pool.
+     * Da chiamare alla chiusura dell'applicazione.
+     */
+    public static void shutdown() {
+        if (ds != null && !ds.isClosed()) {
+            ds.close();
         }
-        return sharedConnection;
     }
 }
