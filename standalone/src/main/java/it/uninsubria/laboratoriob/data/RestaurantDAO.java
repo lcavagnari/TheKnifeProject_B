@@ -1,6 +1,5 @@
 package it.uninsubria.laboratoriob.data;
 
-import it.uninsubria.laboratoriob.DAO;
 import it.uninsubria.laboratoriob.enums.Award;
 import it.uninsubria.laboratoriob.enums.CuisineType;
 import it.uninsubria.laboratoriob.enums.PriceRange;

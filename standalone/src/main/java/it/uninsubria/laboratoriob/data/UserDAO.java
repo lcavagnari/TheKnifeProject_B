@@ -1,12 +1,11 @@
 package it.uninsubria.laboratoriob.data;
 
-import it.uninsubria.laboratoriob.DAO;
 import it.uninsubria.laboratoriob.objects.User;
 
 import java.util.Optional;
 
 /**
- * Contratto it.uninsubria.laboratoriob.DAO comune ai sottotipi di {@link User} ({@code Client},
+ * Contratto it.uninsubria.laboratoriob.data.DAO comune ai sottotipi di {@link User} ({@code customer},
  * {@code Owner}).
  * <p>
  *

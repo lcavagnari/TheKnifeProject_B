@@ -1,6 +1,5 @@
 package it.uninsubria.laboratoriob.data;
 
-import it.uninsubria.laboratoriob.DAO;
 import it.uninsubria.laboratoriob.objects.Restaurant;
 import it.uninsubria.laboratoriob.objects.Review;
 import it.uninsubria.laboratoriob.objects.User;
@@ -16,11 +15,11 @@ import java.util.UUID;
 public class ReviewDAO implements DAO<Review> {
 
     private final RestaurantDAO restaurantDAO = new RestaurantDAO();
-    private final ClientDAO clientDAO = new ClientDAO();
+    private final CustomerDAO CustomerDAO = new CustomerDAO();
 
     @Override
     public Optional<Review> findById(UUID id) {
-        // SELECT id, restaurant_id, client_id, rating, timestamp, comment, reply FROM
+        // SELECT id, restaurant_id, customer_id, rating, timestamp, comment, reply FROM
         // review WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
@@ -29,9 +28,9 @@ public class ReviewDAO implements DAO<Review> {
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     UUID restaurantId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    UUID clientId = UUID.fromString(rs.getString("PLACEHOLDER"));
+                    UUID customerId = UUID.fromString(rs.getString("PLACEHOLDER"));
                     Restaurant restaurant = restaurantDAO.findById(restaurantId).orElse(null);
-                    User user = clientDAO.findById(clientId).orElse(null);
+                    User user = CustomerDAO.findById(customerId).orElse(null);
                     String tsStr = rs.getString("PLACEHOLDER");
                     LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
 
@@ -59,7 +58,7 @@ public class ReviewDAO implements DAO<Review> {
     @Override
     public List<Review> findAll() {
         List<Review> reviews = new ArrayList<>();
-        // SELECT id, restaurant_id, client_id, rating, timestamp, comment, reply FROM
+        // SELECT id, restaurant_id, customer_id, rating, timestamp, comment, reply FROM
         // review
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
@@ -67,9 +66,9 @@ public class ReviewDAO implements DAO<Review> {
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 UUID restaurantId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                UUID clientId = UUID.fromString(rs.getString("PLACEHOLDER"));
+                UUID customerId = UUID.fromString(rs.getString("PLACEHOLDER"));
                 Restaurant restaurant = restaurantDAO.findById(restaurantId).orElse(null);
-                User user = clientDAO.findById(clientId).orElse(null);
+                User user = CustomerDAO.findById(customerId).orElse(null);
                 String tsStr = rs.getString("PLACEHOLDER");
                 LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
 
@@ -91,7 +90,7 @@ public class ReviewDAO implements DAO<Review> {
 
     public List<Review> findByRestaurant(UUID restaurantId) {
         List<Review> reviews = new ArrayList<>();
-        // SELECT id, restaurant_id, client_id, rating, timestamp, comment, reply FROM
+        // SELECT id, restaurant_id, customer_id, rating, timestamp, comment, reply FROM
         // review WHERE restaurant_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
@@ -100,9 +99,9 @@ public class ReviewDAO implements DAO<Review> {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     UUID restId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    UUID clientId = UUID.fromString(rs.getString("PLACEHOLDER"));
+                    UUID customerId = UUID.fromString(rs.getString("PLACEHOLDER"));
                     Restaurant restaurant = restaurantDAO.findById(restId).orElse(null);
-                    User user = clientDAO.findById(clientId).orElse(null);
+                    User user = CustomerDAO.findById(customerId).orElse(null);
                     String tsStr = rs.getString("PLACEHOLDER");
                     LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
 
@@ -125,7 +124,7 @@ public class ReviewDAO implements DAO<Review> {
 
     @Override
     public boolean save(Review review) {
-        // INSERT INTO review (id, restaurant_id, client_id, rating, timestamp, comment,
+        // INSERT INTO review (id, restaurant_id, customer_id, rating, timestamp, comment,
         // reply) VALUES (?, ?, ?, ?, ?, ?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();

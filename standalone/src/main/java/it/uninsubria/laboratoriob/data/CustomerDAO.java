@@ -1,6 +1,6 @@
 package it.uninsubria.laboratoriob.data;
 
-import it.uninsubria.laboratoriob.objects.Client;
+import it.uninsubria.laboratoriob.objects.Customer;
 import it.uninsubria.laboratoriob.objects.Location;
 import it.uninsubria.laboratoriob.utils.Database;
 
@@ -9,17 +9,17 @@ import java.time.LocalDate;
 import java.util.*;
 
 /**
- * it.uninsubria.laboratoriob.DAO per l'entità {@link Client}.
+ * it.uninsubria.laboratoriob.data.DAO per l'entità {@link Customer}.
  * <p>
  */
-public class ClientDAO implements UserDAO<Client> {
+public class CustomerDAO implements UserDAO<Customer> {
 
     private final LocationDAO locationDAO = new LocationDAO();
 
     @Override
-    public Optional<Client> findById(UUID id) {
+    public Optional<Customer> findById(UUID id) {
         // SELECT id, username, password_hash, salt, name, last_name, location_id,
-        // date_of_birth FROM client WHERE id = ?
+        // date_of_birth FROM customer WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -30,7 +30,7 @@ public class ClientDAO implements UserDAO<Client> {
                     Location location = locationDAO.findById(locationId).orElse(null);
                     Set<UUID> favourites = findFavourites(id);
 
-                    Client client = new Client(
+                    Customer customer = new Customer(
                             id,
                             // Column Placeholder: username
                             rs.getString("PLACEHOLDER"),
@@ -46,19 +46,19 @@ public class ClientDAO implements UserDAO<Client> {
                             // Column Placeholder: date_of_birth
                             LocalDate.parse(rs.getString("PLACEHOLDER")),
                             favourites);
-                    return Optional.of(client);
+                    return Optional.of(customer);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore findById in ClientDAO: " + e.getMessage());
+            System.err.println("Errore findById in CustomerDAO: " + e.getMessage());
         }
         return Optional.empty();
     }
 
     @Override
-    public Optional<Client> findByUsername(String username) {
+    public Optional<Customer> findByUsername(String username) {
         // SELECT id, username, password_hash, salt, name, last_name, location_id,
-        // date_of_birth FROM client WHERE username = ?
+        // date_of_birth FROM customer WHERE username = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -70,7 +70,7 @@ public class ClientDAO implements UserDAO<Client> {
                     Location location = locationDAO.findById(locationId).orElse(null);
                     Set<UUID> favourites = findFavourites(id);
 
-                    Client client = new Client(
+                    Customer customer = new Customer(
                             id,
                             rs.getString("PLACEHOLDER"),
                             rs.getString("PLACEHOLDER"),
@@ -80,20 +80,20 @@ public class ClientDAO implements UserDAO<Client> {
                             location,
                             LocalDate.parse(rs.getString("PLACEHOLDER")),
                             favourites);
-                    return Optional.of(client);
+                    return Optional.of(customer);
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore findByUsername in ClientDAO: " + e.getMessage());
+            System.err.println("Errore findByUsername in CustomerDAO: " + e.getMessage());
         }
         return Optional.empty();
     }
 
     @Override
-    public List<Client> findAll() {
-        List<Client> clients = new ArrayList<>();
+    public List<Customer> findAll() {
+        List<Customer> customers = new ArrayList<>();
         // SELECT id, username, password_hash, salt, name, last_name, location_id,
-        // date_of_birth FROM client
+        // date_of_birth FROM customer
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              Statement stmt = conn.createStatement();
@@ -104,7 +104,7 @@ public class ClientDAO implements UserDAO<Client> {
                 Location location = locationDAO.findById(locationId).orElse(null);
                 Set<UUID> favourites = findFavourites(id);
 
-                Client client = new Client(
+                Customer customer = new Customer(
                         id,
                         rs.getString("PLACEHOLDER"),
                         rs.getString("PLACEHOLDER"),
@@ -114,119 +114,119 @@ public class ClientDAO implements UserDAO<Client> {
                         location,
                         LocalDate.parse(rs.getString("PLACEHOLDER")),
                         favourites);
-                clients.add(client);
+                customers.add(customer);
             }
         } catch (SQLException e) {
-            System.err.println("Errore findAll in ClientDAO: " + e.getMessage());
+            System.err.println("Errore findAll in CustomerDAO: " + e.getMessage());
         }
-        return clients;
+        return customers;
     }
 
     @Override
-    public boolean save(Client client) {
-        // INSERT INTO client (id, username, password_hash, salt, name, last_name,
+    public boolean save(Customer customer) {
+        // INSERT INTO customer (id, username, password_hash, salt, name, last_name,
         // location_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, client.getId().toString());
-            stmt.setString(2, client.getUsername());
-            stmt.setString(3, client.getPasswordHash());
-            stmt.setString(4, client.getPasswordSalt());
-            stmt.setString(5, client.getName());
-            stmt.setString(6, client.getLastName());
-            stmt.setString(7, client.getLocation() != null ? client.getLocation().getId().toString() : null);
-            stmt.setString(8, client.getDateOfBirth().toString());
+            stmt.setString(1, customer.getId().toString());
+            stmt.setString(2, customer.getUsername());
+            stmt.setString(3, customer.getPasswordHash());
+            stmt.setString(4, customer.getPasswordSalt());
+            stmt.setString(5, customer.getName());
+            stmt.setString(6, customer.getLastName());
+            stmt.setString(7, customer.getLocation() != null ? customer.getLocation().getId().toString() : null);
+            stmt.setString(8, customer.getDateOfBirth().toString());
 
-            if (client.getLocation() != null) {
-                locationDAO.save(client.getLocation());
+            if (customer.getLocation() != null) {
+                locationDAO.save(customer.getLocation());
             }
 
             int affected = stmt.executeUpdate();
             if (affected > 0) {
-                // DELETE FROM client_favourite_restaurants WHERE client_id = ?
+                // DELETE FROM customer_favourite_restaurants WHERE customer_id = ?
                 String deleteFavs = "PLACEHOLDER";
                 try (PreparedStatement delStmt = conn.prepareStatement(deleteFavs)) {
-                    delStmt.setString(1, client.getId().toString());
+                    delStmt.setString(1, customer.getId().toString());
                     delStmt.executeUpdate();
                 }
-                for (UUID restId : client.getFavouriteRestourants()) {
-                    addFavourite(client.getId(), restId);
+                for (UUID restId : customer.getFavouriteRestourants()) {
+                    addFavourite(customer.getId(), restId);
                 }
                 return true;
             }
         } catch (SQLException e) {
-            System.err.println("Errore save in ClientDAO: " + e.getMessage());
+            System.err.println("Errore save in CustomerDAO: " + e.getMessage());
         }
         return false;
     }
 
     @Override
-    public boolean update(Client client) {
-        return save(client);
+    public boolean update(Customer customer) {
+        return save(customer);
     }
 
     @Override
     public boolean delete(UUID id) {
-        // DELETE FROM client WHERE id = ?
+        // DELETE FROM customer WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Errore delete in ClientDAO: " + e.getMessage());
+            System.err.println("Errore delete in CustomerDAO: " + e.getMessage());
             return false;
         }
     }
 
 
-    public Set<UUID> findFavourites(UUID clientId) {
+    public Set<UUID> findFavourites(UUID customerId) {
         Set<UUID> favourites = new HashSet<>();
-        // SELECT restaurant_id FROM client_favourite_restaurants WHERE client_id = ?
+        // SELECT restaurant_id FROM customer_favourite_restaurants WHERE customer_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, clientId.toString());
+            stmt.setString(1, customerId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     favourites.add(UUID.fromString(rs.getString("PLACEHOLDER")));
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Errore findFavourites in ClientDAO: " + e.getMessage());
+            System.err.println("Errore findFavourites in CustomerDAO: " + e.getMessage());
         }
         return favourites;
     }
 
 
-    public boolean addFavourite(UUID clientId, UUID restaurantId) {
-        // INSERT INTO client_favourite_restaurants (client_id, restaurant_id) VALUES
+    public boolean addFavourite(UUID customerId, UUID restaurantId) {
+        // INSERT INTO customer_favourite_restaurants (customer_id, restaurant_id) VALUES
         // (?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, clientId.toString());
+            stmt.setString(1, customerId.toString());
             stmt.setString(2, restaurantId.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Errore addFavourite in ClientDAO: " + e.getMessage());
+            System.err.println("Errore addFavourite in CustomerDAO: " + e.getMessage());
             return false;
         }
     }
 
 
-    public boolean removeFavourite(UUID clientId, UUID restaurantId) {
-        // DELETE FROM client_favourite_restaurants WHERE client_id = ? AND
+    public boolean removeFavourite(UUID customerId, UUID restaurantId) {
+        // DELETE FROM customer_favourite_restaurants WHERE customer_id = ? AND
         // restaurant_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, clientId.toString());
+            stmt.setString(1, customerId.toString());
             stmt.setString(2, restaurantId.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.println("Errore removeFavourite in ClientDAO: " + e.getMessage());
+            System.err.println("Errore removeFavourite in CustomerDAO: " + e.getMessage());
             return false;
         }
     }

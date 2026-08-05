@@ -1,6 +1,5 @@
 package it.uninsubria.laboratoriob.data;
 
-import it.uninsubria.laboratoriob.DAO;
 import it.uninsubria.laboratoriob.enums.Nation;
 import it.uninsubria.laboratoriob.objects.Location;
 import it.uninsubria.laboratoriob.utils.Database;
@@ -12,7 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * it.uninsubria.laboratoriob.DAO per l'entità {@link Location}.
+ * it.uninsubria.laboratoriob.data.DAO per l'entità {@link Location}.
  * <p>
  */
 public class LocationDAO implements DAO<Location> {

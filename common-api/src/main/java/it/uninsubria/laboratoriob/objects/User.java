@@ -18,7 +18,7 @@ import java.util.UUID;
  * <p>
  * Gestisce la sicurezza della password tramite hashing e salting.
  * <p>
- * Estende {@link Entity}. Persistenza gestita dai relativi it.uninsubria.laboratoriob.DAO
+ * Estende {@link Entity}. Persistenza gestita dai relativi it.uninsubria.laboratoriob.data.DAO
  * ({@code ClientDAO}, {@code OwnerDAO}).
  * <p>
  *

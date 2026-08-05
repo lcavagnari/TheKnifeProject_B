@@ -7,8 +7,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.UUID;
@@ -20,13 +22,17 @@ class ReviewTest {
 
     private Review review;
     private Restaurant restaurant;
-    private Client client;
+    private Customer customer;
 
     @BeforeEach
     void setUp() {
         Location location = new Location(Nation.ITALY, "Rome", 41.9028, 12.4964, "Via Roma 1");
-        Owner owner = new Owner("owner1", "pass123456", "Mario", "Rossi", location, LocalDate.of(1975, 3, 10));
-        client = new Client("client1", "pass123456", "Luigi", "Verdi", location, LocalDate.of(1990, 7, 20));
+        byte[] saltBytes = new byte[16];
+        new SecureRandom().nextBytes(saltBytes);
+        String salt = Base64.getEncoder().encodeToString(saltBytes);
+
+        Owner owner = new Owner(UUID.randomUUID(),"owner1", "pass123456",salt, "Mario", "Rossi", location, LocalDate.of(1975, 3, 10));
+        customer = new Customer(UUID.randomUUID(),"client1", "pass123456",salt, "Luigi", "Verdi", location, LocalDate.of(1990, 7, 20));
 
         restaurant = new Restaurant(
                 UUID.randomUUID(),
@@ -46,7 +52,7 @@ class ReviewTest {
                 new HashMap<>()
         );
 
-        review = new Review(restaurant, client, 4, "Excellent service and food!");
+        review = new Review(restaurant, customer, 4, "Excellent service and food!");
     }
 
     @Test
@@ -55,7 +61,7 @@ class ReviewTest {
         assertNotNull(review);
         assertEquals(4, review.getValue());
         assertEquals("Excellent service and food!", review.getText());
-        assertEquals(client, review.getUser());
+        assertEquals(customer, review.getUser());
         assertEquals(restaurant, review.getRestaurant());
         assertNotNull(review.getTimestamp());
     }
@@ -64,7 +70,7 @@ class ReviewTest {
     @DisplayName("Should create review with timestamp and reply")
     void testReviewWithTimestampAndReply() {
         LocalDateTime timestamp = LocalDateTime.now().minusDays(5);
-        Review r = new Review(restaurant, client, 5, timestamp, "Excellent food and service", "Thank you so much");
+        Review r = new Review(restaurant, customer, 5, timestamp, "Excellent food and service", "Thank you so much");
 
         assertEquals(5, r.getValue());
         assertEquals("Excellent food and service", r.getText());

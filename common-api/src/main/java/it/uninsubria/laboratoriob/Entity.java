@@ -10,7 +10,7 @@ import java.util.UUID;
  * <p>
  * Gestisce l'identificatore univoco UUID condiviso da tutte le entità.
  * <p>
- * La persistenza (salvataggio, lettura, aggiornamento) è delegata ai it.uninsubria.laboratoriob.DAO
+ * La persistenza (salvataggio, lettura, aggiornamento) è delegata ai it.uninsubria.laboratoriob.data.DAO
  * in {@code it.uninsubria.laboratorioa.db}; questa classe non conosce
  * il layer di storage.
  * <p>

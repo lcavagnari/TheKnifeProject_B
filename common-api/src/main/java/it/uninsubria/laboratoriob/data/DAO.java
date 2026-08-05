@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob;
+package it.uninsubria.laboratoriob.data;
 
 import java.util.List;
 import java.util.Optional;

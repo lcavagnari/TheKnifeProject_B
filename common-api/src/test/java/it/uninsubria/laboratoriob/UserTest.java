@@ -1,12 +1,14 @@
 package it.uninsubria.laboratoriob;
 
 import it.uninsubria.laboratoriob.enums.Nation;
-import it.uninsubria.laboratoriob.objects.Client;
+import it.uninsubria.laboratoriob.objects.Customer;
 import it.uninsubria.laboratoriob.objects.Location;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 public class UserTest {
 
@@ -44,7 +46,11 @@ public class UserTest {
     static void main() {
         System.out.println("dddd");
 
-        Client c = new Client("111", "kibafo33", "name", "last", generateRandomLocation(), LocalDate.now());
+        byte[] saltBytes = new byte[16];
+        new SecureRandom().nextBytes(saltBytes);
+        String salt = Base64.getEncoder().encodeToString(saltBytes);
+
+        Customer c = new Customer(UUID.randomUUID(),"111", "kibafo33",salt, "name", "last", generateRandomLocation(), LocalDate.now());
         System.out.println(c);
     }
 }

@@ -1,7 +1,7 @@
 package it.uninsubria.laboratoriob.utils;
 
 
-import it.uninsubria.laboratoriob.data.ClientDAO;
+import it.uninsubria.laboratoriob.data.CustomerDAO;
 import it.uninsubria.laboratoriob.data.OwnerDAO;
 import it.uninsubria.laboratoriob.data.RestaurantDAO;
 import it.uninsubria.laboratoriob.data.ReviewDAO;
@@ -24,7 +24,7 @@ import java.util.concurrent.CompletableFuture;
  * dell'applicazione
  * a partire dal database.
  * <p>
- * Gestisce la lettura delle entità tramite i relativi it.uninsubria.laboratoriob.DAO e le inserisce in
+ * Gestisce la lettura delle entità tramite i relativi it.uninsubria.laboratoriob.data.DAO e le inserisce in
  * strutture dati statiche.
  * <p>
  *
@@ -60,7 +60,7 @@ public class Loader {
 
     private final static RestaurantDAO restaurantDAO = new RestaurantDAO();
     private final static ReviewDAO reviewDAO = new ReviewDAO();
-    private final static ClientDAO clientDAO = new ClientDAO();
+    private final static CustomerDAO CUSTOMER_DAO = new CustomerDAO();
     private final static OwnerDAO ownerDAO = new OwnerDAO();
 
     private void loadRestaurants() {
@@ -79,9 +79,9 @@ public class Loader {
             usersByName.put(owner.getUsername(), owner);
         }
 
-        for (Client client : clientDAO.findAll()) {
-            usersById.put(client.getId(), client);
-            usersByName.put(client.getUsername(), client);
+        for (Customer customer : CUSTOMER_DAO.findAll()) {
+            usersById.put(customer.getId(), customer);
+            usersByName.put(customer.getUsername(), customer);
         }
     }
 
