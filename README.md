@@ -1,7 +1,7 @@
 [licenseImg]: https://img.shields.io/badge/License-MIT-important
-[license]: https://github.com/Chiarchiaooo/CommandBlocker/blob/master/LICENSE
+[license]: https://github.com/lcavagnari/CommandBlocker/blob/master/LICENSE
 [releaseImg]: https://img.shields.io/badge/Version-1.0-blue
-[release]: https://github.com/Chiarchiaooo/TheKnifeProject/releases/latest
+[release]: https://github.com/lcavagnari/TheKnifeProject/releases/latest
 
 # 🔪 The Knife
 ---
@@ -69,7 +69,7 @@ L'applicazione prevede un'interfaccia a linea di comando (CLI) per l'interazione
 
 ### 💿 Metodo automatico
 
-1. Ottenere il jar dai [Releases](https://github.com/Chiarchiaooo/TheKnifeProject/releases/latest)
+1. Ottenere il jar dai [Releases](https://github.com/lcavagnari/TheKnifeProject/releases/latest)
 <br>
 <br>
 2. Eseguire l'applicazione:
@@ -85,7 +85,7 @@ java -jar TheKnifeProject-1.0.jar
 1. Clonare la repository:
 
 ```bash  
-git clone https://github.com/Chiarchiaooo/TheKnifeProject.git
+git clone https://github.com/lcavagnari/TheKnifeProject.git
 cd TheKnifeProject  
 ````  
 
