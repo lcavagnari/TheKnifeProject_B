@@ -1,12 +1,13 @@
-package it.uninsubria.laboratoriob.ui;
+package it.uninsubria.laboratoriob.ui.menus;
 
 import it.uninsubria.laboratoriob.Validators;
+import it.uninsubria.laboratoriob.data.CustomerDAO;
+import it.uninsubria.laboratoriob.data.OwnerDAO;
 import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.objects.Client;
-import it.uninsubria.laboratoriob.objects.Location;
-import it.uninsubria.laboratoriob.objects.Owner;
-import it.uninsubria.laboratoriob.objects.User;
+import it.uninsubria.laboratoriob.objects.*;
+import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.utils.Loader;
+import it.uninsubria.laboratoriob.utils.PasswordHasher;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
  * Classe di utility per la gestione del login e della registrazione utenti.
  * <p>
  * Fornisce metodi statici per facilitare le operazioni di autenticazione e
- * creazione di utenti nel sistema (clienti o gestori). I metodi interagiscono
+ * creazione di utenti nel sistema (customeri o gestori). I metodi interagiscono
  * con la console tramite {@link IO} e con lo storage in-memory/file tramite {@link Loader}.
  * </p>
  *
@@ -35,14 +36,17 @@ import java.time.LocalDateTime;
  * @version 1.0
  */
 @UtilityClass
-public class Login {
+public class LoginMenu {
+
+    private final CustomerDAO cDao = new CustomerDAO();
+    private final OwnerDAO oDao = new OwnerDAO();
 
     /**
      * Avvia una procedura guidata di registrazione utente.
      * <p>
      * Passi principali:
      * <ol>
-     *   <li>Scelta del tipo utente: gestore ({@link Owner}) o cliente ({@link Client}).</li>
+     *   <li>Scelta del tipo utente: gestore ({@link Owner}) o customere ({@link Customer}).</li>
      *   <li>Raccolta e validazione di username, nome, cognome, location (facoltativa) e data di nascita.</li>
      *   <li>Impostazione e validazione della password.</li>
      *   <li>Creazione dell’istanza {@link User}, salvataggio su {@link Loader} e persistenza via {@link it.uninsubria.laboratoriob.data.UserDAO#save(Object)}.</li>
@@ -139,15 +143,16 @@ public class Login {
 
         try {
             User user = isOwner
-                    ? new Owner(username, password, firstName, lastName, location, dateOfBirth)
-                    : new Client(username, password, firstName, lastName, location, dateOfBirth);
+                    ? new Owner(username, password, PasswordHasher.generateSalt(), firstName, lastName, location, dateOfBirth)
+                    : new Customer(username, password,PasswordHasher.generateSalt(), firstName, lastName, location, dateOfBirth);
 
             if (Validators.validateUser(user))
                 IO.getUserInput("Registrazione completata! Premi Invio per tornare al menu principale.");
 
             Loader.getUsersByName().put(username, user);
             Loader.getUsersById().put(user.getId(), user);
-            // TODO: add persistence
+
+            if(isOwner) oDao.save((Owner) user); else cDao.save((Customer) user);
 
             return user;
 
@@ -182,36 +187,35 @@ public class Login {
         IO.clearScreen();
 
         int attempts = 0;
-        while (true) {
-            if (attempts >= 4) throw new AbortOperationException("Raggiunto limite massimo di tentativi");
+        try {
+            while (attempts >= 4) {
+                if (attempts >= 4) throw new AbortOperationException("Raggiunto limite massimo di tentativi");
 
-            String username = IO.getUserInput("Inserisci il nome utente:");
-            String password = IO.getUserInput("Inserisci la password:");
+                String username = IO.getUserInput("Inserisci il nome utente:");
+                String password = IO.getUserInput("Inserisci la password:");
 
-            try {
                 User user = Loader.getUsersByName().get(username);
                 if (user == null)
-                    throw new IllegalArgumentException("Utente non trovato");
-                /*
-                TODO: Add password checking
-                if (user.verifyPassword(password)) {
+                    IO.printErrorMessage("Utente non trovato");
+
+                if (PasswordHasher.verify(password, user.getPasswordSalt(), user.getPasswordHash())) {
                     IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
                     return user;
+
                 } else {
                     IO.printErrorMessage("Username o password errati.");
                     IO.getUserInput("Premi Invio per riprovare.");
                     attempts++;
                 }
-                */
-
-            } catch (IllegalArgumentException ex) {
-                IO.printErrorMessage(ex.getMessage());
-                attempts++;
-            } catch (AbortOperationException e) {
-                IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? " Reason: " + e.getReason() : ""));
-                return null;
             }
+
+        } catch (IllegalArgumentException ex) {
+            IO.printErrorMessage(ex.getMessage());
+        } catch (AbortOperationException e) {
+            IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? " Reason: " + e.getReason() : ""));
         }
+
+        return null;
     }
 }

@@ -89,7 +89,6 @@ public class OwnerMenus extends Menus {
     protected void viewRestaurantDetails(Restaurant restaurant) {
         while (true) {
             IO.clearScreen();
-            System.out.println(restaurant);
 
             Collection<Review> reviews = restaurant.getReviews().values();
             if (reviews.isEmpty()) {

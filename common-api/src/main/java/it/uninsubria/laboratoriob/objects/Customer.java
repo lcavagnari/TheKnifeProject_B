@@ -70,6 +70,11 @@ public class Customer extends User {
         this.favouriteRestourants = (favouriteRestourants != null) ? favouriteRestourants : new HashSet<>();
     }
 
+    public Customer(String username, String passwordHash, String passwordSalt, String firstName, String lastName, Location location, LocalDate dateOfBirth) {
+        super(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth);
+        this.favouriteRestourants = new HashSet<>();
+    }
+
     /**
      * Aggiunge un ristorante ai preferiti del cliente.
      * <p>

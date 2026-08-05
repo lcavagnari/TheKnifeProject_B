@@ -91,6 +91,10 @@ public class Owner extends User {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
     }
 
+    public Owner(String username, String passwordHash, String passwordSalt, String firstName, String lastName, Location location, LocalDate dateOfBirth) {
+        super(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth);
+    }
+
 
     /**
      * Aggiunge un ristorante alle collezioni dell'owner.
