@@ -125,10 +125,10 @@ public class Restaurant extends Entity {
      * @param reviews          mappa recensioni
      */
     public Restaurant(UUID id, String name, String description, String websiteUrl, Owner owner, String phone,
-            Location location, PriceRange priceRange,
-            boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar,
-            Set<CuisineType> cuisinesTypes,
-            Set<String> services, Map<UUID, Review> reviews) {
+                      Location location, PriceRange priceRange,
+                      boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar,
+                      Set<CuisineType> cuisinesTypes,
+                      Set<String> services, Map<UUID, Review> reviews) {
 
         super(id);
 
@@ -170,10 +170,10 @@ public class Restaurant extends Entity {
      * @param reviews          mappa recensioni
      */
     public Restaurant(String name, String description, String websiteUrl, Owner owner, String phone, Location location,
-            PriceRange priceRange,
-            boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar,
-            Set<CuisineType> cuisinesTypes,
-            Set<String> services, Map<UUID, Review> reviews) {
+                      PriceRange priceRange,
+                      boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar,
+                      Set<CuisineType> cuisinesTypes,
+                      Set<String> services, Map<UUID, Review> reviews) {
 
         this(UUID.randomUUID(), name, description, websiteUrl, owner, phone, location, priceRange, hasDelivery,
                 hasOnlineBooking,
@@ -203,9 +203,9 @@ public class Restaurant extends Entity {
      * @param services         insieme servizi
      */
     public Restaurant(UUID id, String name, String description, String websiteUrl, Owner owner, String phone,
-            Location location, PriceRange priceRange,
-            boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar,
-            Set<CuisineType> cuisinesTypes, Set<String> services) {
+                      Location location, PriceRange priceRange,
+                      boolean hasDelivery, boolean hasOnlineBooking, Award award, boolean greenStar,
+                      Set<CuisineType> cuisinesTypes, Set<String> services) {
 
         this(id, name, description, websiteUrl, owner, phone, location, priceRange, hasDelivery, hasOnlineBooking,
                 award, greenStar, cuisinesTypes, services, new HashMap<>());
@@ -245,7 +245,7 @@ public class Restaurant extends Entity {
      *
      * @param service il servizio da aggiungere (es. "WiFi", "Parking")
      * @return true se il servizio è stato aggiunto con successo, false se
-     *         validazione fallisce o servizio già presente
+     * validazione fallisce o servizio già presente
      */
     public boolean addService(String service) {
         if (!Validators.validateString(service))
@@ -263,7 +263,7 @@ public class Restaurant extends Entity {
      *
      * @param service il servizio da rimuovere
      * @return true se il servizio è stato rimosso con successo, false se
-     *         validazione fallisce o servizio non presente
+     * validazione fallisce o servizio non presente
      */
     public boolean removeService(String service) {
         if (!Validators.validateString(service))
@@ -279,7 +279,7 @@ public class Restaurant extends Entity {
      *
      * @param c il tipo di cucina da aggiungere
      * @return true se il tipo di cucina è stato aggiunto con successo, false se
-     *         nullo o già presente
+     * nullo o già presente
      */
     public boolean addCuisineType(CuisineType c) {
         if (c == null)
@@ -295,7 +295,7 @@ public class Restaurant extends Entity {
      *
      * @param c il tipo di cucina da rimuovere
      * @return true se il tipo di cucina è stato rimosso con successo, false se
-     *         nullo o non presente
+     * nullo o non presente
      */
     public boolean removeCuisineType(CuisineType c) {
         if (c == null)

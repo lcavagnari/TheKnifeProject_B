@@ -4,7 +4,6 @@ import it.uninsubria.laboratoriob.Entity;
 import it.uninsubria.laboratoriob.Validators;
 import lombok.Getter;
 
-import javax.xml.validation.Validator;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -58,7 +57,7 @@ public class Review extends Entity {
      * <p>
      */
     public Review(UUID id, Restaurant restaurant, User user, int value, LocalDateTime timestamp, String text,
-            String reply) {
+                  String reply) {
         super(id);
         this.timestamp = (timestamp != null) ? timestamp : LocalDateTime.now();
         this.restaurant = restaurant;

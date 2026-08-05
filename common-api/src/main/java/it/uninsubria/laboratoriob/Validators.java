@@ -27,7 +27,9 @@ public class Validators {
         return true;
     }
 
-    /** Variante di {@link #validateString(String, String)} con regex predefinita. */
+    /**
+     * Variante di {@link #validateString(String, String)} con regex predefinita.
+     */
     public static boolean validateString(String value) throws IllegalArgumentException {
         return validateString("^[\\p{L}0-9 \\-']{4,200}$", value);
     }
@@ -65,7 +67,9 @@ public class Validators {
         return true;
     }
 
-    /** Variante senza intervallo (qualsiasi data valida). */
+    /**
+     * Variante senza intervallo (qualsiasi data valida).
+     */
     public static boolean validateDates(LocalDateTime date) throws IllegalArgumentException {
         return validateDates(LocalDateTime.MIN, LocalDateTime.MAX, date);
     }

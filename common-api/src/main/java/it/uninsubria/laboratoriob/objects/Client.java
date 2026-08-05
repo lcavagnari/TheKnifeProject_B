@@ -32,23 +32,6 @@ public class Client extends User {
     private final Set<UUID> favouriteRestourants;
 
     /**
-     * Costruttore principale senza salt (UUID generato automaticamente).
-     * <p>
-     *
-     * @param username    nome utente
-     * @param password    password in chiaro
-     * @param name        nome
-     * @param lastName    cognome
-     * @param location    posizione geografica
-     * @param dateOfBirth data di nascita
-     */
-    public Client(String username, String password, String name, String lastName, Location location,
-            LocalDate dateOfBirth) {
-        super(username, password, name, lastName, location, dateOfBirth);
-        this.favouriteRestourants = new HashSet<>();
-    }
-
-    /**
      * Costruttore con password hashata e salt (UUID esistente, es. da database).
      * <p>
      *
@@ -62,7 +45,7 @@ public class Client extends User {
      * @param dateOfBirth data di nascita
      */
     public Client(UUID id, String username, String password, String salt, String name, String lastName,
-            Location location, LocalDate dateOfBirth) {
+                  Location location, LocalDate dateOfBirth) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
         this.favouriteRestourants = new HashSet<>();
     }
@@ -82,7 +65,7 @@ public class Client extends User {
      * @param favouriteRestourants insieme di UUID dei ristoranti preferiti
      */
     public Client(UUID id, String username, String password, String salt, String name, String lastName,
-            Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants) {
+                  Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
         this.favouriteRestourants = (favouriteRestourants != null) ? favouriteRestourants : new HashSet<>();
     }

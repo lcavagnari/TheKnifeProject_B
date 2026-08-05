@@ -62,7 +62,7 @@ public class Owner extends User {
      * @param restaurants set di ristoranti da associare all'owner
      */
     public Owner(UUID id, String username, String password, String salt, String name, String lastName,
-            Location location, LocalDate dateOfBirth, Set<Restaurant> restaurants) {
+                 Location location, LocalDate dateOfBirth, Set<Restaurant> restaurants) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
 
         if (restaurants == null || restaurants.isEmpty())
@@ -87,7 +87,7 @@ public class Owner extends User {
      * @param dateOfBirth data di nascita
      */
     public Owner(UUID id, String username, String password, String salt, String name, String lastName,
-            Location location, LocalDate dateOfBirth) {
+                 Location location, LocalDate dateOfBirth) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
     }
 
@@ -103,7 +103,7 @@ public class Owner extends User {
      * @param dateOfBirth data di nascita
      */
     public Owner(String username, String password, String name, String lastName, Location location,
-            LocalDate dateOfBirth) {
+                 LocalDate dateOfBirth) {
         super(username, password, name, lastName, location, dateOfBirth);
     }
 
@@ -113,7 +113,7 @@ public class Owner extends User {
      *
      * @param r il ristorante da aggiungere
      * @return true se il ristorante è stato aggiunto con successo, false se nullo o
-     *         già presente
+     * già presente
      */
     public boolean addRestaurant(Restaurant r) {
         if (r == null || restaurantsById.containsKey(r.getId()))
@@ -129,7 +129,7 @@ public class Owner extends User {
      *
      * @param r il ristorante da rimuovere
      * @return true se il ristorante è stato rimosso con successo, false se nullo o
-     *         non presente
+     * non presente
      */
     public boolean removeRestaurant(Restaurant r) {
         if (r == null || !restaurantsById.containsKey(r.getId()))
@@ -148,7 +148,7 @@ public class Owner extends User {
      * @param id      identificatore del ristorante da rinominare
      * @param newName nuovo nome da assegnare
      * @return true se la rinomina è avvenuta con successo, false se validazione
-     *         fallisce o ristorante non trovato
+     * fallisce o ristorante non trovato
      */
     public boolean renameRestaurant(UUID id, String newName) {
         if (id == null || newName == null || newName.isBlank() || !newName.matches("[\\p{L}0-9 \\-']{4,30}$")
@@ -174,7 +174,7 @@ public class Owner extends User {
      * @param r              il ristorante da modificare
      * @param newDescription nuova descrizione
      * @return true se la modifica è avvenuta con successo, false se ristorante
-     *         nullo o non posseduto
+     * nullo o non posseduto
      */
     public boolean modifyRestaurantDescription(Restaurant r, String newDescription) {
         if (r == null || newDescription == null || !restaurantsById.containsKey(r.getId()))
@@ -192,7 +192,7 @@ public class Owner extends User {
      * @param r             il ristorante da modificare
      * @param newWebsiteUrl nuovo URL del sito web
      * @return true se la modifica è avvenuta con successo, false se ristorante
-     *         nullo o non posseduto
+     * nullo o non posseduto
      */
     public boolean modifyRestaurantWebsite(Restaurant r, String newWebsiteUrl) {
         if (r == null || newWebsiteUrl == null || !restaurantsById.containsKey(r.getId()))
@@ -210,7 +210,7 @@ public class Owner extends User {
      * @param r        il ristorante da modificare
      * @param newPhone nuovo numero di telefono
      * @return true se la modifica è avvenuta con successo, false se ristorante
-     *         nullo o non posseduto
+     * nullo o non posseduto
      */
     public boolean modifyRestaurantPhone(Restaurant r, String newPhone) {
         if (r == null || newPhone == null || !restaurantsById.containsKey(r.getId()))
@@ -228,7 +228,7 @@ public class Owner extends User {
      * @param r           il ristorante da modificare
      * @param newLocation nuova posizione geografica
      * @return true se la modifica è avvenuta con successo, false se ristorante o
-     *         location nulli o ristorante non posseduto
+     * location nulli o ristorante non posseduto
      */
     public boolean modifyRestaurantLocation(Restaurant r, Location newLocation) {
         if (r == null || newLocation == null || !restaurantsById.containsKey(r.getId()))
@@ -246,7 +246,7 @@ public class Owner extends User {
      * @param r             il ristorante da modificare
      * @param newPriceRange nuova fascia di prezzo
      * @return true se la modifica è avvenuta con successo, false se ristorante
-     *         nullo o non posseduto
+     * nullo o non posseduto
      */
     public boolean modifyRestaurantPriceRange(Restaurant r, PriceRange newPriceRange) {
         if (r == null || !restaurantsById.containsKey(r.getId()))
@@ -264,7 +264,7 @@ public class Owner extends User {
      * @param r        il ristorante da modificare
      * @param newAward nuovo premio da assegnare
      * @return true se la modifica è avvenuta con successo, false se ristorante o
-     *         award nulli o ristorante non posseduto
+     * award nulli o ristorante non posseduto
      */
     public boolean modifyRestaurantAward(Restaurant r, Award newAward) {
         if (r == null || newAward == null || !restaurantsById.containsKey(r.getId()))
@@ -282,7 +282,7 @@ public class Owner extends User {
      * @param r         il ristorante da modificare
      * @param greenStar true se il ristorante ha la Stella Verde, false altrimenti
      * @return true se la modifica è avvenuta con successo, false se ristorante
-     *         nullo o non posseduto
+     * nullo o non posseduto
      */
     public boolean modifyRestaurantGreenStar(Restaurant r, boolean greenStar) {
         if (r == null || !restaurantsById.containsKey(r.getId()))
@@ -300,7 +300,7 @@ public class Owner extends User {
      * @param r           il ristorante da modificare
      * @param hasDelivery true se il ristorante offre consegna, false altrimenti
      * @return true se la modifica è avvenuta con successo, false se ristorante
-     *         nullo o non posseduto
+     * nullo o non posseduto
      */
     public boolean modifyRestaurantHasDelivery(Restaurant r, boolean hasDelivery) {
         if (r == null || !restaurantsById.containsKey(r.getId()))
@@ -318,7 +318,7 @@ public class Owner extends User {
      * @param hasBooking true se il ristorante offre prenotazioni online, false
      *                   altrimenti
      * @return true se la modifica è avvenuta con successo, false se ristorante
-     *         nullo o non posseduto
+     * nullo o non posseduto
      */
     public boolean modifyRestaurantHasBooking(Restaurant r, boolean hasBooking) {
         if (r == null || !restaurantsById.containsKey(r.getId()))
@@ -335,7 +335,7 @@ public class Owner extends User {
      *
      * @param r il ristorante di cui mostrare i dettagli
      * @return rappresentazione testuale del ristorante, null se ristorante nullo o
-     *         non posseduto
+     * non posseduto
      */
     public String showRestaurantDetails(Restaurant r) {
         if (r == null || !restaurantsById.containsKey(r.getId()))
