@@ -23,7 +23,7 @@ import java.util.UUID;
  * @author Luca Cavagnari
  * @version 2.0
  */
-public class Client extends User {
+public class Customer extends User {
 
     /**
      * Insieme degli ID dei ristoranti preferiti dal cliente.
@@ -44,8 +44,8 @@ public class Client extends User {
      * @param location    posizione geografica
      * @param dateOfBirth data di nascita
      */
-    public Client(UUID id, String username, String password, String salt, String name, String lastName,
-                  Location location, LocalDate dateOfBirth) {
+    public Customer(UUID id, String username, String password, String salt, String name, String lastName,
+                    Location location, LocalDate dateOfBirth) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
         this.favouriteRestourants = new HashSet<>();
     }
@@ -64,8 +64,8 @@ public class Client extends User {
      * @param dateOfBirth          data di nascita
      * @param favouriteRestourants insieme di UUID dei ristoranti preferiti
      */
-    public Client(UUID id, String username, String password, String salt, String name, String lastName,
-                  Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants) {
+    public Customer(UUID id, String username, String password, String salt, String name, String lastName,
+                    Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
         this.favouriteRestourants = (favouriteRestourants != null) ? favouriteRestourants : new HashSet<>();
     }

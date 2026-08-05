@@ -4,7 +4,6 @@ import it.uninsubria.laboratoriob.enums.UserRole;
 import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.objects.*;
 import it.uninsubria.laboratoriob.ui.IO;
-import it.uninsubria.laboratoriob.ui.Login;
 import it.uninsubria.laboratoriob.ui.Menus;
 
 import java.util.Comparator;
@@ -43,9 +42,9 @@ public class GuestMenus extends Menus {
             switch (choice) {
                 case 1 -> {
                     try {
-                        User user = Login.login();
+                        User user = LoginMenu.login();
                         if (user != null) {
-                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new UserMenus((Client) user);
+                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new CustomerMenus((Customer) user);
                             menus.openMenu();
                         }
                     } catch (AbortOperationException e) {
@@ -54,9 +53,9 @@ public class GuestMenus extends Menus {
                 }
                 case 2 -> {
                     try {
-                        User user = Login.register();
+                        User user = LoginMenu.register();
                         if (user != null) {
-                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new UserMenus((Client) user);
+                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new CustomerMenus((Customer) user);
                             menus.openMenu();
                         }
                     } catch (AbortOperationException e) {
@@ -72,7 +71,7 @@ public class GuestMenus extends Menus {
 
 
     /**
-     * Mostra i dettagli di un ristorante a un utente {@link Client},
+     * Mostra i dettagli di un ristorante a un utente {@link Customer},
      * permettendo di visualizzare, creare o modificare recensioni.
      *
      * @param restaurant ristorante da visualizzare

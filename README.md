@@ -25,7 +25,7 @@
     - 🆕 [Registrazione](#-registrazione)
     - 🔎 [Ricerca Ristorante](#-esplora-ristoranti)
     - 👻 [Guest](#-guest-utenti-anonimi)
-    - 🍽️ [Cliente](#-client-cliente)
+    - 🍽️ [Cliente](#-customer-cliente)
     - 🧑‍🍳 [Proprietario](#-owner-proprietario)
     - 🚪 [Esci](#-esci)
     - 🛑 [Errori Comuni](#-errori-comuni-nessun-problema)
@@ -136,7 +136,7 @@ Tutti gli input sono **guidati**: se sbagli, potrai reinserirli.
 
 ### 🔐 Login
 
-Se hai già un account, scegli `Login`. Inserisci il tuo **nome utente** e **password**.
+Se hai già un account, scegli `LoginMenu`. Inserisci il tuo **nome utente** e **password**.
 Se l’autenticazione fallisce, potrai riprovare o tornare al menu principale.
 
 ---

@@ -3,7 +3,7 @@ package it.uninsubria.laboratoriob.ui.menus;
 
 import it.uninsubria.laboratoriob.Validators;
 import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.objects.Client;
+import it.uninsubria.laboratoriob.objects.Customer;
 import it.uninsubria.laboratoriob.objects.Restaurant;
 import it.uninsubria.laboratoriob.objects.Review;
 import it.uninsubria.laboratoriob.ui.IO;
@@ -13,7 +13,7 @@ import it.uninsubria.laboratoriob.utils.Loader;
 import java.util.*;
 
 /**
- * Classe che gestisce i menu e le operazioni disponibili per gli utenti di tipo {@link Client}.<p>
+ * Classe che gestisce i menu e le operazioni disponibili per gli utenti di tipo {@link Customer}.<p>
  * Estende {@link Menus} fornendo funzionalità specifiche per i clienti.<p>
  * Permette di cercare ristoranti, visualizzare preferiti, creare e gestire recensioni.<p>
  * <p>
@@ -21,23 +21,23 @@ import java.util.*;
  *
  * @version 1.0
  */
-public class UserMenus extends Menus {
+public class CustomerMenus extends Menus {
 
     /**
      * Riferimento al client correntemente autenticato.<p>
      * Utilizzato per accedere ai ristoranti preferiti e alle recensioni personali.
      */
-    private final Client client;
+    private final Customer customer;
 
     /**
      * Costruttore che inizializza il menu per un client specifico.<p>
      * Invoca il costruttore della superclasse passando il client come utente base.
      *
-     * @param client il cliente per cui creare il menu
+     * @param customer il cliente per cui creare il menu
      */
-    public UserMenus(Client client) {
-        super(client);
-        this.client = client;
+    public CustomerMenus(Customer customer) {
+        super(customer);
+        this.customer = customer;
     }
 
     /**
@@ -77,13 +77,13 @@ public class UserMenus extends Menus {
     }
 
     /**
-     * Visualizza i ristoranti preferiti dell'utente {@link Client}.<p>
+     * Visualizza i ristoranti preferiti dell'utente {@link Customer}.<p>
      * Recupera gli UUID dei ristoranti preferiti e li carica dal {@link Loader}.<p>
      * Mostra un menu interattivo per selezionare un ristorante e visualizzarne i dettagli.<p>
      * Se non ci sono preferiti, viene mostrato un messaggio informativo.
      */
     private void viewFavourites() {
-        Set<UUID> favourites = client.getFavouriteRestourants();
+        Set<UUID> favourites = customer.getFavouriteRestourants();
 
         if (favourites == null || favourites.isEmpty()) {
             IO.printErrorMessage("You have no favourite restaurants.");
@@ -113,7 +113,7 @@ public class UserMenus extends Menus {
     }
 
     /**
-     * Mostra i dettagli di un ristorante a un utente {@link Client}.<p>
+     * Mostra i dettagli di un ristorante a un utente {@link Customer}.<p>
      * Visualizza le informazioni complete del ristorante, incluse le recensioni migliori e peggiori.<p>
      * Permette al client di:<p>
      * - Creare una nuova recensione se non ne ha ancora scritta una<p>
@@ -148,9 +148,9 @@ public class UserMenus extends Menus {
             }
 
             Review usersReview = null;
-            if (client != null && reviews != null && reviews.get(client.getId()) != null) {
+            if (customer != null && reviews != null && reviews.get(customer.getId()) != null) {
                 System.out.println("┌─────────────── La Tua Recensione ────────────────┐\n");
-                usersReview = reviews.get(client.getId());
+                usersReview = reviews.get(customer.getId());
                 System.out.println();
             }
 
@@ -180,7 +180,7 @@ public class UserMenus extends Menus {
                             int value = IO.getInt("Che voto daresti al Ristorante '" + restaurant.getName() + "' ? [1-5]");
                             String text = IO.getUserInput("Raccontaci della tua esperienza [4-200 caratteri]:");
 
-                            Review review = new Review(restaurant, client, value, text);
+                            Review review = new Review(restaurant, customer, value, text);
                             break;
                         }
 

@@ -4,10 +4,7 @@ import it.uninsubria.laboratoriob.enums.Award;
 import it.uninsubria.laboratoriob.enums.Nation;
 import it.uninsubria.laboratoriob.enums.PriceRange;
 import it.uninsubria.laboratoriob.enums.UserRole;
-import it.uninsubria.laboratoriob.objects.Client;
-import it.uninsubria.laboratoriob.objects.Location;
-import it.uninsubria.laboratoriob.objects.Owner;
-import it.uninsubria.laboratoriob.objects.Restaurant;
+import it.uninsubria.laboratoriob.objects.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,9 +17,9 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DisplayName("Client Tests")
-class ClientTest {
+class CustomerTest {
 
-    private Client client;
+    private Customer customer;
     private Location location;
 
     @BeforeEach
@@ -32,19 +29,19 @@ class ClientTest {
         String salt = Base64.getEncoder().encodeToString(saltBytes);
 
         location = new Location(Nation.ITALY, "Florence", 43.7696, 11.2558, "Piazza della Signoria");
-        client = new Client(UUID.randomUUID(),"johndoe", "securePass123",salt, "JohnName", "DoeLastName", location, LocalDate.of(1995, 8, 25));
+        customer = new Customer(UUID.randomUUID(),"johndoe", "securePass123",salt, "JohnName", "DoeLastName", location, LocalDate.of(1995, 8, 25));
     }
 
     @Test
     @DisplayName("Should create client with valid credentials")
     void testClientCreation() {
-        assertNotNull(client);
-        assertEquals("johndoe", client.getUsername());
-        assertEquals("JohnName", client.getName());
-        assertEquals("DoeLastName", client.getLastName());
-        assertEquals(UserRole.CLIENT, client.getRole());
-        assertNotNull(client.getFavouriteRestourants());
-        assertTrue(client.getFavouriteRestourants().isEmpty());
+        assertNotNull(customer);
+        assertEquals("johndoe", customer.getUsername());
+        assertEquals("JohnName", customer.getName());
+        assertEquals("DoeLastName", customer.getLastName());
+        assertEquals(UserRole.CLIENT, customer.getRole());
+        assertNotNull(customer.getFavouriteRestourants());
+        assertTrue(customer.getFavouriteRestourants().isEmpty());
     }
 
     @Test
@@ -57,14 +54,14 @@ class ClientTest {
                 PriceRange.MODERATE, false, true, Award.NONE, false, null, null
         );
 
-        assertTrue(client.addFavourite(restaurant));
-        assertTrue(client.getFavouriteRestourants().contains(restaurant.getId()));
+        assertTrue(customer.addFavourite(restaurant));
+        assertTrue(customer.getFavouriteRestourants().contains(restaurant.getId()));
     }
 
     @Test
     @DisplayName("Should not add null restaurant to favourites")
     void testAddNullFavourite() {
-        assertFalse(client.addFavourite(null));
+        assertFalse(customer.addFavourite(null));
     }
 
     @Test
@@ -77,8 +74,8 @@ class ClientTest {
                 PriceRange.MODERATE, false, true, Award.NONE, false, null, null
         );
 
-        client.addFavourite(restaurant);
-        assertTrue(client.removeFavourite(restaurant));
-        assertFalse(client.getFavouriteRestourants().contains(restaurant.getId()));
+        customer.addFavourite(restaurant);
+        assertTrue(customer.removeFavourite(restaurant));
+        assertFalse(customer.getFavouriteRestourants().contains(restaurant.getId()));
     }
 }

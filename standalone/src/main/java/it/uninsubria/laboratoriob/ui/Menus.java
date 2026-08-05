@@ -12,7 +12,7 @@ import java.util.Map;
  * Classe astratta di base per i menu testuali dell'applicazione.
  * <p>
  * Ogni menu rappresenta una sezione dell'interfaccia console associata a un utente specifico.
- * Le sottoclassi concrete (ad esempio menu cliente o menu gestore) estendono questa classe
+ * Le sottoclassi concrete (ad esempio menu customere o menu gestore) estendono questa classe
  * e implementano la logica personalizzata di navigazione e visualizzazione.
  * </p>
  *
@@ -125,7 +125,7 @@ public abstract class Menus {
 
     /**
      * Metodo astratto che deve essere implementato dalle sottoclassi per aprire il menu principale
-     * dell'utente corrente (es. menu cliente o menu gestore).
+     * dell'utente corrente (es. menu customere o menu gestore).
      * <p>Può includere cicli di navigazione e chiamate ad altri sottomenu.</p>
      */
     public abstract void openMenu();
