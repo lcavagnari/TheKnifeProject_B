@@ -23,7 +23,7 @@ public class TheKnife {
 
         IO.printSuccessMessage("Loading The Knife...");
 
-        Loader.loadFromFile();
+        Loader.initialiseMaps();
         new GuestMenus().openMenu();
     }
 }

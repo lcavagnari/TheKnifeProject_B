@@ -38,8 +38,8 @@ import java.time.LocalDateTime;
 @UtilityClass
 public class LoginMenu {
 
-    private final CustomerDAO cDao = new CustomerDAO();
-    private final OwnerDAO oDao = new OwnerDAO();
+    private static final CustomerDAO CUSTOMER_DAO = new CustomerDAO();
+    private static final OwnerDAO OWNER_DAO = new OwnerDAO();
 
     /**
      * Avvia una procedura guidata di registrazione utente.
@@ -152,7 +152,7 @@ public class LoginMenu {
             Loader.getUsersByName().put(username, user);
             Loader.getUsersById().put(user.getId(), user);
 
-            if(isOwner) oDao.save((Owner) user); else cDao.save((Customer) user);
+            if(isOwner) OWNER_DAO.save((Owner) user); else CUSTOMER_DAO.save((Customer) user);
 
             return user;
 

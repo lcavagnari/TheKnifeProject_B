@@ -5,7 +5,7 @@ public class LoadTest {
 
         long timestamp = System.currentTimeMillis();
 
-        Loader.loadFromFile();
+        Loader.initialiseMaps();
 
         System.out.println(System.currentTimeMillis() - timestamp);
     }
