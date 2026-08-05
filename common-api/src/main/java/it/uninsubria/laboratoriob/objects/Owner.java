@@ -91,21 +91,6 @@ public class Owner extends User {
         super(id, username, password, salt, name, lastName, location, dateOfBirth);
     }
 
-    /**
-     * Costruttore semplificato per nuovo owner (UUID generato automaticamente).
-     * <p>
-     *
-     * @param username    nome utente per il login
-     * @param password    password in chiaro (verrà hashata)
-     * @param name        nome del proprietario
-     * @param lastName    cognome del proprietario
-     * @param location    posizione geografica
-     * @param dateOfBirth data di nascita
-     */
-    public Owner(String username, String password, String name, String lastName, Location location,
-                 LocalDate dateOfBirth) {
-        super(username, password, name, lastName, location, dateOfBirth);
-    }
 
     /**
      * Aggiunge un ristorante alle collezioni dell'owner.

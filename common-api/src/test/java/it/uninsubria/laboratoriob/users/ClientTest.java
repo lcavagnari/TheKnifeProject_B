@@ -12,7 +12,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,8 +27,12 @@ class ClientTest {
 
     @BeforeEach
     void setUp() {
+        byte[] saltBytes = new byte[16];
+        new SecureRandom().nextBytes(saltBytes);
+        String salt = Base64.getEncoder().encodeToString(saltBytes);
+
         location = new Location(Nation.ITALY, "Florence", 43.7696, 11.2558, "Piazza della Signoria");
-        client = new Client("johndoe", "securePass123", "JohnName", "DoeLastName", location, LocalDate.of(1995, 8, 25));
+        client = new Client(UUID.randomUUID(),"johndoe", "securePass123",salt, "JohnName", "DoeLastName", location, LocalDate.of(1995, 8, 25));
     }
 
     @Test

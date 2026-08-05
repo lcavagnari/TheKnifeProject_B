@@ -11,7 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -24,8 +26,12 @@ class OwnerTest {
 
     @BeforeEach
     void setUp() {
+        byte[] saltBytes = new byte[16];
+        new SecureRandom().nextBytes(saltBytes);
+        String salt = Base64.getEncoder().encodeToString(saltBytes);
+
         location = new Location(Nation.ITALY, "Venice", 45.4408, 12.3155, "Piazza San Marco");
-        owner = new Owner("restaurateur", "securePass123", "Giuseppe", "Bianchi", location, LocalDate.of(1970, 4, 12));
+        owner = new Owner(UUID.randomUUID(),"restaurateur", "securePass123",salt, "Giuseppe", "Bianchi", location, LocalDate.of(1970, 4, 12));
     }
 
     @Test
