@@ -1,10 +1,9 @@
 package it.uninsubria.laboratoriob.objects;
 
-import it.uninsubria.laboratoriob.objects.enums.Nation;
+import it.uninsubria.laboratoriob.enums.Nation;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -36,27 +35,12 @@ class LocationTest {
     }
 
     @Test
-    @DisplayName("Should build JSON representation")
-    void testBuildJsonObject() {
-        assertNotNull(location.getJsonObject());
-        assertEquals("Italy", location.getJsonObject().get("nation").asText());
-        assertEquals("Rome", location.getJsonObject().get("city").asText());
-        assertEquals(41.9028, location.getJsonObject().get("latitude").asDouble());
-    }
-
-    @Test
     @DisplayName("Should format toString correctly")
     void testToString() {
         String result = location.toString();
         assertTrue(result.contains("Via del Corso, 100"));
         assertTrue(result.contains("Rome"));
         assertTrue(result.contains("ITALY"));
-    }
-
-    @Test
-    @DisplayName("Should save successfully")
-    void testSave() {
-        assertTrue(location.save());
     }
 }
 

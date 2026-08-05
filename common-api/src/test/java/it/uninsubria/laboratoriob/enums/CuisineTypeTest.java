@@ -1,7 +1,10 @@
-package it.uninsubria.laboratoriob.objects.enums;
+package it.uninsubria.laboratoriob.enums;
 
+import it.uninsubria.laboratoriob.enums.CuisineType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.File;
 import java.io.IOException;

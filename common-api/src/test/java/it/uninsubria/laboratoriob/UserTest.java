@@ -1,6 +1,8 @@
+package it.uninsubria.laboratoriob;
+
+import it.uninsubria.laboratoriob.enums.Nation;
+import it.uninsubria.laboratoriob.objects.Client;
 import it.uninsubria.laboratoriob.objects.Location;
-import it.uninsubria.laboratoriob.objects.enums.Nation;
-import it.uninsubria.laboratoriob.objects.users.Client;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;
@@ -44,9 +46,5 @@ public class UserTest {
 
         Client c = new Client("111", "kibafo33", "name", "last", generateRandomLocation(), LocalDate.now());
         System.out.println(c);
-
-        //c.addFavourite(new Restaurant());
-
-        c.save();
     }
 }

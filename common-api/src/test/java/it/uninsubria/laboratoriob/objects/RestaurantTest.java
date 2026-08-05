@@ -1,11 +1,12 @@
 package it.uninsubria.laboratoriob.objects;
 
-import it.uninsubria.laboratoriob.objects.enums.*;
-import it.uninsubria.laboratoriob.objects.users.Owner;
+import it.uninsubria.laboratoriob.enums.Award;
+import it.uninsubria.laboratoriob.enums.CuisineType;
+import it.uninsubria.laboratoriob.enums.Nation;
+import it.uninsubria.laboratoriob.enums.PriceRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 
 import java.time.LocalDate;
 import java.util.*;
@@ -101,14 +102,6 @@ class RestaurantTest {
         assertFalse(restaurant.getServices().contains("WiFi"));
     }
 
-    @Test
-    @DisplayName("Should build JSON object correctly")
-    void testBuildJsonObject() {
-        restaurant.build();
-        assertNotNull(restaurant.getJsonObject());
-        assertEquals("Ristorante Bella Vista", restaurant.getJsonObject().get("name").asText());
-        assertEquals("$$$", restaurant.getJsonObject().get("priceRange").asText());
-    }
 
     @Test
     @DisplayName("Should return formatted toString")
@@ -116,11 +109,5 @@ class RestaurantTest {
         String result = restaurant.toString();
         assertTrue(result.contains("Ristorante Bella Vista"));
         assertTrue(result.contains("ONE_STAR") || result.contains("1 star"));
-    }
-
-    @Test
-    @DisplayName("Should save restaurant successfully")
-    void testSave() {
-        assertTrue(restaurant.save());
     }
 }

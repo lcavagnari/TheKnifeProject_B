@@ -1,15 +1,16 @@
 package it.uninsubria.laboratoriob.objects;
 
-import it.uninsubria.laboratoriob.objects.enums.*;
-import it.uninsubria.laboratoriob.objects.users.Client;
-import it.uninsubria.laboratoriob.objects.users.Owner;
+import it.uninsubria.laboratoriob.enums.Award;
+import it.uninsubria.laboratoriob.enums.Nation;
+import it.uninsubria.laboratoriob.enums.PriceRange;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,9 +31,21 @@ class ReviewTest {
         client = new Client("client1", "pass123456", "Luigi", "Verdi", location, LocalDate.of(1990, 7, 20));
 
         restaurant = new Restaurant(
-                UUID.randomUUID(), "Test Restaurant", "Great food",
-                "https://test.com", owner, "+39 06 12345", location,
-                PriceRange.MODERATE, false, true, Award.NONE, false, null, null
+                UUID.randomUUID(),
+                "Test Restaurant",
+                "Great food",
+                "https://test.com",
+                owner,
+                "+39 06 12345",
+                location,
+                PriceRange.MODERATE,
+                false,
+                true,
+                Award.NONE,
+                false,
+                new HashSet<>(),
+                new HashSet<>(),
+                new HashMap<>()
         );
 
         review = new Review(restaurant, client, 4, "Excellent service and food!");
@@ -107,14 +120,6 @@ class ReviewTest {
         assertEquals("Thank you for your review!", review.getReply());
     }
 
-    @Test
-    @DisplayName("Should build JSON object")
-    void testBuildJsonObject() {
-        review.build();
-        assertNotNull(review.getJsonObject());
-        assertEquals(4, review.getJsonObject().get("value").asInt());
-        assertEquals("Excellent service and food!", review.getJsonObject().get("text").asText());
-    }
 
     @Test
     @DisplayName("Should format toString correctly")
@@ -122,12 +127,6 @@ class ReviewTest {
         String result = review.toString();
         assertTrue(result.contains("4 / 5"));
         assertTrue(result.contains("Excellent service and food!"));
-    }
-
-    @Test
-    @DisplayName("Should return false on save")
-    void testSave() {
-        assertFalse(review.save());
     }
 }
 

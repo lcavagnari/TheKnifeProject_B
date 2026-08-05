@@ -1,8 +1,8 @@
-package it.uninsubria.laboratoriob.objects.enums;
+package it.uninsubria.laboratoriob.enums;
 
+import it.uninsubria.laboratoriob.enums.Nation;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Nested;
 
 import static org.junit.jupiter.api.Assertions.*;
 

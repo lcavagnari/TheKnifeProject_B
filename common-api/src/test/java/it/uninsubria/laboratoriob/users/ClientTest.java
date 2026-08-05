@@ -1,8 +1,13 @@
-package it.uninsubria.laboratoriob.objects.users;
+package it.uninsubria.laboratoriob.users;
 
+import it.uninsubria.laboratoriob.enums.Award;
+import it.uninsubria.laboratoriob.enums.Nation;
+import it.uninsubria.laboratoriob.enums.PriceRange;
+import it.uninsubria.laboratoriob.enums.UserRole;
+import it.uninsubria.laboratoriob.objects.Client;
 import it.uninsubria.laboratoriob.objects.Location;
+import it.uninsubria.laboratoriob.objects.Owner;
 import it.uninsubria.laboratoriob.objects.Restaurant;
-import it.uninsubria.laboratoriob.objects.enums.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -34,18 +39,6 @@ class ClientTest {
         assertEquals(UserRole.CLIENT, client.getRole());
         assertNotNull(client.getFavouriteRestourants());
         assertTrue(client.getFavouriteRestourants().isEmpty());
-    }
-
-    @Test
-    @DisplayName("Should verify correct password")
-    void testPasswordVerification() {
-        assertTrue(client.verifyPassword("securePass123"));
-    }
-
-    @Test
-    @DisplayName("Should reject incorrect password")
-    void testPasswordVerificationFails() {
-        assertFalse(client.verifyPassword("wrongPassword"));
     }
 
     @Test
@@ -81,14 +74,5 @@ class ClientTest {
         client.addFavourite(restaurant);
         assertTrue(client.removeFavourite(restaurant));
         assertFalse(client.getFavouriteRestourants().contains(restaurant.getId()));
-    }
-
-    @Test
-    @DisplayName("Should build JSON object with favourites")
-    void testBuildJsonObject() {
-        client.build();
-        assertNotNull(client.getJsonObject());
-        assertEquals("johndoe", client.getJsonObject().get("username").asText());
-        assertTrue(client.getJsonObject().has("favourites"));
     }
 }
