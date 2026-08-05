@@ -4,8 +4,8 @@ import it.uninsubria.laboratoriob.enums.Award;
 import it.uninsubria.laboratoriob.enums.Nation;
 import it.uninsubria.laboratoriob.enums.PriceRange;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,13 +21,11 @@ class ReviewTest {
     private Review review;
     private Restaurant restaurant;
     private Client client;
-    private Owner owner;
-    private Location location;
 
     @BeforeEach
     void setUp() {
-        location = new Location(Nation.ITALY, "Rome", 41.9028, 12.4964, "Via Roma 1");
-        owner = new Owner("owner1", "pass123456", "Mario", "Rossi", location, LocalDate.of(1975, 3, 10));
+        Location location = new Location(Nation.ITALY, "Rome", 41.9028, 12.4964, "Via Roma 1");
+        Owner owner = new Owner("owner1", "pass123456", "Mario", "Rossi", location, LocalDate.of(1975, 3, 10));
         client = new Client("client1", "pass123456", "Luigi", "Verdi", location, LocalDate.of(1990, 7, 20));
 
         restaurant = new Restaurant(

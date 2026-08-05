@@ -41,7 +41,7 @@ public class UserTest {
     }
 
 
-    public static void main(String[] args) {
+    static void main() {
         System.out.println("dddd");
 
         Client c = new Client("111", "kibafo33", "name", "last", generateRandomLocation(), LocalDate.now());

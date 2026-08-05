@@ -1,10 +1,10 @@
 package it.uninsubria.laboratoriob.enums;
 
-import it.uninsubria.laboratoriob.enums.Nation;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DisplayName("Nation Enum Tests")
 class NationTest {

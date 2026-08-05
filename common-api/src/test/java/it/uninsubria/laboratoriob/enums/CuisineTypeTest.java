@@ -1,6 +1,5 @@
 package it.uninsubria.laboratoriob.enums;
 
-import it.uninsubria.laboratoriob.enums.CuisineType;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -16,6 +15,13 @@ import static org.junit.jupiter.api.Assertions.*;
 @DisplayName("CuisineType Enum Tests")
 class CuisineTypeTest {
 
+    static Stream<String> readCuisinesFromFile() throws IOException {
+        return new Scanner(new File("src/test", "cuisines.txt"))
+                .useDelimiter("\n")
+                .tokens()
+                .map(String::trim);
+    }
+
     @Test
     @DisplayName("Should convert to lowercase string")
     void testToString() {
@@ -26,21 +32,12 @@ class CuisineTypeTest {
         );
     }
 
-
     @ParameterizedTest
     @MethodSource("readCuisinesFromFile")
     @DisplayName("Should validate cuisine type from file")
     void testCuisineFromFile(String cuisine) {
         assertNotNull(CuisineType.valueOf(cuisine.toUpperCase()));
     }
-
-    static Stream<String> readCuisinesFromFile() throws IOException {
-        return new Scanner(new File("src/test", "cuisines.txt"))
-                .useDelimiter("\n")
-                .tokens()
-                .map(String::trim);
-    }
-
 
     @Test
     @DisplayName("Should have all major cuisine types")

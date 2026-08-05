@@ -8,8 +8,8 @@ import it.uninsubria.laboratoriob.objects.Location;
 import it.uninsubria.laboratoriob.objects.Owner;
 import it.uninsubria.laboratoriob.objects.Restaurant;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
 import java.util.UUID;

@@ -2,8 +2,8 @@ package it.uninsubria.laboratoriob.objects;
 
 import it.uninsubria.laboratoriob.enums.Nation;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
