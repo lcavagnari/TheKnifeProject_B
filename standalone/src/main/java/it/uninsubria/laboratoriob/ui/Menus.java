@@ -1,9 +1,9 @@
 package it.uninsubria.laboratoriob.ui;
 
 import it.uninsubria.laboratoriob.Validators;
+import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.objects.Restaurant;
 import it.uninsubria.laboratoriob.objects.User;
-import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.utils.Loader;
 
 import java.util.Map;
@@ -31,7 +31,9 @@ import java.util.Map;
  */
 public abstract class Menus {
 
-    /** Utente attualmente autenticato che utilizza il menu. */
+    /**
+     * Utente attualmente autenticato che utilizza il menu.
+     */
     protected final User user;
 
     /**

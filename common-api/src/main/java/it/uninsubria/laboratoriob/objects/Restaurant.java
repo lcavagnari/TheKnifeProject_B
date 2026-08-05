@@ -2,6 +2,7 @@ package it.uninsubria.laboratoriob.objects;
 
 
 import it.uninsubria.laboratoriob.Entity;
+import it.uninsubria.laboratoriob.Validators;
 import it.uninsubria.laboratoriob.enums.Award;
 import it.uninsubria.laboratoriob.enums.CuisineType;
 import it.uninsubria.laboratoriob.enums.PriceRange;
@@ -217,10 +218,10 @@ public class Restaurant extends Entity {
      * @param r recensione da aggiungere
      */
     public void addReview(Review r) {
-        if (!IO.validateReview(r) || reviews.containsKey(r.id))
+        if (!Validators.validateReview(r) || reviews.containsKey(r.getId()))
             return;
 
-        reviews.put(r.id, r);
+        reviews.put(r.getId(), r);
     }
 
     /**
@@ -230,15 +231,15 @@ public class Restaurant extends Entity {
      * @param r recensione da rimuovere
      */
     public void removeReview(Review r) {
-        if (!IO.validateReview(r) || !reviews.containsValue(r))
+        if (!Validators.validateReview(r) || !reviews.containsValue(r))
             return;
-        reviews.remove(r.id);
+        reviews.remove(r.getId());
     }
 
     /**
      * Aggiunge un servizio alla collezione dei servizi offerti dal ristorante.
      * <p>
-     * Il servizio viene validato tramite {@link IO#validateString(String)} prima
+     * Il servizio viene validato tramite {@link Validators#validateString(String)} prima
      * dell'inserimento.
      * <p>
      *
@@ -247,7 +248,7 @@ public class Restaurant extends Entity {
      *         validazione fallisce o servizio già presente
      */
     public boolean addService(String service) {
-        if (!IO.validateString(service))
+        if (!Validators.validateString(service))
             return false;
 
         return services.add(service);
@@ -256,7 +257,7 @@ public class Restaurant extends Entity {
     /**
      * Rimuove un servizio dalla collezione dei servizi offerti dal ristorante.
      * <p>
-     * Il servizio viene validato tramite {@link IO#validateString(String)} prima
+     * Il servizio viene validato tramite {@link Validators#validateString(String)} prima
      * della rimozione.
      * <p>
      *
@@ -265,7 +266,7 @@ public class Restaurant extends Entity {
      *         validazione fallisce o servizio non presente
      */
     public boolean removeService(String service) {
-        if (!IO.validateString(service))
+        if (!Validators.validateString(service))
             return false;
 
         return services.remove(service);

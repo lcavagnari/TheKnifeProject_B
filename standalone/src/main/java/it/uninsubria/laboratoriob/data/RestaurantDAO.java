@@ -77,8 +77,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
         // restaurant
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 UUID restaurantId = UUID.fromString(rs.getString("PLACEHOLDER"));
                 UUID locationId = rs.getString("PLACEHOLDER") != null ? UUID.fromString(rs.getString("PLACEHOLDER"))
@@ -120,7 +120,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         // restaurant WHERE owner_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, ownerId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -163,7 +163,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         // SELECT cuisine_type FROM restaurant_cuisines WHERE restaurant_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, restaurantId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -184,7 +184,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         // SELECT service_name FROM restaurant_services WHERE restaurant_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, restaurantId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -204,7 +204,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         // green_star) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, restaurant.getId().toString());
             stmt.setString(2, restaurant.getName());
             stmt.setString(3, restaurant.getDescription());
@@ -239,7 +239,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         // DELETE FROM restaurant WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

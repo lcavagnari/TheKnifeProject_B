@@ -76,7 +76,7 @@ public class CsvParser {
                 .replaceAll("[\\s\\-]", "_")
                 .toUpperCase();
 
-        return new String[] { city, nation, address };
+        return new String[]{city, nation, address};
     }
 
     private static Location createLocation(String[] locData, String[] fields) {

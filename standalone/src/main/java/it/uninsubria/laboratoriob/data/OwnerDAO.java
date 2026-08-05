@@ -61,7 +61,7 @@ public class OwnerDAO implements UserDAO<Owner> {
         // date_of_birth FROM owner WHERE username = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -97,8 +97,8 @@ public class OwnerDAO implements UserDAO<Owner> {
         // date_of_birth FROM owner
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 UUID id = UUID.fromString(rs.getString("PLACEHOLDER"));
                 UUID locationId = rs.getString("PLACEHOLDER") != null ? UUID.fromString(rs.getString("PLACEHOLDER"))
@@ -130,7 +130,7 @@ public class OwnerDAO implements UserDAO<Owner> {
         // location_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, owner.getId().toString());
             stmt.setString(2, owner.getUsername());
             stmt.setString(3, owner.getPasswordHash());
@@ -161,7 +161,7 @@ public class OwnerDAO implements UserDAO<Owner> {
         // DELETE FROM owner WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

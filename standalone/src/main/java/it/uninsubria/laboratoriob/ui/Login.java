@@ -1,11 +1,11 @@
 package it.uninsubria.laboratoriob.ui;
 
 import it.uninsubria.laboratoriob.Validators;
+import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.objects.Client;
 import it.uninsubria.laboratoriob.objects.Location;
 import it.uninsubria.laboratoriob.objects.Owner;
 import it.uninsubria.laboratoriob.objects.User;
-import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.utils.Loader;
 import lombok.experimental.UtilityClass;
 
@@ -54,10 +54,9 @@ public class Login {
      * in vari passaggi usando il comando previsto da {@link AbortOperationException#getCANCEL_COMMAND()}.
      *
      * @return l’utente creato e registrato; {@code null} se l’operazione viene annullata o fallisce la validazione
-     *
-     * @throws AbortOperationException se l’utente richiede esplicitamente l’annullamento in uno dei prompt obbligatori
-     *                                 (l’eccezione può essere intercettata internamente e tradotta in {@code null}
-     *                                 in base al punto della procedura)
+     * @throws AbortOperationException  se l’utente richiede esplicitamente l’annullamento in uno dei prompt obbligatori
+     *                                  (l’eccezione può essere intercettata internamente e tradotta in {@code null}
+     *                                  in base al punto della procedura)
      * @throws IllegalArgumentException se alcuni campi non rispettano i vincoli di validazione
      *                                  (può essere intercettata e trasformata in ri-prompt; in caso di errore finale
      *                                  viene mostrato un messaggio e restituito {@code null})
@@ -175,8 +174,7 @@ public class Login {
      * </ol>
      *
      * @return l’utente autenticato; {@code null} se l’operazione viene annullata dall’utente durante i prompt
-     *
-     * @throws AbortOperationException se viene superato il numero massimo di tentativi (4)
+     * @throws AbortOperationException  se viene superato il numero massimo di tentativi (4)
      * @throws IllegalArgumentException se l’username non esiste o altri controlli falliscono
      *                                  (l’eccezione è gestita internamente per riprovare, ma può emergere in casi non previsti)
      */

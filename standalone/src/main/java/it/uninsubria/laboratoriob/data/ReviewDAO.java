@@ -63,8 +63,8 @@ public class ReviewDAO implements DAO<Review> {
         // review
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 UUID restaurantId = UUID.fromString(rs.getString("PLACEHOLDER"));
                 UUID clientId = UUID.fromString(rs.getString("PLACEHOLDER"));
@@ -95,7 +95,7 @@ public class ReviewDAO implements DAO<Review> {
         // review WHERE restaurant_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, restaurantId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -129,7 +129,7 @@ public class ReviewDAO implements DAO<Review> {
         // reply) VALUES (?, ?, ?, ?, ?, ?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, review.getId().toString());
             stmt.setString(2, review.getRestaurant() != null ? review.getRestaurant().getId().toString() : null);
             stmt.setString(3, review.getUser() != null ? review.getUser().getId().toString() : null);
@@ -154,7 +154,7 @@ public class ReviewDAO implements DAO<Review> {
         // DELETE FROM review WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

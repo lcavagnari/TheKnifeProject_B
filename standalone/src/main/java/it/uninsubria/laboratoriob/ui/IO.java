@@ -2,9 +2,8 @@ package it.uninsubria.laboratoriob.ui;
 
 import it.uninsubria.laboratoriob.Validators;
 import it.uninsubria.laboratoriob.enums.Nation;
-import it.uninsubria.laboratoriob.objects.Location;
-import it.uninsubria.laboratoriob.objects.User;
 import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.objects.Location;
 
 import java.util.*;
 
@@ -19,10 +18,14 @@ import java.util.*;
  */
 public class IO {
 
-    /** Istanza Scanner condivisa per la lettura da tastiera. */
+    /**
+     * Istanza Scanner condivisa per la lettura da tastiera.
+     */
     private static final Scanner INPUT = new Scanner(System.in);
 
-    /** Generatore casuale utilizzato in alcune operazioni di input simulato. */
+    /**
+     * Generatore casuale utilizzato in alcune operazioni di input simulato.
+     */
     private static final Random rd = new Random();
 
     /**
@@ -310,7 +313,6 @@ public class IO {
             return null;
         }
     }
-
 
 
     /**

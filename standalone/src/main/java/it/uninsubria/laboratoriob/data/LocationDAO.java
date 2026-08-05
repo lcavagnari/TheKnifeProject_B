@@ -55,8 +55,8 @@ public class LocationDAO implements DAO<Location> {
         // SELECT id, nation, city, latitude, longitude, address FROM location
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 Location location = new Location(
                         // Column Key Placeholder: id
@@ -85,7 +85,7 @@ public class LocationDAO implements DAO<Location> {
         // (?, ?, ?, ?, ?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, location.getId().toString());
             stmt.setString(2, location.getNation().name());
             stmt.setString(3, location.getCity());
@@ -105,7 +105,7 @@ public class LocationDAO implements DAO<Location> {
         // address = ? WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, location.getNation().name());
             stmt.setString(2, location.getCity());
             stmt.setDouble(3, location.getLatitude());
@@ -124,7 +124,7 @@ public class LocationDAO implements DAO<Location> {
         // DELETE FROM location WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

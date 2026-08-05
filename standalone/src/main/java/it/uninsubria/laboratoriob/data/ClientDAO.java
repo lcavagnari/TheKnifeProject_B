@@ -61,7 +61,7 @@ public class ClientDAO implements UserDAO<Client> {
         // date_of_birth FROM client WHERE username = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -96,8 +96,8 @@ public class ClientDAO implements UserDAO<Client> {
         // date_of_birth FROM client
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(query)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
                 UUID id = UUID.fromString(rs.getString("PLACEHOLDER"));
                 UUID locationId = UUID.fromString(rs.getString("PLACEHOLDER"));
@@ -128,7 +128,7 @@ public class ClientDAO implements UserDAO<Client> {
         // location_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, client.getId().toString());
             stmt.setString(2, client.getUsername());
             stmt.setString(3, client.getPasswordHash());
@@ -171,7 +171,7 @@ public class ClientDAO implements UserDAO<Client> {
         // DELETE FROM client WHERE id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -186,7 +186,7 @@ public class ClientDAO implements UserDAO<Client> {
         // SELECT restaurant_id FROM client_favourite_restaurants WHERE client_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, clientId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
@@ -205,7 +205,7 @@ public class ClientDAO implements UserDAO<Client> {
         // (?, ?)
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, clientId.toString());
             stmt.setString(2, restaurantId.toString());
             return stmt.executeUpdate() > 0;
@@ -221,7 +221,7 @@ public class ClientDAO implements UserDAO<Client> {
         // restaurant_id = ?
         String query = "PLACEHOLDER";
         try (Connection conn = Database.getConnection();
-                PreparedStatement stmt = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, clientId.toString());
             stmt.setString(2, restaurantId.toString());
             return stmt.executeUpdate() > 0;
