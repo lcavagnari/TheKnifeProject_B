@@ -1,10 +1,11 @@
 package it.uninsubria.laboratoriob.ui;
 
+import it.uninsubria.laboratoriob.Validators;
+import it.uninsubria.laboratoriob.objects.Client;
 import it.uninsubria.laboratoriob.objects.Location;
-import it.uninsubria.laboratoriob.objects.users.Client;
-import it.uninsubria.laboratoriob.objects.users.Owner;
-import it.uninsubria.laboratoriob.objects.users.User;
-import it.uninsubria.laboratoriob.ui.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.objects.Owner;
+import it.uninsubria.laboratoriob.objects.User;
+import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.utils.Loader;
 import lombok.experimental.UtilityClass;
 
@@ -22,7 +23,7 @@ import java.time.LocalDateTime;
  * <h2>Side effects</h2>
  * <ul>
  *   <li><b>register()</b>: inserisce l'utente creato nelle mappe di {@link Loader}
- *       (username→utente e id→utente) e invoca {@link User#save()}.</li>
+ *       (username→utente e id→utente) e invoca {@link it.uninsubria.laboratoriob.data.UserDAO#save(Object)}.</li>
  *   <li><b>login()</b>: nessuna modifica allo stato persistente, ma può lanciare
  *       {@link AbortOperationException} se superato il numero massimo di tentativi.</li>
  * </ul>
@@ -44,7 +45,7 @@ public class Login {
      *   <li>Scelta del tipo utente: gestore ({@link Owner}) o cliente ({@link Client}).</li>
      *   <li>Raccolta e validazione di username, nome, cognome, location (facoltativa) e data di nascita.</li>
      *   <li>Impostazione e validazione della password.</li>
-     *   <li>Creazione dell’istanza {@link User}, salvataggio su {@link Loader} e persistenza via {@link User#save()}.</li>
+     *   <li>Creazione dell’istanza {@link User}, salvataggio su {@link Loader} e persistenza via {@link it.uninsubria.laboratoriob.data.UserDAO#save(Object)}.</li>
      * </ol>
      * </p>
      *
@@ -74,7 +75,7 @@ public class Login {
                 if (Loader.getUsersByName().containsKey(username))
                     throw new IllegalArgumentException("Username non disponibile");
 
-                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{3,39}$", username);
+                Validators.validateString("^[\\p{L}][\\p{L}'\\- ]{3,39}$", username);
             } catch (IllegalArgumentException ex) {
                 username = null;
                 IO.printErrorMessage(ex.getMessage());
@@ -90,8 +91,8 @@ public class Login {
                 firstName = IO.getUserInput("Inserisci il tuo nome:").trim();
                 lastName = IO.getUserInput("Inserisci il tuo cognome:").trim();
 
-                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", firstName);
-                IO.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", lastName);
+                Validators.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", firstName);
+                Validators.validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", lastName);
             } catch (IllegalArgumentException ex) {
                 firstName = null;
                 lastName = null;
@@ -113,7 +114,7 @@ public class Login {
         while (dateOfBirth == null) {
             try {
                 dateOfBirth = LocalDate.parse(IO.getUserInput("Inserisci la tua data di nascita (YYYY-MM-DD):"));
-                IO.validateDates(LocalDateTime.MIN, LocalDateTime.now(), dateOfBirth.atStartOfDay());
+                Validators.validateDates(LocalDateTime.MIN, LocalDateTime.now(), dateOfBirth.atStartOfDay());
             } catch (IllegalArgumentException ex) {
                 dateOfBirth = null;
                 IO.printErrorMessage(ex.getMessage());
@@ -127,7 +128,7 @@ public class Login {
         while (password == null) {
             try {
                 password = IO.getUserInput("Inserisci una password (min 4 caratteri):").trim();
-                IO.validateString(".{4,}", password);
+                Validators.validateString(".{4,}", password);
             } catch (IllegalArgumentException ex) {
                 password = null;
                 IO.printErrorMessage(ex.getMessage());
@@ -142,12 +143,12 @@ public class Login {
                     ? new Owner(username, password, firstName, lastName, location, dateOfBirth)
                     : new Client(username, password, firstName, lastName, location, dateOfBirth);
 
-            if (IO.validateUser(user))
+            if (Validators.validateUser(user))
                 IO.getUserInput("Registrazione completata! Premi Invio per tornare al menu principale.");
 
             Loader.getUsersByName().put(username, user);
             Loader.getUsersById().put(user.getId(), user);
-            user.save();
+            // TODO: add persistence
 
             return user;
 
@@ -169,7 +170,7 @@ public class Login {
      * <ol>
      *   <li>Richiesta username e password.</li>
      *   <li>Verifica esistenza utente in {@link Loader#getUsersByName()}.</li>
-     *   <li>Verifica password tramite {@link User#verifyPassword(String)}.</li>
+     *   <li>Verifica password tramite }.</li>
      *   <li>In caso di successo: messaggio, conferma su Invio, ritorno dell’utente.</li>
      * </ol>
      *
@@ -193,7 +194,8 @@ public class Login {
                 User user = Loader.getUsersByName().get(username);
                 if (user == null)
                     throw new IllegalArgumentException("Utente non trovato");
-
+                /*
+                TODO: Add password checking
                 if (user.verifyPassword(password)) {
                     IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
@@ -203,6 +205,7 @@ public class Login {
                     IO.getUserInput("Premi Invio per riprovare.");
                     attempts++;
                 }
+                */
 
             } catch (IllegalArgumentException ex) {
                 IO.printErrorMessage(ex.getMessage());
