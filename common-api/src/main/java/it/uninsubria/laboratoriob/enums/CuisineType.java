@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.objects.enums;
+package it.uninsubria.laboratoriob.enums;
 
 /**
  * Enum che rappresenta le possibili cucine servite da un ristorante.

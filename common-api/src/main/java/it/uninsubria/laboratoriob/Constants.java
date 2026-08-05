@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.utils;
+package it.uninsubria.laboratoriob;
 
 import lombok.Getter;
 import lombok.experimental.UtilityClass;

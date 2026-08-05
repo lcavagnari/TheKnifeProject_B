@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.ui.exceptions;
+package it.uninsubria.laboratoriob.exceptions;
 
 import lombok.Getter;
 
