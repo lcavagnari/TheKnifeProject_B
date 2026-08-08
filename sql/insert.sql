@@ -276,3 +276,16 @@ VALUES (1, 'afghan'),
        (247, 'yunnanese'),
        (248, 'zhou'),
        (249, 'zhejiang');
+
+
+INSERT INTO services_and_facilities (id, description) VALUES
+      (1, 'WiFi'),
+      (2, 'Parking'),
+      (3, 'Outdoor seating'),
+      (4, 'Wheelchair accessible'),
+      (5, 'Delivery'),
+      (6, 'Takeaway'),
+      (7, 'Reservations'),
+      (8, 'Pet friendly'),
+      (9, 'Air conditioning'),
+      (10, 'Breakfast');

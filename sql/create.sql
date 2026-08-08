@@ -20,6 +20,11 @@ CREATE TABLE IF NOT EXISTS awards (
     description VARCHAR(100) NOT NULL CHECK (description <> '')
 );
 
+CREATE TABLE IF NOT EXISTS services_and_facilities (
+  id    INT PRIMARY KEY,
+  description   TEXT NOT NULL CHECK (description <> '')
+);
+
 CREATE TABLE IF NOT EXISTS location (
     latitude    DOUBLE PRECISION NOT NULL CHECK (latitude BETWEEN -90.0 AND 90.0),
     longitude   DOUBLE PRECISION NOT NULL CHECK (longitude BETWEEN -180.0 AND 180.0),
@@ -89,13 +94,23 @@ CREATE TABLE IF NOT EXISTS user_favorites (
 
 CREATE TABLE IF NOT EXISTS restaurant_cuisine (
     restaurant_id UUID NOT NULL,
-    cuisine_type  INT  NOT NULL,
+    type  INT  NOT NULL,
 
-    PRIMARY KEY (restaurant_id, cuisine_type),
+    PRIMARY KEY (restaurant_id, type),
     FOREIGN KEY (restaurant_id) REFERENCES restaurant (id),
-    FOREIGN KEY (cuisine_type) REFERENCES cuisine_type (id)
+    FOREIGN KEY (type) REFERENCES cuisine_type (id)
 );
 
+
+CREATE TABLE IF NOT EXISTS restaurant_services (
+    restaurant_id UUID NOT NULL,
+    service     INT NOT NULL,
+
+    PRIMARY KEY (restaurant_id,service),
+
+    FOREIGN KEY (restaurant_id) REFERENCES restaurant (id),
+    FOREIGN KEY (service) REFERENCES services_and_facilities(id)
+);
 
 
 CREATE TABLE IF NOT EXISTS review (
