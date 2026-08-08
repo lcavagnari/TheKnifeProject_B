@@ -17,34 +17,34 @@ public class CustomerDAO implements UserDAO<Customer> {
     private final LocationDAO locationDAO = new LocationDAO();
 
     @Override
-    public Optional<Customer> findById(UUID id) {
+    public Optional<Customer> findById(UUID uId) {
         // SELECT id, username, password_hash, salt, name, last_name, location_id,
         // date_of_birth FROM customer WHERE id = ?
-        String query = "PLACEHOLDER";
+        String query = "SELECT username, psw_hash, psw_salt, first_name,last_name, latitude,longitude, birth_date FROM \"user\" where id=? AND is_owner = false";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id.toString());
+            stmt.setString(1, uId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    UUID locationId = UUID.fromString(rs.getString("PLACEHOLDER"));
+                    UUID locationId = UUID.fromString(rs.getString("..."));
                     Location location = locationDAO.findById(locationId).orElse(null);
-                    Set<UUID> favourites = findFavourites(id);
+                    Set<UUID> favourites = findFavourites(uId);
 
                     Customer customer = new Customer(
-                            id,
-                            // Column Placeholder: username
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: password_hash
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: salt
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: name
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: last_name
-                            rs.getString("PLACEHOLDER"),
+                            uId,
+                            // username
+                            rs.getString("..."),
+                            // password_hash
+                            rs.getString("..."),
+                            // salt
+                            rs.getString("..."),
+                            // name
+                            rs.getString("..."),
+                            // last_name
+                            rs.getString("..."),
                             location,
-                            // Column Placeholder: date_of_birth
-                            LocalDate.parse(rs.getString("PLACEHOLDER")),
+                            // date_of_birth
+                            LocalDate.parse(rs.getString("...")),
                             favourites);
                     return Optional.of(customer);
                 }
@@ -59,26 +59,26 @@ public class CustomerDAO implements UserDAO<Customer> {
     public Optional<Customer> findByUsername(String username) {
         // SELECT id, username, password_hash, salt, name, last_name, location_id,
         // date_of_birth FROM customer WHERE username = ?
-        String query = "PLACEHOLDER";
+        String query = "SELECT id, psw_hash, psw_salt, first_name,last_name, latitude,longitude, birth_date FROM \"user\" where username=? AND is_owner = false";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, username);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    UUID id = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    UUID locationId = UUID.fromString(rs.getString("PLACEHOLDER"));
+                    UUID id = UUID.fromString(rs.getString("..."));
+                    UUID locationId = UUID.fromString(rs.getString("..."));
                     Location location = locationDAO.findById(locationId).orElse(null);
                     Set<UUID> favourites = findFavourites(id);
 
                     Customer customer = new Customer(
                             id,
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
+                            rs.getString("..."),
+                            rs.getString("..."),
+                            rs.getString("..."),
+                            rs.getString("..."),
+                            rs.getString("..."),
                             location,
-                            LocalDate.parse(rs.getString("PLACEHOLDER")),
+                            LocalDate.parse(rs.getString("...")),
                             favourites);
                     return Optional.of(customer);
                 }
@@ -94,25 +94,25 @@ public class CustomerDAO implements UserDAO<Customer> {
         List<Customer> customers = new ArrayList<>();
         // SELECT id, username, password_hash, salt, name, last_name, location_id,
         // date_of_birth FROM customer
-        String query = "PLACEHOLDER";
+        String query = "SELECT username, psw_hash, psw_salt, first_name,last_name, latitude, longitude, birth_date FROM \"user\" where is_owner = false";
         try (Connection conn = Database.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                UUID id = UUID.fromString(rs.getString("PLACEHOLDER"));
-                UUID locationId = UUID.fromString(rs.getString("PLACEHOLDER"));
+                UUID id = UUID.fromString(rs.getString("..."));
+                UUID locationId = UUID.fromString(rs.getString("..."));
                 Location location = locationDAO.findById(locationId).orElse(null);
                 Set<UUID> favourites = findFavourites(id);
 
                 Customer customer = new Customer(
                         id,
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
+                        rs.getString("..."),
+                        rs.getString("..."),
+                        rs.getString("..."),
+                        rs.getString("..."),
+                        rs.getString("..."),
                         location,
-                        LocalDate.parse(rs.getString("PLACEHOLDER")),
+                        LocalDate.parse(rs.getString("...")),
                         favourites);
                 customers.add(customer);
             }
@@ -124,9 +124,9 @@ public class CustomerDAO implements UserDAO<Customer> {
 
     @Override
     public boolean save(Customer customer) {
-        // INSERT INTO customer (id, username, password_hash, salt, name, last_name,
-        // location_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        String query = "PLACEHOLDER";
+        Location loc = customer.getLocation();
+
+        String query = "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, latitude,longitude,is_owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, customer.getId().toString());
@@ -135,17 +135,19 @@ public class CustomerDAO implements UserDAO<Customer> {
             stmt.setString(4, customer.getPasswordSalt());
             stmt.setString(5, customer.getName());
             stmt.setString(6, customer.getLastName());
-            stmt.setString(7, customer.getLocation() != null ? customer.getLocation().getId().toString() : null);
+            stmt.setDouble(7,loc.getLatitude());
+            stmt.setDouble(7,loc.getLongitude());
             stmt.setString(8, customer.getDateOfBirth().toString());
 
             if (customer.getLocation() != null) {
+                // TODO: Aggiungere verifica se esiste una posizione uguale per evitare duplicati nella tabella di lookup
                 locationDAO.save(customer.getLocation());
             }
 
             int affected = stmt.executeUpdate();
             if (affected > 0) {
                 // DELETE FROM customer_favourite_restaurants WHERE customer_id = ?
-                String deleteFavs = "PLACEHOLDER";
+                String deleteFavs = "...";
                 try (PreparedStatement delStmt = conn.prepareStatement(deleteFavs)) {
                     delStmt.setString(1, customer.getId().toString());
                     delStmt.executeUpdate();
@@ -169,7 +171,7 @@ public class CustomerDAO implements UserDAO<Customer> {
     @Override
     public boolean delete(UUID id) {
         // DELETE FROM customer WHERE id = ?
-        String query = "PLACEHOLDER";
+        String query = "...";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
@@ -184,13 +186,13 @@ public class CustomerDAO implements UserDAO<Customer> {
     public Set<UUID> findFavourites(UUID customerId) {
         Set<UUID> favourites = new HashSet<>();
         // SELECT restaurant_id FROM customer_favourite_restaurants WHERE customer_id = ?
-        String query = "PLACEHOLDER";
+        String query = "...";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, customerId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    favourites.add(UUID.fromString(rs.getString("PLACEHOLDER")));
+                    favourites.add(UUID.fromString(rs.getString("...")));
                 }
             }
         } catch (SQLException e) {
@@ -203,7 +205,7 @@ public class CustomerDAO implements UserDAO<Customer> {
     public boolean addFavourite(UUID customerId, UUID restaurantId) {
         // INSERT INTO customer_favourite_restaurants (customer_id, restaurant_id) VALUES
         // (?, ?)
-        String query = "PLACEHOLDER";
+        String query = "...";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, customerId.toString());
@@ -219,7 +221,7 @@ public class CustomerDAO implements UserDAO<Customer> {
     public boolean removeFavourite(UUID customerId, UUID restaurantId) {
         // DELETE FROM customer_favourite_restaurants WHERE customer_id = ? AND
         // restaurant_id = ?
-        String query = "PLACEHOLDER";
+        String query = "...";
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, customerId.toString());
