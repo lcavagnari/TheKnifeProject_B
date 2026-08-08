@@ -58,10 +58,10 @@ CREATE TABLE IF NOT EXISTS restaurant (
     description  TEXT CHECK (description <> ''),
     web_url      TEXT CHECK (web_url <> ''),
     phone_number TEXT CHECK (phone_number <> ''),
+    price_range  INT,
 
     award        INT NOT NULL DEFAULT 0,
     green_star   BOOLEAN NOT NULL DEFAULT false,
-    price_range  INT,
 
     has_delivery BOOLEAN NOT NULL DEFAULT false,
     has_booking  BOOLEAN NOT NULL DEFAULT false,
