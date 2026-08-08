@@ -15,12 +15,10 @@ CREATE TABLE IF NOT EXISTS cuisine_type (
     description VARCHAR(100) NOT NULL CHECK (description <> '')
 );
 
-CREATE TABLE IF NOT EXISTS awards
-(
+CREATE TABLE IF NOT EXISTS awards (
     id          INT PRIMARY KEY,
     description VARCHAR(100) NOT NULL CHECK (description <> '')
 );
-
 
 CREATE TABLE IF NOT EXISTS location (
     latitude    DOUBLE PRECISION NOT NULL CHECK (latitude BETWEEN -90.0 AND 90.0),
@@ -31,6 +29,8 @@ CREATE TABLE IF NOT EXISTS location (
 
     PRIMARY KEY (latitude, longitude)
 );
+
+
 
 CREATE TABLE IF NOT EXISTS "user" (
     id                  UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
@@ -52,26 +52,31 @@ CREATE TABLE IF NOT EXISTS "user" (
 
 CREATE TABLE IF NOT EXISTS restaurant (
     id           UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
-    name         VARCHAR(100) NOT NULL CHECK (name <> ''),
+    owner_id     UUID                  NOT NULL,
 
+    name         VARCHAR(100) NOT NULL CHECK (name <> ''),
     description  TEXT CHECK (description <> ''),
     web_url      TEXT CHECK (web_url <> ''),
     phone_number TEXT CHECK (phone_number <> ''),
-    greenStar    BOOLEAN NOT NULL DEFAULT false,
 
-    -- Changed INT to UUID to match the parent tables
-    owner_id     UUID         NOT NULL,
+    award        INT NOT NULL DEFAULT 0,
+    green_star   BOOLEAN NOT NULL DEFAULT false,
     price_range  INT,
+
+    has_delivery BOOLEAN NOT NULL DEFAULT false,
+    has_booking  BOOLEAN NOT NULL DEFAULT false,
 
     latitude     DOUBLE PRECISION,
     longitude    DOUBLE PRECISION,
     created_at   TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP CHECK (created_at <= CURRENT_TIMESTAMP),
 
 
+    FOREIGN KEY (award) REFERENCES awards(id),
     FOREIGN KEY (owner_id) REFERENCES "user"(id),
     FOREIGN KEY (price_range) REFERENCES price_range (id),
     FOREIGN KEY (latitude, longitude) REFERENCES location (latitude, longitude)
 );
+
 
 CREATE TABLE IF NOT EXISTS user_favorites (
     user_id       UUID NOT NULL,
@@ -82,8 +87,6 @@ CREATE TABLE IF NOT EXISTS user_favorites (
     FOREIGN KEY (restaurant_id) REFERENCES restaurant (id)
 );
 
-
-
 CREATE TABLE IF NOT EXISTS restaurant_cuisine (
     restaurant_id UUID NOT NULL,
     cuisine_type  INT  NOT NULL,
@@ -92,6 +95,7 @@ CREATE TABLE IF NOT EXISTS restaurant_cuisine (
     FOREIGN KEY (restaurant_id) REFERENCES restaurant (id),
     FOREIGN KEY (cuisine_type) REFERENCES cuisine_type (id)
 );
+
 
 
 CREATE TABLE IF NOT EXISTS review (
