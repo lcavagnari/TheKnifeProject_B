@@ -21,12 +21,16 @@ public class RestaurantDAO implements DAO<Restaurant> {
         double lon = rs.getDouble("longitude");
         Location location = !rs.wasNull()
                 ? locationDAO.findByCoordinates(lat, lon).orElse(null) : null;
+
         String ownerIdStr = rs.getString("owner_id");
+
         var owner = ownerIdStr != null ? new OwnerDAO().findById(UUID.fromString(ownerIdStr)).orElse(null) : null;
+
         Set<CuisineType> cuisinesTypes = findCuisines(restaurantId);
         Set<String> services = findServices(restaurantId);
 
         String priceDesc = rs.getString("price_desc");
+
         PriceRange priceRange = (priceDesc != null && !priceDesc.isBlank())
                 ? PriceRange.byDollarAmount(priceDesc.length())
                 : PriceRange.MODERATE;
@@ -49,6 +53,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 services);
     }
 
+    
     @Override
     public Optional<Restaurant> findById(UUID id) {
         String query = """
@@ -209,13 +214,49 @@ public class RestaurantDAO implements DAO<Restaurant> {
 
     @Override
     public boolean update(Restaurant restaurant) {
-        return save(restaurant);
+        String query = """
+                UPDATE restaurant
+                SET owner_id = ?, name = ?, description = ?, web_url = ?, phone_number = ?,
+                    price_range = ?, award = ?, green_star = ?, has_delivery = ?, has_booking = ?,
+                    latitude = ?, longitude = ?
+                WHERE id = ?
+                """;
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, restaurant.getOwner() != null ? restaurant.getOwner().getId().toString() : null);
+            stmt.setString(2, restaurant.getName());
+            stmt.setString(3, restaurant.getDescription());
+            stmt.setString(4, restaurant.getWebsiteUrl());
+            stmt.setString(5, restaurant.getPhone());
+            stmt.setInt(6, restaurant.getPriceRange().getSymbol().length());
+            stmt.setInt(7, restaurant.getAward().getValue());
+            stmt.setBoolean(8, restaurant.isGreenStar());
+            stmt.setBoolean(9, restaurant.isHasDelivery());
+            stmt.setBoolean(10, restaurant.isHasOnlineBooking());
+
+            if (restaurant.getLocation() != null) {
+                stmt.setDouble(11, restaurant.getLocation().getLatitude());
+                stmt.setDouble(12, restaurant.getLocation().getLongitude());
+                locationDAO.save(restaurant.getLocation());
+
+            } else {
+                stmt.setNull(11, Types.DOUBLE);
+                stmt.setNull(12, Types.DOUBLE);
+            }
+
+            stmt.setString(13, restaurant.getId().toString());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Errore update in RestaurantDAO: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public boolean delete(UUID id) {
         String query = "DELETE FROM restaurant WHERE id = ?";
-        
+
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
