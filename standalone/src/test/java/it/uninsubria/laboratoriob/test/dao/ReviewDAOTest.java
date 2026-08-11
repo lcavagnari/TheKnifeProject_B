@@ -4,19 +4,16 @@ import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.objects.*;
-import it.uninsubria.laboratoriob.data.CustomerDAO;
-import it.uninsubria.laboratoriob.data.LocationDAO;
-import it.uninsubria.laboratoriob.data.OwnerDAO;
-import it.uninsubria.laboratoriob.data.RestaurantDAO;
-import it.uninsubria.laboratoriob.data.ReviewDAO;
+import it.uninsubria.laboratoriob.data.*;
 import it.uninsubria.laboratoriob.utils.Database;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -68,7 +65,10 @@ public class ReviewDAOTest {
 
     @AfterAll
     static void tearDown() {
-        try { Database.shutdown(); } catch (Exception ignored) {}
+        try {
+            Database.shutdown();
+        } catch (Exception ignored) {
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════

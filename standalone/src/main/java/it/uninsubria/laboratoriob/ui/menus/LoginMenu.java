@@ -1,10 +1,13 @@
 package it.uninsubria.laboratoriob.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
+import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.objects.Customer;
+import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.objects.Owner;
+import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.data.CustomerDAO;
 import it.uninsubria.laboratoriob.data.OwnerDAO;
-import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.data.UserDAO;
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.utils.Loader;
@@ -145,14 +148,15 @@ public class LoginMenu {
         try {
             User user = isOwner
                     ? new Owner(username, password, PasswordHasher.generateSalt(), firstName, lastName, location, dateOfBirth)
-                    : new Customer(username, password,PasswordHasher.generateSalt(), firstName, lastName, location, dateOfBirth);
+                    : new Customer(username, password, PasswordHasher.generateSalt(), firstName, lastName, location, dateOfBirth);
 
             if (Validators.validateUser(user))
                 IO.getUserInput("Registrazione completata! Premi Invio per tornare al menu principale.");
 
             Loader.addUser(user);
 
-            if(isOwner) OWNER_DAO.save((Owner) user); else CUSTOMER_DAO.save((Customer) user);
+            if (isOwner) OWNER_DAO.save((Owner) user);
+            else CUSTOMER_DAO.save((Customer) user);
 
             return user;
 

@@ -2,21 +2,17 @@ package it.uninsubria.laboratoriob.test.dao;
 
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
+import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
-import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
-import it.uninsubria.laboratoriob.data.CustomerDAO;
 import it.uninsubria.laboratoriob.data.LocationDAO;
 import it.uninsubria.laboratoriob.data.OwnerDAO;
 import it.uninsubria.laboratoriob.data.RestaurantDAO;
 import it.uninsubria.laboratoriob.utils.Database;
-import it.uninsubria.laboratoriob.api.enums.Nation;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -55,7 +51,10 @@ public class RestaurantDAOTest {
 
     @AfterAll
     static void tearDown() {
-        try { Database.shutdown(); } catch (Exception ignored) {}
+        try {
+            Database.shutdown();
+        } catch (Exception ignored) {
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════

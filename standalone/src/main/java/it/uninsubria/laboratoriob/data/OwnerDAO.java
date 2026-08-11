@@ -5,13 +5,21 @@ import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.utils.Database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 public class OwnerDAO extends UserDAO<Owner> {
 
-    public OwnerDAO() { super(true); }
+    public OwnerDAO() {
+        super(true);
+    }
 
     @Override
     protected Owner mapRow(ResultSet rs) throws SQLException {
@@ -44,7 +52,7 @@ public class OwnerDAO extends UserDAO<Owner> {
                 Optional<Restaurant> r1 = restaurantDAO.findById(r.getId());
                 if (r1.isEmpty()) restaurantDAO.save(r);
 
-                addSpecial(r.getId(),user.getId());
+                addSpecial(r.getId(), user.getId());
             }
         }
 
@@ -59,7 +67,7 @@ public class OwnerDAO extends UserDAO<Owner> {
             String query = "DELETE FROM user_restaurants WHERE user_id=?";
 
             try (Connection conn = Database.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query))  {
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, user.getId().toString());
                 stmt.executeUpdate();
 
@@ -75,7 +83,15 @@ public class OwnerDAO extends UserDAO<Owner> {
         return succeded;
     }
 
-    public boolean addRestaurant(UUID ownerId, UUID restaurantId) { return super.addSpecial(ownerId, restaurantId); }
-    public boolean removeRestaurant(UUID ownerId, UUID restaurantId) { return super.removeSpecial(ownerId, restaurantId); }
-    public Set<UUID> findRestaurants(UUID ownerId) { return super.findSpecial(ownerId); }
+    public boolean addRestaurant(UUID ownerId, UUID restaurantId) {
+        return super.addSpecial(ownerId, restaurantId);
+    }
+
+    public boolean removeRestaurant(UUID ownerId, UUID restaurantId) {
+        return super.removeSpecial(ownerId, restaurantId);
+    }
+
+    public Set<UUID> findRestaurants(UUID ownerId) {
+        return super.findSpecial(ownerId);
+    }
 }

@@ -5,9 +5,14 @@ import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.utils.Database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * it.uninsubria.laboratoriob.api.data.DAO per l'entità {@link Customer}.
@@ -15,7 +20,9 @@ import java.util.*;
  */
 public final class CustomerDAO extends UserDAO<Customer> {
 
-    public CustomerDAO() { super(false); }
+    public CustomerDAO() {
+        super(false);
+    }
 
     @Override
     protected Customer mapRow(ResultSet rs) throws SQLException {
@@ -49,7 +56,7 @@ public final class CustomerDAO extends UserDAO<Customer> {
             String query = "DELETE FROM user_favorites WHERE user_id=?";
 
             try (Connection conn = Database.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query))  {
+                 PreparedStatement stmt = conn.prepareStatement(query)) {
                 stmt.setString(1, user.getId().toString());
                 stmt.executeUpdate();
 
@@ -70,15 +77,22 @@ public final class CustomerDAO extends UserDAO<Customer> {
     public boolean save(Customer user) {
         boolean succeded = super.save(user);
         if (succeded) {
-            for (UUID id : user.getFavouriteRestourants()) addSpecial(user.getId(),id);
+            for (UUID id : user.getFavouriteRestourants()) addSpecial(user.getId(), id);
         }
 
 
         return succeded;
     }
 
-    public boolean addFavourites(UUID ownerId, UUID restaurantId) { return super.addSpecial(ownerId, restaurantId); }
+    public boolean addFavourites(UUID ownerId, UUID restaurantId) {
+        return super.addSpecial(ownerId, restaurantId);
+    }
 
-    public boolean removeFavourites(UUID ownerId, UUID restaurantId) { return super.removeSpecial(ownerId, restaurantId); }
-    public Set<UUID> findFavourites(UUID ownerId) { return super.findSpecial(ownerId); }
+    public boolean removeFavourites(UUID ownerId, UUID restaurantId) {
+        return super.removeSpecial(ownerId, restaurantId);
+    }
+
+    public Set<UUID> findFavourites(UUID ownerId) {
+        return super.findSpecial(ownerId);
+    }
 }

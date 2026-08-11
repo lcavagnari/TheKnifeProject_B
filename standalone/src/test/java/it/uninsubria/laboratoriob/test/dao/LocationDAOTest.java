@@ -6,8 +6,6 @@ import it.uninsubria.laboratoriob.data.LocationDAO;
 import it.uninsubria.laboratoriob.utils.Database;
 import org.junit.jupiter.api.*;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +32,10 @@ public class LocationDAOTest {
 
     @AfterAll
     static void tearDown() {
-        try { Database.shutdown(); } catch (Exception ignored) {}
+        try {
+            Database.shutdown();
+        } catch (Exception ignored) {
+        }
     }
 
     // ═══════════════════════════════════════════════════════════════

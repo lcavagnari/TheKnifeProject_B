@@ -53,7 +53,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 services);
     }
 
-    
+
     @Override
     public Optional<Restaurant> findById(UUID id) {
         String query = """

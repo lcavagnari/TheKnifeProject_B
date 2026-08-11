@@ -31,7 +31,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     protected abstract T mapRow(ResultSet rs) throws SQLException;
 
     public Optional<T> findById(UUID uId) {
-        final String query = "SELECT id, username, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date FROM \"user\" where id=? AND is_owner = "+isOwner;
+        final String query = "SELECT id, username, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date FROM \"user\" where id=? AND is_owner = " + isOwner;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -42,14 +42,14 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
             }
 
         } catch (SQLException e) {
-            System.err.printf("Errore findById in %sDAO: %s", this.getClass().getCanonicalName(),e.getMessage());
+            System.err.printf("Errore findById in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
         }
 
         return Optional.empty();
     }
 
     public Optional<T> findByUsername(String username) {
-        final String query = "SELECT id, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date FROM \"user\" where username=? AND is_owner = "+isOwner;
+        final String query = "SELECT id, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date FROM \"user\" where username=? AND is_owner = " + isOwner;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -60,7 +60,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
             }
 
         } catch (SQLException e) {
-            System.err.printf("Errore findByUsername in %sDAO: %s", this.getClass().getCanonicalName(),e.getMessage());
+            System.err.printf("Errore findByUsername in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
         }
 
         return Optional.empty();
@@ -69,7 +69,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     public List<T> findAll() {
         List<T> users = new ArrayList<>();
 
-        final String query = "SELECT id, username, psw_hash, psw_salt, first_name,last_name, latitude, longitude, birth_date FROM \"user\" where is_owner = "+isOwner;
+        final String query = "SELECT id, username, psw_hash, psw_salt, first_name,last_name, latitude, longitude, birth_date FROM \"user\" where is_owner = " + isOwner;
 
         try (Connection conn = Database.getConnection();
              Statement stmt = conn.createStatement();
@@ -81,7 +81,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
             }
 
         } catch (SQLException e) {
-            System.err.printf("Errore findAll in %sDAO: %s", this.getClass().getCanonicalName(),e.getMessage());
+            System.err.printf("Errore findAll in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
         }
 
         return users;
@@ -103,7 +103,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
             stmt.setDouble(7, loc.getLatitude());
             stmt.setDouble(7, loc.getLongitude());
             stmt.setString(8, user.getDateOfBirth().toString());
-            stmt.setBoolean(9,isOwner);
+            stmt.setBoolean(9, isOwner);
 
             if (user.getLocation() != null) {
                 // TODO: Aggiungere verifica se esiste una posizione uguale per evitare duplicati nella tabella di lookup
@@ -112,7 +112,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.printf("Errore save in %sDAO: %s", this.getClass().getCanonicalName(),e.getMessage());
+            System.err.printf("Errore save in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
         }
 
         return false;
@@ -120,7 +120,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
     @Override
     public boolean update(T user) {
-        final String query = "UPDATE \"user\" SET username=?, password_hash=?, salt=?, name=?, last_name=?, location_id=?, date_of_birth=?, WHERE id=? AND is_owner ="+isOwner;
+        final String query = "UPDATE \"user\" SET username=?, password_hash=?, salt=?, name=?, last_name=?, location_id=?, date_of_birth=?, WHERE id=? AND is_owner =" + isOwner;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -139,13 +139,13 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.printf("Errore update in %sDAO: %s", this.getClass().getCanonicalName(),e.getMessage());
+            System.err.printf("Errore update in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
             return false;
         }
     }
 
     public boolean delete(UUID id) {
-        String query = "DELETE FROM \"user\" WHERE id=? AND is_owner="+isOwner;
+        String query = "DELETE FROM \"user\" WHERE id=? AND is_owner=" + isOwner;
 
 
         try (Connection conn = Database.getConnection();
@@ -154,14 +154,14 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.printf("Errore delete in %sDAO: %s", this.getClass().getCanonicalName(),e.getMessage());
+            System.err.printf("Errore delete in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
             return false;
         }
     }
 
 
     protected Set<UUID> findSpecial(UUID userId) {
-        String query = "SELECT restaurant_id FROM "+ ((isOwner) ? "user_restaurants" : "user_favorites") +" WHERE user_id=?";
+        String query = "SELECT restaurant_id FROM " + ((isOwner) ? "user_restaurants" : "user_favorites") + " WHERE user_id=?";
 
         Set<UUID> favourites = new HashSet<>();
         try (Connection conn = Database.getConnection();
@@ -175,14 +175,14 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
             }
 
         } catch (SQLException e) {
-            System.err.printf("Errore find%s in %sDAO: %s",(isOwner) ? "Restaurants" : "Favourites", this.getClass().getCanonicalName(), e.getMessage());
+            System.err.printf("Errore find%s in %sDAO: %s", (isOwner) ? "Restaurants" : "Favourites", this.getClass().getCanonicalName(), e.getMessage());
         }
 
         return favourites;
     }
 
     protected boolean addSpecial(UUID userId, UUID restaurantId) {
-        String query = "INSERT INTO" + ((isOwner) ? "user_restaurants" : "user_favorites") +"VALUES (?,?)";
+        String query = "INSERT INTO" + ((isOwner) ? "user_restaurants" : "user_favorites") + "VALUES (?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -192,7 +192,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.printf("Errore add%s in %sDAO: %s",(isOwner) ? "Restaurants" : "Favourites", this.getClass().getCanonicalName(), e.getMessage());
+            System.err.printf("Errore add%s in %sDAO: %s", (isOwner) ? "Restaurants" : "Favourites", this.getClass().getCanonicalName(), e.getMessage());
             return false;
         }
     }
@@ -209,7 +209,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
-            System.err.printf("Errore remove%s in %sDAO: %s",(isOwner) ? "Restaurants" : "Favourites", this.getClass().getCanonicalName(), e.getMessage());
+            System.err.printf("Errore remove%s in %sDAO: %s", (isOwner) ? "Restaurants" : "Favourites", this.getClass().getCanonicalName(), e.getMessage());
             return false;
         }
     }

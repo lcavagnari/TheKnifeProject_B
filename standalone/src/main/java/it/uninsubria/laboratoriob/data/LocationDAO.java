@@ -5,7 +5,10 @@ import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.utils.Database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +21,15 @@ import java.util.UUID;
 public final class LocationDAO implements DAO<Location> {
 
     // Location has no ID attribute
-    @Override public Optional<Location> findById(UUID id) { return Optional.empty(); }
-    @Override public boolean delete(UUID id) { return false; }
+    @Override
+    public Optional<Location> findById(UUID id) {
+        return Optional.empty();
+    }
+
+    @Override
+    public boolean delete(UUID id) {
+        return false;
+    }
 
 
     public Optional<Location> findByCoordinates(double lat, double longit) {
@@ -114,7 +124,10 @@ public final class LocationDAO implements DAO<Location> {
         }
     }
 
-    @Override public boolean update(Location entity) { return update(entity.getLatitude(),entity.getLongitude(),entity); }
+    @Override
+    public boolean update(Location entity) {
+        return update(entity.getLatitude(), entity.getLongitude(), entity);
+    }
 
 
     public boolean delete(double lat, double longit) {
