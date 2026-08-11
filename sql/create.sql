@@ -92,6 +92,15 @@ CREATE TABLE IF NOT EXISTS user_favorites (
     FOREIGN KEY (restaurant_id) REFERENCES restaurant (id)
 );
 
+CREATE TABLE IF NOT EXISTS user_restaurants (
+    user_id       UUID NOT NULL,
+    restaurant_id UUID NOT NULL,
+
+    PRIMARY KEY (user_id, restaurant_id),
+    FOREIGN KEY (user_id) REFERENCES "user"(id),
+    FOREIGN KEY (restaurant_id) REFERENCES restaurant (id)
+);
+
 CREATE TABLE IF NOT EXISTS restaurant_cuisine (
     restaurant_id UUID NOT NULL,
     type  INT  NOT NULL,
