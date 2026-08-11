@@ -38,7 +38,7 @@ public final class LocationDAO implements DAO<Location> {
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDouble(1, lat);
-            stmt.setDouble(1, longit);
+            stmt.setDouble(2, longit);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
@@ -86,14 +86,14 @@ public final class LocationDAO implements DAO<Location> {
 
     @Override
     public boolean save(Location location) {
-        String query = "INSERT INTO location VALUES (?,?,?,?,?)";
+        String query = "INSERT INTO location (latitude, longitude, city, country, address) VALUES (?,?,?,?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, location.getNation().getIsoCode());
-            stmt.setString(2, location.getCity());
-            stmt.setDouble(3, location.getLatitude());
-            stmt.setDouble(4, location.getLongitude());
+            stmt.setDouble(1, location.getLatitude());
+            stmt.setDouble(2, location.getLongitude());
+            stmt.setString(3, location.getCity());
+            stmt.setString(4, location.getNation().getIsoCode());
             stmt.setString(5, location.getAddress());
 
             return stmt.executeUpdate() > 0;
@@ -136,7 +136,7 @@ public final class LocationDAO implements DAO<Location> {
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDouble(1, lat);
-            stmt.setDouble(1, longit);
+            stmt.setDouble(2, longit);
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

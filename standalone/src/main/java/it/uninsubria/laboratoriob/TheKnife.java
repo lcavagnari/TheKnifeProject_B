@@ -12,7 +12,7 @@ public class TheKnife {
      *
      * @param args Argomenti cli
      */
-    static void main(String[] args) {
+    public static void main(String[] args) {
         if (args.length > 1 && args[0].equals("--update")) {
             Loader.updateMichelinDataset(args[1]);
             return;

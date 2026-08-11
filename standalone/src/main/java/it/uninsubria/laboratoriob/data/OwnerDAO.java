@@ -40,7 +40,8 @@ public class OwnerDAO extends UserDAO<Owner> {
                 rs.getString("last_name"),                      //  last_name
                 loc.orElse(null),                                     //  location
                 LocalDate.parse(rs.getString("birth_date")),    //  date_of_birth
-                restaurants
+                restaurants,                                               //  restaurants
+                rs.getBoolean("is_system")                      //  system
         );
     }
 
@@ -68,7 +69,7 @@ public class OwnerDAO extends UserDAO<Owner> {
 
             try (Connection conn = Database.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setString(1, user.getId().toString());
+                stmt.setObject(1, user.getId(), java.sql.Types.OTHER);
                 stmt.executeUpdate();
 
             } catch (SQLException e) {

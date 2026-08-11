@@ -183,8 +183,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, restaurant.getId().toString());
-            stmt.setString(2, restaurant.getOwner() != null ? restaurant.getOwner().getId().toString() : null);
+            stmt.setObject(1, restaurant.getId(), Types.OTHER);
+            stmt.setObject(2, restaurant.getOwner() != null ? restaurant.getOwner().getId() : null, Types.OTHER);
             stmt.setString(3, restaurant.getName());
             stmt.setString(4, restaurant.getDescription());
             stmt.setString(5, restaurant.getWebsiteUrl());
@@ -224,7 +224,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, restaurant.getOwner() != null ? restaurant.getOwner().getId().toString() : null);
+            stmt.setObject(1, restaurant.getOwner() != null ? restaurant.getOwner().getId() : null, Types.OTHER);
             stmt.setString(2, restaurant.getName());
             stmt.setString(3, restaurant.getDescription());
             stmt.setString(4, restaurant.getWebsiteUrl());
@@ -245,7 +245,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 stmt.setNull(12, Types.DOUBLE);
             }
 
-            stmt.setString(13, restaurant.getId().toString());
+            stmt.setObject(13, restaurant.getId(), Types.OTHER);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Errore update in RestaurantDAO: " + e.getMessage());
@@ -259,7 +259,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id.toString());
+            stmt.setObject(1, id, Types.OTHER);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Errore delete in RestaurantDAO: " + e.getMessage());
@@ -276,7 +276,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
             conn.setAutoCommit(false);
 
             try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
-                deleteStmt.setString(1, restaurantId.toString());
+                deleteStmt.setObject(1, restaurantId, Types.OTHER);
                 deleteStmt.executeUpdate();
             }
 
@@ -305,7 +305,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
 
                 if (typeId != -1) {
                     try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-                        insertStmt.setString(1, restaurantId.toString());
+                        insertStmt.setObject(1, restaurantId, Types.OTHER);
                         insertStmt.setInt(2, typeId);
                         insertStmt.executeUpdate();
                     }
@@ -329,7 +329,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
             conn.setAutoCommit(false);
 
             try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
-                deleteStmt.setString(1, restaurantId.toString());
+                deleteStmt.setObject(1, restaurantId, Types.OTHER);
                 deleteStmt.executeUpdate();
             }
 
@@ -358,7 +358,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
 
                 if (serviceId != -1) {
                     try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
-                        insertStmt.setString(1, restaurantId.toString());
+                        insertStmt.setObject(1, restaurantId, Types.OTHER);
                         insertStmt.setInt(2, serviceId);
                         insertStmt.executeUpdate();
                     }

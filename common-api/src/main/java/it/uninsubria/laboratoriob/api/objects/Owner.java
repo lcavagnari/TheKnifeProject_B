@@ -63,7 +63,12 @@ public class Owner extends User {
      */
     public Owner(UUID id, String username, String password, String salt, String name, String lastName,
                  Location location, LocalDate dateOfBirth, Set<Restaurant> restaurants) {
-        super(id, username, password, salt, name, lastName, location, dateOfBirth);
+        this(id, username, password, salt, name, lastName, location, dateOfBirth, restaurants, false);
+    }
+
+    public Owner(UUID id, String username, String password, String salt, String name, String lastName,
+                 Location location, LocalDate dateOfBirth, Set<Restaurant> restaurants, boolean system) {
+        super(id, username, password, salt, name, lastName, location, dateOfBirth, system);
 
         if (restaurants == null || restaurants.isEmpty())
             return;
@@ -88,11 +93,20 @@ public class Owner extends User {
      */
     public Owner(UUID id, String username, String password, String salt, String name, String lastName,
                  Location location, LocalDate dateOfBirth) {
-        super(id, username, password, salt, name, lastName, location, dateOfBirth);
+        this(id, username, password, salt, name, lastName, location, dateOfBirth, false);
+    }
+
+    public Owner(UUID id, String username, String password, String salt, String name, String lastName,
+                 Location location, LocalDate dateOfBirth, boolean system) {
+        super(id, username, password, salt, name, lastName, location, dateOfBirth, system);
     }
 
     public Owner(String username, String passwordHash, String passwordSalt, String firstName, String lastName, Location location, LocalDate dateOfBirth) {
-        super(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth);
+        this(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth, false);
+    }
+
+    public Owner(String username, String passwordHash, String passwordSalt, String firstName, String lastName, Location location, LocalDate dateOfBirth, boolean system) {
+        super(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth, system);
     }
 
 

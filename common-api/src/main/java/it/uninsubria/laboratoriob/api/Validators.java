@@ -119,7 +119,7 @@ public class Validators {
 
         validateUUID(user.getId());
         validateString("^[\\p{L}][\\p{L}'\\- ]{1,39}$", user.getName());
-        validateString("^[a-zA-Z][\\w.]{1,14}[a-zA-Z0-9]$", user.getUsername());
+        validateString("^[\\p{L}][\\p{L}'\\- ]{3,39}$", user.getUsername());
 
         if (user.getLocation() != null) validateLocation(user.getLocation());
         validateDates(LocalDateTime.MIN, LocalDateTime.now().plusDays(1), user.getDateOfBirth().atStartOfDay());
