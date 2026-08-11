@@ -52,7 +52,7 @@ class ReviewTest {
                 new HashMap<>()
         );
 
-        review = new Review(restaurant, customer, 4, "Excellent service and food!");
+        review = new Review(restaurant, customer, 4, "Excellent service and food");
     }
 
     @Test
@@ -60,7 +60,7 @@ class ReviewTest {
     void testReviewCreation() {
         assertNotNull(review);
         assertEquals(4, review.getValue());
-        assertEquals("Excellent service and food!", review.getText());
+        assertEquals("Excellent service and food", review.getText());
         assertEquals(customer, review.getUser());
         assertEquals(restaurant, review.getRestaurant());
         assertNotNull(review.getTimestamp());
@@ -130,7 +130,7 @@ class ReviewTest {
     void testToString() {
         String result = review.toString();
         assertTrue(result.contains("4 / 5"));
-        assertTrue(result.contains("Excellent service and food!"));
+        assertTrue(result.contains("Excellent service and food"));
     }
 }
 

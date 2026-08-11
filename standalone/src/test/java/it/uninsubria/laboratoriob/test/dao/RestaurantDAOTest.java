@@ -15,10 +15,13 @@ import it.uninsubria.laboratoriob.utils.Database;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import org.junit.jupiter.api.*;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class RestaurantDAOTest {
@@ -32,6 +35,13 @@ public class RestaurantDAOTest {
 
     @BeforeAll
     static void setUp() {
+        try (java.sql.Connection c = java.sql.DriverManager.getConnection(
+                "jdbc:postgresql://localhost:5432/mydb", "testuser", "test1234")) {
+            assumeTrue(c.isValid(3), "PostgreSQL not available");
+        } catch (Exception e) {
+            assumeTrue(false, "PostgreSQL not available, skipping DAO tests");
+        }
+
         Database.initTables();
         Database.initialiseConstants();
 
@@ -45,7 +55,7 @@ public class RestaurantDAOTest {
 
     @AfterAll
     static void tearDown() {
-        Database.shutdown();
+        try { Database.shutdown(); } catch (Exception ignored) {}
     }
 
     // ═══════════════════════════════════════════════════════════════
