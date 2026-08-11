@@ -1,7 +1,7 @@
 package it.uninsubria.laboratoriob.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
-import it.uninsubria.laboratoriob.api.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.data.RestaurantDAO;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;

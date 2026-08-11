@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.api.data;
+package it.uninsubria.laboratoriob.data;
 
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;

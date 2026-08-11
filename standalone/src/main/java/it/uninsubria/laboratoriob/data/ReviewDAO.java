@@ -1,5 +1,6 @@
-package it.uninsubria.laboratoriob.api.data;
+package it.uninsubria.laboratoriob.data;
 
+import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.objects.User;

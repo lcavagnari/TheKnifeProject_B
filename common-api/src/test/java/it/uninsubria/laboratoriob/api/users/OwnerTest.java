@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.users;
+package it.uninsubria.laboratoriob.api.users;
 
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.Nation;

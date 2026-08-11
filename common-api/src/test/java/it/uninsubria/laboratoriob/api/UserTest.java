@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob;
+package it.uninsubria.laboratoriob.api;
 
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Customer;

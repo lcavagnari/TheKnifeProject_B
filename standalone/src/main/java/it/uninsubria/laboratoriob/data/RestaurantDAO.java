@@ -1,5 +1,6 @@
-package it.uninsubria.laboratoriob.api.data;
+package it.uninsubria.laboratoriob.data;
 
+import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
