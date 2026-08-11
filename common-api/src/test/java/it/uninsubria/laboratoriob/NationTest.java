@@ -1,6 +1,6 @@
 package it.uninsubria.laboratoriob;
 
-import it.uninsubria.laboratoriob.enums.Nation;
+import it.uninsubria.laboratoriob.api.enums.Nation;
 
 public class NationTest {
     static void main() {

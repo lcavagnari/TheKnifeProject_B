@@ -1,10 +1,10 @@
 package it.uninsubria.laboratoriob.users;
 
-import it.uninsubria.laboratoriob.enums.Award;
-import it.uninsubria.laboratoriob.enums.Nation;
-import it.uninsubria.laboratoriob.enums.PriceRange;
-import it.uninsubria.laboratoriob.enums.UserRole;
-import it.uninsubria.laboratoriob.objects.*;
+import it.uninsubria.laboratoriob.api.enums.Award;
+import it.uninsubria.laboratoriob.api.enums.Nation;
+import it.uninsubria.laboratoriob.api.enums.PriceRange;
+import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.objects.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
