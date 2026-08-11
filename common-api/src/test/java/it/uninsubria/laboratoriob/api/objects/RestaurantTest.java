@@ -8,11 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.security.SecureRandom;
 import java.time.LocalDate;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -26,7 +24,11 @@ class RestaurantTest {
     @BeforeEach
     void setUp() {
         location = new Location(Nation.ITALY, "Milan", 45.4642, 9.1900, "Via Garibaldi 5");
-        owner = new Owner("owneruser", "password123", "Mario", "Rossi", location, LocalDate.of(1980, 5, 15));
+        byte[] saltBytes = new byte[16];
+        new SecureRandom().nextBytes(saltBytes);
+        String salt = Base64.getEncoder().encodeToString(saltBytes);
+
+        owner = new Owner("owneruser", "password123",salt, "Mario", "Rossi", location, LocalDate.of(1980, 5, 15));
 
         Set<CuisineType> cuisines = new HashSet<>(Arrays.asList(CuisineType.ITALIAN, CuisineType.MEDITERRANEAN));
         Set<String> services = new HashSet<>(Arrays.asList("WiFi", "Parking"));

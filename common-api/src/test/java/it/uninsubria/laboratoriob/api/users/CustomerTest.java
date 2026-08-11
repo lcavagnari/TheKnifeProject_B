@@ -20,16 +20,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class CustomerTest {
 
     private Customer customer;
+    private Owner owner;
     private Location location;
+
+    private static String generateSalt() {
+        byte[] saltBytes = new byte[16];
+        new SecureRandom().nextBytes(saltBytes);
+        return Base64.getEncoder().encodeToString(saltBytes);
+    }
 
     @BeforeEach
     void setUp() {
-        byte[] saltBytes = new byte[16];
-        new SecureRandom().nextBytes(saltBytes);
-        String salt = Base64.getEncoder().encodeToString(saltBytes);
-
         location = new Location(Nation.ITALY, "Florence", 43.7696, 11.2558, "Piazza della Signoria");
-        customer = new Customer(UUID.randomUUID(),"johndoe", "securePass123",salt, "JohnName", "DoeLastName", location, LocalDate.of(1995, 8, 25));
+
+        owner = new Owner("owner1", "pass123456",generateSalt(), "Mario", "Rossi", location, LocalDate.of(1980, 1, 1));
+        customer = new Customer(UUID.randomUUID(),"johndoe", "securePass123",generateSalt(), "JohnName", "DoeLastName", location, LocalDate.of(1995, 8, 25));
     }
 
     @Test
@@ -47,7 +52,6 @@ class CustomerTest {
     @Test
     @DisplayName("Should add favourite restaurant")
     void testAddFavourite() {
-        Owner owner = new Owner("owner1", "pass123456", "Mario", "Rossi", location, LocalDate.of(1980, 1, 1));
         Restaurant restaurant = new Restaurant(
                 UUID.randomUUID(), "Test Restaurant", "Great place",
                 "https://test.com", owner, "+39 055 12345", location,
@@ -67,7 +71,6 @@ class CustomerTest {
     @Test
     @DisplayName("Should remove favourite restaurant")
     void testRemoveFavourite() {
-        Owner owner = new Owner("owner1", "pass123456", "Mario", "Rossi", location, LocalDate.of(1980, 1, 1));
         Restaurant restaurant = new Restaurant(
                 UUID.randomUUID(), "Test Restaurant", "Great place",
                 "https://test.com", owner, "+39 055 12345", location,
