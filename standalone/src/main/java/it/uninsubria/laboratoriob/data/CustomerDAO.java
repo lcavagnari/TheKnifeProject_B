@@ -68,9 +68,6 @@ public final class CustomerDAO extends UserDAO<Customer> {
     }
 
 
-
-
-
     @Override
     public boolean save(Customer user) {
         boolean succeded = super.save(user);

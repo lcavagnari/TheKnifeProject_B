@@ -3,6 +3,7 @@ package it.uninsubria.laboratoriob.data;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.utils.Database;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -47,6 +48,29 @@ public class OwnerDAO extends UserDAO<Owner> {
             }
         }
 
+
+        return succeded;
+    }
+
+    @Override
+    public boolean update(Owner user) {
+        boolean succeded = super.update(user);
+        if (succeded) {
+            String query = "DELETE FROM user_restaurants WHERE user_id=?";
+
+            try (Connection conn = Database.getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(query))  {
+                stmt.setString(1, user.getId().toString());
+                stmt.executeUpdate();
+
+            } catch (SQLException e) {
+                System.err.println("Errore update in OwnerDAO: " + e.getMessage());
+                return false;
+            }
+
+            for (Restaurant r : user.getRestaurantsById().values())
+                addSpecial(user.getId(), r.getId());
+        }
 
         return succeded;
     }
