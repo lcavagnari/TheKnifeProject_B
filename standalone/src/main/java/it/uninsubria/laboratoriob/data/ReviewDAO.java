@@ -18,36 +18,37 @@ public class ReviewDAO implements DAO<Review> {
     private final RestaurantDAO restaurantDAO = new RestaurantDAO();
     private final CustomerDAO CustomerDAO = new CustomerDAO();
 
+    private Review mapReview(ResultSet rs) throws SQLException {
+        UUID restaurantId = UUID.fromString(rs.getString("restaurant_id"));
+        UUID customerId = UUID.fromString(rs.getString("customer_id"));
+        Restaurant restaurant = restaurantDAO.findById(restaurantId).orElse(null);
+        User user = CustomerDAO.findById(customerId).orElse(null);
+        String tsStr = rs.getString("created_at");
+        LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
+
+        return new Review(
+                UUID.fromString(rs.getString("id")),
+                restaurant,
+                user,
+                rs.getInt("rating"),
+                timestamp,
+                rs.getString("text"),
+                rs.getString("response"));
+    }
+
     @Override
     public Optional<Review> findById(UUID id) {
-        // SELECT id, restaurant_id, customer_id, rating, timestamp, comment, reply FROM
-        // review WHERE id = ?
-        String query = "PLACEHOLDER";
+        String query = """
+                SELECT id, restaurant_id, customer_id, rating, text, response, created_at
+                FROM review
+                WHERE id = ?
+                """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
-                    UUID restaurantId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    UUID customerId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    Restaurant restaurant = restaurantDAO.findById(restaurantId).orElse(null);
-                    User user = CustomerDAO.findById(customerId).orElse(null);
-                    String tsStr = rs.getString("PLACEHOLDER");
-                    LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
-
-                    Review review = new Review(
-                            // Column Key Placeholder: id
-                            UUID.fromString(rs.getString("PLACEHOLDER")),
-                            restaurant,
-                            user,
-                            // Column Placeholder: rating
-                            rs.getInt("PLACEHOLDER"),
-                            timestamp,
-                            // Column Placeholder: comment
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: reply
-                            rs.getString("PLACEHOLDER"));
-                    return Optional.of(review);
+                    return Optional.of(mapReview(rs));
                 }
             }
         } catch (SQLException e) {
@@ -59,29 +60,15 @@ public class ReviewDAO implements DAO<Review> {
     @Override
     public List<Review> findAll() {
         List<Review> reviews = new ArrayList<>();
-        // SELECT id, restaurant_id, customer_id, rating, timestamp, comment, reply FROM
-        // review
-        String query = "PLACEHOLDER";
+        String query = """
+                SELECT id, restaurant_id, customer_id, rating, text, response, created_at
+                FROM review
+                """;
         try (Connection conn = Database.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
             while (rs.next()) {
-                UUID restaurantId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                UUID customerId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                Restaurant restaurant = restaurantDAO.findById(restaurantId).orElse(null);
-                User user = CustomerDAO.findById(customerId).orElse(null);
-                String tsStr = rs.getString("PLACEHOLDER");
-                LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
-
-                Review review = new Review(
-                        UUID.fromString(rs.getString("PLACEHOLDER")),
-                        restaurant,
-                        user,
-                        rs.getInt("PLACEHOLDER"),
-                        timestamp,
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"));
-                reviews.add(review);
+                reviews.add(mapReview(rs));
             }
         } catch (SQLException e) {
             System.err.println("Errore findAll in ReviewDAO: " + e.getMessage());
@@ -91,30 +78,17 @@ public class ReviewDAO implements DAO<Review> {
 
     public List<Review> findByRestaurant(UUID restaurantId) {
         List<Review> reviews = new ArrayList<>();
-        // SELECT id, restaurant_id, customer_id, rating, timestamp, comment, reply FROM
-        // review WHERE restaurant_id = ?
-        String query = "PLACEHOLDER";
+        String query = """
+                SELECT id, restaurant_id, customer_id, rating, text, response, created_at
+                FROM review
+                WHERE restaurant_id = ?
+                """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, restaurantId.toString());
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    UUID restId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    UUID customerId = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    Restaurant restaurant = restaurantDAO.findById(restId).orElse(null);
-                    User user = CustomerDAO.findById(customerId).orElse(null);
-                    String tsStr = rs.getString("PLACEHOLDER");
-                    LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
-
-                    Review review = new Review(
-                            UUID.fromString(rs.getString("PLACEHOLDER")),
-                            restaurant,
-                            user,
-                            rs.getInt("PLACEHOLDER"),
-                            timestamp,
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"));
-                    reviews.add(review);
+                    reviews.add(mapReview(rs));
                 }
             }
         } catch (SQLException e) {
@@ -125,18 +99,19 @@ public class ReviewDAO implements DAO<Review> {
 
     @Override
     public boolean save(Review review) {
-        // INSERT INTO review (id, restaurant_id, customer_id, rating, timestamp, comment,
-        // reply) VALUES (?, ?, ?, ?, ?, ?, ?)
-        String query = "PLACEHOLDER";
+        String query = """
+                INSERT INTO review (id, restaurant_id, customer_id, rating, text, response, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+                """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, review.getId().toString());
             stmt.setString(2, review.getRestaurant() != null ? review.getRestaurant().getId().toString() : null);
             stmt.setString(3, review.getUser() != null ? review.getUser().getId().toString() : null);
             stmt.setInt(4, review.getValue());
-            stmt.setString(5, review.getTimestamp() != null ? review.getTimestamp().toString() : null);
-            stmt.setString(6, review.getText());
-            stmt.setString(7, review.getReply());
+            stmt.setString(5, review.getText());
+            stmt.setString(6, review.getReply());
+            stmt.setString(7, review.getTimestamp() != null ? review.getTimestamp().toString() : null);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Errore save in ReviewDAO: " + e.getMessage());
@@ -146,13 +121,32 @@ public class ReviewDAO implements DAO<Review> {
 
     @Override
     public boolean update(Review review) {
-        return save(review);
+        String query = """
+                UPDATE review
+                SET restaurant_id = ?, customer_id = ?, rating = ?, text = ?, response = ?, created_at = ?
+                WHERE id = ?
+                """;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, review.getRestaurant() != null ? review.getRestaurant().getId().toString() : null);
+            stmt.setString(2, review.getUser() != null ? review.getUser().getId().toString() : null);
+            stmt.setInt(3, review.getValue());
+            stmt.setString(4, review.getText());
+            stmt.setString(5, review.getReply());
+            stmt.setString(6, review.getTimestamp() != null ? review.getTimestamp().toString() : null);
+            stmt.setString(7, review.getId().toString());
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Errore update in ReviewDAO: " + e.getMessage());
+            return false;
+        }
     }
 
     @Override
     public boolean delete(UUID id) {
-        // DELETE FROM review WHERE id = ?
-        String query = "PLACEHOLDER";
+        String query = """
+                DELETE FROM review WHERE id = ?
+                """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setString(1, id.toString());
