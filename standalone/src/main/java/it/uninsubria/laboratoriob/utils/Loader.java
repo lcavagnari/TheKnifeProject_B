@@ -1,7 +1,8 @@
 package it.uninsubria.laboratoriob.utils;
 
 
-import it.uninsubria.laboratoriob.api.data.CustomerDAO;
+
+import it.uninsubria.laboratoriob.data.CustomerDAO;
 import it.uninsubria.laboratoriob.data.OwnerDAO;
 import it.uninsubria.laboratoriob.data.RestaurantDAO;
 import it.uninsubria.laboratoriob.data.ReviewDAO;
