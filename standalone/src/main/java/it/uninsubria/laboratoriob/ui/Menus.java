@@ -66,10 +66,9 @@ public abstract class Menus {
                 String name = IO.getUserInput("Enter restaurant name:");
                 Validators.validateString(name);
 
-                if (!Loader.getRestaurantsByName().containsKey(name))
+                r = Loader.findRestaurantByName(name);
+                if (r == null)
                     throw new IllegalArgumentException("Nessun ristorante trovato, riprovare");
-
-                r = Loader.getRestaurantsByName().get(name);
 
             } catch (IllegalArgumentException ex) {
                 IO.printErrorMessage(ex.getMessage());
@@ -94,7 +93,7 @@ public abstract class Menus {
      * <p>Se non sono presenti ristoranti, viene mostrato un messaggio di errore.</p>
      */
     protected void browseRestaurants() {
-        Map<String, Restaurant> restaurants = Loader.getRestaurantsByName();
+        Map<String, Restaurant> restaurants = Loader.getAllRestaurantsByName();
         if (restaurants.isEmpty()) {
             IO.printErrorMessage("Nessun ristorante disponibile al momento.");
             return;

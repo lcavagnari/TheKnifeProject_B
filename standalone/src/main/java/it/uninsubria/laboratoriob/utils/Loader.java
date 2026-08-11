@@ -9,7 +9,6 @@ import it.uninsubria.laboratoriob.data.ReviewDAO;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.ui.IO;
-import lombok.Getter;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
@@ -34,28 +33,9 @@ import java.util.concurrent.CompletionException;
 @UtilityClass
 public class Loader {
 
-    /**
-     * Mappa dei ristoranti indicizzati per ID.
-     */
-    @Getter
     private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
-
-    /**
-     * Mappa dei ristoranti indicizzati per nome.
-     */
-    @Getter
     private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
-
-    /**
-     * Mappa degli utenti indicizzati per ID.
-     */
-    @Getter
     private final static Map<UUID, User> usersById = new HashMap<>();
-
-    /**
-     * Mappa degli utenti indicizzati per nome utente (username).
-     */
-    @Getter
     private final static Map<String, User> usersByName = new HashMap<>();
 
     private final static RestaurantDAO restaurantDAO = new RestaurantDAO();
@@ -63,6 +43,72 @@ public class Loader {
 
     private final static CustomerDAO CUSTOMER_DAO = new CustomerDAO();
     private final static OwnerDAO OWNER_DAO = new OwnerDAO();
+
+    // ── Write operations ──
+
+    public static void addRestaurant(Restaurant r) {
+        restaurantsById.put(r.getId(), r);
+        restaurantsByName.put(r.getName(), r);
+    }
+
+    public static void removeRestaurant(UUID id) {
+        Restaurant r = restaurantsById.remove(id);
+        if (r != null) restaurantsByName.remove(r.getName());
+    }
+
+    public static void addUser(User u) {
+        usersById.put(u.getId(), u);
+        usersByName.put(u.getUsername(), u);
+    }
+
+    public static void removeUser(UUID id) {
+        User u = usersById.remove(id);
+        if (u != null) usersByName.remove(u.getUsername());
+    }
+
+    // ── Read operations (single entity) ──
+
+    public static Restaurant findRestaurantById(UUID id) {
+        return restaurantsById.get(id);
+    }
+
+    public static Restaurant findRestaurantByName(String name) {
+        return restaurantsByName.get(name);
+    }
+
+    public static boolean hasRestaurantByName(String name) {
+        return restaurantsByName.containsKey(name);
+    }
+
+    public static User findUserById(UUID id) {
+        return usersById.get(id);
+    }
+
+    public static User findUserByName(String name) {
+        return usersByName.get(name);
+    }
+
+    public static boolean hasUserByName(String name) {
+        return usersByName.containsKey(name);
+    }
+
+    // ── Read operations (bulk / unmodifiable views) ──
+
+    public static Map<UUID, Restaurant> getAllRestaurantsById() {
+        return Collections.unmodifiableMap(restaurantsById);
+    }
+
+    public static Map<String, Restaurant> getAllRestaurantsByName() {
+        return Collections.unmodifiableMap(restaurantsByName);
+    }
+
+    public static Map<UUID, User> getAllUsersById() {
+        return Collections.unmodifiableMap(usersById);
+    }
+
+    public static Map<String, User> getAllUsersByName() {
+        return Collections.unmodifiableMap(usersByName);
+    }
 
     private void loadRestaurants() throws CompletionException {
         List<Restaurant> restaurants = CompletableFuture
@@ -98,8 +144,7 @@ public class Loader {
 
             for (Review review : reviews) restaurant.addReview(review);
 
-            restaurantsById.put(restaurant.getId(), restaurant);
-            restaurantsByName.put(restaurant.getName(), restaurant);
+            addRestaurant(restaurant);
         }
     }
 
@@ -126,13 +171,11 @@ public class Loader {
         List<Customer> c = customers.join();
 
         for (Owner owner : o) {
-            usersById.put(owner.getId(), owner);
-            usersByName.put(owner.getUsername(), owner);
+            addUser(owner);
         }
 
         for (Customer customer : c) {
-            usersById.put(customer.getId(), customer);
-            usersByName.put(customer.getUsername(), customer);
+            addUser(customer);
         }
     }
 

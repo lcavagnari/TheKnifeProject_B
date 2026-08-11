@@ -3,9 +3,7 @@ package it.uninsubria.laboratoriob.data;
 
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
-import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.utils.Database;
-import it.uninsubria.laboratoriob.utils.Loader;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -72,15 +70,7 @@ public final class CustomerDAO extends UserDAO<Customer> {
     public boolean save(Customer user) {
         boolean succeded = super.save(user);
         if (succeded) {
-            for (UUID id : user.getFavouriteRestourants()) {
-                Optional<Restaurant> r1 = restaurantDAO.findById(id);
-                if (r1.isEmpty()) {
-                    Restaurant r = Loader.getRestaurantsById().get(id);
-                    restaurantDAO.save(r);
-                }
-
-                addSpecial(user.getId(),id);
-            }
+            for (UUID id : user.getFavouriteRestourants()) addSpecial(user.getId(),id);
         }
 
 

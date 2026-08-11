@@ -242,10 +242,7 @@ public class CsvParser {
             });
 
             CompletableFuture<Void> cacheFuture = CompletableFuture.runAsync(() -> {
-                for (Restaurant r : restaurants) {
-                    Loader.getRestaurantsById().put(r.getId(), r);
-                    Loader.getRestaurantsByName().put(r.getName(), r);
-                }
+                for (Restaurant r : restaurants) Loader.addRestaurant(r);
                 System.out.println("✅ Ristoranti aggiunti alla cache in memoria!");
             });
 

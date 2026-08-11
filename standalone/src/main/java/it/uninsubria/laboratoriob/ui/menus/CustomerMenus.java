@@ -91,7 +91,7 @@ public class CustomerMenus extends Menus {
             return;
         }
 
-        List<Restaurant> restaurants = Loader.getRestaurantsById().entrySet().stream()
+        List<Restaurant> restaurants = Loader.getAllRestaurantsById().entrySet().stream()
                 .filter(e -> favourites.contains(e.getKey()))
                 .map(Map.Entry::getValue)
                 .toList();
