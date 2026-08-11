@@ -17,10 +17,13 @@ import java.util.*;
 public abstract class UserDAO<T extends User> implements DAO<T> {
 
     protected final LocationDAO locationDAO;
+    protected final RestaurantDAO restaurantDAO;
     private final boolean isOwner;
 
     public UserDAO(boolean isOwner) {
         this.locationDAO = new LocationDAO();
+        this.restaurantDAO = new RestaurantDAO();
+
         this.isOwner = isOwner;
     }
 
@@ -155,6 +158,28 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         }
     }
 
+
+    protected Set<UUID> findSpecial(UUID userId) {
+        String query = "SELECT restaurant_id FROM "+ ((isOwner) ? "user_restaurants" : "user_favorites") +" WHERE user_id=?";
+
+        Set<UUID> favourites = new HashSet<>();
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+
+            stmt.setString(1, userId.toString());
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next())
+                    favourites.add(UUID.fromString(rs.getString("restaurant_id")));
+            }
+
+        } catch (SQLException e) {
+            System.err.printf("Errore find%s in %sDAO: %s",(isOwner) ? "Restaurants" : "Favourites", this.getClass().getCanonicalName(), e.getMessage());
+        }
+
+        return favourites;
+    }
+
     protected boolean addSpecial(UUID userId, UUID restaurantId) {
         String query = "INSERT INTO" + ((isOwner) ? "user_restaurants" : "user_favorites") +"VALUES (?,?)";
 
@@ -172,7 +197,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     }
 
 
-    public boolean removeSpecial(UUID customerId, UUID restaurantId) {
+    protected boolean removeSpecial(UUID customerId, UUID restaurantId) {
         String query = "DELETE FROM " + ((isOwner) ? "user_restaurants" : "user_favorites") + " WHERE restaurant_id=? AND user_id=?";
 
         try (Connection conn = Database.getConnection();

@@ -9,164 +9,50 @@ import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 
-public class OwnerDAO implements UserDAO<Owner> {
+public class OwnerDAO extends UserDAO<Owner> {
 
-    private final LocationDAO locationDAO = new LocationDAO();
-    private final RestaurantDAO restaurantDAO = new RestaurantDAO();
+    public OwnerDAO() { super(true); }
 
     @Override
-    public Optional<Owner> findById(UUID id) {
-        // SELECT id, username, password_hash, salt, name, last_name, location_id,
-        // date_of_birth FROM owner WHERE id = ?
-        String query = "PLACEHOLDER";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id.toString());
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    UUID locationId = rs.getString("PLACEHOLDER") != null ? UUID.fromString(rs.getString("PLACEHOLDER"))
-                            : null;
-                    Location location = locationId != null ? locationDAO.findById(locationId).orElse(null) : null;
-                    Set<Restaurant> restaurants = new HashSet<>(restaurantDAO.findByOwner(id));
+    protected Owner mapRow(ResultSet rs) throws SQLException {
+        UUID uId = UUID.fromString(rs.getString("id"));
+        Set<Restaurant> restaurants = new HashSet<>(restaurantDAO.findByOwner(uId));
 
-                    Owner owner = new Owner(
-                            // Column Key Placeholder: id
-                            UUID.fromString(rs.getString("PLACEHOLDER")),
-                            // Column Placeholder: username
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: password_hash
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: salt
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: name
-                            rs.getString("PLACEHOLDER"),
-                            // Column Placeholder: last_name
-                            rs.getString("PLACEHOLDER"),
-                            location,
-                            // Column Placeholder: date_of_birth
-                            LocalDate.parse(rs.getString("PLACEHOLDER")),
-                            restaurants);
-                    return Optional.of(owner);
-                }
+        Optional<Location> loc = locationDAO.findByCoordinates(
+                rs.getDouble("latitude"),
+                rs.getDouble("longitude")
+        );
+
+        return new Owner(
+                uId,                                                         //  id
+                rs.getString("username"),                       //  username
+                rs.getString("psw_hash"),                       //  password_hash
+                rs.getString("psw_salt"),                       //  salt
+                rs.getString("first_name"),                     //  name
+                rs.getString("last_name"),                      //  last_name
+                loc.orElse(null),                                     //  location
+                LocalDate.parse(rs.getString("birth_date")),    //  date_of_birth
+                restaurants
+        );
+    }
+
+    @Override
+    public boolean save(Owner user) {
+        boolean succeded = super.save(user);
+        if (succeded) {
+            for (Restaurant r : user.getRestaurantsById().values()) {
+                Optional<Restaurant> r1 = restaurantDAO.findById(r.getId());
+                if (r1.isEmpty()) restaurantDAO.save(r);
+
+                addSpecial(r.getId(),user.getId());
             }
-        } catch (SQLException e) {
-            System.err.println("Errore findById in OwnerDAO: " + e.getMessage());
         }
-        return Optional.empty();
+
+
+        return succeded;
     }
 
-    @Override
-    public Optional<Owner> findByUsername(String username) {
-        // SELECT id, username, password_hash, salt, name, last_name, location_id,
-        // date_of_birth FROM owner WHERE username = ?
-        String query = "PLACEHOLDER";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, username);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    UUID id = UUID.fromString(rs.getString("PLACEHOLDER"));
-                    UUID locationId = rs.getString("PLACEHOLDER") != null ? UUID.fromString(rs.getString("PLACEHOLDER"))
-                            : null;
-                    Location location = locationId != null ? locationDAO.findById(locationId).orElse(null) : null;
-                    Set<Restaurant> restaurants = new HashSet<>(restaurantDAO.findByOwner(id));
-
-                    Owner owner = new Owner(
-                            id,
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
-                            rs.getString("PLACEHOLDER"),
-                            location,
-                            LocalDate.parse(rs.getString("PLACEHOLDER")),
-                            restaurants);
-                    return Optional.of(owner);
-                }
-            }
-        } catch (SQLException e) {
-            System.err.println("Errore findByUsername in OwnerDAO: " + e.getMessage());
-        }
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Owner> findAll() {
-        List<Owner> owners = new ArrayList<>();
-        // SELECT id, username, password_hash, salt, name, last_name, location_id,
-        // date_of_birth FROM owner
-        String query = "PLACEHOLDER";
-        try (Connection conn = Database.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
-            while (rs.next()) {
-                UUID id = UUID.fromString(rs.getString("PLACEHOLDER"));
-                UUID locationId = rs.getString("PLACEHOLDER") != null ? UUID.fromString(rs.getString("PLACEHOLDER"))
-                        : null;
-                Location location = locationId != null ? locationDAO.findById(locationId).orElse(null) : null;
-                Set<Restaurant> restaurants = new HashSet<>(restaurantDAO.findByOwner(id));
-
-                Owner owner = new Owner(
-                        id,
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
-                        rs.getString("PLACEHOLDER"),
-                        location,
-                        LocalDate.parse(rs.getString("PLACEHOLDER")),
-                        restaurants);
-                owners.add(owner);
-            }
-        } catch (SQLException e) {
-            System.err.println("Errore findAll in OwnerDAO: " + e.getMessage());
-        }
-        return owners;
-    }
-
-    @Override
-    public boolean save(Owner owner) {
-        // INSERT INTO owner (id, username, password_hash, salt, name, last_name,
-        // location_id, date_of_birth) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        String query = "PLACEHOLDER";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, owner.getId().toString());
-            stmt.setString(2, owner.getUsername());
-            stmt.setString(3, owner.getPasswordHash());
-            stmt.setString(4, owner.getPasswordSalt());
-            stmt.setString(5, owner.getName());
-            stmt.setString(6, owner.getLastName());
-            stmt.setString(7, owner.getLocation() != null ? owner.getLocation().getId().toString() : null);
-            stmt.setString(8, owner.getDateOfBirth().toString());
-
-            if (owner.getLocation() != null) {
-                locationDAO.save(owner.getLocation());
-            }
-
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Errore save in OwnerDAO: " + e.getMessage());
-            return false;
-        }
-    }
-
-    @Override
-    public boolean update(Owner owner) {
-        return save(owner);
-    }
-
-    @Override
-    public boolean delete(UUID id) {
-        // DELETE FROM owner WHERE id = ?
-        String query = "PLACEHOLDER";
-        try (Connection conn = Database.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id.toString());
-            return stmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            System.err.println("Errore delete in OwnerDAO: " + e.getMessage());
-            return false;
-        }
-    }
+    public boolean addRestaurant(UUID ownerId, UUID restaurantId) { return super.addSpecial(ownerId, restaurantId); }
+    public boolean removeRestaurant(UUID ownerId, UUID restaurantId) { return super.removeSpecial(ownerId, restaurantId); }
+    public Set<UUID> findRestaurants(UUID ownerId) { return super.findSpecial(ownerId); }
 }
