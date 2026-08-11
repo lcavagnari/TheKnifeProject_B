@@ -32,6 +32,7 @@ public final class Database {
         config.setMaximumPoolSize(10);
         config.setConnectionTimeout(30000);
         config.setMinimumIdle(2);
+        config.setInitializationFailTimeout(0);
 
         ds = new HikariDataSource(config);
     }
