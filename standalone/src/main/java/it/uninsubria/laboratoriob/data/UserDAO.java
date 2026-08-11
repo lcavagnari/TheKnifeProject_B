@@ -31,7 +31,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     protected abstract T mapRow(ResultSet rs) throws SQLException;
 
     public Optional<T> findById(UUID uId) {
-        final String query = "SELECT id, username, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date FROM \"user\" where id=? AND is_owner = " + isOwner;
+        final String query = "SELECT id, username, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date, is_system FROM \"user\" where id=? AND is_owner = " + isOwner;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -49,7 +49,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     }
 
     public Optional<T> findByUsername(String username) {
-        final String query = "SELECT id, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date FROM \"user\" where username=? AND is_owner = " + isOwner;
+        final String query = "SELECT id, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date, is_system FROM \"user\" where username=? AND is_owner = " + isOwner;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -69,7 +69,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     public List<T> findAll() {
         List<T> users = new ArrayList<>();
 
-        final String query = "SELECT id, username, psw_hash, psw_salt, first_name,last_name, latitude, longitude, birth_date FROM \"user\" where is_owner = " + isOwner;
+        final String query = "SELECT id, username, psw_hash, psw_salt, first_name,last_name, latitude, longitude, birth_date, is_system FROM \"user\" where is_owner = " + isOwner;
 
         try (Connection conn = Database.getConnection();
              Statement stmt = conn.createStatement();
@@ -90,23 +90,28 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     public boolean save(T user) {
         Location loc = user.getLocation();
 
-        String query = "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, latitude,longitude, is_owner) VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)";
+        String query = "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, latitude, longitude, is_owner, is_system) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, user.getId().toString());
+            stmt.setObject(1, user.getId(), Types.OTHER);
             stmt.setString(2, user.getUsername());
             stmt.setString(3, user.getPasswordHash());
             stmt.setString(4, user.getPasswordSalt());
             stmt.setString(5, user.getName());
             stmt.setString(6, user.getLastName());
-            stmt.setDouble(7, loc.getLatitude());
-            stmt.setDouble(7, loc.getLongitude());
-            stmt.setString(8, user.getDateOfBirth().toString());
-            stmt.setBoolean(9, isOwner);
+            stmt.setDate(7, java.sql.Date.valueOf(user.getDateOfBirth()));
+            if (loc != null) {
+                stmt.setDouble(8, loc.getLatitude());
+                stmt.setDouble(9, loc.getLongitude());
+            } else {
+                stmt.setNull(8, Types.DOUBLE);
+                stmt.setNull(9, Types.DOUBLE);
+            }
+            stmt.setBoolean(10, isOwner);
+            stmt.setBoolean(11, user.isSystem());
 
             if (user.getLocation() != null) {
-                // TODO: Aggiungere verifica se esiste una posizione uguale per evitare duplicati nella tabella di lookup
                 locationDAO.save(user.getLocation());
             }
 
@@ -120,7 +125,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
     @Override
     public boolean update(T user) {
-        final String query = "UPDATE \"user\" SET username=?, password_hash=?, salt=?, name=?, last_name=?, location_id=?, date_of_birth=?, WHERE id=? AND is_owner =" + isOwner;
+        final String query = "UPDATE \"user\" SET username=?, psw_hash=?, psw_salt=?, first_name=?, last_name=?, birth_date=?, latitude=?, longitude=?, is_system=? WHERE id=? AND is_owner=" + isOwner;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -129,9 +134,16 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
             stmt.setString(3, user.getPasswordSalt());
             stmt.setString(4, user.getName());
             stmt.setString(5, user.getLastName());
-            stmt.setString(6, user.getLocation() != null ? user.getLocation().getId().toString() : null);
-            stmt.setString(7, user.getDateOfBirth().toString());
-            stmt.setString(8, user.getId().toString());
+            stmt.setDate(6, java.sql.Date.valueOf(user.getDateOfBirth()));
+            if (user.getLocation() != null) {
+                stmt.setDouble(7, user.getLocation().getLatitude());
+                stmt.setDouble(8, user.getLocation().getLongitude());
+            } else {
+                stmt.setNull(7, Types.DOUBLE);
+                stmt.setNull(8, Types.DOUBLE);
+            }
+            stmt.setBoolean(9, user.isSystem());
+            stmt.setObject(10, user.getId(), Types.OTHER);
 
             if (user.getLocation() != null)
                 locationDAO.save(user.getLocation());
@@ -150,7 +162,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id.toString());
+            stmt.setObject(1, id, Types.OTHER);
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -182,13 +194,13 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     }
 
     protected boolean addSpecial(UUID userId, UUID restaurantId) {
-        String query = "INSERT INTO" + ((isOwner) ? "user_restaurants" : "user_favorites") + "VALUES (?,?)";
+        String query = "INSERT INTO " + ((isOwner) ? "user_restaurants" : "user_favorites") + " VALUES (?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, userId.toString());
-            stmt.setString(2, restaurantId.toString());
+            stmt.setObject(1, userId, Types.OTHER);
+            stmt.setObject(2, restaurantId, Types.OTHER);
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -204,8 +216,8 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, restaurantId.toString());
-            stmt.setString(2, customerId.toString());
+            stmt.setObject(1, restaurantId, Types.OTHER);
+            stmt.setObject(2, customerId, Types.OTHER);
 
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {

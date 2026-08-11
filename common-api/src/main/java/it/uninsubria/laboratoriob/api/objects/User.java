@@ -38,8 +38,15 @@ public abstract class User extends Entity {
     private String passwordHash;
     private String passwordSalt;
 
+    private boolean system;
+
     public User(String username, String passwordHash, String salt, String name, String lastName, Location location,
                 LocalDate dateOfBirth) {
+        this(username, passwordHash, salt, name, lastName, location, dateOfBirth, false);
+    }
+
+    public User(String username, String passwordHash, String salt, String name, String lastName, Location location,
+                LocalDate dateOfBirth, boolean system) {
         super();
         this.username = (username == null || username.length() < 4) ? "user" : username;
         this.name = (name == null || name.length() < 4) ? "nome" : name;
@@ -49,11 +56,17 @@ public abstract class User extends Entity {
 
         this.passwordHash = passwordHash;
         this.passwordSalt = salt;
+        this.system = system;
 
     }
 
     public User(UUID id, String username, String passwordHash, String salt, String name, String lastName, Location location,
                 LocalDate dateOfBirth) {
+        this(id, username, passwordHash, salt, name, lastName, location, dateOfBirth, false);
+    }
+
+    public User(UUID id, String username, String passwordHash, String salt, String name, String lastName, Location location,
+                LocalDate dateOfBirth, boolean system) {
         super(id);
         this.username = (username == null || username.length() < 3) ? null : username;
         this.name = (name == null || name.length() < 4) ? "nome" : name;
@@ -63,6 +76,7 @@ public abstract class User extends Entity {
         this.passwordSalt = salt;
 
         this.location = location;
+        this.system = system;
 
         LocalDate birth = (dateOfBirth == null) ? LocalDate.now().minusDays(1) : dateOfBirth;
         if (birth.isBefore(LocalDate.MIN) || birth.isAfter(LocalDate.now().plusDays(1))) {

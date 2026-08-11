@@ -192,17 +192,17 @@ public class LoginMenu {
 
         int attempts = 0;
         try {
-            while (attempts >= 4) {
+            while (attempts < 4) {
                 if (attempts >= 4) throw new AbortOperationException("Raggiunto limite massimo di tentativi");
 
                 String username = IO.getUserInput("Inserisci il nome utente:");
                 String password = IO.getUserInput("Inserisci la password:");
 
                 User user = Loader.findUserByName(username);
-                if (user == null)
+                if (user == null || Loader.isSystemUser(user))
                     IO.printErrorMessage("Utente non trovato");
 
-                if (PasswordHasher.verify(password, user.getPasswordSalt(), user.getPasswordHash())) {
+                else if (PasswordHasher.verify(password, user.getPasswordSalt(), user.getPasswordHash())) {
                     IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
                     return user;

@@ -46,8 +46,7 @@ public class Customer extends User {
      */
     public Customer(UUID id, String username, String password, String salt, String name, String lastName,
                     Location location, LocalDate dateOfBirth) {
-        super(id, username, password, salt, name, lastName, location, dateOfBirth);
-        this.favouriteRestourants = new HashSet<>();
+        this(id, username, password, salt, name, lastName, location, dateOfBirth, new HashSet<>(), false);
     }
 
     /**
@@ -66,7 +65,12 @@ public class Customer extends User {
      */
     public Customer(UUID id, String username, String password, String salt, String name, String lastName,
                     Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants) {
-        super(id, username, password, salt, name, lastName, location, dateOfBirth);
+        this(id, username, password, salt, name, lastName, location, dateOfBirth, favouriteRestourants, false);
+    }
+
+    public Customer(UUID id, String username, String password, String salt, String name, String lastName,
+                    Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants, boolean system) {
+        super(id, username, password, salt, name, lastName, location, dateOfBirth, system);
         this.favouriteRestourants = (favouriteRestourants != null) ? favouriteRestourants : new HashSet<>();
     }
 

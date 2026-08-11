@@ -44,6 +44,10 @@ public class Loader {
     private final static CustomerDAO CUSTOMER_DAO = new CustomerDAO();
     private final static OwnerDAO OWNER_DAO = new OwnerDAO();
 
+    public static boolean isSystemUser(User user) {
+        return user != null && user.isSystem();
+    }
+
     // ── Write operations ──
 
     public static void addRestaurant(Restaurant r) {

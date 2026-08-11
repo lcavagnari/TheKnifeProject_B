@@ -8,8 +8,10 @@ import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.data.LocationDAO;
+import it.uninsubria.laboratoriob.data.OwnerDAO;
 import it.uninsubria.laboratoriob.data.RestaurantDAO;
 import it.uninsubria.laboratoriob.ui.IO;
 import lombok.experimental.UtilityClass;
@@ -18,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.SecureRandom;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -44,6 +47,13 @@ public class CsvParser {
 
     private final static RestaurantDAO RESTAURANT_DAO = new RestaurantDAO();
     private final static LocationDAO LOCATION_DAO = new LocationDAO();
+    private final static OwnerDAO OWNER_DAO = new OwnerDAO();
+
+    public static final UUID SYSTEM_OWNER_ID = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes());
+    private static final String SYSTEM_OWNER_USERNAME = "system";
+    private static final String SYSTEM_OWNER_PASSWORD = "system";
+    private static final String SYSTEM_OWNER_SALT = PasswordHasher.generateSalt();
+    private static final String SYSTEM_OWNER_PASSWORD_HASH = PasswordHasher.hash(SYSTEM_OWNER_PASSWORD, SYSTEM_OWNER_SALT);
 
     private static String[] retrieveLocData(String address, String location) {
         String[] cityAndNation = location.split(",");
@@ -183,7 +193,29 @@ public class CsvParser {
         return cuisineTypes;
     }
 
-    private static Restaurant createRestaurant(String[] fields) {
+    public static Owner getOrCreateSystemOwner() {
+        Optional<Owner> existing = OWNER_DAO.findById(SYSTEM_OWNER_ID);
+        if (existing.isPresent()) {
+            return existing.get();
+        }
+
+        Owner systemOwner = new Owner(
+                SYSTEM_OWNER_ID,
+                SYSTEM_OWNER_USERNAME,
+                SYSTEM_OWNER_PASSWORD_HASH,
+                SYSTEM_OWNER_SALT,
+                "System",
+                "Michelin",
+                null,
+                LocalDate.of(2000, 1, 1),
+                true
+        );
+
+        OWNER_DAO.save(systemOwner);
+        return systemOwner;
+    }
+
+    private static Restaurant createRestaurant(String[] fields, Owner owner) {
         String[] locData = retrieveLocData(fields[1], fields[2]);
         Set<CuisineType> cuisineTypes = parseCuisineTypes(fields[4]);
         Set<String> services = parseServices(fields[12]);
@@ -200,7 +232,7 @@ public class CsvParser {
                 fields[0],
                 fields[13],
                 fields[9],
-                null,
+                owner,
                 nationalPrefix + fields[7],
                 location,
                 PriceRange.byDollarAmount(fields[3].length()),
@@ -220,9 +252,11 @@ public class CsvParser {
             List<String> csvLines = lines.skip(1).toList();
             System.out.println("Processando " + csvLines.size() + " ristoranti...");
 
+            Owner systemOwner = getOrCreateSystemOwner();
+
             List<Restaurant> restaurants = csvLines.stream()
                     .map(line -> line.split(";"))
-                    .map(CsvParser::createRestaurant)
+                    .map(fields -> createRestaurant(fields, systemOwner))
                     .filter(Objects::nonNull)
                     .toList();
 
@@ -242,6 +276,7 @@ public class CsvParser {
             });
 
             CompletableFuture<Void> cacheFuture = CompletableFuture.runAsync(() -> {
+                Loader.addUser(systemOwner);
                 for (Restaurant r : restaurants) Loader.addRestaurant(r);
                 System.out.println("✅ Ristoranti aggiunti alla cache in memoria!");
             });
