@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Classe di utilità responsabile del caricamento e della gestione dei dati
@@ -33,10 +34,10 @@ import java.util.concurrent.CompletionException;
 @UtilityClass
 public class Loader {
 
-    private final static Map<UUID, Restaurant> restaurantsById = new HashMap<>();
-    private final static Map<String, Restaurant> restaurantsByName = new HashMap<>();
-    private final static Map<UUID, User> usersById = new HashMap<>();
-    private final static Map<String, User> usersByName = new HashMap<>();
+    private final static Map<UUID, Restaurant> restaurantsById = new ConcurrentHashMap<>();
+    private final static Map<String, Restaurant> restaurantsByName = new ConcurrentHashMap<>();
+    private final static Map<UUID, User> usersById = new ConcurrentHashMap<>();
+    private final static Map<String, User> usersByName = new ConcurrentHashMap<>();
 
     private final static RestaurantDAO restaurantDAO = new RestaurantDAO();
     private final static ReviewDAO reviewDAO = new ReviewDAO();
@@ -56,6 +57,16 @@ public class Loader {
         if (r != null) restaurantsByName.remove(r.getName());
     }
 
+    public static void updateRestaurant(Restaurant oldRestaurant, Restaurant newRestaurant) {
+        if (oldRestaurant == null || newRestaurant == null) return;
+
+        restaurantsById.remove(oldRestaurant.getId());
+        restaurantsByName.remove(oldRestaurant.getName());
+
+        restaurantsById.put(newRestaurant.getId(), newRestaurant);
+        restaurantsByName.put(newRestaurant.getName(), newRestaurant);
+    }
+
     public static void addUser(User u) {
         usersById.put(u.getId(), u);
         usersByName.put(u.getUsername(), u);
@@ -64,6 +75,16 @@ public class Loader {
     public static void removeUser(UUID id) {
         User u = usersById.remove(id);
         if (u != null) usersByName.remove(u.getUsername());
+    }
+
+    public static void updateUser(User oldUser, User newUser) {
+        if (oldUser == null || newUser == null) return;
+
+        usersById.remove(oldUser.getId());
+        usersByName.remove(oldUser.getUsername());
+
+        usersById.put(newUser.getId(), newUser);
+        usersByName.put(newUser.getUsername(), newUser);
     }
 
     // ── Read operations (single entity) ──

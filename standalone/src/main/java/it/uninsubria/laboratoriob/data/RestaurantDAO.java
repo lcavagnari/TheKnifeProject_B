@@ -266,4 +266,110 @@ public class RestaurantDAO implements DAO<Restaurant> {
             return false;
         }
     }
+
+    public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) {
+        String deleteQuery = "DELETE FROM restaurant_cuisine WHERE restaurant_id = ?";
+        String insertQuery = "INSERT INTO restaurant_cuisine (restaurant_id, type) VALUES (?, ?)";
+        String findTypeQuery = "SELECT id FROM cuisine_type WHERE description = ?";
+
+        try (Connection conn = Database.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
+                deleteStmt.setString(1, restaurantId.toString());
+                deleteStmt.executeUpdate();
+            }
+
+            for (CuisineType cuisine : cuisines) {
+                int typeId = -1;
+                try (PreparedStatement findStmt = conn.prepareStatement(findTypeQuery)) {
+                    findStmt.setString(1, cuisine.name());
+                    try (ResultSet rs = findStmt.executeQuery()) {
+                        if (rs.next()) {
+                            typeId = rs.getInt("id");
+                        }
+                    }
+                }
+
+                if (typeId == -1) {
+                    String insertTypeQuery = "INSERT INTO cuisine_type (id, description) VALUES (DEFAULT, ?) RETURNING id";
+                    try (PreparedStatement insertTypeStmt = conn.prepareStatement(insertTypeQuery)) {
+                        insertTypeStmt.setString(1, cuisine.name());
+                        try (ResultSet rs = insertTypeStmt.executeQuery()) {
+                            if (rs.next()) {
+                                typeId = rs.getInt("id");
+                            }
+                        }
+                    }
+                }
+
+                if (typeId != -1) {
+                    try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+                        insertStmt.setString(1, restaurantId.toString());
+                        insertStmt.setInt(2, typeId);
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Errore updateCuisines in RestaurantDAO: " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean updateServices(UUID restaurantId, Set<String> services) {
+        String deleteQuery = "DELETE FROM restaurant_services WHERE restaurant_id = ?";
+        String insertQuery = "INSERT INTO restaurant_services (restaurant_id, service) VALUES (?, ?)";
+        String findServiceQuery = "SELECT id FROM services_and_facilities WHERE description = ?";
+
+        try (Connection conn = Database.getConnection()) {
+            conn.setAutoCommit(false);
+
+            try (PreparedStatement deleteStmt = conn.prepareStatement(deleteQuery)) {
+                deleteStmt.setString(1, restaurantId.toString());
+                deleteStmt.executeUpdate();
+            }
+
+            for (String service : services) {
+                int serviceId = -1;
+                try (PreparedStatement findStmt = conn.prepareStatement(findServiceQuery)) {
+                    findStmt.setString(1, service);
+                    try (ResultSet rs = findStmt.executeQuery()) {
+                        if (rs.next()) {
+                            serviceId = rs.getInt("id");
+                        }
+                    }
+                }
+
+                if (serviceId == -1) {
+                    String insertServiceQuery = "INSERT INTO services_and_facilities (id, description) VALUES (DEFAULT, ?) RETURNING id";
+                    try (PreparedStatement insertServiceStmt = conn.prepareStatement(insertServiceQuery)) {
+                        insertServiceStmt.setString(1, service);
+                        try (ResultSet rs = insertServiceStmt.executeQuery()) {
+                            if (rs.next()) {
+                                serviceId = rs.getInt("id");
+                            }
+                        }
+                    }
+                }
+
+                if (serviceId != -1) {
+                    try (PreparedStatement insertStmt = conn.prepareStatement(insertQuery)) {
+                        insertStmt.setString(1, restaurantId.toString());
+                        insertStmt.setInt(2, serviceId);
+                        insertStmt.executeUpdate();
+                    }
+                }
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            System.err.println("Errore updateServices in RestaurantDAO: " + e.getMessage());
+            return false;
+        }
+    }
 }

@@ -2,6 +2,7 @@ package it.uninsubria.laboratoriob.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.data.ReviewDAO;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
@@ -12,6 +13,7 @@ import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.ui.Menus;
+import it.uninsubria.laboratoriob.utils.Loader;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -26,6 +28,8 @@ import java.util.*;
  * @version 1.0
  */
 public class OwnerMenus extends Menus {
+
+    private static final ReviewDAO REVIEW_DAO = new ReviewDAO();
 
     /**
      * Riferimento all'owner correntemente autenticato.<p>
@@ -87,6 +91,8 @@ public class OwnerMenus extends Menus {
      */
     @Override
     protected void viewRestaurantDetails(Restaurant restaurant) {
+        String originalName = restaurant.getName();
+
         while (true) {
             IO.clearScreen();
 
@@ -181,7 +187,18 @@ public class OwnerMenus extends Menus {
                         IO.printSuccessMessage("Servizi aggiornati.");
                     }
                     case 13 -> {
-                        new RestaurantDAO().update(restaurant);
+                        RestaurantDAO dao = new RestaurantDAO();
+                        dao.update(restaurant);
+                        dao.updateCuisines(restaurant.getId(), restaurant.getCuisinesTypes());
+                        dao.updateServices(restaurant.getId(), restaurant.getServices());
+
+                        if (!originalName.equals(restaurant.getName())) {
+                            Loader.removeRestaurant(restaurant.getId());
+                            owner.getRestaurantsByName().remove(originalName);
+                        }
+                        Loader.addRestaurant(restaurant);
+                        owner.getRestaurantsByName().put(restaurant.getName(), restaurant);
+
                         IO.printSuccessMessage("Modifiche salvate.");
                         return;
                     }
@@ -304,6 +321,7 @@ public class OwnerMenus extends Menus {
             Review selected = allReviews.get(sel - 1);
             String response = IO.getUserInput("Scrivi la tua risposta (max 300 caratteri):");
             selected.setReply(response);
+            REVIEW_DAO.update(selected);
 
             IO.printSuccessMessage("Risposta salvata.");
             IO.getUserInput("Premi invio per continuare.");

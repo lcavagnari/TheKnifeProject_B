@@ -6,6 +6,7 @@ import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
+import it.uninsubria.laboratoriob.data.ReviewDAO;
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.ui.Menus;
 import it.uninsubria.laboratoriob.utils.Loader;
@@ -22,6 +23,8 @@ import java.util.*;
  * @version 1.0
  */
 public class CustomerMenus extends Menus {
+
+    private static final ReviewDAO REVIEW_DAO = new ReviewDAO();
 
     /**
      * Riferimento al client correntemente autenticato.<p>
@@ -181,12 +184,17 @@ public class CustomerMenus extends Menus {
                             String text = IO.getUserInput("Raccontaci della tua esperienza [4-200 caratteri]:");
 
                             Review review = new Review(restaurant, customer, value, text);
+                            restaurant.addReview(review);
+                            REVIEW_DAO.save(review);
+                            IO.printSuccessMessage("Recensione salvata.");
                             break;
                         }
 
                         String newText = IO.getUserInput("Raccontaci della tua esperienza [4-200 caratteri]:");
                         Validators.validateString(newText);
                         usersReview.setText(newText);
+                        REVIEW_DAO.update(usersReview);
+                        IO.printSuccessMessage("Recensione aggiornata.");
                     }
                     default -> IO.printErrorMessage("Opzione non valida.");
                 }
