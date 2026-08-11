@@ -1,9 +1,9 @@
 package it.uninsubria.laboratoriob.ui;
 
-import it.uninsubria.laboratoriob.Validators;
-import it.uninsubria.laboratoriob.enums.Nation;
-import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.objects.Location;
+import it.uninsubria.laboratoriob.api.Validators;
+import it.uninsubria.laboratoriob.api.enums.Nation;
+import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.objects.Location;
 
 import java.util.*;
 

@@ -1,8 +1,8 @@
 package it.uninsubria.laboratoriob.ui.menus;
 
-import it.uninsubria.laboratoriob.enums.UserRole;
-import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.objects.*;
+import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.ui.Menus;
 

@@ -1,12 +1,12 @@
 package it.uninsubria.laboratoriob.utils;
 
 
-import it.uninsubria.laboratoriob.data.CustomerDAO;
-import it.uninsubria.laboratoriob.data.OwnerDAO;
-import it.uninsubria.laboratoriob.data.RestaurantDAO;
-import it.uninsubria.laboratoriob.data.ReviewDAO;
-import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.objects.*;
+import it.uninsubria.laboratoriob.api.data.CustomerDAO;
+import it.uninsubria.laboratoriob.api.data.OwnerDAO;
+import it.uninsubria.laboratoriob.api.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.api.data.ReviewDAO;
+import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.ui.IO;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
@@ -23,7 +23,7 @@ import java.util.concurrent.CompletionException;
  * dell'applicazione
  * a partire dal database.
  * <p>
- * Gestisce la lettura delle entità tramite i relativi it.uninsubria.laboratoriob.data.DAO e le inserisce in
+ * Gestisce la lettura delle entità tramite i relativi it.uninsubria.laboratoriob.api.data.DAO e le inserisce in
  * strutture dati statiche.
  * <p>
  *

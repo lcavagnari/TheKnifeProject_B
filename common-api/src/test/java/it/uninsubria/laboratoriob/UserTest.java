@@ -1,8 +1,8 @@
 package it.uninsubria.laboratoriob;
 
-import it.uninsubria.laboratoriob.enums.Nation;
-import it.uninsubria.laboratoriob.objects.Customer;
-import it.uninsubria.laboratoriob.objects.Location;
+import it.uninsubria.laboratoriob.api.enums.Nation;
+import it.uninsubria.laboratoriob.api.objects.Customer;
+import it.uninsubria.laboratoriob.api.objects.Location;
 
 import java.security.SecureRandom;
 import java.time.LocalDate;

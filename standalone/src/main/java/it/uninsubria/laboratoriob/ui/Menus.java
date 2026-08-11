@@ -1,9 +1,9 @@
 package it.uninsubria.laboratoriob.ui;
 
-import it.uninsubria.laboratoriob.Validators;
-import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.objects.Restaurant;
-import it.uninsubria.laboratoriob.objects.User;
+import it.uninsubria.laboratoriob.api.Validators;
+import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.utils.Loader;
 
 import java.util.Map;
@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * @see IO
  * @see Loader
- * @see it.uninsubria.laboratoriob.objects.Restaurant
+ * @see it.uninsubria.laboratoriob.api.objects.Restaurant
  * @see User
  */
 public abstract class Menus {

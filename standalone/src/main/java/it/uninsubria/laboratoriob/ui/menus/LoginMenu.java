@@ -1,10 +1,10 @@
 package it.uninsubria.laboratoriob.ui.menus;
 
-import it.uninsubria.laboratoriob.Validators;
-import it.uninsubria.laboratoriob.data.CustomerDAO;
-import it.uninsubria.laboratoriob.data.OwnerDAO;
-import it.uninsubria.laboratoriob.exceptions.AbortOperationException;
-import it.uninsubria.laboratoriob.objects.*;
+import it.uninsubria.laboratoriob.api.Validators;
+import it.uninsubria.laboratoriob.api.data.CustomerDAO;
+import it.uninsubria.laboratoriob.api.data.OwnerDAO;
+import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.ui.IO;
 import it.uninsubria.laboratoriob.utils.Loader;
 import it.uninsubria.laboratoriob.utils.PasswordHasher;
@@ -24,7 +24,7 @@ import java.time.LocalDateTime;
  * <h2>Side effects</h2>
  * <ul>
  *   <li><b>register()</b>: inserisce l'utente creato nelle mappe di {@link Loader}
- *       (username→utente e id→utente) e invoca {@link it.uninsubria.laboratoriob.data.UserDAO#save(Object)}.</li>
+ *       (username→utente e id→utente) e invoca {@link it.uninsubria.laboratoriob.api.data.UserDAO#save(Object)}.</li>
  *   <li><b>login()</b>: nessuna modifica allo stato persistente, ma può lanciare
  *       {@link AbortOperationException} se superato il numero massimo di tentativi.</li>
  * </ul>
@@ -49,7 +49,7 @@ public class LoginMenu {
      *   <li>Scelta del tipo utente: gestore ({@link Owner}) o customere ({@link Customer}).</li>
      *   <li>Raccolta e validazione di username, nome, cognome, location (facoltativa) e data di nascita.</li>
      *   <li>Impostazione e validazione della password.</li>
-     *   <li>Creazione dell’istanza {@link User}, salvataggio su {@link Loader} e persistenza via {@link it.uninsubria.laboratoriob.data.UserDAO#save(Object)}.</li>
+     *   <li>Creazione dell’istanza {@link User}, salvataggio su {@link Loader} e persistenza via {@link it.uninsubria.laboratoriob.api.data.UserDAO#save(Object)}.</li>
      * </ol>
      * </p>
      *
