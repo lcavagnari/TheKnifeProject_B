@@ -4,6 +4,8 @@ import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,38 +23,41 @@ import java.util.Optional;
  */
 public class TheKnifeClient {
 
+    private static final String serverHost = "localhost";
+    private final int rmiPort = 1099;
+    private static final int heartbeatPort = 5555;
+    private static final long heartbeatIntervalMinutes = 5;
     private final ClientDataStore dataStore;
 
     public TheKnifeClient() {
         this.dataStore = new ClientDataStore();
     }
 
-    public ClientDataStore getDataStore() {
-        return dataStore;
-    }
-
     public Optional<Customer> loginCustomer(String username, String password) {
-        return dataStore.customerDAO().findByUsername(username)
+        return dataStore.getCustomerDAO().findByUsername(username)
                 .filter(c -> c.getPasswordHash().equals(password));
     }
 
     public Optional<Owner> loginOwner(String username, String password) {
-        return dataStore.ownerDAO().findByUsername(username)
+        return dataStore.getOwnerDAO().findByUsername(username)
                 .filter(o -> o.getPasswordHash().equals(password));
     }
 
     public List<Restaurant> searchRestaurantsByName(String name) {
-        return dataStore.restaurantDAO().findAll().stream()
+        return dataStore.getRestaurantDAO().findAll().stream()
                 .filter(r -> r.getName().toLowerCase().contains(name.toLowerCase()))
                 .toList();
     }
 
     public List<Restaurant> getRestaurantsByOwner(Owner owner) {
-        return dataStore.restaurantDAO().findByOwner(owner.getId());
+        return dataStore.getRestaurantDAO().findByOwner(owner.getId());
     }
 
     public static void main(String[] args) {
         System.out.println("The Knife Client starting...");
+        HeartbeatClient heartbeat = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
+        heartbeat.start();
+
         TheKnifeClient client = new TheKnifeClient();
         System.out.println("Client initialized. Data store ready.");
     }
