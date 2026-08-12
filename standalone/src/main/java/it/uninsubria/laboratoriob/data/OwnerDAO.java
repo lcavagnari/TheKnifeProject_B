@@ -15,6 +15,26 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Implementazione del DAO per l'entità {@link Owner}.
+ * <p>
+ * Estende {@link UserDAO} specializzando le operazioni per i proprietari di ristoranti.
+ * Gestisce la associazione many-to-many tra owner e ristoranti tramite la tabella
+ * {@code user_restaurants}.
+ * </p>
+ *
+ * <h2>Responsabilità</h2>
+ * <ul>
+ *   <li>Mappatura delle righe del ResultSet in oggetti {@link Owner} con i ristoranti associati.</li>
+ *   <li>Gestione del salvataggio e aggiornamento dell'owner con i suoi ristoranti.</li>
+ *   <li>Operazioni di aggiunta, rimozione e ricerca ristoranti per owner.</li>
+ * </ul>
+ *
+ * @author Luca Cavagnari
+ * @version 2.0
+ * @see UserDAO
+ * @see Owner
+ */
 public class OwnerDAO extends UserDAO<Owner> {
 
     public OwnerDAO() {

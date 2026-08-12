@@ -12,6 +12,26 @@ import it.uninsubria.laboratoriob.utils.Database;
 import java.sql.*;
 import java.util.*;
 
+/**
+ * Implementazione del DAO per l'entità {@link Restaurant}.
+ * <p>
+ * Gestisce le operazioni CRUD sui ristoranti nel database PostgreSQL, incluse
+ * le operazioni sulle tabelle di join per cucine e servizi associati.
+ * </p>
+ *
+ * <h2>Responsabilità</h2>
+ * <ul>
+ *   <li>Mappatura delle righe del ResultSet in oggetti {@link Restaurant}.</li>
+ *   <li>Gestione delle associazioni many-to-many con {@code cuisine_type} e {@code services_and_facilities}.</li>
+ *   <li>Ricerca per ID, UUID proprietario, e recupero di tutti i ristoranti.</li>
+ *   <li>Aggiornamento transazionale delle cucine e dei servizi associati.</li>
+ * </ul>
+ *
+ * @author Luca Cavagnari
+ * @version 2.0
+ * @see DAO
+ * @see Restaurant
+ */
 public class RestaurantDAO implements DAO<Restaurant> {
 
     private final LocationDAO locationDAO = new LocationDAO();

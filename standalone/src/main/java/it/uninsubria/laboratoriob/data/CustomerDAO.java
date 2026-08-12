@@ -15,8 +15,24 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * it.uninsubria.laboratoriob.api.data.DAO per l'entità {@link Customer}.
+ * Implementazione del DAO per l'entità {@link Customer}.
  * <p>
+ * Estende {@link UserDAO} specializzando le operazioni per i clienti.
+ * Gestisce l'associazione many-to-many tra clienti e ristoranti preferiti
+ * tramite la tabella {@code user_favorites}.
+ * </p>
+ *
+ * <h2>Responsabilità</h2>
+ * <ul>
+ *   <li>Mappatura delle righe del ResultSet in oggetti {@link Customer} con i preferiti associati.</li>
+ *   <li>Gestione del salvataggio e aggiornamento del customer con i suoi preferiti.</li>
+ *   <li>Operazioni di aggiunta, rimozione e ricerca ristoranti preferiti.</li>
+ * </ul>
+ *
+ * @author Luca Cavagnari
+ * @version 2.0
+ * @see UserDAO
+ * @see Customer
  */
 public final class CustomerDAO extends UserDAO<Customer> {
 

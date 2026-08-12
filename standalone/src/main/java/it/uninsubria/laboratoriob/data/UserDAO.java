@@ -9,11 +9,27 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * Contratto it.uninsubria.laboratoriob.api.data.DAO comune ai sottotipi di {@link User} ({@code customer},
- * {@code Owner}).
+ * Classe astratta base per i DAO che gestiscono gli utenti ({@link Customer}, {@link Owner}).
  * <p>
+ * Fornisce le operazioni CRUD comuni a tutti i tipi di utente, gestendo la tabella
+ * {@code "user"} nel database PostgreSQL. Utilizza un flag {@code isOwner} per distinguere
+ * tra clienti e proprietari nella stessa tabella.
+ * </p>
  *
- * @param <T> sottotipo concreto di User
+ * <h2>Responsabilità</h2>
+ * <ul>
+ *   <li>Mappatura delle righe del ResultSet in sottotipi concreti di {@link User}.</li>
+ *   <li>Gestione delle operazioni di ricerca per ID e username.</li>
+ *   <li>Gestione delle associazioni many-to-many (preferiti o ristoranti posseduti).</li>
+ *   <li>Persistenza delle location associate agli utenti.</li>
+ * </ul>
+ *
+ * @param <T> sottotipo concreto di User gestito da questo DAO
+ * @author Luca Cavagnari
+ * @version 2.0
+ * @see DAO
+ * @see CustomerDAO
+ * @see OwnerDAO
  */
 public abstract class UserDAO<T extends User> implements DAO<T> {
 

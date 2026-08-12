@@ -150,12 +150,15 @@ public class LoginMenu {
         }
 
         try {
+            String salt = PasswordHasher.generateSalt();
+            String hashedPassword = PasswordHasher.hash(password, salt);
+
             User user = isOwner
-                    ? new Owner(username, password, PasswordHasher.generateSalt(), firstName, lastName, location, dateOfBirth)
-                    : new Customer(username, password, PasswordHasher.generateSalt(), firstName, lastName, location, dateOfBirth);
+                    ? new Owner(username, hashedPassword, salt, firstName, lastName, location, dateOfBirth)
+                    : new Customer(username, hashedPassword, salt, firstName, lastName, location, dateOfBirth);
 
             if (Validators.validateUser(user))
-                IO.getUserInput("Registrazione completata! Premi Invio per tornare al menu principale.");
+                IO.getUserInput("Registrazione completata! Premi un qualsiasi tasto + Invio per tornare al menu principale.");
 
             Loader.addUser(user);
 

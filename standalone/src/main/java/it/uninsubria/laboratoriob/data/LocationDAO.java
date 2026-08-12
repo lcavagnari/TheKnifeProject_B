@@ -15,8 +15,24 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- * it.uninsubria.laboratoriob.api.data.DAO per l'entità {@link Location}.
+ * Implementazione del DAO per l'entità {@link Location}.
  * <p>
+ * Gestisce le operazioni CRUD sulle posizioni geografiche nel database PostgreSQL.
+ * Le location sono identificate dalla coppia di coordinate (latitudine, longitudine)
+ * anziché da un UUID, poiché la tabella {@code location} utilizza queste come chiave primaria.
+ * </p>
+ *
+ * <h2>Responsabilità</h2>
+ * <ul>
+ *   <li>Ricerca per coordinate geografiche.</li>
+ *   <li>Salvataggio con gestione dei conflitti (ON CONFLICT DO NOTHING).</li>
+ *   <li>Aggiornamento e cancellazione per coordinate.</li>
+ * </ul>
+ *
+ * @author Luca Cavagnari
+ * @version 2.0
+ * @see DAO
+ * @see Location
  */
 public final class LocationDAO implements DAO<Location> {
 

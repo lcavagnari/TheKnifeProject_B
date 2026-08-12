@@ -13,6 +13,25 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Implementazione del DAO per l'entità {@link Review}.
+ * <p>
+ * Gestisce le operazioni CRUD sulle recensioni nel database PostgreSQL.
+ * Ogni recensione è associata a un ristorante e a un utente.
+ * </p>
+ *
+ * <h2>Responsabilità</h2>
+ * <ul>
+ *   <li>Mappatura delle righe del ResultSet in oggetti {@link Review}.</li>
+ *   <li>Ricerca per ID, per ristorante, e recupero di tutte le recensioni.</li>
+ *   <li>Gestione dei timestamp di creazione e risposta.</li>
+ * </ul>
+ *
+ * @author Luca Cavagnari
+ * @version 2.0
+ * @see DAO
+ * @see Review
+ */
 public class ReviewDAO implements DAO<Review> {
 
     private final RestaurantDAO restaurantDAO = new RestaurantDAO();

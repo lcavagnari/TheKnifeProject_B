@@ -8,6 +8,27 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * Gestione della connessione al database PostgreSQL e inizializzazione dello schema.
+ * <p>
+ * Utilizza HikariCP come connection pool per gestire le connessioni in modo efficiente.
+ * Fornisce metodi per inizializzare le tabelle del database, inserire i dati costanti
+ * (fasce di prezzo, premi, tipi di cucina, servizi) e ottenere connessioni dal pool.
+ * </p>
+ *
+ * <h2>Responsabilità</h2>
+ * <ul>
+ *   <li>Creazione e configurazione del connection pool HikariCP.</li>
+ *   <li>Inizializzazione dello schema del database (DDL) con {@code CREATE TABLE IF NOT EXISTS}.</li>
+ *   <li>Popolamento delle tabelle di lookup con dati costanti.</li>
+ *   <li>Fornitura di connessioni sicure tramite {@link #getConnection()}.</li>
+ *   <li>Chiusura controllata del pool alla terminazione dell'applicazione.</li>
+ * </ul>
+ *
+ * @author Luca Cavagnari
+ * @version 2.0
+ * @see com.zaxxer.hikari.HikariDataSource
+ */
 @UtilityClass
 public final class Database {
 
