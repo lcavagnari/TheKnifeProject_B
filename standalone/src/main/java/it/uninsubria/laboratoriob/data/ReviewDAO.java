@@ -45,7 +45,7 @@ public class ReviewDAO implements DAO<Review> {
                 """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id.toString());
+            stmt.setObject(1, id, Types.OTHER);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(mapReview(rs));
@@ -85,7 +85,7 @@ public class ReviewDAO implements DAO<Review> {
                 """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, restaurantId.toString());
+            stmt.setObject(1, restaurantId, Types.OTHER);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     reviews.add(mapReview(rs));

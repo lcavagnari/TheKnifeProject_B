@@ -66,7 +66,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, id.toString());
+            stmt.setObject(1, id, Types.OTHER);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(mapRestaurant(rs));
@@ -113,7 +113,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, ownerId.toString());
+            stmt.setObject(1, ownerId, Types.OTHER);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     restaurants.add(mapRestaurant(rs));
@@ -135,7 +135,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, restaurantId.toString());
+            stmt.setObject(1, restaurantId, Types.OTHER);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     try {
@@ -160,7 +160,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, restaurantId.toString());
+            stmt.setObject(1, restaurantId, Types.OTHER);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     services.add(rs.getString("description"));

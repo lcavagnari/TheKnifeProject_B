@@ -86,7 +86,7 @@ public final class LocationDAO implements DAO<Location> {
 
     @Override
     public boolean save(Location location) {
-        String query = "INSERT INTO location (latitude, longitude, city, country, address) VALUES (?,?,?,?,?)";
+        String query = "INSERT INTO location (latitude, longitude, city, country, address) VALUES (?,?,?,?,?) ON CONFLICT (latitude, longitude) DO NOTHING";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -96,7 +96,7 @@ public final class LocationDAO implements DAO<Location> {
             stmt.setString(4, location.getNation().getIsoCode());
             stmt.setString(5, location.getAddress());
 
-            return stmt.executeUpdate() > 0;
+            return stmt.executeUpdate() >= 0;
         } catch (SQLException e) {
             System.err.println("Errore save in LocationDAO: " + e.getMessage());
             return false;

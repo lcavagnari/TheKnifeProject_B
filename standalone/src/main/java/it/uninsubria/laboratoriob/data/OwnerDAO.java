@@ -53,7 +53,7 @@ public class OwnerDAO extends UserDAO<Owner> {
                 Optional<Restaurant> r1 = restaurantDAO.findById(r.getId());
                 if (r1.isEmpty()) restaurantDAO.save(r);
 
-                addSpecial(r.getId(), user.getId());
+                addSpecial(user.getId(), r.getId());
             }
         }
 

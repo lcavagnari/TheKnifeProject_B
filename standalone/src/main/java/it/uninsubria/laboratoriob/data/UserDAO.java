@@ -35,7 +35,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, uId.toString());
+            stmt.setObject(1, uId, Types.OTHER);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) return Optional.of(mapRow(rs));
@@ -179,7 +179,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
 
-            stmt.setString(1, userId.toString());
+            stmt.setObject(1, userId, Types.OTHER);
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next())
