@@ -90,7 +90,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     public boolean save(T user) {
         Location loc = user.getLocation();
 
-        String query = "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, latitude, longitude, is_owner, is_system) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO \"user\" (id, username, hash, salt, first_name, last_name, birth_date, latitude, longitude, is_owner, is_system) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
