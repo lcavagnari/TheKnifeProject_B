@@ -1,7 +1,6 @@
 package it.uninsubria.laboratoriob.server.utils;
 
 
-import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.server.data.CustomerDAO;
 import it.uninsubria.laboratoriob.server.data.OwnerDAO;
@@ -11,6 +10,7 @@ import it.uninsubria.laboratoriob.server.ui.IO;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -212,26 +212,15 @@ public class Loader {
         }
     }
 
-    public static void updateMichelinDataset(String path) {
+    public static void updateMichelinDataset(String path) throws IOException {
         path = (path != null && !path.isBlank()) ? path : "michelin_my_maps.csv";
+        Path inputPath = Paths.get(path).normalize().toRealPath();
 
-        Path inputPath;
-        try {
-            inputPath = Paths.get(path).normalize().toRealPath();
-            File dataset = inputPath.toFile();
+        File dataset = inputPath.toFile();
 
-            if (!dataset.exists() || !dataset.isFile() || !dataset.getName().endsWith(".csv")) {
-                IO.printErrorMessage("File or path " + path
-                        + " does not exist or it is not supported by the program, please check and try again.");
-                return;
-            }
-
-        } catch (AbortOperationException ignored) {
-            IO.printErrorMessage("Operazione annullata");
-            return;
-
-        } catch (Exception ignored) {
-            IO.printErrorMessage("File or path " + path + " does not exist, check and try again.");
+        if (!dataset.exists() || !dataset.isFile() || !dataset.getName().endsWith(".csv")) {
+            IO.printErrorMessage("File or path " + path
+                    + " does not exist or it is not supported by the program, please check and try again.");
             return;
         }
 

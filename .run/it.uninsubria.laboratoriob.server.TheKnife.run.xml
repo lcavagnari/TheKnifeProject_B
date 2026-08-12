@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="it.uninsubria.laboratoriob.server.TheKnife" type="Application" factoryName="Application" nameIsGenerated="true">
-    <option name="MAIN_CLASS_NAME" value="it.uninsubria.laboratoriob.server.TheKnife" />
+  <configuration default="false" name="it.uninsubria.laboratoriob.server.TheKnifeServer" type="Application" factoryName="Application" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="it.uninsubria.laboratoriob.server.TheKnifeServer" />
     <module name="theknifeserver" />
     <extension name="coverage">
       <pattern>

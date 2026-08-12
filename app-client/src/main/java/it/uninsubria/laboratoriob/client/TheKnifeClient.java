@@ -4,8 +4,8 @@ import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.ui.IO;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
-import lombok.Getter;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,6 +44,7 @@ public class TheKnifeClient {
         this.tcpHbeatClient = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
 
         tcpHbeatClient.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
     }
 
     public Optional<Customer> loginCustomer(String username, String password) {
@@ -67,6 +68,7 @@ public class TheKnifeClient {
     }
 
     public void shutdown() {
-        Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
+        tcpHbeatClient.shutdown();
+        IO.closeScanner();
     }
 }
