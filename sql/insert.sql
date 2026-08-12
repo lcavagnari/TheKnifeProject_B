@@ -297,5 +297,5 @@ INSERT INTO services_and_facilities (id, description) VALUES
 -- ============================================================
 
 INSERT INTO "user" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system)
-VALUES ('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11', 'system', '<generated_at_runtime>', '<generated_at_runtime>', 'System', 'Michelin', '2000-01-01', true, true)
+VALUES ('0f3cc9e2-a04c-36fe-a36b-397dbe59c74b', 'system', '<generated_at_runtime>', '<generated_at_runtime>', 'System', 'Michelin', '2000-01-01', true, true)
 ON CONFLICT (id) DO NOTHING;
