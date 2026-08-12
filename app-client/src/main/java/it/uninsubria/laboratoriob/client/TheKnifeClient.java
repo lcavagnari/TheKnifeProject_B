@@ -23,14 +23,27 @@ import java.util.Optional;
  */
 public class TheKnifeClient {
 
+    public static void main(String[] args) {
+        System.out.println("The Knife Client starting...");
+
+        TheKnifeClient client = new TheKnifeClient();
+
+        System.out.println("Client initialized. Data store ready.");
+    }
+
     private static final String serverHost = "localhost";
     private final int rmiPort = 1099;
     private static final int heartbeatPort = 5555;
     private static final long heartbeatIntervalMinutes = 5;
+
+    private final HeartbeatClient tcpHbeatClient;
     private final ClientDataStore dataStore;
 
     public TheKnifeClient() {
         this.dataStore = new ClientDataStore();
+        this.tcpHbeatClient = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
+
+        tcpHbeatClient.start();
     }
 
     public Optional<Customer> loginCustomer(String username, String password) {
@@ -53,12 +66,7 @@ public class TheKnifeClient {
         return dataStore.getRestaurantDAO().findByOwner(owner.getId());
     }
 
-    public static void main(String[] args) {
-        System.out.println("The Knife Client starting...");
-        HeartbeatClient heartbeat = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
-        heartbeat.start();
-
-        TheKnifeClient client = new TheKnifeClient();
-        System.out.println("Client initialized. Data store ready.");
+    public void shutdown() {
+        Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
     }
 }
