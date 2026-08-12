@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.ui;
+package it.uninsubria.laboratoriob.client.ui;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.enums.Nation;
@@ -8,40 +8,18 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import java.util.*;
 
 /**
- * Classe di utilità per Input/Output da console.<p>
- * Contiene metodi statici per leggere input da tastiera, formattare output e gestire menu testuali.<p>
- * Utilizza Scanner per la lettura dallo standard input.<p>
- * Supporta formati booleani personalizzati, gestione menu, messaggi di errore e pulizia schermo.
- *
- * @author Luca Cavagnari
- * @version 1.1
+ * Classe di utilita per Input/Output da console.
+ * Contiene metodi statici per leggere input da tastiera, formattare output e gestire menu testuali.
  */
 public class IO {
 
-    /**
-     * Istanza Scanner condivisa per la lettura da tastiera.
-     */
     private static final Scanner INPUT = new Scanner(System.in);
-
-    /**
-     * Generatore casuale utilizzato in alcune operazioni di input simulato.
-     */
     private static final Random rd = new Random();
 
-    /**
-     * Chiude lo scanner condiviso per liberare le risorse di input.
-     */
     public static void closeScanner() {
         INPUT.close();
     }
 
-    /**
-     * Stampa un menu testuale con titolo, voci numerate e footer opzionale.
-     *
-     * @param title  titolo del menu (può essere null)
-     * @param footer testo footer opzionale (può essere null)
-     * @param items  array di voci del menu da stampare
-     */
     public static void printMenu(String title, String footer, String... items) {
         if (items.length == 0) return;
         else if (title != null) System.out.println(title + "\n");
@@ -53,13 +31,6 @@ public class IO {
         else System.out.println();
     }
 
-    /**
-     * Richiede input booleano all’utente (sì/no) con validazione.
-     *
-     * @param promptMessage messaggio di richiesta input
-     * @return true se l’input è "s" o "sì", false se "n" o "no"
-     * @throws AbortOperationException se viene inserito il comando di annullamento
-     */
     public static boolean getBooleanInput(String promptMessage) throws AbortOperationException {
         String input = getUserInput(promptMessage).toLowerCase();
 
@@ -72,12 +43,6 @@ public class IO {
         return Boolean.parseBoolean(bool);
     }
 
-    /**
-     * Richiede un input testuale da menu.
-     *
-     * @param promptMessage messaggio di richiesta input
-     * @return stringa inserita dall’utente
-     */
     public static String getMenuUserInput(String promptMessage) {
         INPUT.nextLine();
         System.out.print(IO.replaceText(32, "> ") + promptMessage);
@@ -86,14 +51,6 @@ public class IO {
         return INPUT.nextLine();
     }
 
-    /**
-     * Richiede input testuale all’utente.
-     * Permette di annullare l’operazione digitando ‘::annulla’.
-     *
-     * @param promptMessage messaggio di richiesta input
-     * @return stringa inserita dall’utente
-     * @throws AbortOperationException se viene richiesto l’annullamento
-     */
     public static String getUserInput(String promptMessage) throws AbortOperationException {
         System.out.print(IO.replaceText(32, "> ") + promptMessage + " ");
         while (!INPUT.hasNext()) INPUT.nextLine();
@@ -106,16 +63,6 @@ public class IO {
         return input;
     }
 
-    /**
-     * Richiede input testuale con controllo di lunghezza minima e massima.
-     * Permette l’annullamento tramite ‘::annulla’.
-     *
-     * @param promptMessage messaggio di richiesta input
-     * @param minLength     lunghezza minima accettata
-     * @param maxLength     lunghezza massima accettata
-     * @return stringa conforme ai limiti
-     * @throws AbortOperationException se viene richiesto l’annullamento
-     */
     public static String getUserInput(String promptMessage, int minLength, int maxLength) throws AbortOperationException {
         String input;
         do {
@@ -125,12 +72,6 @@ public class IO {
         return input;
     }
 
-    /**
-     * Richiede un numero di telefono valido con prefisso nazionale.
-     *
-     * @return numero di telefono in formato internazionale
-     * @throws AbortOperationException se viene richiesto l’annullamento
-     */
     public static String getPhoneNumberInput() throws AbortOperationException {
         String input = getUserInput("Inserire numero di telefono con prefisso nazionale:", 10, 15);
 
@@ -142,12 +83,6 @@ public class IO {
         return input;
     }
 
-    /**
-     * Richiede input numerico intero (non decimale) all’utente per menu.
-     *
-     * @param promptMessage messaggio di richiesta input
-     * @return valore intero valido
-     */
     public static Integer getMenuInt(String promptMessage) {
         String input = getMenuUserInput(promptMessage);
 
@@ -159,12 +94,6 @@ public class IO {
         return Integer.parseInt(input);
     }
 
-    /**
-     * Richiede input numerico intero (non decimale) all’utente.
-     *
-     * @param promptMessage messaggio di richiesta input
-     * @return valore intero valido
-     */
     public static Integer getInt(String promptMessage) {
         String input = getUserInput(promptMessage);
 
@@ -176,13 +105,6 @@ public class IO {
         return Integer.parseInt(input);
     }
 
-    /**
-     * Ottiene la posizione geografica di un’entità tramite input utente.
-     *
-     * @param skippable true se è possibile saltare l’inserimento digitando ‘::skip’
-     * @return istanza {@link Location} creata da input utente, oppure null se saltata
-     * @throws AbortOperationException se l’utente interrompe l’operazione
-     */
     public static Location getLocationInput(boolean skippable) throws AbortOperationException {
         Location location = null;
         System.out.println("Puoi inserire l'indirizzo seguendo il formato indicato:");
@@ -191,7 +113,7 @@ public class IO {
 
         while (location == null) {
             try {
-                String addrees = IO.getUserInput("Inserisci l'indirizzo nel seguente formato [indirizzo, città, nazione]: ").trim();
+                String addrees = IO.getUserInput("Inserisci l'indirizzo nel seguente formato [indirizzo, citta, nazione]: ").trim();
                 if (addrees.equals("::skip") && skippable) throw new AbortOperationException();
 
                 String[] fields = addrees.split(",");
@@ -220,15 +142,6 @@ public class IO {
         return location;
     }
 
-    /**
-     * Richiede e interpreta un valore Enum da input utente.<br>
-     * L’input viene normalizzato in MAIUSCOLO e gli spazi sostituiti da underscore.
-     *
-     * @param enumType      classe dell’enum
-     * @param promptMessage messaggio di richiesta
-     * @param <T>           tipo Enum
-     * @return valore Enum parsato da input, o null se interrotto
-     */
     public static <T extends Enum<T>> T getEnumInput(Class<T> enumType, String promptMessage) {
         while (true) {
             try {
@@ -243,14 +156,6 @@ public class IO {
         }
     }
 
-    /**
-     * Permette l’inserimento di un insieme di valori Enum tramite input multiplo.
-     *
-     * @param enumClass classe dell’enum
-     * @param prompt    messaggio iniziale
-     * @param <E>       tipo Enum
-     * @return set di valori Enum inseriti
-     */
     public static <E extends Enum<E>> Set<E> getEnumSetInput(Class<E> enumClass, String prompt) {
         Set<E> result = new HashSet<>();
         System.out.println(prompt + " Scrivi '::stop' per terminare.");
@@ -273,12 +178,6 @@ public class IO {
         return result;
     }
 
-    /**
-     * Permette di inserire e validare più stringhe, terminando con ‘::stop’.
-     *
-     * @param prompt messaggio iniziale
-     * @return insieme di stringhe validate
-     */
     public static Set<String> parseValidatedStrings(String prompt) {
         Set<String> result = new HashSet<>();
         System.out.println(prompt + " Scrivi '::stop' per terminare.");
@@ -300,12 +199,6 @@ public class IO {
         return result;
     }
 
-    /**
-     * Converte una stringa UUID in oggetto UUID.
-     *
-     * @param uuid stringa UUID
-     * @return UUID valido o null se invalido
-     */
     public static UUID parseUUID(String uuid) {
         try {
             return UUID.fromString(uuid);
@@ -314,51 +207,24 @@ public class IO {
         }
     }
 
-
-    /**
-     * Applica formattazione ANSI per il colore del testo.
-     *
-     * @param colorCode codice colore ANSI
-     * @param text      testo da colorare
-     * @return testo colorato
-     */
     public static String replaceText(int colorCode, String text) {
         return "\u001B[" + colorCode + "m" + text + "\u001B[0m";
     }
 
-    /**
-     * Genera una riga separatrice composta da trattini.
-     *
-     * @param qta numero di elementi della tabella
-     * @return stringa di separazione
-     */
     private static String printRow(int qta) {
         return "-".repeat(Math.max(0, (qta * 4) + 1));
     }
 
-    /**
-     * Stampa un messaggio di errore colorato in rosso.
-     *
-     * @param msg messaggio di errore
-     */
     public static void printErrorMessage(String msg) {
         if (msg == null) return;
         System.out.print("\n" + IO.replaceText(31, "! ") + msg);
     }
 
-    /**
-     * Stampa un messaggio di successo colorato in verde.
-     *
-     * @param msg messaggio di successo
-     */
     public static void printSuccessMessage(String msg) {
         if (msg == null) return;
         System.out.print("\n" + IO.replaceText(32, " ⩥ ") + msg);
     }
 
-    /**
-     * Pulisce la schermata della console (Windows o Unix-like).
-     */
     public static void clearScreen() {
         try {
             if (System.getProperty("os.name").toLowerCase().contains("windows")) {

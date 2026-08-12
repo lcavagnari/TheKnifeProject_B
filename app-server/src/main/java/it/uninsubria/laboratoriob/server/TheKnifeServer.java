@@ -1,7 +1,5 @@
 package it.uninsubria.laboratoriob.server;
 
-import it.uninsubria.laboratoriob.server.ui.IO;
-import it.uninsubria.laboratoriob.server.ui.menus.GuestMenus;
 import it.uninsubria.laboratoriob.server.utils.Database;
 import it.uninsubria.laboratoriob.server.utils.HeartbeatServer;
 import it.uninsubria.laboratoriob.server.utils.Loader;
@@ -11,20 +9,17 @@ import java.io.IOException;
 /**
  * Classe principale di ingresso dell'applicazione The Knife.
  * <p>
- * Responsabile dell'avvio dell'applicazione, dell'inizializzazione del database
- * e della navigazione del menu principale. Supporta due modalità di esecuzione:
+ * Responsabile dell'avvio dell'applicazione e dell'inizializzazione del database.
+ * <p>
+ * Supporta la modalità di aggiornamento: esegue il parsing del dataset Michelin CSV
+ * e popola il database (con {@code --update} opzionalmente seguito dal percorso del file).
  * </p>
- * <ul>
- *   <li><b>Modalità aggiornamento</b>: esegue il parsing del dataset Michelin CSV
- *       e popola il database (con {@code --update} opzionalmente seguito dal percorso del file).</li>
- *   <li><b>Modalità interattiva</b>: avvia il menu CLI per la navigazione e gestione dei ristoranti.</li>
- * </ul>
  *
  * @author Luca Cavagnari
  * @version 2.0
  * @see Loader
  * @see Database
- * @see GuestMenus
+
  */
 public class TheKnifeServer {
 
@@ -41,10 +36,10 @@ public class TheKnifeServer {
         Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatServer::shutdown));
 
         if (!Database.initTables())
-            IO.printErrorMessage("ERROR while initialising database schema");
+            System.err.println("ERROR while initialising database schema");
 
         if (!Database.initialiseConstants())
-            IO.printErrorMessage("ERROR while initialising database constants");
+            System.err.println("ERROR while initialising database constants");
     }
 
     /**
@@ -57,7 +52,7 @@ public class TheKnifeServer {
      * @param args argomenti della riga di comando:
      *             <ul>
      *               <li>{@code --update [path]} - aggiorna il dataset Michelin</li>
-     *               <li>nessun argomento - avvia il menu interattivo</li>
+     *               <li>nessun argomento - avvia il server</li>
      *             </ul>
      */
     private void start(String[] args) {
@@ -69,8 +64,8 @@ public class TheKnifeServer {
                 Loader.updateMichelinDataset(null);
             }
         } catch (IOException e) {
-            IO.printErrorMessage("Error occured during database update: "+e);
-            IO.printErrorMessage("Shutting down...");
+            System.err.println("Error occured during database update: " + e);
+            System.err.println("Shutting down...");
             shutdown();
         }
 
@@ -85,12 +80,12 @@ public class TheKnifeServer {
 
 
     public static void main(String[] args) {
-        IO.printSuccessMessage("Loading The Knife...");
+        System.out.println("Loading The Knife Server...");
 
         TheKnifeServer server = new TheKnifeServer();
         server.start(args);
 
-        IO.printSuccessMessage("Loading completed!");
-        new GuestMenus().openMenu();
+        System.out.println("Loading completed!");
+        System.out.println("Server is running. Connect via the client application.");
     }
 }

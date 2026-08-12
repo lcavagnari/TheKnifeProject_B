@@ -1,10 +1,11 @@
-package it.uninsubria.laboratoriob.server.ui.menus;
+package it.uninsubria.laboratoriob.client.ui.menus;
 
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.*;
-import it.uninsubria.laboratoriob.server.ui.IO;
-import it.uninsubria.laboratoriob.server.ui.Menus;
+import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.ui.Menus;
 
 import java.util.Comparator;
 import java.util.Map;
@@ -12,17 +13,13 @@ import java.util.UUID;
 
 /**
  * Menu per utenti non autenticati (guest).
- * Consente la visualizzazione dei ristoranti e delle recensioni pubbliche.
  */
 public class GuestMenus extends Menus {
 
-    public GuestMenus() {
-        super(null);
+    public GuestMenus(ClientDataStore dataStore) {
+        super(null, dataStore);
     }
 
-    /**
-     * Avvia il menu principale per l'utente ospite.
-     */
     @Override
     public void openMenu() {
         while (true) {
@@ -42,9 +39,11 @@ public class GuestMenus extends Menus {
             switch (choice) {
                 case 1 -> {
                     try {
-                        User user = LoginMenu.login();
+                        User user = LoginMenu.login(dataStore);
                         if (user != null) {
-                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new CustomerMenus((Customer) user);
+                            Menus menus = (user.getRole().equals(UserRole.OWNER))
+                                    ? new OwnerMenus((Owner) user, dataStore)
+                                    : new CustomerMenus((Customer) user, dataStore);
                             menus.openMenu();
                         }
                     } catch (AbortOperationException e) {
@@ -53,9 +52,11 @@ public class GuestMenus extends Menus {
                 }
                 case 2 -> {
                     try {
-                        User user = LoginMenu.register();
+                        User user = LoginMenu.register(dataStore);
                         if (user != null) {
-                            Menus menus = (user.getRole().equals(UserRole.OWNER)) ? new OwnerMenus((Owner) user) : new CustomerMenus((Customer) user);
+                            Menus menus = (user.getRole().equals(UserRole.OWNER))
+                                    ? new OwnerMenus((Owner) user, dataStore)
+                                    : new CustomerMenus((Customer) user, dataStore);
                             menus.openMenu();
                         }
                     } catch (AbortOperationException e) {
@@ -69,13 +70,6 @@ public class GuestMenus extends Menus {
         }
     }
 
-
-    /**
-     * Mostra i dettagli di un ristorante a un utente {@link Customer},
-     * permettendo di visualizzare, creare o modificare recensioni.
-     *
-     * @param restaurant ristorante da visualizzare
-     */
     @Override
     public void viewRestaurantDetails(Restaurant restaurant) {
         while (true) {

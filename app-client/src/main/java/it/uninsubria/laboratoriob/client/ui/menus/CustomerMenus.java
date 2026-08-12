@@ -1,53 +1,28 @@
-package it.uninsubria.laboratoriob.server.ui.menus;
-
+package it.uninsubria.laboratoriob.client.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
-import it.uninsubria.laboratoriob.server.data.ReviewDAO;
-import it.uninsubria.laboratoriob.server.ui.IO;
-import it.uninsubria.laboratoriob.server.ui.Menus;
-import it.uninsubria.laboratoriob.server.utils.Loader;
+import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.ui.Menus;
 
 import java.util.*;
 
 /**
- * Classe che gestisce i menu e le operazioni disponibili per gli utenti di tipo {@link Customer}.<p>
- * Estende {@link Menus} fornendo funzionalità specifiche per i clienti.<p>
- * Permette di cercare ristoranti, visualizzare preferiti, creare e gestire recensioni.<p>
- * <p>
- * Autore: Luke
- *
- * @version 1.0
+ * Menu per utenti di tipo Customer.
  */
 public class CustomerMenus extends Menus {
 
-    private static final ReviewDAO REVIEW_DAO = new ReviewDAO();
-
-    /**
-     * Riferimento al client correntemente autenticato.<p>
-     * Utilizzato per accedere ai ristoranti preferiti e alle recensioni personali.
-     */
     private final Customer customer;
 
-    /**
-     * Costruttore che inizializza il menu per un client specifico.<p>
-     * Invoca il costruttore della superclasse passando il client come utente base.
-     *
-     * @param customer il cliente per cui creare il menu
-     */
-    public CustomerMenus(Customer customer) {
-        super(customer);
+    public CustomerMenus(Customer customer, ClientDataStore dataStore) {
+        super(customer, dataStore);
         this.customer = customer;
     }
 
-    /**
-     * Apre il menu principale per il client.<p>
-     * Presenta le opzioni disponibili e gestisce la navigazione tra le diverse funzionalità.<p>
-     * Il ciclo continua finché l'utente non sceglie di disconnettersi o uscire dall'applicazione.
-     */
     @Override
     public void openMenu() {
         while (true) {
@@ -79,12 +54,6 @@ public class CustomerMenus extends Menus {
         }
     }
 
-    /**
-     * Visualizza i ristoranti preferiti dell'utente {@link Customer}.<p>
-     * Recupera gli UUID dei ristoranti preferiti e li carica dal {@link Loader}.<p>
-     * Mostra un menu interattivo per selezionare un ristorante e visualizzarne i dettagli.<p>
-     * Se non ci sono preferiti, viene mostrato un messaggio informativo.
-     */
     private void viewFavourites() {
         Set<UUID> favourites = customer.getFavouriteRestourants();
 
@@ -94,9 +63,8 @@ public class CustomerMenus extends Menus {
             return;
         }
 
-        List<Restaurant> restaurants = Loader.getAllRestaurantsById().entrySet().stream()
-                .filter(e -> favourites.contains(e.getKey()))
-                .map(Map.Entry::getValue)
+        List<Restaurant> restaurants = dataStore.getRestaurantDAO().findAll().stream()
+                .filter(r -> favourites.contains(r.getId()))
                 .toList();
 
         while (true) {
@@ -115,19 +83,6 @@ public class CustomerMenus extends Menus {
         }
     }
 
-    /**
-     * Mostra i dettagli di un ristorante a un utente {@link Customer}.<p>
-     * Visualizza le informazioni complete del ristorante, incluse le recensioni migliori e peggiori.<p>
-     * Permette al client di:<p>
-     * - Creare una nuova recensione se non ne ha ancora scritta una<p>
-     * - Modificare il testo della propria recensione esistente<p>
-     * - Modificare il voto della propria recensione esistente<p>
-     * - Cancellare la propria recensione<p>
-     * <p>
-     * Le operazioni vengono gestite con validazione e messaggi di errore appropriati.
-     *
-     * @param restaurant ristorante da visualizzare e per cui gestire le recensioni
-     */
     @Override
     public void viewRestaurantDetails(Restaurant restaurant) {
         while (true) {
@@ -185,7 +140,7 @@ public class CustomerMenus extends Menus {
 
                             Review review = new Review(restaurant, customer, value, text);
                             restaurant.addReview(review);
-                            REVIEW_DAO.save(review);
+                            dataStore.getReviewDAO().save(review);
                             IO.printSuccessMessage("Recensione salvata.");
                             break;
                         }
@@ -193,7 +148,7 @@ public class CustomerMenus extends Menus {
                         String newText = IO.getUserInput("Raccontaci della tua esperienza [4-200 caratteri]:");
                         Validators.validateString(newText);
                         usersReview.setText(newText);
-                        REVIEW_DAO.update(usersReview);
+                        dataStore.getReviewDAO().update(usersReview);
                         IO.printSuccessMessage("Recensione aggiornata.");
                     }
                     default -> IO.printErrorMessage("Opzione non valida.");

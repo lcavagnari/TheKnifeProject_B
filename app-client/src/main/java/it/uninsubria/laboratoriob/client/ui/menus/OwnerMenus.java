@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.ui.menus;
+package it.uninsubria.laboratoriob.client.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.enums.Award;
@@ -9,50 +9,25 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
-import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
-import it.uninsubria.laboratoriob.server.data.ReviewDAO;
-import it.uninsubria.laboratoriob.server.ui.IO;
-import it.uninsubria.laboratoriob.server.ui.Menus;
-import it.uninsubria.laboratoriob.server.utils.Loader;
+import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.ui.Menus;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
 /**
- * Classe che gestisce i menu e le operazioni disponibili per gli utenti di tipo {@link Owner}.<p>
- * Estende {@link Menus} fornendo funzionalità specifiche per i proprietari di ristoranti.<p>
- * Permette di visualizzare, modificare e gestire i ristoranti posseduti, oltre a rispondere alle recensioni.<p>
- * <p>
- * Autore: Luke
- *
- * @version 1.0
+ * Menu per utenti di tipo Owner.
  */
 public class OwnerMenus extends Menus {
 
-    private static final ReviewDAO REVIEW_DAO = new ReviewDAO();
-
-    /**
-     * Riferimento all'owner correntemente autenticato.<p>
-     * Utilizzato per accedere ai ristoranti posseduti e alle relative operazioni.
-     */
     private final Owner owner;
 
-    /**
-     * Costruttore che inizializza il menu per un proprietario specifico.<p>
-     * Invoca il costruttore della superclasse passando l'owner come utente base.
-     *
-     * @param owner il proprietario per cui creare il menu
-     */
-    public OwnerMenus(Owner owner) {
-        super(owner);
+    public OwnerMenus(Owner owner, ClientDataStore dataStore) {
+        super(owner, dataStore);
         this.owner = owner;
     }
 
-    /**
-     * Apre il menu principale per l'owner.<p>
-     * Presenta le opzioni disponibili e gestisce la navigazione tra le diverse funzionalità.<p>
-     * Il ciclo continua finché l'utente non sceglie di disconnettersi o uscire dall'applicazione.
-     */
     @Override
     public void openMenu() {
         while (true) {
@@ -81,14 +56,6 @@ public class OwnerMenus extends Menus {
         }
     }
 
-    /**
-     * Visualizza i dettagli completi di un ristorante e permette di modificarne le proprietà.<p>
-     * Mostra le recensioni migliori e peggiori ricevute dal ristorante.<p>
-     * Presenta un menu con tutte le operazioni di modifica disponibili per l'owner.<p>
-     * Le modifiche vengono applicate immediatamente e salvate con l'opzione dedicata.
-     *
-     * @param restaurant il ristorante di cui visualizzare e modificare i dettagli
-     */
     @Override
     protected void viewRestaurantDetails(Restaurant restaurant) {
         String originalName = restaurant.getName();
@@ -187,16 +154,11 @@ public class OwnerMenus extends Menus {
                         IO.printSuccessMessage("Servizi aggiornati.");
                     }
                     case 13 -> {
-                        RestaurantDAO dao = new RestaurantDAO();
-                        dao.update(restaurant);
-                        dao.updateCuisines(restaurant.getId(), restaurant.getCuisinesTypes());
-                        dao.updateServices(restaurant.getId(), restaurant.getServices());
+                        dataStore.getRestaurantDAO().update(restaurant);
 
                         if (!originalName.equals(restaurant.getName())) {
-                            Loader.removeRestaurant(restaurant.getId());
                             owner.getRestaurantsByName().remove(originalName);
                         }
-                        Loader.addRestaurant(restaurant);
                         owner.getRestaurantsByName().put(restaurant.getName(), restaurant);
 
                         IO.printSuccessMessage("Modifiche salvate.");
@@ -216,11 +178,6 @@ public class OwnerMenus extends Menus {
         }
     }
 
-    /**
-     * Visualizza le recensioni ricevute negli ultimi 7 giorni per tutti i ristoranti dell'owner.<p>
-     * Raccoglie le recensioni da tutti i ristoranti posseduti, le filtra per data e le ordina cronologicamente.<p>
-     * Se non ci sono recensioni recenti, viene mostrato un messaggio di avviso.
-     */
     protected void viewOwnerLatestReviews() {
         Map<UUID, Restaurant> restaurants = owner.getRestaurantsById();
 
@@ -245,11 +202,6 @@ public class OwnerMenus extends Menus {
         IO.getUserInput("\nPremi invio per tornare.");
     }
 
-    /**
-     * Mostra la lista dei ristoranti posseduti dall'owner e permette di selezionarne uno per visualizzarne i dettagli.<p>
-     * Se l'owner non possiede ristoranti, viene mostrato un messaggio informativo.<p>
-     * Presenta un menu numerato con tutti i nomi dei ristoranti posseduti.
-     */
     private void viewOwnedRestaurants() {
         List<Restaurant> list = new ArrayList<>(owner.getRestaurantsById().values());
         if (list.isEmpty()) {
@@ -280,14 +232,6 @@ public class OwnerMenus extends Menus {
         }
     }
 
-    /**
-     * Permette all'owner di rispondere alle recensioni ricevute per un ristorante specifico.<p>
-     * Mostra tutte le recensioni con le eventuali risposte già fornite.<p>
-     * L'owner può selezionare una recensione e scrivere o modificare la risposta (massimo 300 caratteri).<p>
-     * La risposta viene salvata immediatamente nel sistema.
-     *
-     * @param restaurant il ristorante per cui gestire le risposte alle recensioni
-     */
     private void respondToReview(Restaurant restaurant) {
         List<Review> allReviews = new ArrayList<>(restaurant.getReviews().values());
 
@@ -321,7 +265,7 @@ public class OwnerMenus extends Menus {
             Review selected = allReviews.get(sel - 1);
             String response = IO.getUserInput("Scrivi la tua risposta (max 300 caratteri):");
             selected.setReply(response);
-            REVIEW_DAO.update(selected);
+            dataStore.getReviewDAO().update(selected);
 
             IO.printSuccessMessage("Risposta salvata.");
             IO.getUserInput("Premi invio per continuare.");

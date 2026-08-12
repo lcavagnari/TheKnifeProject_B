@@ -5,6 +5,7 @@ import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.ui.menus.GuestMenus;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
 
 import java.util.List;
@@ -24,11 +25,13 @@ import java.util.Optional;
 public class TheKnifeClient {
 
     public static void main(String[] args) {
-        System.out.println("The Knife Client starting...");
+        IO.printSuccessMessage("Loading The Knife Client...");
 
         TheKnifeClient client = new TheKnifeClient();
 
-        System.out.println("Client initialized. Data store ready.");
+        IO.printSuccessMessage("Client initialized. Data store ready.");
+
+        new GuestMenus(client.dataStore).openMenu();
     }
 
     private static final String serverHost = "localhost";

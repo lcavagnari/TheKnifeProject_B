@@ -6,7 +6,6 @@ import it.uninsubria.laboratoriob.server.data.CustomerDAO;
 import it.uninsubria.laboratoriob.server.data.OwnerDAO;
 import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
 import it.uninsubria.laboratoriob.server.data.ReviewDAO;
-import it.uninsubria.laboratoriob.server.ui.IO;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;
@@ -134,7 +133,7 @@ public class Loader {
         List<Restaurant> restaurants = CompletableFuture
                 .supplyAsync(restaurantDAO::findAll)
                 .exceptionally(ex -> {
-                    IO.printErrorMessage("Errore caricamento restaurants: " + ex.getMessage());
+                    System.err.println("Errore caricamento restaurants: " + ex.getMessage());
                     return new ArrayList<>();
                 })
                 .join();
@@ -146,7 +145,7 @@ public class Loader {
                     CompletableFuture
                             .supplyAsync(() -> reviewDAO.findByRestaurant(restaurant.getId()))
                             .exceptionally(ex -> {
-                                IO.printErrorMessage(
+                                System.err.println(
                                         "Errore caricamento review for restaurant #"
                                                 + restaurant.getId() + ": " + ex.getMessage()
                                 );
@@ -172,14 +171,14 @@ public class Loader {
         CompletableFuture<List<Owner>> owners = CompletableFuture
                 .supplyAsync(OWNER_DAO::findAll)
                 .exceptionally(ex -> {
-                    IO.printErrorMessage("Errore caricamento clienti: " + ex.getMessage());
+                    System.err.println("Errore caricamento clienti: " + ex.getMessage());
                     return null;
                 });
 
         CompletableFuture<List<Customer>> customers = CompletableFuture
                 .supplyAsync(CUSTOMER_DAO::findAll)
                 .exceptionally(ex -> {
-                    IO.printErrorMessage("Errore caricamento proprietari: " + ex.getMessage());
+                    System.err.println("Errore caricamento proprietari: " + ex.getMessage());
                     return null;
                 });
 
@@ -206,9 +205,9 @@ public class Loader {
 
 
         } catch (CompletionException ex) {
-            IO.printErrorMessage("Errore/i durante il caricamento: ");
+            System.err.println("Errore/i durante il caricamento: ");
         } catch (Exception ex) {
-            IO.printErrorMessage("Errore/i durante il caricamento: " + ex.getMessage());
+            System.err.println("Errore/i durante il caricamento: " + ex.getMessage());
         }
     }
 
@@ -219,17 +218,16 @@ public class Loader {
         File dataset = inputPath.toFile();
 
         if (!dataset.exists() || !dataset.isFile() || !dataset.getName().endsWith(".csv")) {
-            IO.printErrorMessage("File or path " + path
+            System.err.println("File or path " + path
                     + " does not exist or it is not supported by the program, please check and try again.");
             return;
         }
 
-        IO.printErrorMessage("Updating michelin data from file...");
+        System.err.println("Updating michelin data from file...");
 
         long timestamp = System.currentTimeMillis();
         CsvParser.parseFromDataset(inputPath);
 
-        IO.clearScreen();
-        IO.printSuccessMessage("Update completed in " + ((System.currentTimeMillis() - timestamp) + "ms"));
+        System.out.println("Update completed in " + ((System.currentTimeMillis() - timestamp) + "ms"));
     }
 }

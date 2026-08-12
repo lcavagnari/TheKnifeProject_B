@@ -13,7 +13,6 @@ import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.server.data.LocationDAO;
 import it.uninsubria.laboratoriob.server.data.OwnerDAO;
 import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
-import it.uninsubria.laboratoriob.server.ui.IO;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
@@ -103,9 +102,9 @@ public class CsvParser {
         } catch (IllegalArgumentException ex) {
             nation = Nation.fromString(nationName);
             if (nation == null) {
-                IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
-                IO.printErrorMessage("loc data " + Arrays.toString(locData));
-                IO.printErrorMessage(fields[6] + " " + fields[5]);
+                System.err.println("Errore creazione location: " + ex.getMessage());
+                System.err.println("loc data " + Arrays.toString(locData));
+                System.err.println(fields[6] + " " + fields[5]);
                 return null;
             }
         }
@@ -131,9 +130,9 @@ public class CsvParser {
                     lon,
                     locData[2]);
         } catch (Exception ex) {
-            IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
-            IO.printErrorMessage("loc data " + Arrays.toString(locData));
-            IO.printErrorMessage(fields[6] + " " + fields[5]);
+            System.err.println("Errore creazione location: " + ex.getMessage());
+            System.err.println("loc data " + Arrays.toString(locData));
+            System.err.println(fields[6] + " " + fields[5]);
             return null;
         }
     }
@@ -219,7 +218,7 @@ public class CsvParser {
                 }
             }
         } catch (java.sql.SQLException e) {
-            IO.printErrorMessage("Errore verifica system owner: " + e.getMessage());
+            System.err.println("Errore verifica system owner: " + e.getMessage());
         }
 
         Owner systemOwner = new Owner(
@@ -293,7 +292,7 @@ public class CsvParser {
                             LOCATION_DAO.save(r.getLocation());
                         RESTAURANT_DAO.save(r);
                     } catch (Exception ex) {
-                        IO.printErrorMessage("Errore salvataggio su database per " + r.getName() + ": " + ex.getMessage());
+                        System.err.println("Errore salvataggio su database per " + r.getName() + ": " + ex.getMessage());
                     }
                 }
                 System.out.println("✅ Ristoranti salvati su database!");
@@ -308,7 +307,7 @@ public class CsvParser {
             CompletableFuture.allOf(persistFuture, cacheFuture).join();
 
         } catch (IOException | SecurityException e) {
-            IO.printErrorMessage("❌ Error while parsing csv database: " + e.getMessage());
+            System.err.println("❌ Error while parsing csv database: " + e.getMessage());
         }
     }
 }

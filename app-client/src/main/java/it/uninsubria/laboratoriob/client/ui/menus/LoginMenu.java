@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.ui.menus;
+package it.uninsubria.laboratoriob.client.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
@@ -6,84 +6,36 @@ import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
-import it.uninsubria.laboratoriob.server.data.CustomerDAO;
-import it.uninsubria.laboratoriob.server.data.OwnerDAO;
-import it.uninsubria.laboratoriob.server.data.UserDAO;
-import it.uninsubria.laboratoriob.server.ui.IO;
-import it.uninsubria.laboratoriob.server.utils.Loader;
-import it.uninsubria.laboratoriob.server.utils.PasswordHasher;
+import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.data.PasswordHasher;
+import it.uninsubria.laboratoriob.client.ui.IO;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Classe di utility per la gestione del login e della registrazione utenti.
- * <p>
- * Fornisce metodi statici per facilitare le operazioni di autenticazione e
- * creazione di utenti nel sistema (customeri o gestori). I metodi interagiscono
- * con la console tramite {@link IO} e con lo storage in-memory/file tramite {@link Loader}.
- * </p>
- *
- * <h2>Side effects</h2>
- * <ul>
- *   <li><b>register()</b>: inserisce l'utente creato nelle mappe di {@link Loader}
- *       (username→utente e id→utente) e invoca {@link UserDAO#save(User)}.</li>
- *   <li><b>login()</b>: nessuna modifica allo stato persistente, ma può lanciare
- *       {@link AbortOperationException} se superato il numero massimo di tentativi.</li>
- * </ul>
- *
- * <p>I metodi possono propagare eccezioni di validazione come {@link IllegalArgumentException}
- * originate dai metodi di {@link IO} o da controlli locali.</p>
- *
- * @author Luca Cavagnari
- * @version 1.0
+ * Classe di utility per la gestione del login e della registrazione utenti lato client.
  */
 @UtilityClass
 public class LoginMenu {
-
-    private static final CustomerDAO CUSTOMER_DAO = new CustomerDAO();
-    private static final OwnerDAO OWNER_DAO = new OwnerDAO();
 
     private static boolean isSystemUser(User user) {
         return user != null && user.isSystem();
     }
 
-    /**
-     * Avvia una procedura guidata di registrazione utente.
-     * <p>
-     * Passi principali:
-     * <ol>
-     *   <li>Scelta del tipo utente: gestore ({@link Owner}) o customere ({@link Customer}).</li>
-     *   <li>Raccolta e validazione di username, nome, cognome, location (facoltativa) e data di nascita.</li>
-     *   <li>Impostazione e validazione della password.</li>
-     *   <li>Creazione dell’istanza {@link User}, salvataggio su {@link Loader} e persistenza via {@link UserDAO#save(User)}.</li>
-     * </ol>
-     * </p>
-     *
-     * <h3>Input/Output</h3>
-     * Interagisce con l’utente via console usando i metodi di {@link IO}. L’utente può annullare
-     * in vari passaggi usando il comando previsto da {@link AbortOperationException#getCANCEL_COMMAND()}.
-     *
-     * @return l’utente creato e registrato; {@code null} se l’operazione viene annullata o fallisce la validazione
-     * @throws AbortOperationException  se l’utente richiede esplicitamente l’annullamento in uno dei prompt obbligatori
-     *                                  (l’eccezione può essere intercettata internamente e tradotta in {@code null}
-     *                                  in base al punto della procedura)
-     * @throws IllegalArgumentException se alcuni campi non rispettano i vincoli di validazione
-     *                                  (può essere intercettata e trasformata in ri-prompt; in caso di errore finale
-     *                                  viene mostrato un messaggio e restituito {@code null})
-     */
-    public static User register() {
+    public static User register(ClientDataStore dataStore) {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
 
-        boolean isOwner = IO.getBooleanInput("Benvenuto! Sei un gestore o un cliente? [Sì - Gestore, No - Cliente]:");
+        boolean isOwner = IO.getBooleanInput("Benvenuto! Sei un gestore o un cliente? [Si - Gestore, No - Cliente]:");
 
         String username = null;
         while (username == null) {
             try {
                 username = IO.getUserInput("Scegli un nome utente [4-16 caratteri]:").trim();
-                if (Loader.hasUserByName(username))
+                if (dataStore.getCustomerDAO().findByUsername(username).isPresent()
+                        || dataStore.getOwnerDAO().findByUsername(username).isPresent())
                     throw new IllegalArgumentException("Username non disponibile");
 
                 Validators.validateString("^[\\p{L}][\\p{L}'\\- ]{3,39}$", username);
@@ -118,7 +70,6 @@ public class LoginMenu {
         try {
             location = IO.getLocationInput(true);
         } catch (AbortOperationException ignored) {
-            // Inserimento location opzionale, si prosegue con null
         }
 
         LocalDate dateOfBirth = null;
@@ -160,10 +111,8 @@ public class LoginMenu {
             if (Validators.validateUser(user))
                 IO.getUserInput("Registrazione completata! Premi un qualsiasi tasto + Invio per tornare al menu principale.");
 
-            Loader.addUser(user);
-
-            if (isOwner) OWNER_DAO.save((Owner) user);
-            else CUSTOMER_DAO.save((Customer) user);
+            if (isOwner) dataStore.getOwnerDAO().save((Owner) user);
+            else dataStore.getCustomerDAO().save((Customer) user);
 
             return user;
 
@@ -173,28 +122,7 @@ public class LoginMenu {
         }
     }
 
-    /**
-     * Esegue la procedura di autenticazione tramite username e password.
-     * <p>
-     * La funzione consente fino a 4 tentativi complessivi. In caso di credenziali errate
-     * viene mostrato un messaggio e viene richiesto un nuovo tentativo; al superamento
-     * del limite viene sollevata {@link AbortOperationException}.
-     * </p>
-     *
-     * <h3>Flusso</h3>
-     * <ol>
-     *   <li>Richiesta username e password.</li>
-     *   <li>Verifica esistenza utente in {@link Loader#getAllUsersByName()}.</li>
-     *   <li>Verifica password tramite }.</li>
-     *   <li>In caso di successo: messaggio, conferma su Invio, ritorno dell’utente.</li>
-     * </ol>
-     *
-     * @return l’utente autenticato; {@code null} se l’operazione viene annullata dall’utente durante i prompt
-     * @throws AbortOperationException  se viene superato il numero massimo di tentativi (4)
-     * @throws IllegalArgumentException se l’username non esiste o altri controlli falliscono
-     *                                  (l’eccezione è gestita internamente per riprovare, ma può emergere in casi non previsti)
-     */
-    public static User login() {
+    public static User login(ClientDataStore dataStore) {
         IO.clearScreen();
 
         int attempts = 0;
@@ -205,7 +133,11 @@ public class LoginMenu {
                 String username = IO.getUserInput("Inserisci il nome utente:");
                 String password = IO.getUserInput("Inserisci la password:");
 
-                User user = Loader.findUserByName(username);
+                User user = dataStore.getCustomerDAO().findByUsername(username)
+                        .map(u -> (User) u)
+                        .or(() -> dataStore.getOwnerDAO().findByUsername(username))
+                        .orElse(null);
+
                 if (user == null || isSystemUser(user))
                     IO.printErrorMessage("Utente non trovato");
 
