@@ -1,9 +1,9 @@
-package it.uninsubria.laboratoriob;
+package it.uninsubria.laboratoriob.server;
 
-import it.uninsubria.laboratoriob.ui.IO;
-import it.uninsubria.laboratoriob.ui.menus.GuestMenus;
-import it.uninsubria.laboratoriob.utils.Database;
-import it.uninsubria.laboratoriob.utils.Loader;
+import it.uninsubria.laboratoriob.server.ui.IO;
+import it.uninsubria.laboratoriob.server.ui.menus.GuestMenus;
+import it.uninsubria.laboratoriob.server.utils.Database;
+import it.uninsubria.laboratoriob.server.utils.Loader;
 
 /**
  * Classe principale di ingresso dell'applicazione The Knife.

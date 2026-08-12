@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.ui;
+package it.uninsubria.laboratoriob.server.ui;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.enums.Nation;

@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.utils;
+package it.uninsubria.laboratoriob.server.utils;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

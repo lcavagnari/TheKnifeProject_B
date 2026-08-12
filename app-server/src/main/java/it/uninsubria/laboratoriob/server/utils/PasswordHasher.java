@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.utils;
+package it.uninsubria.laboratoriob.server.utils;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;

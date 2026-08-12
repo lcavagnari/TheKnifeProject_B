@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.ui.menus;
+package it.uninsubria.laboratoriob.server.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
@@ -6,12 +6,12 @@ import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
-import it.uninsubria.laboratoriob.data.CustomerDAO;
-import it.uninsubria.laboratoriob.data.OwnerDAO;
-import it.uninsubria.laboratoriob.data.UserDAO;
-import it.uninsubria.laboratoriob.ui.IO;
-import it.uninsubria.laboratoriob.utils.Loader;
-import it.uninsubria.laboratoriob.utils.PasswordHasher;
+import it.uninsubria.laboratoriob.server.data.CustomerDAO;
+import it.uninsubria.laboratoriob.server.data.OwnerDAO;
+import it.uninsubria.laboratoriob.server.data.UserDAO;
+import it.uninsubria.laboratoriob.server.ui.IO;
+import it.uninsubria.laboratoriob.server.utils.Loader;
+import it.uninsubria.laboratoriob.server.utils.PasswordHasher;
 import lombok.experimental.UtilityClass;
 
 import java.time.LocalDate;

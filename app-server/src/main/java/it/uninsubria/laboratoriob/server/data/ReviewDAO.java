@@ -1,10 +1,10 @@
-package it.uninsubria.laboratoriob.data;
+package it.uninsubria.laboratoriob.server.data;
 
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.objects.User;
-import it.uninsubria.laboratoriob.utils.Database;
+import it.uninsubria.laboratoriob.server.utils.Database;
 
 import java.sql.*;
 import java.time.LocalDateTime;

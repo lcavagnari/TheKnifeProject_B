@@ -1,10 +1,10 @@
-package it.uninsubria.laboratoriob.ui;
+package it.uninsubria.laboratoriob.server.ui;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.User;
-import it.uninsubria.laboratoriob.utils.Loader;
+import it.uninsubria.laboratoriob.server.utils.Loader;
 
 import java.util.Map;
 

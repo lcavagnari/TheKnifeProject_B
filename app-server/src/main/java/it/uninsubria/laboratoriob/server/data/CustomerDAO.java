@@ -1,9 +1,9 @@
-package it.uninsubria.laboratoriob.data;
+package it.uninsubria.laboratoriob.server.data;
 
 
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
-import it.uninsubria.laboratoriob.utils.Database;
+import it.uninsubria.laboratoriob.server.utils.Database;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

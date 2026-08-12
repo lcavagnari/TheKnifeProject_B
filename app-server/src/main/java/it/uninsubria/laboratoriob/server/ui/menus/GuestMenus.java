@@ -1,10 +1,10 @@
-package it.uninsubria.laboratoriob.ui.menus;
+package it.uninsubria.laboratoriob.server.ui.menus;
 
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.*;
-import it.uninsubria.laboratoriob.ui.IO;
-import it.uninsubria.laboratoriob.ui.Menus;
+import it.uninsubria.laboratoriob.server.ui.IO;
+import it.uninsubria.laboratoriob.server.ui.Menus;
 
 import java.util.Comparator;
 import java.util.Map;

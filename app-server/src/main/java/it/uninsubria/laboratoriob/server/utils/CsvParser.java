@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.utils;
+package it.uninsubria.laboratoriob.server.utils;
 
 import com.google.i18n.phonenumbers.NumberParseException;
 import com.google.i18n.phonenumbers.PhoneNumberUtil;
@@ -10,10 +10,10 @@ import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
-import it.uninsubria.laboratoriob.data.LocationDAO;
-import it.uninsubria.laboratoriob.data.OwnerDAO;
-import it.uninsubria.laboratoriob.data.RestaurantDAO;
-import it.uninsubria.laboratoriob.ui.IO;
+import it.uninsubria.laboratoriob.server.data.LocationDAO;
+import it.uninsubria.laboratoriob.server.data.OwnerDAO;
+import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.server.ui.IO;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;

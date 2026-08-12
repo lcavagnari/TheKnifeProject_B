@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.ui.menus;
+package it.uninsubria.laboratoriob.server.ui.menus;
 
 
 import it.uninsubria.laboratoriob.api.Validators;
@@ -6,10 +6,10 @@ import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
-import it.uninsubria.laboratoriob.data.ReviewDAO;
-import it.uninsubria.laboratoriob.ui.IO;
-import it.uninsubria.laboratoriob.ui.Menus;
-import it.uninsubria.laboratoriob.utils.Loader;
+import it.uninsubria.laboratoriob.server.data.ReviewDAO;
+import it.uninsubria.laboratoriob.server.ui.IO;
+import it.uninsubria.laboratoriob.server.ui.Menus;
+import it.uninsubria.laboratoriob.server.utils.Loader;
 
 import java.util.*;
 
