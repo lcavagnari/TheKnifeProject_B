@@ -1,0 +1,12 @@
+DROP TABLE IF EXISTS review;
+DROP TABLE IF EXISTS restaurant_cuisine;
+DROP TABLE IF EXISTS restaurant_services;
+DROP TABLE IF EXISTS user_favorites;
+DROP TABLE IF EXISTS user_restaurants;
+DROP TABLE IF EXISTS restaurant;
+DROP TABLE IF EXISTS "user";
+DROP TABLE IF EXISTS services_and_facilities;
+DROP TABLE IF EXISTS awards;
+DROP TABLE IF EXISTS cuisine_type;
+DROP TABLE IF EXISTS price_range;
+DROP TABLE IF EXISTS location;

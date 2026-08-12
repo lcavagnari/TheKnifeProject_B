@@ -1,8 +1,9 @@
 package it.uninsubria.laboratoriob.ui;
 
-import it.uninsubria.laboratoriob.objects.Restaurant;
-import it.uninsubria.laboratoriob.objects.users.User;
-import it.uninsubria.laboratoriob.ui.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.Validators;
+import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.utils.Loader;
 
 import java.util.Map;
@@ -11,7 +12,7 @@ import java.util.Map;
  * Classe astratta di base per i menu testuali dell'applicazione.
  * <p>
  * Ogni menu rappresenta una sezione dell'interfaccia console associata a un utente specifico.
- * Le sottoclassi concrete (ad esempio menu cliente o menu gestore) estendono questa classe
+ * Le sottoclassi concrete (ad esempio menu customere o menu gestore) estendono questa classe
  * e implementano la logica personalizzata di navigazione e visualizzazione.
  * </p>
  *
@@ -25,12 +26,14 @@ import java.util.Map;
  *
  * @see IO
  * @see Loader
- * @see it.uninsubria.laboratoriob.objects.Restaurant
- * @see it.uninsubria.laboratoriob.objects.users.User
+ * @see it.uninsubria.laboratoriob.api.objects.Restaurant
+ * @see User
  */
 public abstract class Menus {
 
-    /** Utente attualmente autenticato che utilizza il menu. */
+    /**
+     * Utente attualmente autenticato che utilizza il menu.
+     */
     protected final User user;
 
     /**
@@ -46,7 +49,7 @@ public abstract class Menus {
     /**
      * Avvia una ricerca di un ristorante per nome.
      * <p>
-     * Il metodo richiede un input testuale all’utente, convalidato tramite {@link IO#validateString(String)}.
+     * Il metodo richiede un input testuale all’utente, convalidato tramite {@link Validators#validateString(String)}.
      * Se il ristorante esiste in {@link Loader#getRestaurantsByName()}, ne visualizza i dettagli
      * tramite {@link #viewRestaurantDetails(Restaurant)}. In caso di errore o annullamento,
      * viene mostrato un messaggio e il metodo termina senza eccezioni propagate.
@@ -61,12 +64,11 @@ public abstract class Menus {
         while (r == null) {
             try {
                 String name = IO.getUserInput("Enter restaurant name:");
-                IO.validateString(name);
+                Validators.validateString(name);
 
-                if (!Loader.getRestaurantsByName().containsKey(name))
+                r = Loader.findRestaurantByName(name);
+                if (r == null)
                     throw new IllegalArgumentException("Nessun ristorante trovato, riprovare");
-
-                r = Loader.getRestaurantsByName().get(name);
 
             } catch (IllegalArgumentException ex) {
                 IO.printErrorMessage(ex.getMessage());
@@ -91,7 +93,7 @@ public abstract class Menus {
      * <p>Se non sono presenti ristoranti, viene mostrato un messaggio di errore.</p>
      */
     protected void browseRestaurants() {
-        Map<String, Restaurant> restaurants = Loader.getRestaurantsByName();
+        Map<String, Restaurant> restaurants = Loader.getAllRestaurantsByName();
         if (restaurants.isEmpty()) {
             IO.printErrorMessage("Nessun ristorante disponibile al momento.");
             return;
@@ -122,7 +124,7 @@ public abstract class Menus {
 
     /**
      * Metodo astratto che deve essere implementato dalle sottoclassi per aprire il menu principale
-     * dell'utente corrente (es. menu cliente o menu gestore).
+     * dell'utente corrente (es. menu customere o menu gestore).
      * <p>Può includere cicli di navigazione e chiamate ad altri sottomenu.</p>
      */
     public abstract void openMenu();

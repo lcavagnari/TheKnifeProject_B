@@ -17,6 +17,42 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals><goal>shade</goal></goals>
+                        <configuration>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/versions/19/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <relocations>
+                                <relocation>
+                                    <pattern>it.uninsubria.laboratoriob.api</pattern>
+                                    <shadedPattern>it.uninsubria.laboratoriob.libs.theknifeapi</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.google.i18n.phonenumbers</pattern>
+                                    <shadedPattern>it.uninsubria.laboratoriob.libs.phonenumbers</shadedPattern>
+                                </relocation>
+                            </relocations>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
     <dependencies>
         <dependency>
             <groupId>it.uninsubria.laboratoriob</groupId>

@@ -1,260 +1,370 @@
 # The Knife Project — Technical Documentation
 
 ## 1. Introduction
-The Knife is a Java CLI system for restaurant discovery and management. This document is organized **by application area** so each part (runtime, UI, domain, persistence, operations) has its own explanation and targeted diagrams.
+The Knife is a Java CLI system for restaurant discovery and management. It uses PostgreSQL for persistence, HikariCP for connection pooling, and a modular architecture with a shared domain API (`common-api`), a standalone executable module, and placeholder client/server modules for future expansion.
 
 ---
 
-## 2. Runtime Entry Point and Bootstrapping
-This section describes how the application starts and decides between update-mode and interactive CLI mode.
+## 2. Project Structure
+
+The project is organized as a Maven multi-module build with the following modules:
+
+| Module | Artifact ID | Role |
+|--------|------------|------|
+| `common-api` | `theknifeapi` | Shared domain model, enums, validators, DAO interface |
+| `standalone` | `standalone` | Executable CLI application (fat JAR via maven-shade-plugin) |
+| `app-server` | `theknifeserver` | Placeholder for future server module |
+| `app-client` | `theknifeclient` | Placeholder for future client module |
+
+**Note:** The `standalone` module is treated as an executable (like `app-server`/`app-client`), not as a library module. It produces a self-contained JAR with all dependencies shaded and relocated.
+
+### Module Dependency Graph
+```
+common-api (theknifeapi)
+    ^
+    |
+standalone (depends on theknifeapi + HikariCP + PostgreSQL driver + SLF4J)
+```
+
+---
+
+## 3. Runtime Entry Point and Bootstrapping
+
+The application starts via `TheKnife.main(...)` in the `standalone` module.
 
 ### Responsibilities
-- Parse startup arguments in `TheKnife.main(...)`.
-- Optionally run Michelin dataset update.
-- Load in-memory data from disk.
+- Initialize database tables and constant data via `Database.initTables()` and `Database.initialiseConstants()`.
+- Optionally run Michelin dataset update with `--update [path]`.
+- Load in-memory data from PostgreSQL via `Loader.initialiseMaps()`.
 - Start guest menu navigation.
 
 ### Diagram: Startup Activity Flow
 ```mermaid
 flowchart TD
-    A([Start app]) --> B{"--update flag?"}
-    B -- Yes --> C[updateMichelinDataset(path?)]
-    C --> Z([Exit])
-    B -- No --> D[print "Loading The Knife..."]
-    D --> E[Loader.loadFromFile()]
-    E --> F[GuestMenus.openMenu()]
-    F --> Z
-```
-
-### Diagram: Startup Sequence
-```mermaid
-sequenceDiagram
-    participant Main as TheKnife.main
-    participant Loader as Loader
-    participant Guest as GuestMenus
-
-    Main->>Main: parse args
-    alt --update provided
-      Main->>Loader: updateMichelinDataset(...)
-      Main-->>Main: return
-    else normal launch
-      Main->>Loader: loadFromFile()
-      Main->>Guest: new GuestMenus().openMenu()
-    end
+    A([Start app]) --> B[Database.initTables]
+    B --> C[Database.initialiseConstants]
+    C --> D{"--update flag?"}
+    D -- Yes --> E[Loader.updateMichelinDataset]
+    E --> Z([Exit])
+    D -- No --> F[Loader.initialiseMaps]
+    F --> G[GuestMenus.openMenu]
+    G --> H[Database.shutdown]
+    H --> Z
 ```
 
 ---
 
-## 3. User Interface and Navigation Layer
-This section covers CLI interaction components (`IO`, `Menus`, `GuestMenus`, `UserMenus`, `OwnerMenus`, `Login`) and how users traverse the application.
+## 4. Persistence Layer
 
-### Responsibilities
-- Console I/O, input validation, and menu rendering.
-- Role-based navigation and menu branching.
-- Authentication and registration workflows.
+The persistence layer has been migrated from file-based JSON storage to a PostgreSQL relational database with HikariCP connection pooling.
 
-### Diagram: UI Module Map
-```mermaid
-flowchart LR
-    IO[IO]
-    Login[Login]
-    Menus[Menus (abstract)]
-    Guest[GuestMenus]
-    UserM[UserMenus]
-    OwnerM[OwnerMenus]
+### Database Schema
 
-    Menus --> Guest
-    Menus --> UserM
-    UserM --> OwnerM
-    Guest --> Login
-    Guest --> IO
-    UserM --> IO
-    OwnerM --> IO
-    Login --> IO
-```
+The schema is defined in `Database.initTables()` and consists of:
 
-### Diagram: Login Sequence
-```mermaid
-sequenceDiagram
-    actor U as User
-    participant G as GuestMenus
-    participant L as Login
-    participant LD as Loader
+| Table | Purpose | Key |
+|-------|---------|-----|
+| `price_range` | Price tier lookup (economy, moderate, expensive, luxury) | `id INT PK` |
+| `awards` | Michelin award lookup (none, stars, Bib Gourmand, etc.) | `id INT PK` |
+| `cuisine_type` | Cuisine type lookup (249 types) | `id INT PK` |
+| `services_and_facilities` | Service/facility lookup (WiFi, Parking, etc.) | `id INT PK` |
+| `location` | Geographic locations | `(latitude, longitude) PK` |
+| `"user"` | Users (both customers and owners) | `UUID PK` |
+| `restaurant` | Restaurants | `UUID PK` |
+| `user_favorites` | Customer → Restaurant favorites (many-to-many) | `(user_id, restaurant_id) PK` |
+| `user_restaurants` | Owner → Restaurant ownership (many-to-many) | `(user_id, restaurant_id) PK` |
+| `restaurant_cuisine` | Restaurant → Cuisine type (many-to-many) | `(restaurant_id, type) PK` |
+| `restaurant_services` | Restaurant → Service (many-to-many) | `(restaurant_id, service) PK` |
+| `review` | Reviews (one per user per restaurant) | `UUID PK`, `UNIQUE(user_id, restaurant_id)` |
 
-    U->>G: choose Login
-    G->>L: login()
-    loop max 4 attempts
-      L->>U: ask username/password
-      U-->>L: credentials
-      L->>LD: getUsersByName().get(username)
-      alt valid + password ok
-        L-->>G: authenticated user
-      else invalid
-        L-->>U: error and retry
-      end
-    end
-```
+### Connection Pool (HikariCP)
 
-### Diagram: Registration Sequence
-```mermaid
-sequenceDiagram
-    actor N as New User
-    participant L as Login
-    participant IO as IO
-    participant U as Owner/Client
-    participant LD as Loader
-
-    N->>L: register()
-    L->>IO: collect role + profile + password
-    IO-->>L: validated inputs
-    L->>U: instantiate Owner or Client
-    L->>LD: add in usersById/usersByName
-    L->>U: save()
-    L-->>N: registration completed
-```
-
----
-
-## 4. Domain Model (Entities and Business Relationships)
-This section documents the core entities and their relationships.
-
-### Responsibilities
-- Represent users, restaurants, reviews, and locations.
-- Keep entity data consistent and serializable.
-- Support role-specific actions (favorites for clients, management for owners).
-
-### Diagram: Domain Class Diagram
-```mermaid
-classDiagram
-    class JsonEntity {
-      #UUID id
-      #ObjectNode jsonObject
-      +save()
-      #build()
-    }
-
-    class User {
-      -username
-      -name
-      -lastName
-      -dateOfBirth
-      -location
-      +verifyPassword(String) boolean
-      +getRole() UserRole
-    }
-
-    class Client {
-      -Set~UUID~ favouriteRestourants
-      +addFavourite(Restaurant) boolean
-      +removeFavourite(Restaurant) boolean
-    }
-
-    class Owner {
-      -Map~UUID,Restaurant~ restaurantsById
-      -Map~String,Restaurant~ restaurantsByName
-      +addRestaurant(Restaurant) boolean
-      +removeRestaurant(Restaurant) boolean
-      +renameRestaurant(UUID,String) boolean
-    }
-
-    class Restaurant {
-      -name
-      -owner
-      -location
-      -Map~UUID,Review~ reviews
-      +addReview(Review)
-      +removeReview(Review)
-      +build()
-    }
-
-    class Review
-    class Location
-
-    JsonEntity <|-- User
-    JsonEntity <|-- Restaurant
-    JsonEntity <|-- Review
-    JsonEntity <|-- Location
-
-    User <|-- Client
-    User <|-- Owner
-
-    Restaurant "1" --> "1" Owner
-    Restaurant "1" --> "1" Location
-    Restaurant "1" --> "0..*" Review
-    Client "1" --> "0..*" Restaurant : favourites
-```
-
-### Diagram: Restaurant Lifecycle State Machine
-```mermaid
-stateDiagram-v2
-    [*] --> Created
-    Created --> Loaded: deserialized by Loader
-    Loaded --> Indexed: inserted in maps
-    Indexed --> Updated: owner edits metadata
-    Indexed --> Reviewed: addReview()
-    Reviewed --> Indexed: remove/edit review
-    Updated --> Indexed: build() + save()
-    Indexed --> Deleted: owner removes restaurant
-    Deleted --> [*]
-```
-
----
-
-## 5. Persistence and Data Management
-This section explains file-backed persistence and runtime indexing via `Loader` and `JsonEntity`.
-
-### Responsibilities
-- Load users/restaurants from JSON files.
-- Maintain fast lookup indexes by ID and name.
-- Persist updated entities back to filesystem.
+Configured in `Database`:
+- Max pool size: 10 connections
+- Connection timeout: 30 seconds
+- Min idle: 2 connections
+- PreparedStatement cache: 250 entries, max 2048 bytes
 
 ### Diagram: Persistence Component Diagram
 ```mermaid
 flowchart TB
-    subgraph Runtime[In-memory runtime]
-      U1[(usersById)]
-      U2[(usersByName)]
-      R1[(restaurantsById)]
-      R2[(restaurantsByName)]
+    subgraph Application
+        Loader[Loader]
+        DAOs[DAO Layer]
     end
 
-    Loader[Loader] --> U1
-    Loader --> U2
-    Loader --> R1
-    Loader --> R2
+    subgraph ConnectionPool[HikariCP]
+        Pool[(Connection Pool)]
+    end
 
-    JsonEntity[JsonEntity save/build] --> Files[(users/*.json, companies/*.json)]
-    Loader --> Files
-    Files --> Loader
-```
+    subgraph Database[PostgreSQL]
+        Tables[(Tables)]
+    end
 
-### Diagram: Data Load Sequence
-```mermaid
-sequenceDiagram
-    participant App as TheKnife
-    participant L as Loader
-    participant FS as FileSystem
-
-    App->>L: loadFromFile()
-    L->>FS: list/read users JSON
-    FS-->>L: user documents
-    L->>L: parse users + fill user maps
-    L->>FS: list/read restaurants JSON
-    FS-->>L: restaurant documents
-    L->>L: parse restaurants + fill restaurant maps
-    L-->>App: load complete
+    Loader --> DAOs
+    DAOs --> Pool
+    Pool --> Tables
+    Tables --> Pool
+    Pool --> DAOs
+    DAOs --> Loader
 ```
 
 ---
 
-## 6. Operational Workflows
-This section isolates the most common day-to-day user operations.
+## 5. Data Access Objects (DAO)
 
-### 6.1 Browse and Search Restaurants
+All DAOs implement the generic `DAO<T>` interface defined in `common-api`:
+
+```java
+public interface DAO<T> {
+    Optional<T> findById(UUID id);
+    List<T> findAll();
+    boolean save(T entity);
+    boolean update(T entity);
+    boolean delete(UUID id);
+}
+```
+
+### DAO Hierarchy
+```mermaid
+classDiagram
+    class DAO~T~ {
+        <<interface>>
+        +findById(UUID) Optional~T~
+        +findAll() List~T~
+        +save(T) boolean
+        +update(T) boolean
+        +delete(UUID) boolean
+    }
+
+    class UserDAO~T~ {
+        <<abstract>>
+        #LocationDAO locationDAO
+        #RestaurantDAO restaurantDAO
+        -boolean isOwner
+        +findByUsername(String) Optional~T~
+        +save(T) boolean
+        +update(T) boolean
+        #findSpecial(UUID) Set~UUID~
+        #addSpecial(UUID, UUID) boolean
+        #removeSpecial(UUID, UUID) boolean
+    }
+
+    class CustomerDAO {
+        +addFavourites(UUID, UUID) boolean
+        +removeFavourites(UUID, UUID) boolean
+        +findFavourites(UUID) Set~UUID~
+    }
+
+    class OwnerDAO {
+        +addRestaurant(UUID, UUID) boolean
+        +removeRestaurant(UUID, UUID) boolean
+        +findRestaurants(UUID) Set~UUID~
+    }
+
+    class RestaurantDAO {
+        +findByOwner(UUID) List~Restaurant~
+        +findCuisines(UUID) Set~CuisineType~
+        +findServices(UUID) Set~String~
+        +updateCuisines(UUID, Set) boolean
+        +updateServices(UUID, Set) boolean
+    }
+
+    class ReviewDAO {
+        +findByRestaurant(UUID) List~Review~
+    }
+
+    class LocationDAO {
+        +findByCoordinates(double, double) Optional~Location~
+        +update(double, double, Location) boolean
+        +delete(double, double) boolean
+    }
+
+    DAO~T~ <|.. UserDAO~T~
+    DAO~T~ <|.. RestaurantDAO
+    DAO~T~ <|.. ReviewDAO
+    DAO~T~ <|.. LocationDAO
+    UserDAO~T~ <|-- CustomerDAO
+    UserDAO~T~ <|-- OwnerDAO
+```
+
+---
+
+## 6. Domain Model
+
+The domain model is defined in the `common-api` module and shared across all modules.
+
+### Entity Hierarchy
+```mermaid
+classDiagram
+    class Entity {
+        <<abstract>>
+        #UUID id
+        +Entity(UUID)
+        +Entity()
+        +equals(Object) boolean
+        +hashCode() int
+    }
+
+    class User {
+        <<abstract>>
+        -String name
+        -String lastName
+        -Location location
+        -String username
+        -LocalDate dateOfBirth
+        -String passwordHash
+        -String passwordSalt
+        -boolean system
+        +getRole() UserRole
+    }
+
+    class Customer {
+        -Set~UUID~ favouriteRestourants
+        +addFavourite(Restaurant) boolean
+        +removeFavourite(Restaurant) boolean
+    }
+
+    class Owner {
+        -Map~UUID,Restaurant~ restaurantsById
+        -Map~String,Restaurant~ restaurantsByName
+        +addRestaurant(Restaurant) boolean
+        +removeRestaurant(Restaurant) boolean
+        +renameRestaurant(UUID, String) boolean
+    }
+
+    class Restaurant {
+        -String name
+        -String description
+        -String websiteUrl
+        -String phone
+        -Owner owner
+        -Location location
+        -PriceRange priceRange
+        -boolean hasDelivery
+        -boolean hasOnlineBooking
+        -Award award
+        -boolean greenStar
+        -Set~CuisineType~ cuisinesTypes
+        -Set~String~ services
+        -Map~UUID,Review~ reviews
+        +addReview(Review) void
+        +removeReview(Review) void
+        +addService(String) boolean
+        +addCuisineType(CuisineType) boolean
+    }
+
+    class Review {
+        -LocalDateTime timestamp
+        -Restaurant restaurant
+        -User user
+        -int value
+        -String text
+        -String reply
+    }
+
+    class Location {
+        -Nation nation
+        -String city
+        -String address
+        -double latitude
+        -double longitude
+    }
+
+    Entity <|-- User
+    Entity <|-- Restaurant
+    Entity <|-- Review
+    Entity <|-- Location
+    User <|-- Customer
+    User <|-- Owner
+    Restaurant "1" --> "1" Owner
+    Restaurant "1" --> "1" Location
+    Restaurant "1" --> "0..*" Review
+    Review "1" --> "1" User
+    Review "1" --> "1" Restaurant
+    Customer "1" --> "0..*" Restaurant : favourites
+    Owner "1" --> "0..*" Restaurant : owns
+```
+
+### Key Enums
+| Enum | Values | Purpose |
+|------|--------|---------|
+| `UserRole` | `CLIENT`, `OWNER` | Distinguishes user capabilities |
+| `Award` | `NONE`, `ONE_STAR`, `TWO_STARS`, `THREE_STARS`, `BIB_GOURMAND`, `SELECTED_RESTAURANTS` | Michelin recognition levels |
+| `PriceRange` | `ECONOMY`, `MODERATE`, `EXPENSIVE`, `LUXURY` | Price tier classification |
+| `CuisineType` | 249 values | Cuisine categories from around the world |
+| `Nation` | ~100 values | Supported countries with ISO codes |
+
+---
+
+## 7. Security
+
+### Password Hashing
+Passwords are hashed using PBKDF2 with HMAC-SHA256 via `PasswordHasher`:
+- Salt length: 16 bytes (random via `SecureRandom`)
+- Iterations: 10,000
+- Key length: 256 bits
+- Encoding: Base64
+
+### Authentication Flow
+1. User provides username and password.
+2. System retrieves stored hash and salt from database.
+3. `PasswordHasher.verify()` compares the attempted password hash with the stored hash.
+4. Maximum 4 login attempts before session termination.
+
+---
+
+## 8. User Interface and Navigation Layer
+
+The CLI interface is implemented in the `standalone` module under `it.uninsubria.laboratoriob.ui`.
+
+### UI Component Hierarchy
+```mermaid
+flowchart LR
+    IO[IO - Console I/O]
+    Menus[Menus - Abstract Base]
+    Guest[GuestMenus]
+    CustomerM[CustomerMenus]
+    OwnerM[OwnerMenus]
+    Login[LoginMenu]
+
+    Menus --> Guest
+    Menus --> CustomerM
+    Menus --> OwnerM
+    Guest --> Login
+    Guest --> IO
+    CustomerM --> IO
+    OwnerM --> IO
+    Login --> IO
+```
+
+### Navigation Flow
+```mermaid
+stateDiagram-v2
+    [*] --> Guest
+    Guest --> Authenticating: login
+    Guest --> Registering: registration
+    Registering --> Guest: complete/cancel
+    Authenticating --> CustomerMenu: CLIENT login
+    Authenticating --> OwnerMenu: OWNER login
+    Authenticating --> Guest: failure
+    CustomerMenu --> Guest: logout
+    OwnerMenu --> Guest: logout
+    Guest --> Closed: exit
+    CustomerMenu --> Closed: exit
+    OwnerMenu --> Closed: exit
+    Closed --> [*]
+```
+
+---
+
+## 9. Operational Workflows
+
+### 9.1 Browse and Search Restaurants
 ```mermaid
 flowchart TD
     A[Open menu] --> B{Browse or Search?}
-    B -- Browse --> C[Show restaurants list]
+    B -- Browse --> C[Show restaurants list from Loader]
     B -- Search --> D[Input restaurant name]
     D --> E{Exists in restaurantsByName?}
     E -- Yes --> F[Show details]
@@ -262,102 +372,102 @@ flowchart TD
     C --> F
 ```
 
-### 6.2 Owner Creates a Restaurant
+### 9.2 Owner Creates/Edits a Restaurant
 ```mermaid
 sequenceDiagram
     actor O as Owner
     participant OM as OwnerMenus
     participant IO as IO
     participant R as Restaurant
+    participant RD as RestaurantDAO
     participant LD as Loader
 
-    O->>OM: add restaurant
+    O->>OM: add/edit restaurant
     OM->>IO: collect and validate fields
-    OM->>R: instantiate Restaurant
-    OM->>O: addRestaurant(R)
-    OM->>LD: insert in global restaurant maps
-    OM->>R: save()
+    OM->>R: instantiate/modify Restaurant
+    OM->>RD: save/update restaurant
+    OM->>LD: update in-memory maps
     OM-->>O: operation result
 ```
 
-### 6.3 Client Adds/Edits a Review
+### 9.3 Client Adds/Edits a Review
 ```mermaid
 sequenceDiagram
     actor C as Client
-    participant UM as UserMenus
+    participant UM as CustomerMenus
     participant IO as IO
     participant RV as Review
     participant R as Restaurant
+    participant RD as ReviewDAO
 
     C->>UM: choose review action
     UM->>IO: collect score/text
     UM->>RV: create/update review
-    UM->>R: addReview()/update review map
-    UM->>R: build() + save()
+    UM->>R: addReview()
+    UM->>RD: save/update review
     UM-->>C: confirmation
 ```
 
-### 6.4 User Session State
+### 9.4 Michelin Dataset Update
 ```mermaid
-stateDiagram-v2
-    [*] --> Guest
-    Guest --> Authenticating: login
-    Guest --> Registering: registration
-    Registering --> Guest: complete/cancel
-    Authenticating --> UserMenu: success
-    Authenticating --> Guest: failure
-    UserMenu --> Guest: logout
-    Guest --> Closed: exit
-    UserMenu --> Closed: exit
-    Closed --> [*]
+sequenceDiagram
+    participant Main as TheKnife.main
+    participant L as Loader
+    participant CP as CsvParser
+    participant DB as Database
+    participant Cache as Loader (in-memory)
+
+    Main->>L: updateMichelinDataset(path)
+    L->>CP: parseFromDataset(path)
+    CP->>CP: parse CSV lines
+    CP->>Cache: addRestaurant (in-memory)
+    CP->>DB: save restaurant + location (async)
+    CP-->>L: update complete
 ```
 
 ---
 
-## 7. Consolidated Use Case View
-This is the cross-section view that connects all roles with supported capabilities.
+## 10. Utilities
 
-```mermaid
-flowchart LR
-    Guest([Guest])
-    Client([Client])
-    Owner([Owner])
+### CsvParser
+Parses the Michelin restaurant CSV dataset and persists records to the database and in-memory cache. Handles:
+- Robust parsing of irregular CSV fields (addresses, phone numbers, coordinates).
+- Normalization of cities, nations, awards, cuisine types, and services.
+- Creation of a system owner for imported records.
 
-    Browse((Browse restaurants))
-    Search((Search restaurants))
-    Details((View details))
-    Register((Register))
-    Login((Login))
-    Fav((Manage favourites))
-    Reviews((Write/Edit/Delete reviews))
-    CreateR((Create restaurant))
-    EditR((Edit owned restaurant))
-    DeleteR((Delete owned restaurant))
+### Loader
+Central in-memory data store with `ConcurrentHashMap` for thread-safe access. Provides:
+- Read operations (single entity lookup, bulk unmodifiable views).
+- Write operations (add, remove, update for restaurants and users).
+- Initialization from database via DAOs.
 
-    Guest --> Browse
-    Guest --> Search
-    Guest --> Details
-    Guest --> Register
-    Guest --> Login
+### Database
+Manages the PostgreSQL connection pool and schema initialization via HikariCP.
 
-    Client --> Browse
-    Client --> Search
-    Client --> Details
-    Client --> Fav
-    Client --> Reviews
-
-    Owner --> Browse
-    Owner --> Search
-    Owner --> Details
-    Owner --> CreateR
-    Owner --> EditR
-    Owner --> DeleteR
-```
+### PasswordHasher
+PBKDF2-based password hashing utility with configurable parameters.
 
 ---
 
-## 8. Observations and Improvement Opportunities
-- The current approach is simple and effective for a CLI project: in-memory maps + JSON file persistence.
-- Domain objects are tightly coupled to serialization (`build()` pattern), which simplifies persistence but couples concerns.
-- `Loader` static state is convenient but reduces testability and dependency control.
-- A natural evolution path is introducing explicit service/repository layers and integration tests for end-to-end CLI scenarios.
+## 11. Technology Stack
+
+| Component | Technology | Version |
+|-----------|-----------|---------|
+| Language | Java | 17+ |
+| Build | Maven | 3.9.9+ |
+| Database | PostgreSQL | 42.7.7 (driver) |
+| Connection Pool | HikariCP | 7.0.2 |
+| Logging | SLF4J Simple | 2.0.17 |
+| Code Generation | Lombok | 1.18.38 |
+| Phone Validation | libphonenumber | 8.13.27 |
+| Testing | JUnit 5 | 5.10.2 |
+
+---
+
+## 12. Observations and Improvement Opportunities
+- The `standalone` module is the current executable; `app-server` and `app-client` are placeholders for future client-server architecture.
+- The `UserDAO` uses a boolean `isOwner` flag to distinguish user types in the same table — a potential refactor to separate tables or use inheritance mapping.
+- `LocationDAO` uses composite primary key (latitude, longitude) instead of a UUID, which is non-standard compared to other entities.
+- `CsvParser` creates random lat/lon for locations that lack coordinates — this could be improved with geocoding.
+- The in-memory `Loader` caches all data at startup — suitable for the current scale but may need pagination or lazy loading for larger datasets.
+- Connection pool credentials are hardcoded in `Database.java` — should be externalized to configuration.
