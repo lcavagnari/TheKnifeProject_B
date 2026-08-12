@@ -39,7 +39,7 @@ public class ReviewDAO implements DAO<Review> {
     @Override
     public Optional<Review> findById(UUID id) {
         String query = """
-                SELECT id, restaurant_id, customer_id, rating, text, response, created_at
+                SELECT id, restaurant_id, user_id, rating, text, response, created_at
                 FROM review
                 WHERE id = ?
                 """;
@@ -61,7 +61,7 @@ public class ReviewDAO implements DAO<Review> {
     public List<Review> findAll() {
         List<Review> reviews = new ArrayList<>();
         String query = """
-                SELECT id, restaurant_id, customer_id, rating, text, response, created_at
+                SELECT id, restaurant_id, user_id, rating, text, response, created_at
                 FROM review
                 """;
         try (Connection conn = Database.getConnection();
@@ -79,7 +79,7 @@ public class ReviewDAO implements DAO<Review> {
     public List<Review> findByRestaurant(UUID restaurantId) {
         List<Review> reviews = new ArrayList<>();
         String query = """
-                SELECT id, restaurant_id, customer_id, rating, text, response, created_at
+                SELECT id, restaurant_id, user_id, rating, text, response, created_at
                 FROM review
                 WHERE restaurant_id = ?
                 """;
@@ -100,7 +100,7 @@ public class ReviewDAO implements DAO<Review> {
     @Override
     public boolean save(Review review) {
         String query = """
-                INSERT INTO review (id, restaurant_id, customer_id, rating, text, response, created_at)
+                INSERT INTO review (id, restaurant_id, user_id, rating, text, response, created_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection conn = Database.getConnection();
@@ -123,7 +123,7 @@ public class ReviewDAO implements DAO<Review> {
     public boolean update(Review review) {
         String query = """
                 UPDATE review
-                SET restaurant_id = ?, customer_id = ?, rating = ?, text = ?, response = ?, created_at = ?
+                SET restaurant_id = ?, user_id = ?, rating = ?, text = ?, response = ?, created_at = ?
                 WHERE id = ?
                 """;
         try (Connection conn = Database.getConnection();

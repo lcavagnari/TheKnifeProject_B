@@ -40,8 +40,8 @@ CREATE TABLE IF NOT EXISTS location (
 CREATE TABLE IF NOT EXISTS "user" (
     id                  UUID PRIMARY KEY      DEFAULT gen_random_uuid(),
     username            VARCHAR(50)  NOT NULL UNIQUE CHECK (username <> ''),
-    hash                VARCHAR(255) NOT NULL CHECK (hash <> ''),
-    salt                VARCHAR(255) NOT NULL CHECK (salt <> ''),
+    psw_hash            VARCHAR(255) NOT NULL CHECK (psw_hash <> ''),
+    psw_salt            VARCHAR(255) NOT NULL CHECK (psw_salt <> ''),
     first_name          VARCHAR(100) CHECK (first_name <> ''),
     last_name           VARCHAR(100) CHECK (last_name <> ''),
 
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS restaurant_services (
 
 CREATE TABLE IF NOT EXISTS review (
     id            UUID PRIMARY KEY   DEFAULT gen_random_uuid(),
-    customer_id   UUID      NOT NULL,
+    user_id       UUID      NOT NULL,
     restaurant_id UUID      NOT NULL,
     rating        INT       NOT NULL CHECK (rating BETWEEN 1 AND 5),
     text          TEXT      NOT NULL CHECK (text <> ''),
@@ -134,8 +134,8 @@ CREATE TABLE IF NOT EXISTS review (
     responded_at  TIMESTAMP,
 
 
-    UNIQUE (customer_id, restaurant_id),
-    FOREIGN KEY (customer_id) REFERENCES "user" (id),
+    UNIQUE (user_id, restaurant_id),
+    FOREIGN KEY (user_id) REFERENCES "user" (id),
     FOREIGN KEY (restaurant_id) REFERENCES restaurant (id),
 
     CONSTRAINT chk_response_after_review CHECK (responded_at IS NULL OR responded_at >= created_at),

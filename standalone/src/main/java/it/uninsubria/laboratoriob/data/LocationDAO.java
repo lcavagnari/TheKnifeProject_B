@@ -92,9 +92,9 @@ public final class LocationDAO implements DAO<Location> {
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setDouble(1, location.getLatitude());
             stmt.setDouble(2, location.getLongitude());
-            stmt.setString(3, location.getCity());
+            stmt.setString(3, location.getCity() != null && location.getCity().isBlank() ? null : location.getCity());
             stmt.setString(4, location.getNation().getIsoCode());
-            stmt.setString(5, location.getAddress());
+            stmt.setString(5, location.getAddress() != null && location.getAddress().isBlank() ? null : location.getAddress());
 
             return stmt.executeUpdate() >= 0;
         } catch (SQLException e) {

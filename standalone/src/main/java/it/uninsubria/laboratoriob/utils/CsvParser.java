@@ -224,12 +224,14 @@ public class CsvParser {
                 true
         );
 
-        boolean saved = OWNER_DAO.save(systemOwner);
-        if (!saved) {
-            IO.printErrorMessage("Impossibile salvare il system owner nel database.");
+        OWNER_DAO.save(systemOwner);
+
+        existing = OWNER_DAO.findById(SYSTEM_OWNER_ID);
+        if (existing.isEmpty()) {
+            throw new RuntimeException("Impossibile salvare il system owner nel database.");
         }
 
-        return systemOwner;
+        return existing.get();
     }
 
     private static Restaurant createRestaurant(String[] fields, Owner owner) {
@@ -280,6 +282,7 @@ public class CsvParser {
             System.out.println("✅ Elaborati " + restaurants.size() + "/" + csvLines.size() + " ristoranti");
 
             CompletableFuture<Void> persistFuture = CompletableFuture.runAsync(() -> {
+                OWNER_DAO.save(systemOwner);
                 for (Restaurant r : restaurants) {
                     try {
                         if (r.getLocation() != null)

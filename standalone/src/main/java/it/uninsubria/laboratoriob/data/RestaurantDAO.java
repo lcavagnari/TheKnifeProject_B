@@ -186,9 +186,9 @@ public class RestaurantDAO implements DAO<Restaurant> {
             stmt.setObject(1, restaurant.getId(), Types.OTHER);
             stmt.setObject(2, restaurant.getOwner() != null ? restaurant.getOwner().getId() : null, Types.OTHER);
             stmt.setString(3, restaurant.getName());
-            stmt.setString(4, restaurant.getDescription());
-            stmt.setString(5, restaurant.getWebsiteUrl());
-            stmt.setString(6, restaurant.getPhone());
+            stmt.setString(4, restaurant.getDescription() != null && restaurant.getDescription().isBlank() ? null : restaurant.getDescription());
+            stmt.setString(5, restaurant.getWebsiteUrl() != null && restaurant.getWebsiteUrl().isBlank() ? null : restaurant.getWebsiteUrl());
+            stmt.setString(6, restaurant.getPhone() != null && restaurant.getPhone().isBlank() ? null : restaurant.getPhone());
             stmt.setInt(7, restaurant.getPriceRange().getSymbol().length());
             stmt.setInt(8, restaurant.getAward().getValue());
             stmt.setBoolean(9, restaurant.isGreenStar());
@@ -226,9 +226,9 @@ public class RestaurantDAO implements DAO<Restaurant> {
              PreparedStatement stmt = conn.prepareStatement(query)) {
             stmt.setObject(1, restaurant.getOwner() != null ? restaurant.getOwner().getId() : null, Types.OTHER);
             stmt.setString(2, restaurant.getName());
-            stmt.setString(3, restaurant.getDescription());
-            stmt.setString(4, restaurant.getWebsiteUrl());
-            stmt.setString(5, restaurant.getPhone());
+            stmt.setString(3, restaurant.getDescription() != null && restaurant.getDescription().isBlank() ? null : restaurant.getDescription());
+            stmt.setString(4, restaurant.getWebsiteUrl() != null && restaurant.getWebsiteUrl().isBlank() ? null : restaurant.getWebsiteUrl());
+            stmt.setString(5, restaurant.getPhone() != null && restaurant.getPhone().isBlank() ? null : restaurant.getPhone());
             stmt.setInt(6, restaurant.getPriceRange().getSymbol().length());
             stmt.setInt(7, restaurant.getAward().getValue());
             stmt.setBoolean(8, restaurant.isGreenStar());
