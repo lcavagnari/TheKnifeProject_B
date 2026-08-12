@@ -68,7 +68,7 @@ public class OwnerDAO extends UserDAO<Owner> {
     @Override
     public boolean save(Owner user) {
         boolean succeded = super.save(user);
-        if (succeded) {
+         if (succeded) {
             for (Restaurant r : user.getRestaurantsById().values()) {
                 Optional<Restaurant> r1 = restaurantDAO.findById(r.getId());
                 if (r1.isEmpty()) restaurantDAO.save(r);

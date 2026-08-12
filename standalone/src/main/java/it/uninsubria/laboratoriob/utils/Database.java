@@ -7,6 +7,7 @@ import lombok.experimental.UtilityClass;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 
 /**
  * Gestione della connessione al database PostgreSQL e inizializzazione dello schema.
@@ -538,6 +539,16 @@ public final class Database {
                            (10, 'Breakfast')
                     ON CONFLICT (id) DO NOTHING;
                     """);
+
+            String systemSalt = PasswordHasher.generateSalt();
+            String systemHash = PasswordHasher.hash(UUID.randomUUID().toString(), systemSalt);
+            String systemId = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes()).toString();
+
+            stmt.execute("""
+                    INSERT INTO "user" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system)
+                    VALUES ('%s', 'system', '%s', '%s', 'System', 'Michelin', '2000-01-01', true, true)
+                    ON CONFLICT (id) DO NOTHING;
+                    """.formatted(systemId, systemHash, systemSalt));
 
             return true;
         } catch (SQLException ex) {

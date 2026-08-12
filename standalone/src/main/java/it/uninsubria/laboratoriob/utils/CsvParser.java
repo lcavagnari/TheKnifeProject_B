@@ -51,9 +51,8 @@ public class CsvParser {
 
     public static final UUID SYSTEM_OWNER_ID = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes());
     private static final String SYSTEM_OWNER_USERNAME = "system";
-    private static final String SYSTEM_OWNER_PASSWORD = "system";
     private static final String SYSTEM_OWNER_SALT = PasswordHasher.generateSalt();
-    private static final String SYSTEM_OWNER_PASSWORD_HASH = PasswordHasher.hash(SYSTEM_OWNER_PASSWORD, SYSTEM_OWNER_SALT);
+    private static final String SYSTEM_OWNER_PASSWORD_HASH = PasswordHasher.hash(UUID.randomUUID().toString(), SYSTEM_OWNER_SALT);
 
     private static String[] retrieveLocData(String address, String location) {
         String[] cityAndNation = location.split(",");
