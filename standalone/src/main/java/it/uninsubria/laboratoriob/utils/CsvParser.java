@@ -112,11 +112,24 @@ public class CsvParser {
         }
 
         try {
+            double lat = Double.parseDouble(fields[5]);
+            double lon = Double.parseDouble(fields[6]);
+
+            if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+                double tmp = lat;
+                lat = lon;
+                lon = tmp;
+            }
+
+            if (lat < -90.0 || lat > 90.0 || lon < -180.0 || lon > 180.0) {
+                return null;
+            }
+
             return new Location(
                     nation,
                     locData[0],
-                    Double.parseDouble(fields[5]),
-                    Double.parseDouble(fields[6]),
+                    lat,
+                    lon,
                     locData[2]);
         } catch (Exception ex) {
             IO.printErrorMessage("Errore creazione location: " + ex.getMessage());
@@ -211,7 +224,11 @@ public class CsvParser {
                 true
         );
 
-        OWNER_DAO.save(systemOwner);
+        boolean saved = OWNER_DAO.save(systemOwner);
+        if (!saved) {
+            IO.printErrorMessage("Impossibile salvare il system owner nel database.");
+        }
+
         return systemOwner;
     }
 

@@ -152,6 +152,18 @@ public final class Database {
                     """);
 
             stmt.execute("""
+                    CREATE TABLE IF NOT EXISTS user_restaurants (
+                        user_id UUID NOT NULL,
+                        restaurant_id UUID NOT NULL,
+                    
+                        PRIMARY KEY (user_id, restaurant_id),
+                    
+                        FOREIGN KEY (user_id) REFERENCES "user"(id),
+                        FOREIGN KEY (restaurant_id) REFERENCES restaurant(id)
+                    );
+                    """);
+
+            stmt.execute("""
                     CREATE TABLE IF NOT EXISTS restaurant_cuisine (
                         restaurant_id UUID NOT NULL,
                         type INT NOT NULL,
@@ -222,7 +234,8 @@ public final class Database {
                     VALUES (1, 0.00, 25.00, 'economy'),
                            (2, 25.00, 50.00, 'moderate'),
                            (3, 50.00, 100.00, 'expensive'),
-                           (4, 100.00, 2000000, 'luxury');
+                           (4, 100.00, 2000000, 'luxury')
+                    ON CONFLICT (id) DO NOTHING;
                     """);
 
             stmt.execute("""
@@ -232,7 +245,8 @@ public final class Database {
                            (2, '2 stars'),
                            (3, '3 stars'),
                            (4, 'Bib Gourmand'),
-                           (5, 'Selected Restaurants');
+                           (5, 'Selected Restaurants')
+                    ON CONFLICT (id) DO NOTHING;
                     """);
 
             stmt.execute("""
@@ -485,7 +499,8 @@ public final class Database {
                            (246, 'yukhoe'),
                            (247, 'yunnanese'),
                            (248, 'zhou'),
-                           (249, 'zhejiang');
+                           (249, 'zhejiang')
+                    ON CONFLICT (id) DO NOTHING;
                     """);
 
             stmt.execute("""
@@ -499,7 +514,8 @@ public final class Database {
                            (7, 'Reservations'),
                            (8, 'Pet friendly'),
                            (9, 'Air conditioning'),
-                           (10, 'Breakfast');
+                           (10, 'Breakfast')
+                    ON CONFLICT (id) DO NOTHING;
                     """);
 
             return true;

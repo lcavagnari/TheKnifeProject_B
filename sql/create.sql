@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     latitude            DOUBLE PRECISION,
     longitude           DOUBLE PRECISION,
     is_owner            BOOLEAN      NOT NULL,
+    is_system           BOOLEAN      NOT NULL DEFAULT false,
     registered_at       TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     FOREIGN KEY (latitude, longitude) REFERENCES location (latitude, longitude)

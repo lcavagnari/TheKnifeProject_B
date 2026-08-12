@@ -9,3 +9,4 @@ DROP TABLE IF EXISTS services_and_facilities;
 DROP TABLE IF EXISTS awards;
 DROP TABLE IF EXISTS cuisine_type;
 DROP TABLE IF EXISTS price_range;
+DROP TABLE IF EXISTS location;
