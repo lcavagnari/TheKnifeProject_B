@@ -1,0 +1,9 @@
+Manifest-Version: 1.0
+Main-Class: it.uninsubria.laboratoriob.TheKnife
+Class-Path: junit-jupiter-api-5.10.1.jar jackson-core-2.15.3.jar apiguar
+ dian-api-1.1.2.jar jackson-databind-2.15.3.jar opentest4j-1.3.0.jar jun
+ it-jupiter-engine-5.10.1.jar libphonenumber-8.13.27.jar junit-jupiter-p
+ arams-5.10.1.jar javax.json-1.1.4.jar junit-jupiter-5.10.1.jar junit-pl
+ atform-engine-1.10.1.jar commons-io-2.16.1.jar junit-platform-commons-1
+ .10.1.jar jackson-annotations-2.15.3.jar javax.json-api-1.1.4.jar
+
