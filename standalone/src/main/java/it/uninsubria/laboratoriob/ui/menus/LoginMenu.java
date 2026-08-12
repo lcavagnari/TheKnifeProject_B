@@ -45,6 +45,10 @@ public class LoginMenu {
     private static final CustomerDAO CUSTOMER_DAO = new CustomerDAO();
     private static final OwnerDAO OWNER_DAO = new OwnerDAO();
 
+    private static boolean isSystemUser(User user) {
+        return user != null && user.isSystem();
+    }
+
     /**
      * Avvia una procedura guidata di registrazione utente.
      * <p>
@@ -199,7 +203,7 @@ public class LoginMenu {
                 String password = IO.getUserInput("Inserisci la password:");
 
                 User user = Loader.findUserByName(username);
-                if (user == null || Loader.isSystemUser(user))
+                if (user == null || isSystemUser(user))
                     IO.printErrorMessage("Utente non trovato");
 
                 else if (PasswordHasher.verify(password, user.getPasswordSalt(), user.getPasswordHash())) {

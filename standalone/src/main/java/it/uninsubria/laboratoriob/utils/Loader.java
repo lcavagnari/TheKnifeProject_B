@@ -44,9 +44,7 @@ public class Loader {
     private final static CustomerDAO CUSTOMER_DAO = new CustomerDAO();
     private final static OwnerDAO OWNER_DAO = new OwnerDAO();
 
-    public static boolean isSystemUser(User user) {
-        return user != null && user.isSystem();
-    }
+
 
     // ── Write operations ──
 
@@ -66,8 +64,7 @@ public class Loader {
         restaurantsById.remove(oldRestaurant.getId());
         restaurantsByName.remove(oldRestaurant.getName());
 
-        restaurantsById.put(newRestaurant.getId(), newRestaurant);
-        restaurantsByName.put(newRestaurant.getName(), newRestaurant);
+        addRestaurant(newRestaurant);
     }
 
     public static void addUser(User u) {
@@ -86,8 +83,7 @@ public class Loader {
         usersById.remove(oldUser.getId());
         usersByName.remove(oldUser.getUsername());
 
-        usersById.put(newUser.getId(), newUser);
-        usersByName.put(newUser.getUsername(), newUser);
+        addUser(newUser);
     }
 
     // ── Read operations (single entity) ──
