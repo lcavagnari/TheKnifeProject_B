@@ -217,8 +217,8 @@ public class Loader {
 
         Path inputPath;
         try {
-            inputPath = Paths.get(path);
-            File dataset = new File(inputPath.toUri());
+            inputPath = Paths.get(path).normalize().toRealPath();
+            File dataset = inputPath.toFile();
 
             if (!dataset.exists() || !dataset.isFile() || !dataset.getName().endsWith(".csv")) {
                 IO.printErrorMessage("File or path " + path
