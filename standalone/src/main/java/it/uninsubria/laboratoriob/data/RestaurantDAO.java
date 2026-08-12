@@ -5,6 +5,7 @@ import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.utils.Database;
 
@@ -24,7 +25,11 @@ public class RestaurantDAO implements DAO<Restaurant> {
 
         String ownerIdStr = rs.getString("owner_id");
 
-        var owner = ownerIdStr != null ? new OwnerDAO().findById(UUID.fromString(ownerIdStr)).orElse(null) : null;
+        Owner owner = null;
+        if (ownerIdStr != null) {
+            UUID ownerId = UUID.fromString(ownerIdStr);
+            owner = new Owner(ownerId, "", "", "", "", "", null, java.time.LocalDate.MIN);
+        }
 
         Set<CuisineType> cuisinesTypes = findCuisines(restaurantId);
         Set<String> services = findServices(restaurantId);
@@ -198,8 +203,6 @@ public class RestaurantDAO implements DAO<Restaurant> {
             if (restaurant.getLocation() != null) {
                 stmt.setDouble(12, restaurant.getLocation().getLatitude());
                 stmt.setDouble(13, restaurant.getLocation().getLongitude());
-                locationDAO.save(restaurant.getLocation());
-
             } else {
                 stmt.setNull(12, Types.DOUBLE);
                 stmt.setNull(13, Types.DOUBLE);
@@ -238,8 +241,6 @@ public class RestaurantDAO implements DAO<Restaurant> {
             if (restaurant.getLocation() != null) {
                 stmt.setDouble(11, restaurant.getLocation().getLatitude());
                 stmt.setDouble(12, restaurant.getLocation().getLongitude());
-                locationDAO.save(restaurant.getLocation());
-
             } else {
                 stmt.setNull(11, Types.DOUBLE);
                 stmt.setNull(12, Types.DOUBLE);

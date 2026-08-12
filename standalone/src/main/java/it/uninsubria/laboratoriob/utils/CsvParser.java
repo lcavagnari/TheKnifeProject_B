@@ -207,9 +207,20 @@ public class CsvParser {
     }
 
     public static Owner getOrCreateSystemOwner() {
-        Optional<Owner> existing = OWNER_DAO.findById(SYSTEM_OWNER_ID);
-        if (existing.isPresent()) {
-            return existing.get();
+        try (java.sql.Connection conn = Database.getConnection();
+             java.sql.PreparedStatement check = conn.prepareStatement(
+                     "SELECT 1 FROM \"user\" WHERE id = ? AND is_owner = true")) {
+            check.setObject(1, SYSTEM_OWNER_ID, java.sql.Types.OTHER);
+            try (java.sql.ResultSet rs = check.executeQuery()) {
+                if (rs.next()) {
+                    return new Owner(SYSTEM_OWNER_ID, SYSTEM_OWNER_USERNAME,
+                            SYSTEM_OWNER_PASSWORD_HASH, SYSTEM_OWNER_SALT,
+                            "System", "Michelin", null,
+                            LocalDate.of(2000, 1, 1), true);
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            IO.printErrorMessage("Errore verifica system owner: " + e.getMessage());
         }
 
         Owner systemOwner = new Owner(
@@ -226,12 +237,7 @@ public class CsvParser {
 
         OWNER_DAO.save(systemOwner);
 
-        existing = OWNER_DAO.findById(SYSTEM_OWNER_ID);
-        if (existing.isEmpty()) {
-            throw new RuntimeException("Impossibile salvare il system owner nel database.");
-        }
-
-        return existing.get();
+        return systemOwner;
     }
 
     private static Restaurant createRestaurant(String[] fields, Owner owner) {
@@ -276,7 +282,6 @@ public class CsvParser {
             List<Restaurant> restaurants = csvLines.stream()
                     .map(line -> line.split(";"))
                     .map(fields -> createRestaurant(fields, systemOwner))
-                    .filter(Objects::nonNull)
                     .toList();
 
             System.out.println("✅ Elaborati " + restaurants.size() + "/" + csvLines.size() + " ristoranti");
