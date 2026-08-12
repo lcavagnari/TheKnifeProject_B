@@ -7,7 +7,6 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
-import it.uninsubria.laboratoriob.client.data.PasswordHasher;
 import it.uninsubria.laboratoriob.client.ui.IO;
 import lombok.experimental.UtilityClass;
 
@@ -101,8 +100,14 @@ public class LoginMenu {
         }
 
         try {
+            String salt = "";
+            String hashedPassword = "";
+
+            /*
             String salt = PasswordHasher.generateSalt();
             String hashedPassword = PasswordHasher.hash(password, salt);
+            */
+
 
             User user = isOwner
                     ? new Owner(username, hashedPassword, salt, firstName, lastName, location, dateOfBirth)
@@ -140,13 +145,14 @@ public class LoginMenu {
 
                 if (user == null || isSystemUser(user))
                     IO.printErrorMessage("Utente non trovato");
-
+                /*
                 else if (PasswordHasher.verify(password, user.getPasswordSalt(), user.getPasswordHash())) {
                     IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
                     return user;
+                 */
 
-                } else {
+                else {
                     IO.printErrorMessage("Username o password errati.");
                     IO.getUserInput("Premi Invio per riprovare.");
                     attempts++;
