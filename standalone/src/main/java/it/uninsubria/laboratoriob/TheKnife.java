@@ -13,6 +13,9 @@ public class TheKnife {
      * @param args Argomenti cli
      */
     public static void main(String[] args) {
+        Database.initTables();
+        Database.initialiseConstants();
+
         if (args.length > 1 && args[0].equals("--update")) {
             Loader.updateMichelinDataset(args[1]);
             return;
@@ -23,6 +26,7 @@ public class TheKnife {
         }
 
         IO.printSuccessMessage("Loading The Knife...");
+
 
         Loader.initialiseMaps();
         new GuestMenus().openMenu();
