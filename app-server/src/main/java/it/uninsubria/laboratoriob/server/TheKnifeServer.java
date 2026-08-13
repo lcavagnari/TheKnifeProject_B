@@ -34,6 +34,7 @@ public class TheKnifeServer {
 
         tcpHbeatServer.start();
         Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatServer::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(Database::shutdown));
 
         if (!Database.initTables())
             System.err.println("ERROR while initialising database schema");
