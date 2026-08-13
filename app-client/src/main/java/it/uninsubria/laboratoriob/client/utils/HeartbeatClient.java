@@ -1,6 +1,7 @@
 package it.uninsubria.laboratoriob.client.utils;
 
 import it.uninsubria.laboratoriob.api.utils.HeartbeatChannel;
+import it.uninsubria.laboratoriob.client.ui.IO;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -24,18 +25,12 @@ public class HeartbeatClient {
     }
 
     public void start() {
-        Thread setupThread = new Thread(this::connectAndRun, "heartbeat-setup");
-        setupThread.setDaemon(true);
-        setupThread.start();
-    }
-
-    private void connectAndRun() {
         try {
             Socket socket = new Socket(host, port);
             channel = new HeartbeatChannel(socket, intervalMinutes);
             channel.start();
         } catch (IOException e) {
-            System.err.println("Heartbeat connection setup failed, continuing without it: " + e.getMessage());
+            IO.printErrorMessage("Heartbeat connection setup failed, continuing without it: " + e.getMessage());
         }
     }
 
