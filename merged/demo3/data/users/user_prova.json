@@ -1,0 +1,15 @@
+{
+  "id" : "1032d8fa-1bc2-4722-9b2c-b68b9a91a9b3",
+  "username" : "prova",
+  "name" : "aa",
+  "lastName" : "aa",
+  "dateOfBirth" : "2026-07-28",
+  "location" : {
+    "nation" : "aaa",
+    "city" : "aa",
+    "address" : "aa"
+  },
+  "role" : "client",
+  "password" : "aaaa",
+  "favourites" : [ ]
+}

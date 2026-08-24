@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+      prefHeight="550.0" prefWidth="650.0"
+      style="-fx-background-color: #ffffff; -fx-padding: 20;"
+      xmlns="http://javafx.com/javafx/26"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.demo3.RestaurantDetailsController">
+
+    <children>
+        <Label fx:id="nameLabel" text="Nome ristorante">
+            <font>
+                <Font name="Verdana Bold" size="22.0" />
+            </font>
+        </Label>
+
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent;" VBox.vgrow="ALWAYS">
+            <content>
+                <GridPane hgap="10.0" vgap="10.0" style="-fx-padding: 15 0 15 0;">
+                    <columnConstraints>
+                        <ColumnConstraints minWidth="140.0" prefWidth="140.0" />
+                        <ColumnConstraints hgrow="ALWAYS" minWidth="300.0" prefWidth="400.0" />
+                    </columnConstraints>
+
+                    <children>
+                        <Label style="-fx-font-weight: bold;" text="Descrizione:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
+                        <Label fx:id="descriptionLabel" wrapText="true" text="" GridPane.rowIndex="0" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Website:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
+                        <Label fx:id="websiteLabel" wrapText="true" text="" GridPane.rowIndex="1" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Telefono:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
+                        <Label fx:id="phoneLabel" wrapText="true" text="" GridPane.rowIndex="2" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Location:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
+                        <Label fx:id="locationLabel" wrapText="true" text="" GridPane.rowIndex="3" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Fascia prezzo:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
+                        <Label fx:id="priceRangeLabel" text="" GridPane.rowIndex="4" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Delivery:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
+                        <Label fx:id="deliveryLabel" text="" GridPane.rowIndex="5" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Prenotazione online:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
+                        <Label fx:id="onlineBookingLabel" text="" GridPane.rowIndex="6" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Award:" GridPane.rowIndex="7" GridPane.columnIndex="0" />
+                        <Label fx:id="awardLabel" text="" GridPane.rowIndex="7" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Green Star:" GridPane.rowIndex="8" GridPane.columnIndex="0" />
+                        <Label fx:id="greenStarLabel" text="" GridPane.rowIndex="8" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Owner ID:" GridPane.rowIndex="9" GridPane.columnIndex="0" />
+                        <Label fx:id="ownerIdLabel" text="" GridPane.rowIndex="9" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Tipi di cucina:" GridPane.rowIndex="10" GridPane.columnIndex="0" />
+                        <Label fx:id="cuisineTypesLabel" wrapText="true" text="" GridPane.rowIndex="10" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Servizi:" GridPane.rowIndex="11" GridPane.columnIndex="0" />
+                        <Label fx:id="servicesLabel" wrapText="true" text="" GridPane.rowIndex="11" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="Recensioni:" GridPane.rowIndex="12" GridPane.columnIndex="0" />
+                        <Label fx:id="reviewsCountLabel" text="" GridPane.rowIndex="12" GridPane.columnIndex="1" />
+
+                        <Label style="-fx-font-weight: bold;" text="ID:" GridPane.rowIndex="13" GridPane.columnIndex="0" />
+                        <Label fx:id="idLabel" wrapText="true" text="" GridPane.rowIndex="13" GridPane.columnIndex="1" />
+                    </children>
+                </GridPane>
+            </content>
+        </ScrollPane>
+
+        <HBox alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+            <children>
+                <Button fx:id="btnIndietro" mnemonicParsing="false" text="Torna indietro" onAction="#onIndietroClick" />
+            </children>
+        </HBox>
+    </children>
+</VBox>
