@@ -1,0 +1,314 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report.xsd" version="3.0.2" name="it.uninsubria.laboratoriob.api.enums.CuisineTypeTest" time="0.384" tests="251" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="25"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\lmatt\OneDrive\Desktop\merged\common-api\target\test-classes;C:\Users\lmatt\OneDrive\Desktop\merged\common-api\target\classes;C:\Users\lmatt\.m2\repository\org\projectlombok\lombok\1.18.42\lombok-1.18.42.jar;C:\Users\lmatt\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\lmatt\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\lmatt\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\lmatt\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\lmatt\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\lmatt\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;C:\Users\lmatt\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;"/>
+    <property name="java.vm.vendor" value="Eclipse Adoptium"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://adoptium.net/"/>
+    <property name="user.timezone" value="Europe/Rome"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="25"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="IT"/>
+    <property name="sun.boot.library.path" value="C:\Users\lmatt\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.3.9-hotspot\bin"/>
+    <property name="sun.java.command" value="C:\Users\lmatt\AppData\Local\Temp\surefire12665807013962182853\surefirebooter-20260822121111888_3.jar C:\Users\lmatt\AppData\Local\Temp\surefire12665807013962182853 2026-08-22T12-11-11_714-jvmRun1 surefire-20260822121111888_1tmp surefire_0-20260822121111888_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\lmatt\OneDrive\Desktop\merged\common-api\target\test-classes;C:\Users\lmatt\OneDrive\Desktop\merged\common-api\target\classes;C:\Users\lmatt\.m2\repository\org\projectlombok\lombok\1.18.42\lombok-1.18.42.jar;C:\Users\lmatt\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\lmatt\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\lmatt\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\lmatt\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\lmatt\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\lmatt\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;C:\Users\lmatt\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\lmatt"/>
+    <property name="user.language" value="it"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-04-21"/>
+    <property name="java.home" value="C:\Users\lmatt\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.3.9-hotspot"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\lmatt\OneDrive\Desktop\merged\common-api"/>
+    <property name="java.vm.compressedOopsMode" value="32-bit"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="surefire.real.class.path" value="C:\Users\lmatt\AppData\Local\Temp\surefire12665807013962182853\surefirebooter-20260822121111888_3.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="25.0.3+9-LTS"/>
+    <property name="user.name" value="lmatt"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="java.vendor.version" value="Temurin-25.0.3+9"/>
+    <property name="localRepository" value="C:\Users\lmatt\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://github.com/adoptium/adoptium-support/issues"/>
+    <property name="java.io.tmpdir" value="C:\Users\lmatt\AppData\Local\Temp\"/>
+    <property name="java.version" value="25.0.3"/>
+    <property name="user.dir" value="C:\Users\lmatt\OneDrive\Desktop\merged\common-api"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Users\lmatt\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.3.9-hotspot\bin;C:\WINDOWS\Sun\Java\bin;C:\WINDOWS\system32;C:\WINDOWS;C:\Users\lmatt\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.3.9-hotspot\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\Git\cmd;C:\Program Files\apache-maven-3.9.16\bin;C:\Users\lmatt\AppData\Local\Programs\Eclipse Adoptium\jdk-25.0.3.9-hotspot\bin;C:\Users\lmatt\.local\bin;C:\Program Files\Java\jdk-21\bin;C:\Users\lmatt\AppData\Local\Microsoft\WindowsApps;C:\Users\lmatt\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\lmatt\AppData\Local\GitHubDesktop\bin;."/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="Eclipse Adoptium"/>
+    <property name="java.vm.version" value="25.0.3+9-LTS"/>
+    <property name="stdin.encoding" value="Cp1252"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="69.0"/>
+  </properties>
+  <testcase name="testMajorCuisineTypes" classname="CuisineType Enum Tests" time="0.008"/>
+  <testcase name="testToString" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[1]" classname="CuisineType Enum Tests" time="0.021"/>
+  <testcase name="testCuisineFromFile(String)[2]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[3]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[4]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[5]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[6]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[7]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[8]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[9]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[10]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[11]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[12]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[13]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[14]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[15]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[16]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[17]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[18]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[19]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[20]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[21]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[22]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[23]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[24]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[25]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[26]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[27]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[28]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[29]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[30]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[31]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[32]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[33]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[34]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[35]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[36]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[37]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[38]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[39]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[40]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[41]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[42]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[43]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[44]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[45]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[46]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[47]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[48]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[49]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[50]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[51]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[52]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[53]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[54]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[55]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[56]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[57]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[58]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[59]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[60]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[61]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[62]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[63]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[64]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[65]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[66]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[67]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[68]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[69]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[70]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[71]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[72]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[73]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[74]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[75]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[76]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[77]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[78]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[79]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[80]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[81]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[82]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[83]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[84]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[85]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[86]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[87]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[88]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[89]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[90]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[91]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[92]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[93]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[94]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[95]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[96]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[97]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[98]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[99]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[100]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[101]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[102]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[103]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[104]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[105]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[106]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[107]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[108]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[109]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[110]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[111]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[112]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[113]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[114]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[115]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[116]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[117]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[118]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[119]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[120]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[121]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[122]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[123]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[124]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[125]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[126]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[127]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[128]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[129]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[130]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[131]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[132]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[133]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[134]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[135]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[136]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[137]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[138]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[139]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[140]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[141]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[142]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[143]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[144]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[145]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[146]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[147]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[148]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[149]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[150]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[151]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[152]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[153]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[154]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[155]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[156]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[157]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[158]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[159]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[160]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[161]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[162]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[163]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[164]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[165]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[166]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[167]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[168]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[169]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[170]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[171]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[172]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[173]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[174]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[175]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[176]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[177]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[178]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[179]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[180]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[181]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[182]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[183]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[184]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[185]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[186]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[187]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[188]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[189]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[190]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[191]" classname="CuisineType Enum Tests" time="0.002"/>
+  <testcase name="testCuisineFromFile(String)[192]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[193]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[194]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[195]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[196]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[197]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[198]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[199]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[200]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[201]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[202]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[203]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[204]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[205]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[206]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[207]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[208]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[209]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[210]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[211]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[212]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[213]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[214]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[215]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[216]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[217]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[218]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[219]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[220]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[221]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[222]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[223]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[224]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[225]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[226]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[227]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[228]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[229]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[230]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[231]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[232]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[233]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[234]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[235]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[236]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[237]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[238]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[239]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[240]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[241]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[242]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[243]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[244]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[245]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[246]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[247]" classname="CuisineType Enum Tests" time="0.001"/>
+  <testcase name="testCuisineFromFile(String)[248]" classname="CuisineType Enum Tests" time="0.0"/>
+  <testcase name="testCuisineFromFile(String)[249]" classname="CuisineType Enum Tests" time="0.0"/>
+</testsuite>

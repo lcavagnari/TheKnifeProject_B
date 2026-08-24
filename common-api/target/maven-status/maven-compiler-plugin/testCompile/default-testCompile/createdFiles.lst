@@ -1,0 +1,11 @@
+it\uninsubria\laboratoriob\api\enums\CuisineTypeTest.class
+it\uninsubria\laboratoriob\api\objects\ReviewTest.class
+it\uninsubria\laboratoriob\api\NationTest.class
+it\uninsubria\laboratoriob\api\enums\PriceRangeTest.class
+it\uninsubria\laboratoriob\api\objects\RestaurantTest.class
+it\uninsubria\laboratoriob\api\users\CustomerTest.class
+it\uninsubria\laboratoriob\api\users\OwnerTest.class
+it\uninsubria\laboratoriob\api\enums\AwardTest.class
+it\uninsubria\laboratoriob\api\UserTest.class
+it\uninsubria\laboratoriob\api\enums\NationTest.class
+it\uninsubria\laboratoriob\api\objects\LocationTest.class
