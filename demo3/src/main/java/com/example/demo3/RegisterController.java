@@ -9,6 +9,7 @@ import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 
@@ -21,6 +22,8 @@ public class RegisterController {
     @FXML private RadioButton radioGestore;
     @FXML private RadioButton radioCliente;
     @FXML private ToggleGroup tipoUtenteGroup;
+    @FXML private VBox roleClienteCard;
+    @FXML private VBox roleGestoreCard;
 
     @FXML private TextField usernameField;
     @FXML private TextField nomeField;
@@ -30,9 +33,28 @@ public class RegisterController {
     @FXML private TextField nazioneField;
     @FXML private DatePicker dataNascitaPicker;
     @FXML private PasswordField passwordField;
+    @FXML private PasswordField confirmPasswordField;
 
     @FXML private Button btnRegistrati;
     @FXML private Button btnAnnulla;
+
+    @FXML
+    public void initialize() {
+        roleClienteCard.setOnMouseClicked(e -> selectRole(true));
+        roleGestoreCard.setOnMouseClicked(e -> selectRole(false));
+    }
+
+    private void selectRole(boolean cliente) {
+        if (cliente) {
+            radioCliente.setSelected(true);
+            roleClienteCard.getStyleClass().setAll("role-card", "role-card-selected");
+            roleGestoreCard.getStyleClass().setAll("role-card");
+        } else {
+            radioGestore.setSelected(true);
+            roleGestoreCard.getStyleClass().setAll("role-card", "role-card-selected");
+            roleClienteCard.getStyleClass().setAll("role-card");
+        }
+    }
 
     public void setOnCancelCallback(Runnable callback) {
         this.onCancelCallback = callback;
@@ -43,7 +65,7 @@ public class RegisterController {
         errorLabel.getStyleClass().removeAll("label-success", "label-error");
         errorLabel.getStyleClass().add("label-error");
         errorLabel.setText("");
-        resetStyles(usernameField, nomeField, cognomeField, passwordField, dataNascitaPicker);
+        clearErrors();
 
         String username = usernameField.getText() != null ? usernameField.getText().trim() : "";
         String nome = nomeField.getText() != null ? nomeField.getText().trim() : "";
@@ -53,44 +75,42 @@ public class RegisterController {
         String nazioneTesto = nazioneField.getText() != null ? nazioneField.getText().trim() : "";
         LocalDate dataNascita = dataNascitaPicker.getValue();
         String password = passwordField.getText() != null ? passwordField.getText() : "";
+        String confirmPassword = confirmPasswordField.getText() != null ? confirmPasswordField.getText() : "";
 
         boolean isGestore = radioGestore != null && radioGestore.isSelected();
 
         if (username.length() < 4 || username.length() > 16) {
-            errorLabel.setText("Username non valido: deve avere tra 4 e 16 caratteri.");
-            setErrorStyle(usernameField);
+            showError("Username non valido: deve avere tra 4 e 16 caratteri.", usernameField);
             return;
         }
         if (userRepository.existsByUsername(username)) {
-            errorLabel.setText("Username non disponibile, scegline un altro.");
-            setErrorStyle(usernameField);
+            showError("Username non disponibile, scegline un altro.", usernameField);
             return;
         }
         if (nome.isEmpty()) {
-            errorLabel.setText("Il nome è obbligatorio.");
-            setErrorStyle(nomeField);
+            showError("Il nome e obbligatorio.", nomeField);
             return;
         }
         if (cognome.isEmpty()) {
-            errorLabel.setText("Il cognome è obbligatorio.");
-            setErrorStyle(cognomeField);
+            showError("Il cognome e obbligatorio.", cognomeField);
             return;
         }
         if (dataNascita == null) {
-            errorLabel.setText("Inserisci la data di nascita.");
-            setErrorStyle(dataNascitaPicker);
+            showError("Inserisci la data di nascita.", dataNascitaPicker);
             return;
         }
         if (password.length() < 4) {
-            errorLabel.setText("La password deve avere almeno 4 caratteri.");
-            setErrorStyle(passwordField);
+            showError("La password deve avere almeno 4 caratteri.", passwordField);
+            return;
+        }
+        if (!password.equals(confirmPassword)) {
+            showError("Le password non corrispondono.", confirmPasswordField);
             return;
         }
 
         Nation nazione = Nation.fromString(nazioneTesto);
         if (!nazioneTesto.isEmpty() && nazione == null) {
-            errorLabel.setText("Nazione non riconosciuta: " + nazioneTesto);
-            setErrorStyle(nazioneField);
+            showError("Nazione non riconosciuta: " + nazioneTesto, nazioneField);
             return;
         }
 
@@ -121,13 +141,22 @@ public class RegisterController {
         }
     }
 
-    private void setErrorStyle(Control field) {
-        field.getStyleClass().add("error");
+    private void showError(String message, Control field) {
+        errorLabel.setText(message);
+        if (field != null) {
+            field.getStyleClass().add("error");
+        }
     }
 
-    private void resetStyles(Control... fields) {
+    private void clearErrors() {
+        Control[] fields = {
+            usernameField, nomeField, cognomeField, passwordField,
+            confirmPasswordField, dataNascitaPicker, nazioneField
+        };
         for (Control field : fields) {
-            field.getStyleClass().remove("error");
+            if (field != null) {
+                field.getStyleClass().remove("error");
+            }
         }
     }
 }

@@ -180,3 +180,44 @@
 .spacing-md { -fx-spacing: 15; }
 .spacing-lg { -fx-spacing: 25; }
 .padding-lg { -fx-padding: 40; }
+
+/* ---- Section headers (register form) ---- */
+.section-header {
+    -fx-font-size: 12px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #007161;
+    -fx-padding: 6 0 2 0;
+}
+
+/* ---- Role selector cards ---- */
+.role-selector {
+    -fx-padding: 4 0 4 0;
+}
+.role-card {
+    -fx-background-color: #f5f7fa;
+    -fx-background-radius: 10px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 10px;
+    -fx-border-width: 2px;
+    -fx-padding: 12 16 12 16;
+    -fx-cursor: hand;
+    -fx-min-width: 140;
+    -fx-transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+.role-card:hover {
+    -fx-background-color: #e8f5e9;
+    -fx-border-color: #a5d6a7;
+}
+.role-card-selected {
+    -fx-background-color: #e0f2f1;
+    -fx-border-color: #007161;
+}
+.role-card-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #212121;
+}
+.role-card-sub {
+    -fx-font-size: 11px;
+    -fx-text-fill: #757575;
+}
