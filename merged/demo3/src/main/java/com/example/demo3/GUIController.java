@@ -24,37 +24,14 @@ public class GUIController {
 
     @FXML
     private void onLoginClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Login.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) btnLogin.getScene().getWindow();
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Login");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Stage stage = (Stage) btnLogin.getScene().getWindow();
+        Navigation.navigateTo(stage, "Login.fxml", "Login", 500, 450);
     }
 
     @FXML
     private void onRegisterClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Register.fxml"));
-            Parent root = loader.load();
-
-            // Prendo lo Stage corrente a partire da un nodo qualsiasi già in scena
-            Stage stage = (Stage) btnRegister.getScene().getWindow();
-
-            Scene scene = new Scene(root);
-            stage.setScene(scene);
-            stage.setTitle("Registrazione");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Stage stage = (Stage) btnRegister.getScene().getWindow();
+        Navigation.navigateTo(stage, "Register.fxml", "Registrazione", 550, 650);
     }
 
     @FXML
@@ -87,7 +64,6 @@ public class GUIController {
 
     @FXML
     private void onEsciClick() {
-        System.out.println("Esci premuto - chiudo l'applicazione");
         Stage stage = (Stage) btnEsci.getScene().getWindow();
         stage.close();
     }

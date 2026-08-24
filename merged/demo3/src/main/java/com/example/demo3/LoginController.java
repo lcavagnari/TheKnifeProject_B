@@ -5,16 +5,12 @@ import com.example.demo3.data.Session;
 import com.example.demo3.data.UserRepository;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.Optional;
 
 public class LoginController {
@@ -38,7 +34,8 @@ public class LoginController {
 
     @FXML
     private void onLoginClick() {
-        errorLabel.setStyle("-fx-text-fill: #e74c3c;");
+        errorLabel.getStyleClass().removeAll("label-success", "label-error");
+        errorLabel.getStyleClass().add("label-error");
         errorLabel.setText("");
 
         String username = usernameField.getText() != null ? usernameField.getText().trim() : "";
@@ -62,31 +59,16 @@ public class LoginController {
             return;
         }
 
-        // --- Login riuscito ---
         Session.login(utente);
-        System.out.println("Login riuscito per: " + username + " (" + utente.getRole() + ")");
-
-        errorLabel.setStyle("-fx-text-fill: #008000;");
+        errorLabel.getStyleClass().removeAll("label-error", "label-success");
+        errorLabel.getStyleClass().add("label-success");
         errorLabel.setText("Login riuscito! Benvenuto " + utente.getName() + ".");
+        System.out.println("Login riuscito per: " + username + " (" + utente.getRole() + ")");
     }
 
     @FXML
     private void onAnnullaClick() {
-        tornaAlMenuPrincipale();
-    }
-
-    private void tornaAlMenuPrincipale() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("GUI.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) btnAnnulla.getScene().getWindow();
-            Scene scene = new Scene(root, 600, 400);
-            stage.setScene(scene);
-            stage.setTitle("The Knife Menu");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Stage stage = (Stage) btnAnnulla.getScene().getWindow();
+        Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 600, 400);
     }
 }

@@ -4,14 +4,10 @@ import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
-import java.io.IOException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -50,10 +46,6 @@ public class RestaurantDetailsController {
     @FXML
     private Button btnIndietro;
 
-    /**
-     * Chiamato da RestaurantsController subito dopo aver caricato l'FXML,
-     * prima di stage.show(), per riempire tutti i campi col ristorante selezionato.
-     */
     public void carica(Restaurant r) {
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
         descriptionLabel.setText(valoreO(r.getDescription(), "?"));
@@ -76,18 +68,8 @@ public class RestaurantDetailsController {
 
     @FXML
     private void onIndietroClick() {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("GUI.fxml"));
-            Parent root = loader.load();
-
-            Stage stage = (Stage) btnIndietro.getScene().getWindow();
-            Scene scene = new Scene(root, 600, 400);
-            stage.setScene(scene);
-            stage.setTitle("The Knife Menu");
-            stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        Stage stage = (Stage) btnIndietro.getScene().getWindow();
+        Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 600, 400);
     }
 
     private String valoreO(String valore, String fallback) {
