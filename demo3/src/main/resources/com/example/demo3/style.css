@@ -14,7 +14,8 @@
 
 /* ---- Right box – lighter background to contrast with card ---- */
 .right-box {
-    -fx-background-color: #ffffff;
+    /* -fx-background-color: #ffffff; */
+    -fx-background-color: #007161;
     -fx-alignment: center;
 }
 
