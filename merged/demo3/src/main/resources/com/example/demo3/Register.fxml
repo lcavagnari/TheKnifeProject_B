@@ -8,99 +8,39 @@
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleGroup?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="560.0" prefWidth="480.0" spacing="20.0"
-      style="-fx-background-color: #ffffff; -fx-padding: 30;"
-      xmlns="http://javafx.com/javafx/26"
-      xmlns:fx="http://javafx.com/fxml/1"
+<VBox alignment="CENTER" spacing="25" stylesheets="@style.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.demo3.RegisterController">
-
-    <Label text="=== User Registration ===">
-        <font>
-            <Font name="Verdana Bold" size="20.0" />
-        </font>
-    </Label>
-
-    <Label fx:id="errorLabel" style="-fx-text-fill: #cc0000;" text="" wrapText="true" />
-
-    <GridPane hgap="10.0" vgap="15.0">
-        <columnConstraints>
-            <ColumnConstraints minWidth="140.0" prefWidth="140.0" />
-            <ColumnConstraints hgrow="ALWAYS" minWidth="200.0" prefWidth="260.0" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints />
-            <RowConstraints />
-            <RowConstraints />
-            <RowConstraints />
-            <RowConstraints />
-            <RowConstraints />
-            <RowConstraints />
-            <RowConstraints />
-        </rowConstraints>
-
-        <children>
-            <Label text="Tipo utente:" GridPane.rowIndex="0" GridPane.columnIndex="0" />
-            <HBox spacing="15.0" GridPane.rowIndex="0" GridPane.columnIndex="1">
-                <children>
-                    <RadioButton fx:id="radioGestore" text="Gestore">
-                        <toggleGroup>
-                            <ToggleGroup fx:id="tipoUtenteGroup" />
-                        </toggleGroup>
-                    </RadioButton>
-                    <RadioButton fx:id="radioCliente" text="Cliente" selected="true" toggleGroup="$tipoUtenteGroup" />
-                </children>
-            </HBox>
-
-            <Label text="Username:" GridPane.rowIndex="1" GridPane.columnIndex="0" />
-            <TextField fx:id="usernameField" promptText="4-16 caratteri" GridPane.rowIndex="1" GridPane.columnIndex="1" />
-
-            <Label text="Nome:" GridPane.rowIndex="2" GridPane.columnIndex="0" />
-            <TextField fx:id="nomeField" promptText="Es. Matteo" GridPane.rowIndex="2" GridPane.columnIndex="1" />
-
-            <Label text="Cognome:" GridPane.rowIndex="3" GridPane.columnIndex="0" />
-            <TextField fx:id="cognomeField" promptText="Es. Landini" GridPane.rowIndex="3" GridPane.columnIndex="1" />
-
-            <Label text="Indirizzo:" GridPane.rowIndex="4" GridPane.columnIndex="0" />
-            <TextField fx:id="indirizzoField" promptText="Es. Via Ottorino Rossi 9" GridPane.rowIndex="4" GridPane.columnIndex="1" />
-
-            <Label text="Città:" GridPane.rowIndex="5" GridPane.columnIndex="0" />
-            <TextField fx:id="cittaField" promptText="Es. Bizzozero" GridPane.rowIndex="5" GridPane.columnIndex="1" />
-
-            <Label text="Nazione:" GridPane.rowIndex="6" GridPane.columnIndex="0" />
-            <TextField fx:id="nazioneField" promptText="Es. Italy" GridPane.rowIndex="6" GridPane.columnIndex="1" />
-
-            <Label text="Data di nascita:" GridPane.rowIndex="7" GridPane.columnIndex="0" />
-            <DatePicker fx:id="dataNascitaPicker" promptText="YYYY-MM-DD" GridPane.rowIndex="7" GridPane.columnIndex="1" />
-        </children>
-    </GridPane>
-
-    <VBox spacing="8.0">
-        <children>
-            <Label text="Password:" />
-            <PasswordField fx:id="passwordField" promptText="Min 4 caratteri" />
-        </children>
+    <padding>
+        <Insets top="40" right="40" bottom="40" left="40" />
+    </padding>
+    <Label text="📝 Nuovo account" styleClass="card-header" />
+    <VBox styleClass="card" spacing="12" maxWidth="400">
+        <!-- Role selection -->
+        <HBox spacing="25" alignment="CENTER">
+            <RadioButton fx:id="radioCliente" text="👤 Cliente" selected="true">
+                <toggleGroup><ToggleGroup fx:id="tipoUtenteGroup" /></toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="radioGestore" text="🏢 Gestore" toggleGroup="$tipoUtenteGroup" />
+        </HBox>
+        <!-- Form fields -->
+        <TextField fx:id="usernameField" promptText="Username * (4-16 char)" />
+        <TextField fx:id="nomeField" promptText="Nome *" />
+        <TextField fx:id="cognomeField" promptText="Cognome *" />
+        <TextField fx:id="indirizzoField" promptText="Indirizzo" />
+        <HBox spacing="10">
+            <TextField fx:id="cittaField" promptText="Città *" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="nazioneField" promptText="Nazione (es. Italy)" HBox.hgrow="ALWAYS" />
+        </HBox>
+        <DatePicker fx:id="dataNascitaPicker" promptText="Data di nascita *" />
+        <PasswordField fx:id="passwordField" promptText="Password * (min 4 char)" />
+        <Label fx:id="errorLabel" wrapText="true" />
+        <HBox spacing="15" alignment="CENTER">
+            <Button fx:id="btnRegistrati" text="Registrati" onAction="#onRegistratiClick" />
+            <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-secondary" />
+        </HBox>
     </VBox>
-
-    <HBox alignment="CENTER" spacing="15.0">
-        <children>
-            <Button fx:id="btnAnnulla" mnemonicParsing="false" text="Annulla" onAction="#onAnnullaClick" />
-            <Button fx:id="btnRegistrati" mnemonicParsing="false" style="-fx-background-color: #008000; -fx-text-fill: white;" text="Registrati" onAction="#onRegistratiClick">
-                <font>
-                    <Font name="Verdana Bold" size="13.0" />
-                </font>
-            </Button>
-        </children>
-        <VBox.margin>
-            <Insets top="10.0" />
-        </VBox.margin>
-    </HBox>
-
 </VBox>

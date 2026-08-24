@@ -7,49 +7,21 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<VBox alignment="TOP_CENTER" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-      prefHeight="320.0" prefWidth="400.0" spacing="20.0"
-      style="-fx-background-color: #ffffff; -fx-padding: 30;"
-      xmlns="http://javafx.com/javafx/26"
-      xmlns:fx="http://javafx.com/fxml/1"
+<VBox alignment="CENTER" spacing="25" stylesheets="@style.css"
+      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.demo3.LoginController">
-
-    <Label text="=== Login ===">
-        <font>
-            <Font name="Verdana Bold" size="20.0" />
-        </font>
-    </Label>
-
-    <Label fx:id="errorLabel" style="-fx-text-fill: #cc0000;" text="" wrapText="true" />
-
-    <VBox spacing="8.0">
-        <children>
-            <Label text="Username:" />
-            <TextField fx:id="usernameField" promptText="Inserisci username" />
-        </children>
+    <padding>
+        <Insets top="50" right="50" bottom="50" left="50" />
+    </padding>
+    <Label text="🔐 Accedi" styleClass="card-header" />
+    <VBox styleClass="card" spacing="15" maxWidth="360">
+        <TextField fx:id="usernameField" promptText="Username" />
+        <PasswordField fx:id="passwordField" promptText="Password" />
+        <Label fx:id="errorLabel" wrapText="true" />
+        <HBox spacing="15" alignment="CENTER">
+            <Button fx:id="btnLogin" text="Login" onAction="#onLoginClick" />
+            <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-secondary" />
+        </HBox>
     </VBox>
-
-    <VBox spacing="8.0">
-        <children>
-            <Label text="Password:" />
-            <PasswordField fx:id="passwordField" promptText="Inserisci password" />
-        </children>
-    </VBox>
-
-    <HBox alignment="CENTER" spacing="15.0">
-        <children>
-            <Button fx:id="btnAnnulla" mnemonicParsing="false" text="Annulla" onAction="#onAnnullaClick" />
-            <Button fx:id="btnLogin" mnemonicParsing="false" style="-fx-background-color: #008000; -fx-text-fill: white;" text="Login" onAction="#onLoginClick">
-                <font>
-                    <Font name="Verdana Bold" size="13.0" />
-                </font>
-            </Button>
-        </children>
-        <VBox.margin>
-            <Insets top="10.0" />
-        </VBox.margin>
-    </HBox>
-
 </VBox>
