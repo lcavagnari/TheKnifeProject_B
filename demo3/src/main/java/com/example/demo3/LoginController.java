@@ -9,13 +9,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.stage.Stage;
 
 import java.util.Optional;
 
 public class LoginController {
 
     private final UserRepository userRepository = new UserRepository();
+    private Runnable onCancelCallback;
 
     @FXML
     private Label errorLabel;
@@ -31,6 +31,10 @@ public class LoginController {
 
     @FXML
     private Button btnAnnulla;
+
+    public void setOnCancelCallback(Runnable callback) {
+        this.onCancelCallback = callback;
+    }
 
     @FXML
     private void onLoginClick() {
@@ -68,7 +72,8 @@ public class LoginController {
 
     @FXML
     private void onAnnullaClick() {
-        Stage stage = (Stage) btnAnnulla.getScene().getWindow();
-        Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 600, 400);
+        if (onCancelCallback != null) {
+            onCancelCallback.run();
+        }
     }
 }

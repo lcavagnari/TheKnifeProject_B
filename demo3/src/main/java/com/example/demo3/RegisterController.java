@@ -9,13 +9,13 @@ import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.Stage;
 
 import java.time.LocalDate;
 
 public class RegisterController {
 
     private final UserRepository userRepository = new UserRepository();
+    private Runnable onCancelCallback;
 
     @FXML private Label errorLabel;
     @FXML private RadioButton radioGestore;
@@ -33,6 +33,10 @@ public class RegisterController {
 
     @FXML private Button btnRegistrati;
     @FXML private Button btnAnnulla;
+
+    public void setOnCancelCallback(Runnable callback) {
+        this.onCancelCallback = callback;
+    }
 
     @FXML
     private void onRegistratiClick() {
@@ -112,8 +116,9 @@ public class RegisterController {
 
     @FXML
     private void onAnnullaClick() {
-        Stage stage = (Stage) btnAnnulla.getScene().getWindow();
-        Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 600, 400);
+        if (onCancelCallback != null) {
+            onCancelCallback.run();
+        }
     }
 
     private void setErrorStyle(Control field) {

@@ -11,36 +11,31 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="25" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<VBox alignment="CENTER" spacing="10" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.demo3.RegisterController">
-    <padding>
-        <Insets top="40" right="40" bottom="40" left="40" />
-    </padding>
-    <Label text="📝 Nuovo account" styleClass="card-header" />
-    <VBox styleClass="card" spacing="12" maxWidth="400">
-        <!-- Role selection -->
-        <HBox spacing="25" alignment="CENTER">
-            <RadioButton fx:id="radioCliente" text="👤 Cliente" selected="true">
-                <toggleGroup><ToggleGroup fx:id="tipoUtenteGroup" /></toggleGroup>
-            </RadioButton>
-            <RadioButton fx:id="radioGestore" text="🏢 Gestore" toggleGroup="$tipoUtenteGroup" />
-        </HBox>
-        <!-- Form fields -->
-        <TextField fx:id="usernameField" promptText="Username * (4-16 char)" />
-        <TextField fx:id="nomeField" promptText="Nome *" />
-        <TextField fx:id="cognomeField" promptText="Cognome *" />
-        <TextField fx:id="indirizzoField" promptText="Indirizzo" />
-        <HBox spacing="10">
-            <TextField fx:id="cittaField" promptText="Città *" HBox.hgrow="ALWAYS" />
-            <TextField fx:id="nazioneField" promptText="Nazione (es. Italy)" HBox.hgrow="ALWAYS" />
-        </HBox>
-        <DatePicker fx:id="dataNascitaPicker" promptText="Data di nascita *" />
-        <PasswordField fx:id="passwordField" promptText="Password * (min 4 char)" />
-        <Label fx:id="errorLabel" wrapText="true" />
-        <HBox spacing="15" alignment="CENTER">
-            <Button fx:id="btnRegistrati" text="Registrati" onAction="#onRegistratiClick" />
-            <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-secondary" />
-        </HBox>
-    </VBox>
+    <Label text="Nuovo account" styleClass="label-title" />
+    <Label text="Compila i dati per registrarti" styleClass="label-info" />
+    <!-- Role selection -->
+    <HBox spacing="25" alignment="CENTER">
+        <RadioButton fx:id="radioCliente" text="Cliente" selected="true">
+            <toggleGroup><ToggleGroup fx:id="tipoUtenteGroup" /></toggleGroup>
+        </RadioButton>
+        <RadioButton fx:id="radioGestore" text="Gestore" toggleGroup="$tipoUtenteGroup" />
+    </HBox>
+    <!-- Form fields -->
+    <TextField fx:id="usernameField" promptText="Username * (4-16 char)" />
+    <TextField fx:id="nomeField" promptText="Nome *" />
+    <TextField fx:id="cognomeField" promptText="Cognome *" />
+    <TextField fx:id="indirizzoField" promptText="Indirizzo" />
+    <HBox spacing="10">
+        <TextField fx:id="cittaField" promptText="Citta *" HBox.hgrow="ALWAYS" />
+        <TextField fx:id="nazioneField" promptText="Nazione (es. Italy)" HBox.hgrow="ALWAYS" />
+    </HBox>
+    <DatePicker fx:id="dataNascitaPicker" promptText="Data di nascita *" />
+    <PasswordField fx:id="passwordField" promptText="Password * (min 4 char)" />
+    <Label fx:id="errorLabel" wrapText="true" styleClass="label-error" />
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="btnRegistrati" text="Registrati" onAction="#onRegistratiClick" />
+        <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-secondary" />
+    </HBox>
 </VBox>

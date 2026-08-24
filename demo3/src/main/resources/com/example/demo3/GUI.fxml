@@ -29,17 +29,17 @@
    <!-- RIGHT BOX – 40% width, fills entire height, elevates the card -->
    <VBox alignment="CENTER" maxHeight="Infinity" maxWidth="Infinity" styleClass="right-box" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
       <!-- Menu card – centered inside the right box -->
-      <VBox alignment="CENTER" maxWidth="280" styleClass="menu-card">
+      <VBox fx:id="menuCard" alignment="CENTER" styleClass="menu-card">
          <padding>
             <Insets bottom="20" left="20" right="20" top="20" />
          </padding>
          <!-- Title block -->
-         <VBox alignment="CENTER" spacing="10">
+         <VBox fx:id="titleBlock" alignment="CENTER" spacing="10">
             <Label styleClass="label-title" text="The Knife" />
             <Label styleClass="label-info" text="Il tuo compagno per scoperte culinarie" />
          </VBox>
          <!-- Button clusters -->
-         <VBox alignment="CENTER" spacing="50">
+         <VBox fx:id="menuButtons" alignment="CENTER" spacing="50">
             <padding>
                <Insets top="50" />
             </padding>
