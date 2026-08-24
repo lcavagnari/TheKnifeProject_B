@@ -17,6 +17,6 @@
     <Label fx:id="errorLabel" wrapText="true" styleClass="label-error" />
     <HBox spacing="10" alignment="CENTER">
         <Button fx:id="btnLogin" text="Login" onAction="#onLoginClick" />
-        <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-secondary" />
+        <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-danger" />
     </HBox>
 </VBox>

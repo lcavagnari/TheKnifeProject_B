@@ -88,6 +88,22 @@
     -fx-background-color: #b71c1c;
 }
 
+.button-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #757575;
+    -fx-padding: 6 12 6 12;
+    -fx-font-size: 13px;
+    -fx-underline: true;
+    -fx-cursor: hand;
+}
+.button-link:hover {
+    -fx-background-color: transparent;
+    -fx-text-fill: #d32f2f;
+    -fx-scale-x: 1;
+    -fx-scale-y: 1;
+    -fx-effect: none;
+}
+
 /* ---- Inputs (shared across all screens) ---- */
 .text-field, .password-field, .date-picker, .combo-box {
     -fx-background-color: #fafafa;

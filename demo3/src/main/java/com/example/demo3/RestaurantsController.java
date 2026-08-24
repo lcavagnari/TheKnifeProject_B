@@ -35,7 +35,7 @@ public class RestaurantsController {
     @FXML
     private Button btnIndietro;
 
-    public void inizializza(boolean modalitaRicerca) {
+    public void inizializza() {
         restaurantListView.setCellFactory(lv -> new RestaurantCell());
 
         restaurantListView.setOnMouseClicked(event -> {
@@ -45,17 +45,10 @@ public class RestaurantsController {
             }
         });
 
-        if (modalitaRicerca) {
-            titleLabel.setText("Cerca Ristorante");
-            searchBar.setVisible(true);
-            searchBar.setManaged(true);
-            infoLabel.setText("Digita una parola chiave e premi Cerca. Clicca su un ristorante per i dettagli.");
-        } else {
-            titleLabel.setText("Esplora Ristoranti");
-            searchBar.setVisible(false);
-            searchBar.setManaged(false);
-            caricaEMostra(restaurantRepository.caricaTutti());
-        }
+        searchBar.setVisible(true);
+        searchBar.setManaged(true);
+        caricaEMostra(restaurantRepository.caricaTutti());
+        infoLabel.setText("Cerca per nome, cucina o citta. Clicca su un ristorante per i dettagli.");
     }
 
     private void apriDettagli(Restaurant r) {

@@ -25,8 +25,7 @@ public class GUIController {
     @FXML private VBox menuButtons;
     @FXML private Button btnLogin;
     @FXML private Button btnRegister;
-    @FXML private Button btnCerca;
-    @FXML private Button btnEsplora;
+    @FXML private Button btnTrova;
     @FXML private Button btnEsci;
 
     private Node loginForm;
@@ -206,27 +205,22 @@ public class GUIController {
     }
 
     @FXML
-    private void onCercaClick() {
-        apriRestaurants(true, btnCerca);
+    private void onTrovaClick() {
+        apriRestaurants(btnTrova);
     }
 
-    @FXML
-    private void onEsploraClick() {
-        apriRestaurants(false, btnEsplora);
-    }
-
-    private void apriRestaurants(boolean modalitaRicerca, Button sourceButton) {
+    private void apriRestaurants(Button sourceButton) {
         try {
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("Restaurants.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
             javafx.scene.Parent root = loader.load();
 
             RestaurantsController controller = loader.getController();
-            controller.inizializza(modalitaRicerca);
+            controller.inizializza();
 
             Stage stage = (Stage) sourceButton.getScene().getWindow();
             javafx.scene.Scene scene = new javafx.scene.Scene(root, 650, 500);
             stage.setScene(scene);
-            stage.setTitle(modalitaRicerca ? "Cerca Ristorante" : "Esplora Ristoranti");
+            stage.setTitle("Trova Ristoranti");
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

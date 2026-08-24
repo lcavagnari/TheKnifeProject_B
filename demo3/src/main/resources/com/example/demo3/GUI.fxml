@@ -60,17 +60,10 @@
                </Button>
             </VBox>
             <VBox alignment="CENTER" spacing="8">
-               <Button fx:id="btnCerca" onAction="#onCercaClick" prefWidth="240" text="Cerca Ristorante">
+               <Button fx:id="btnTrova" onAction="#onTrovaClick" prefWidth="240" text="Trova Ristoranti">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
                         <Image url="@images/icon-search.png"/>
-                     </ImageView>
-                  </graphic>
-               </Button>
-               <Button fx:id="btnEsplora" onAction="#onEsploraClick" prefWidth="200" styleClass="button-secondary" text="Esplora Ristoranti">
-                  <graphic>
-                     <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-explore.png"/>
                      </ImageView>
                   </graphic>
                </Button>

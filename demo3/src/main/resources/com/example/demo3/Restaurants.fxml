@@ -17,7 +17,7 @@
     <!-- Top bar -->
     <HBox alignment="CENTER_LEFT" spacing="20">
         <Button fx:id="btnIndietro" text="← Indietro" onAction="#onIndietroClick" styleClass="button-secondary" />
-        <Label fx:id="titleLabel" styleClass="card-header" />
+        <Label fx:id="titleLabel" styleClass="card-header" text="Trova Ristoranti" />
     </HBox>
     <!-- Main card -->
     <VBox styleClass="card" spacing="15" VBox.vgrow="ALWAYS">
