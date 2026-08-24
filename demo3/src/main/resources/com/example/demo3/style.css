@@ -1,4 +1,4 @@
-/* style.css – University of Insubria Institutional Theme */
+/* style.css – University of Insubria Theme + Main Menu Layout */
 
 .root {
     -fx-font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
@@ -6,19 +6,40 @@
     -fx-base: #f5f7fa;
 }
 
-/* ---- Cards & Containers ---- */
-.card {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 12px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 15, 0.15, 0, 4);
-    -fx-padding: 30 25 30 25;
+/* ---- Left box – background colour, no shadow ---- */
+.left-box {
+    -fx-background-color: #eef3f7; /* subtle grey-blue */
+    -fx-alignment: center;
 }
 
-.card-header {
-    -fx-font-size: 26px;
+/* ---- Right box – lighter background to contrast with card ---- */
+.right-box {
+    -fx-background-color: #ffffff;
+    -fx-alignment: center;
+}
+
+/* ---- Menu card – 6dp elevation + 20dp padding (already in FXML) ---- */
+.menu-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 16px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 12, 0.3, 0, 6); /* 6dp shadow */
+    -fx-padding: 20 20 25 20;
+    -fx-spacing: 0;
+    -fx-alignment: center;
+    -fx-max-width: 280;
+    -fx-min-width: 200;
+}
+
+/* ---- Card title & subtitle ---- */
+.card-title {
+    -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-text-fill: #007161; /* Verde Insubria */
-    -fx-padding: 0 0 15 0;
+}
+.card-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #757575;
+    -fx-padding: 0 0 8 0;
 }
 
 /* ---- Buttons (Primary: Verde Insubria) ---- */
@@ -34,7 +55,7 @@
     -fx-transition: all 0.2s ease-in-out;
 }
 .button:hover {
-    -fx-background-color: #066858; /* Darker variant */
+    -fx-background-color: #066858;
     -fx-scale-x: 1.03;
     -fx-scale-y: 1.03;
     -fx-effect: dropshadow(gaussian, rgba(0,113,97,0.35), 10, 0.3, 0, 4);
@@ -44,7 +65,6 @@
     -fx-scale-y: 0.97;
 }
 
-/* Secondary buttons (light gray) */
 .button-secondary {
     -fx-background-color: #e0e0e0;
     -fx-text-fill: #212121;
@@ -54,7 +74,6 @@
     -fx-background-color: #bdbdbd;
 }
 
-/* Danger button (kept as standard red – institutional palette has no red, but it's a common UX element) */
 .button-danger {
     -fx-background-color: #d32f2f;
     -fx-effect: dropshadow(gaussian, rgba(211,47,47,0.2), 6, 0.2, 0, 2);
@@ -63,36 +82,7 @@
     -fx-background-color: #b71c1c;
 }
 
-/* ---- Labels ---- */
-.label {
-    -fx-font-size: 14px;
-    -fx-text-fill: #212121;
-}
-.label-title {
-    -fx-font-size: 28px;
-    -fx-font-weight: 700;
-    -fx-text-fill: #007161; /* Verde Insubria */
-}
-.label-info {
-    -fx-font-size: 14px;
-    -fx-text-fill: #757575;
-}
-.label-error {
-    -fx-text-fill: #d32f2f;
-    -fx-font-weight: 600;
-    -fx-padding: 5 0 0 0;
-}
-.label-success {
-    -fx-text-fill: #2e7d32;
-    -fx-font-weight: 600;
-    -fx-padding: 5 0 0 0;
-}
-.label-field {
-    -fx-font-weight: 600;
-    -fx-text-fill: #455a64;
-}
-
-/* ---- Inputs ---- */
+/* ---- Inputs (shared across all screens) ---- */
 .text-field, .password-field, .date-picker, .combo-box {
     -fx-background-color: #fafafa;
     -fx-background-radius: 6px;
@@ -103,7 +93,7 @@
     -fx-transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .text-field:focused, .password-field:focused, .date-picker:focused {
-    -fx-border-color: #007161; /* Verde Insubria */
+    -fx-border-color: #007161;
     -fx-border-width: 2px;
     -fx-background-color: white;
     -fx-effect: dropshadow(gaussian, rgba(0,113,97,0.15), 6, 0.2, 0, 2);
@@ -113,7 +103,7 @@
     -fx-border-width: 2px;
 }
 
-/* ---- ListView ---- */
+/* ---- ListView (shared) ---- */
 .list-view {
     -fx-background-color: white;
     -fx-background-radius: 8px;
@@ -129,7 +119,7 @@
     -fx-transition: background-color 0.15s ease;
 }
 .list-cell:selected {
-    -fx-background-color: #e8f5e9; /* Very light green tint */
+    -fx-background-color: #e8f5e9;
     -fx-text-fill: #007161;
 }
 .list-cell:hover {
@@ -153,13 +143,34 @@
     -fx-background-color: #007161;
 }
 
-/* ---- Misc spacing ---- */
-.spacing-md {
-    -fx-spacing: 15;
+/* ---- Misc ---- */
+.label-title {
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #007161;
 }
-.spacing-lg {
-    -fx-spacing: 25;
+.label-info {
+    -fx-font-size: 14px;
+    -fx-text-fill: #757575;
+    -fx-wrap-text: true;
+    -fx-text-alignment: center;
 }
-.padding-lg {
-    -fx-padding: 40;
+.label-error {
+    -fx-text-fill: #d32f2f;
+    -fx-font-weight: 600;
+    -fx-padding: 5 0 0 0;
 }
+.label-success {
+    -fx-text-fill: #2e7d32;
+    -fx-font-weight: 600;
+    -fx-padding: 5 0 0 0;
+}
+.label-field {
+    -fx-font-weight: 600;
+    -fx-text-fill: #455a64;
+}
+
+/* ---- Reusable spacing (optional) ---- */
+.spacing-md { -fx-spacing: 15; }
+.spacing-lg { -fx-spacing: 25; }
+.padding-lg { -fx-padding: 40; }
