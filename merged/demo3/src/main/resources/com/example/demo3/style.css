@@ -1,118 +1,165 @@
-/* style.css - Modern Flat Theme */
+/* style.css – University of Insubria Institutional Theme */
+
 .root {
-    -fx-font-family: "Segoe UI", Roboto, Helvetica, sans-serif;
-    -fx-base: #f5f5f5;
-    -fx-background: #f5f5f5;
-    -fx-control-inner-background: #ffffff;
-    -fx-text-fill: #212121;
+    -fx-font-family: "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    -fx-background: #f5f7fa;
+    -fx-base: #f5f7fa;
 }
 
-.button {
-    -fx-background-color: #1976d2;
-    -fx-text-fill: white;
+/* ---- Cards & Containers ---- */
+.card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 15, 0.15, 0, 4);
+    -fx-padding: 30 25 30 25;
+}
+
+.card-header {
+    -fx-font-size: 26px;
     -fx-font-weight: bold;
+    -fx-text-fill: #007161; /* Verde Insubria */
+    -fx-padding: 0 0 15 0;
+}
+
+/* ---- Buttons (Primary: Verde Insubria) ---- */
+.button {
+    -fx-background-color: #007161;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
     -fx-font-size: 14px;
-    -fx-padding: 8 20 8 20;
-    -fx-background-radius: 4px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 6, 0, 0, 2);
+    -fx-padding: 10 25 10 25;
+    -fx-background-radius: 8px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0,113,97,0.2), 6, 0.2, 0, 2);
+    -fx-transition: all 0.2s ease-in-out;
 }
 .button:hover {
-    -fx-background-color: #1565c0;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 8, 0, 0, 3);
+    -fx-background-color: #066858; /* Darker variant */
+    -fx-scale-x: 1.03;
+    -fx-scale-y: 1.03;
+    -fx-effect: dropshadow(gaussian, rgba(0,113,97,0.35), 10, 0.3, 0, 4);
 }
 .button:pressed {
-    -fx-background-color: #0d47a1;
+    -fx-scale-x: 0.97;
+    -fx-scale-y: 0.97;
 }
+
+/* Secondary buttons (light gray) */
 .button-secondary {
     -fx-background-color: #e0e0e0;
     -fx-text-fill: #212121;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.05), 4, 0.1, 0, 1);
 }
 .button-secondary:hover {
     -fx-background-color: #bdbdbd;
 }
+
+/* Danger button (kept as standard red – institutional palette has no red, but it's a common UX element) */
 .button-danger {
     -fx-background-color: #d32f2f;
+    -fx-effect: dropshadow(gaussian, rgba(211,47,47,0.2), 6, 0.2, 0, 2);
 }
 .button-danger:hover {
-    -fx-background-color: #c62828;
+    -fx-background-color: #b71c1c;
 }
 
+/* ---- Labels ---- */
 .label {
     -fx-font-size: 14px;
     -fx-text-fill: #212121;
 }
 .label-title {
-    -fx-font-size: 24px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #1976d2;
+    -fx-font-size: 28px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #007161; /* Verde Insubria */
 }
 .label-info {
-    -fx-font-size: 13px;
+    -fx-font-size: 14px;
     -fx-text-fill: #757575;
 }
 .label-error {
     -fx-text-fill: #d32f2f;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
+    -fx-padding: 5 0 0 0;
 }
 .label-success {
     -fx-text-fill: #2e7d32;
-    -fx-font-weight: bold;
+    -fx-font-weight: 600;
+    -fx-padding: 5 0 0 0;
+}
+.label-field {
+    -fx-font-weight: 600;
+    -fx-text-fill: #455a64;
 }
 
+/* ---- Inputs ---- */
 .text-field, .password-field, .date-picker, .combo-box {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 4px;
-    -fx-border-color: #bdbdbd;
-    -fx-border-radius: 4px;
-    -fx-padding: 8 10 8 10;
+    -fx-background-color: #fafafa;
+    -fx-background-radius: 6px;
+    -fx-border-color: #cfd8dc;
+    -fx-border-radius: 6px;
+    -fx-padding: 10 12 10 12;
     -fx-font-size: 14px;
+    -fx-transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 .text-field:focused, .password-field:focused, .date-picker:focused {
-    -fx-border-color: #1976d2;
+    -fx-border-color: #007161; /* Verde Insubria */
     -fx-border-width: 2px;
+    -fx-background-color: white;
+    -fx-effect: dropshadow(gaussian, rgba(0,113,97,0.15), 6, 0.2, 0, 2);
 }
 .text-field.error, .password-field.error, .date-picker.error {
     -fx-border-color: #d32f2f;
     -fx-border-width: 2px;
 }
 
+/* ---- ListView ---- */
 .list-view {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 6px;
+    -fx-background-color: white;
+    -fx-background-radius: 8px;
     -fx-border-color: #e0e0e0;
-    -fx-border-radius: 6px;
-    -fx-padding: 5;
+    -fx-border-radius: 8px;
+    -fx-padding: 0;
 }
 .list-cell {
-    -fx-padding: 12 10 12 10;
+    -fx-padding: 14 12 14 12;
     -fx-font-size: 14px;
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent #f0f0f0 transparent;
+    -fx-border-color: transparent transparent #f5f5f5 transparent;
+    -fx-transition: background-color 0.15s ease;
 }
 .list-cell:selected {
-    -fx-background-color: #e3f2fd;
-    -fx-text-fill: #1976d2;
+    -fx-background-color: #e8f5e9; /* Very light green tint */
+    -fx-text-fill: #007161;
 }
 .list-cell:hover {
     -fx-background-color: #f5f5f5;
 }
 
-.card {
-    -fx-background-color: #ffffff;
-    -fx-background-radius: 8px;
-    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 10, 0, 0, 2);
-    -fx-padding: 20;
-}
-
+/* ---- RadioButton ---- */
 .radio-button {
     -fx-font-size: 14px;
+    -fx-text-fill: #212121;
 }
 .radio-button .radio {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #1976d2;
+    -fx-background-color: #fafafa;
+    -fx-border-color: #78909c;
     -fx-border-radius: 50%;
 }
+.radio-button:selected .radio {
+    -fx-border-color: #007161;
+}
 .radio-button:selected .dot {
-    -fx-background-color: #1976d2;
+    -fx-background-color: #007161;
+}
+
+/* ---- Misc spacing ---- */
+.spacing-md {
+    -fx-spacing: 15;
+}
+.spacing-lg {
+    -fx-spacing: 25;
+}
+.padding-lg {
+    -fx-padding: 40;
 }
