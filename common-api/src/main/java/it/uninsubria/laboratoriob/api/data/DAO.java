@@ -17,6 +17,10 @@ public interface DAO<T> {
 
     List<T> findAll();
 
+    List<T> findAll(int offset, int limit);
+
+    long count();
+
     boolean save(T entity);
 
     boolean update(T entity);
