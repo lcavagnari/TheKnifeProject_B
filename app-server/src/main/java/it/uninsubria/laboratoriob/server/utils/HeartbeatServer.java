@@ -25,18 +25,26 @@ public class HeartbeatServer {
 
     public void start() {
         Thread setupThread = new Thread(this::acceptAndRun, "heartbeat-setup");
-        setupThread.setDaemon(true);
         setupThread.start();
     }
 
     private void acceptAndRun() {
         try {
             serverSocket = new ServerSocket(port);
-            Socket socket = serverSocket.accept();
-            channel = new HeartbeatChannel(socket, intervalMinutes);
-            channel.start();
+            System.out.println("Heartbeat server listening on port " + port);
+            while (!Thread.currentThread().isInterrupted()) {
+                Socket socket = serverSocket.accept();
+                System.out.println("Client connected to heartbeat: " + socket.getRemoteSocketAddress());
+                if (channel != null) {
+                    channel.shutdown();
+                }
+                channel = new HeartbeatChannel(socket, intervalMinutes);
+                channel.start();
+            }
         } catch (IOException e) {
-            System.err.println("Heartbeat connection setup failed, continuing without it: " + e.getMessage());
+            if (!serverSocket.isClosed()) {
+                System.err.println("Heartbeat server error: " + e.getMessage());
+            }
         }
     }
 

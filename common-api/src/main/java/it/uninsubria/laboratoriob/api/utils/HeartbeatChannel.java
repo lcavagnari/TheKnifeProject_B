@@ -50,12 +50,14 @@ public class HeartbeatChannel {
                 byte tag = in.readByte();
                 int value = in.readInt();
                 if (tag == PING) {
+                    System.out.println("[Heartbeat] Received PING " + value + ", sending PONG");
                     synchronized (outLock) {
                         out.writeByte(PONG);
                         out.writeInt(value);
                         out.flush();
                     }
                 } else if (tag == PONG) {
+                    System.out.println("[Heartbeat] Received PONG " + value);
                     pongQueue.offer(value);
                 }
             }
@@ -75,6 +77,7 @@ public class HeartbeatChannel {
                     out.writeInt(counter);
                     out.flush();
                 }
+                System.out.println("[Heartbeat] Sent PING " + counter);
             } catch (IOException e) {
                 System.err.println("Heartbeat ping failed: " + e.getMessage());
             }
