@@ -27,6 +27,7 @@ public class HeartbeatClient {
     public void start() {
         try {
             Socket socket = new Socket(host, port);
+            System.out.println("[Heartbeat] Client connected to " + host + ":" + port);
             channel = new HeartbeatChannel(socket, intervalMinutes);
             channel.start();
         } catch (IOException e) {

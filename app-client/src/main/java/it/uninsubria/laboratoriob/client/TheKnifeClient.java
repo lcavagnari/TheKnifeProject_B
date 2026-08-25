@@ -1,15 +1,9 @@
 package it.uninsubria.laboratoriob.client;
 
-import it.uninsubria.laboratoriob.api.objects.Customer;
-import it.uninsubria.laboratoriob.api.objects.Owner;
-import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
 import it.uninsubria.laboratoriob.client.ui.menus.GuestMenus;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
-
-import java.util.List;
-import java.util.Optional;
 
 /**
  * Classe principale del client The Knife.
@@ -35,7 +29,6 @@ public class TheKnifeClient {
     }
 
     private static final String serverHost = "localhost";
-    private final int rmiPort = 1099;
     private static final int heartbeatPort = 5555;
     private static final long heartbeatIntervalMinutes = 5;
 
@@ -49,26 +42,6 @@ public class TheKnifeClient {
         tcpHbeatClient.start();
         Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
         Runtime.getRuntime().addShutdownHook(new Thread(IO::closeScanner));
-    }
-
-    public Optional<Customer> loginCustomer(String username, String password) {
-        return dataStore.getCustomerDAO().findByUsername(username)
-                .filter(c -> c.getPasswordHash().equals(password));
-    }
-
-    public Optional<Owner> loginOwner(String username, String password) {
-        return dataStore.getOwnerDAO().findByUsername(username)
-                .filter(o -> o.getPasswordHash().equals(password));
-    }
-
-    public List<Restaurant> searchRestaurantsByName(String name) {
-        return dataStore.getRestaurantDAO().findAll().stream()
-                .filter(r -> r.getName().toLowerCase().contains(name.toLowerCase()))
-                .toList();
-    }
-
-    public List<Restaurant> getRestaurantsByOwner(Owner owner) {
-        return dataStore.getRestaurantDAO().findByOwner(owner.getId());
     }
 
     public void shutdown() {

@@ -4,9 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.experimental.UtilityClass;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.UUID;
 
 /**
@@ -33,9 +31,9 @@ import java.util.UUID;
 @UtilityClass
 public final class Database {
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/mydb";
-    private static final String USERNAME = "testuser";
-    private static final String PASSWORD = "test1234";
+    private static final String URL = System.getenv().getOrDefault("THEKNIFE_DB_URL", "jdbc:postgresql://localhost:5432/mydb");
+    private static final String USERNAME = System.getenv().getOrDefault("THEKNIFE_DB_USER", "testuser");
+    private static final String PASSWORD = System.getenv().getOrDefault("THEKNIFE_DB_PASS", "test1234");
 
     private static final HikariDataSource ds;
 
@@ -238,10 +236,7 @@ public final class Database {
             return true;
 
         } catch (SQLException e) {
-            System.err.println(
-                    "Errore durante l'inizializzazione del database: "
-                            + e.getMessage()
-            );
+            System.err.println("Errore durante l'inizializzazione del database: " + e.getMessage());
             return false;
         }
     }
@@ -544,14 +539,18 @@ public final class Database {
             String systemHash = PasswordHasher.hash(UUID.randomUUID().toString(), systemSalt);
             String systemId = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes()).toString();
 
-            stmt.execute("""
-                    INSERT INTO "user" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system)
-                    VALUES ('%s', 'system', '%s', '%s', 'System', 'Michelin', '2000-01-01', true, true)
-                    ON CONFLICT (id) DO NOTHING;
-                    """.formatted(systemId, systemHash, systemSalt));
+            try (PreparedStatement userStmt = conn.prepareStatement(
+                    "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system) VALUES (?, ?, ?, ?, 'System', 'Michelin', '2000-01-01', true, true) ON CONFLICT (id) DO NOTHING")) {
+                userStmt.setObject(1, UUID.fromString(systemId), Types.OTHER);
+                userStmt.setString(2, "system");
+                userStmt.setString(3, systemHash);
+                userStmt.setString(4, systemSalt);
+                userStmt.execute();
+            }
 
             return true;
         } catch (SQLException ex) {
+            System.err.println("Errore durante l'inizializzazione delle costanti: " + ex.getMessage());
             return false;
         }
     }
