@@ -2,34 +2,36 @@ package it.uninsubria.laboratoriob.server.data.remote;
 
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
+import it.uninsubria.laboratoriob.server.data.ReviewDAO;
 
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.UUID;
 
 public class ReviewServiceImpl implements ReviewServiceInter {
+    ReviewDAO rDAO = new  ReviewDAO();
     @Override
     public List<Review> findByRestaurant(UUID restaurantId) throws RemoteException {
-        return List.of();
+        return rDAO.findByRestaurant(restaurantId);
     }
 
     @Override
     public List<Review> findAll() throws RemoteException {
-        return List.of();
+        return rDAO.findAll();
     }
 
     @Override
     public boolean save(Review review) throws RemoteException {
-        return false;
+        return rDAO.save(review);
     }
 
     @Override
     public boolean update(Review review) throws RemoteException {
-        return false;
+        return rDAO.update(review);
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        return false;
+        return rDAO.delete(id);
     }
 }
