@@ -6,6 +6,7 @@ import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.util.Set;
@@ -45,6 +46,18 @@ public class RestaurantDetailsController {
     private Label idLabel;
     @FXML
     private Button btnIndietro;
+    @FXML
+    private VBox root;
+
+    @FXML
+    public void initialize() {
+        String css = getClass().getResource("style.css").toExternalForm();
+        root.sceneProperty().addListener((obs, oldScene, newScene) -> {
+            if (newScene != null && !newScene.getRoot().getStylesheets().contains(css)) {
+                newScene.getRoot().getStylesheets().add(css);
+            }
+        });
+    }
 
     public void carica(Restaurant r) {
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));

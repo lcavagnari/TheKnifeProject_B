@@ -8,32 +8,30 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="18" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.demo3.RestaurantsController">
+<VBox spacing="18" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.RestaurantsController">
     <padding>
-        <Insets top="25" right="25" bottom="25" left="25" />
+        <Insets bottom="25" left="25" right="25" top="25" />
     </padding>
     <!-- Top bar -->
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Button fx:id="btnIndietro" text="← Indietro" onAction="#onIndietroClick" styleClass="button-secondary" />
+        <Button fx:id="btnIndietro" onAction="#onIndietroClick" styleClass="button-secondary" text="← Indietro" />
         <Label fx:id="titleLabel" styleClass="card-header" text="Trova Ristoranti" />
     </HBox>
     <!-- Search card -->
-    <HBox fx:id="searchBar" styleClass="search-card" alignment="CENTER" spacing="10">
+    <HBox fx:id="searchBar" alignment="CENTER" spacing="10" styleClass="search-card">
         <TextField fx:id="searchField" promptText="Cerca per nome, cucina o città..." HBox.hgrow="ALWAYS" />
-        <Button text="Cerca" onAction="#onCercaClick" />
+        <Button onAction="#onCercaClick" text="Cerca" />
     </HBox>
     <!-- Stats -->
-    <HBox fx:id="statsBar" styleClass="stats-bar" alignment="CENTER_LEFT">
+    <HBox fx:id="statsBar" alignment="CENTER_LEFT">
         <Label fx:id="infoLabel" styleClass="stats-label" />
     </HBox>
     <!-- Empty state (hidden by default) -->
-    <VBox fx:id="emptyState" styleClass="empty-state" visible="false" managed="false">
+    <VBox fx:id="emptyState" managed="false" styleClass="empty-state" visible="false">
         <Label styleClass="empty-state-icon" text="🍽" />
         <Label styleClass="empty-state-title" text="Nessun ristorante trovato" />
         <Label styleClass="empty-state-sub" text="Prova a cercare con parole chiave diverse" />
     </VBox>
     <!-- List -->
-    <ListView fx:id="restaurantListView" VBox.vgrow="ALWAYS" prefHeight="320" />
+    <ListView fx:id="restaurantListView" prefHeight="320" VBox.vgrow="ALWAYS" />
 </VBox>
