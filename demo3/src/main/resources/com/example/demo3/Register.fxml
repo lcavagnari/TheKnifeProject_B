@@ -29,7 +29,7 @@
     <Label text="Account" styleClass="section-header" />
     <TextField fx:id="usernameField" promptText="Username * (4-16 caratteri)" />
     <PasswordField fx:id="passwordField" promptText="Password * (min 4 caratteri)" />
-    <PasswordField fx:id="confirmPasswordField" promptText="Conferma password *" />
+    <PasswordField fx:id="confirmPasswordField" promptText="Conferma password *" visible="false" managed="false" />
 
     <!-- Profilo -->
     <Label text="Profilo" styleClass="section-header" />

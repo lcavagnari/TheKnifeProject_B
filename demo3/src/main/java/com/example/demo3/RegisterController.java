@@ -10,6 +10,9 @@ import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
+import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
+import javafx.util.Duration;
 
 import java.time.LocalDate;
 
@@ -42,6 +45,31 @@ public class RegisterController {
     public void initialize() {
         roleClienteCard.setOnMouseClicked(e -> selectRole(true));
         roleGestoreCard.setOnMouseClicked(e -> selectRole(false));
+
+        confirmPasswordField.setTranslateY(-20);
+        passwordField.textProperty().addListener((obs, oldVal, newVal) -> {
+            if (!newVal.isEmpty() && !confirmPasswordField.isVisible()) {
+                confirmPasswordField.setVisible(true);
+                confirmPasswordField.setManaged(true);
+                PauseTransition pause = new PauseTransition(Duration.millis(300));
+                pause.setOnFinished(e -> {
+                    TranslateTransition tt = new TranslateTransition(Duration.millis(200), confirmPasswordField);
+                    tt.setFromY(-20);
+                    tt.setToY(0);
+                    tt.play();
+                });
+                pause.play();
+            } else if (newVal.isEmpty() && confirmPasswordField.isVisible()) {
+                TranslateTransition tt = new TranslateTransition(Duration.millis(200), confirmPasswordField);
+                tt.setFromY(0);
+                tt.setToY(-20);
+                tt.setOnFinished(e -> {
+                    confirmPasswordField.setVisible(false);
+                    confirmPasswordField.setManaged(false);
+                });
+                tt.play();
+            }
+        });
     }
 
     private void selectRole(boolean cliente) {
