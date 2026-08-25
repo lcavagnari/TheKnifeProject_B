@@ -11,7 +11,8 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface ResturantServiceInter extends Remote {
-    public List<Restaurant>  findAll() throws RemoteException;
+    public List<Restaurant> findAll(int offset, int limit) throws RemoteException;
+    public long count() throws RemoteException;
     public Optional<Restaurant> findById(UUID id) throws RemoteException;
     public List<Restaurant> findByOwner(UUID id) throws  RemoteException;
     public boolean save (Restaurant restaurant) throws RemoteException;
