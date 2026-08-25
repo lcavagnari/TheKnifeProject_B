@@ -187,6 +187,11 @@
     -fx-font-weight: 600;
     -fx-padding: 5 0 0 0;
 }
+.field-error {
+    -fx-text-fill: #d32f2f;
+    -fx-font-size: 11px;
+    -fx-padding: 0 0 2 4;
+}
 .label-field {
     -fx-font-weight: 600;
     -fx-text-fill: #455a64;

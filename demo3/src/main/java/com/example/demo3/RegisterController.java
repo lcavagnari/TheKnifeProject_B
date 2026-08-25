@@ -27,6 +27,7 @@ public class RegisterController {
     @FXML private ToggleGroup tipoUtenteGroup;
     @FXML private VBox roleClienteCard;
     @FXML private VBox roleGestoreCard;
+    @FXML private VBox confirmPasswordWrapper;
 
     @FXML private TextField usernameField;
     @FXML private TextField nomeField;
@@ -38,6 +39,14 @@ public class RegisterController {
     @FXML private PasswordField passwordField;
     @FXML private PasswordField confirmPasswordField;
 
+    @FXML private Label usernameError;
+    @FXML private Label passwordError;
+    @FXML private Label confirmPasswordError;
+    @FXML private Label nomeError;
+    @FXML private Label cognomeError;
+    @FXML private Label dataNascitaError;
+    @FXML private Label nazioneError;
+
     @FXML private Button btnRegistrati;
     @FXML private Button btnAnnulla;
 
@@ -46,30 +55,58 @@ public class RegisterController {
         roleClienteCard.setOnMouseClicked(e -> selectRole(true));
         roleGestoreCard.setOnMouseClicked(e -> selectRole(false));
 
-        confirmPasswordField.setTranslateY(-20);
+        confirmPasswordWrapper.setTranslateY(-20);
         passwordField.textProperty().addListener((obs, oldVal, newVal) -> {
-            if (!newVal.isEmpty() && !confirmPasswordField.isVisible()) {
-                confirmPasswordField.setVisible(true);
-                confirmPasswordField.setManaged(true);
+            if (!newVal.isEmpty() && !confirmPasswordWrapper.isVisible()) {
+                confirmPasswordWrapper.setVisible(true);
+                confirmPasswordWrapper.setManaged(true);
                 PauseTransition pause = new PauseTransition(Duration.millis(300));
                 pause.setOnFinished(e -> {
-                    TranslateTransition tt = new TranslateTransition(Duration.millis(200), confirmPasswordField);
+                    TranslateTransition tt = new TranslateTransition(Duration.millis(200), confirmPasswordWrapper);
                     tt.setFromY(-20);
                     tt.setToY(0);
                     tt.play();
                 });
                 pause.play();
-            } else if (newVal.isEmpty() && confirmPasswordField.isVisible()) {
-                TranslateTransition tt = new TranslateTransition(Duration.millis(200), confirmPasswordField);
+            } else if (newVal.isEmpty() && confirmPasswordWrapper.isVisible()) {
+                TranslateTransition tt = new TranslateTransition(Duration.millis(200), confirmPasswordWrapper);
                 tt.setFromY(0);
                 tt.setToY(-20);
                 tt.setOnFinished(e -> {
-                    confirmPasswordField.setVisible(false);
-                    confirmPasswordField.setManaged(false);
+                    confirmPasswordWrapper.setVisible(false);
+                    confirmPasswordWrapper.setManaged(false);
                 });
                 tt.play();
             }
         });
+
+        // Blur validation
+        usernameField.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) validateUsername();
+        });
+        nomeField.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) validateNome();
+        });
+        cognomeField.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) validateCognome();
+        });
+        passwordField.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) validatePassword();
+        });
+        confirmPasswordField.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) validateConfirmPassword();
+        });
+        nazioneField.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) validateNazione();
+        });
+
+        // Clear errors on typing
+        usernameField.textProperty().addListener((obs, old, n) -> { if (usernameError.isVisible()) clearFieldError(usernameError, usernameField); });
+        nomeField.textProperty().addListener((obs, old, n) -> { if (nomeError.isVisible()) clearFieldError(nomeError, nomeField); });
+        cognomeField.textProperty().addListener((obs, old, n) -> { if (cognomeError.isVisible()) clearFieldError(cognomeError, cognomeField); });
+        passwordField.textProperty().addListener((obs, old, n) -> { if (passwordError.isVisible()) clearFieldError(passwordError, passwordField); });
+        confirmPasswordField.textProperty().addListener((obs, old, n) -> { if (confirmPasswordError.isVisible()) clearFieldError(confirmPasswordError, confirmPasswordField); });
+        nazioneField.textProperty().addListener((obs, old, n) -> { if (nazioneError.isVisible()) clearFieldError(nazioneError, nazioneField); });
     }
 
     private void selectRole(boolean cliente) {
@@ -88,12 +125,78 @@ public class RegisterController {
         this.onCancelCallback = callback;
     }
 
+    // --- Blur validation ---
+
+    private void validateUsername() {
+        String val = usernameField.getText() != null ? usernameField.getText().trim() : "";
+        if (val.isEmpty()) return;
+        if (val.length() < 4 || val.length() > 16) {
+            showFieldError(usernameError, "Deve avere tra 4 e 16 caratteri.", usernameField);
+        } else if (userRepository.existsByUsername(val)) {
+            showFieldError(usernameError, "Username non disponibile.", usernameField);
+        } else {
+            clearFieldError(usernameError, usernameField);
+        }
+    }
+
+    private void validateNome() {
+        String val = nomeField.getText() != null ? nomeField.getText().trim() : "";
+        if (val.isEmpty()) {
+            showFieldError(nomeError, "Il nome è obbligatorio.", nomeField);
+        } else {
+            clearFieldError(nomeError, nomeField);
+        }
+    }
+
+    private void validateCognome() {
+        String val = cognomeField.getText() != null ? cognomeField.getText().trim() : "";
+        if (val.isEmpty()) {
+            showFieldError(cognomeError, "Il cognome è obbligatorio.", cognomeField);
+        } else {
+            clearFieldError(cognomeError, cognomeField);
+        }
+    }
+
+    private void validatePassword() {
+        String val = passwordField.getText() != null ? passwordField.getText() : "";
+        if (val.isEmpty()) return;
+        if (val.length() < 4) {
+            showFieldError(passwordError, "Minimo 4 caratteri.", passwordField);
+        } else {
+            clearFieldError(passwordError, passwordField);
+        }
+    }
+
+    private void validateConfirmPassword() {
+        String pw = passwordField.getText() != null ? passwordField.getText() : "";
+        String confirm = confirmPasswordField.getText() != null ? confirmPasswordField.getText() : "";
+        if (confirm.isEmpty()) return;
+        if (!pw.equals(confirm)) {
+            showFieldError(confirmPasswordError, "Le password non corrispondono.", confirmPasswordField);
+        } else {
+            clearFieldError(confirmPasswordError, confirmPasswordField);
+        }
+    }
+
+    private void validateNazione() {
+        String val = nazioneField.getText() != null ? nazioneField.getText().trim() : "";
+        if (val.isEmpty()) {
+            clearFieldError(nazioneError, nazioneField);
+            return;
+        }
+        if (Nation.fromString(val) == null) {
+            showFieldError(nazioneError, "Nazione non riconosciuta.", nazioneField);
+        } else {
+            clearFieldError(nazioneError, nazioneField);
+        }
+    }
+
+    // --- Submit ---
+
     @FXML
     private void onRegistratiClick() {
-        errorLabel.getStyleClass().removeAll("label-success", "label-error");
-        errorLabel.getStyleClass().add("label-error");
+        clearAllErrors();
         errorLabel.setText("");
-        clearErrors();
 
         String username = usernameField.getText() != null ? usernameField.getText().trim() : "";
         String nome = nomeField.getText() != null ? nomeField.getText().trim() : "";
@@ -104,46 +207,52 @@ public class RegisterController {
         LocalDate dataNascita = dataNascitaPicker.getValue();
         String password = passwordField.getText() != null ? passwordField.getText() : "";
         String confirmPassword = confirmPasswordField.getText() != null ? confirmPasswordField.getText() : "";
-
         boolean isGestore = radioGestore != null && radioGestore.isSelected();
 
+        boolean valid = true;
+
         if (username.length() < 4 || username.length() > 16) {
-            showError("Username non valido: deve avere tra 4 e 16 caratteri.", usernameField);
-            return;
+            showFieldError(usernameError, "Deve avere tra 4 e 16 caratteri.", usernameField);
+            valid = false;
+        } else if (userRepository.existsByUsername(username)) {
+            showFieldError(usernameError, "Username non disponibile.", usernameField);
+            valid = false;
         }
-        if (userRepository.existsByUsername(username)) {
-            showError("Username non disponibile, scegline un altro.", usernameField);
-            return;
-        }
+
         if (nome.isEmpty()) {
-            showError("Il nome e obbligatorio.", nomeField);
-            return;
+            showFieldError(nomeError, "Il nome è obbligatorio.", nomeField);
+            valid = false;
         }
+
         if (cognome.isEmpty()) {
-            showError("Il cognome e obbligatorio.", cognomeField);
-            return;
+            showFieldError(cognomeError, "Il cognome è obbligatorio.", cognomeField);
+            valid = false;
         }
+
         if (dataNascita == null) {
-            showError("Inserisci la data di nascita.", dataNascitaPicker);
-            return;
+            showFieldError(dataNascitaError, "Seleziona la data di nascita.", dataNascitaPicker);
+            valid = false;
         }
+
         if (password.length() < 4) {
-            showError("La password deve avere almeno 4 caratteri.", passwordField);
-            return;
+            showFieldError(passwordError, "Minimo 4 caratteri.", passwordField);
+            valid = false;
         }
+
         if (!password.equals(confirmPassword)) {
-            showError("Le password non corrispondono.", confirmPasswordField);
-            return;
+            showFieldError(confirmPasswordError, "Le password non corrispondono.", confirmPasswordField);
+            valid = false;
         }
 
         Nation nazione = Nation.fromString(nazioneTesto);
         if (!nazioneTesto.isEmpty() && nazione == null) {
-            showError("Nazione non riconosciuta: " + nazioneTesto, nazioneField);
-            return;
+            showFieldError(nazioneError, "Nazione non riconosciuta.", nazioneField);
+            valid = false;
         }
 
-        Location location = new Location(nazione, citta, 0.0, 0.0, indirizzo);
+        if (!valid) return;
 
+        Location location = new Location(nazione, citta, 0.0, 0.0, indirizzo);
         String salt = PasswordUtil.generateSalt();
         String passwordHash = PasswordUtil.hash(password, salt);
 
@@ -158,6 +267,8 @@ public class RegisterController {
             errorLabel.getStyleClass().add("label-success");
             errorLabel.setText("Registrazione completata! File salvato in data/users.");
         } else {
+            errorLabel.getStyleClass().removeAll("label-error", "label-success");
+            errorLabel.getStyleClass().add("label-error");
             errorLabel.setText("Errore durante il salvataggio dei dati dell'utente.");
         }
     }
@@ -169,22 +280,30 @@ public class RegisterController {
         }
     }
 
-    private void showError(String message, Control field) {
+    // --- Error helpers ---
+
+    private void showFieldError(Label errorLabel, String message, Control field) {
         errorLabel.setText(message);
-        if (field != null) {
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
+        if (!field.getStyleClass().contains("error")) {
             field.getStyleClass().add("error");
         }
     }
 
-    private void clearErrors() {
-        Control[] fields = {
-            usernameField, nomeField, cognomeField, passwordField,
-            confirmPasswordField, dataNascitaPicker, nazioneField
-        };
-        for (Control field : fields) {
-            if (field != null) {
-                field.getStyleClass().remove("error");
-            }
+    private void clearFieldError(Label errorLabel, Control field) {
+        errorLabel.setVisible(false);
+        errorLabel.setManaged(false);
+        field.getStyleClass().remove("error");
+    }
+
+    private void clearAllErrors() {
+        Label[] errors = {usernameError, passwordError, confirmPasswordError, nomeError, cognomeError, dataNascitaError, nazioneError};
+        Control[] fields = {usernameField, passwordField, confirmPasswordField, nomeField, cognomeField, dataNascitaPicker, nazioneField};
+        for (int i = 0; i < errors.length; i++) {
+            errors[i].setVisible(false);
+            errors[i].setManaged(false);
+            fields[i].getStyleClass().remove("error");
         }
     }
 }
