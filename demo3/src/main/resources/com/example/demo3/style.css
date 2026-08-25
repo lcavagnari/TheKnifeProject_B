@@ -245,3 +245,149 @@
     -fx-font-size: 11px;
     -fx-text-fill: #757575;
 }
+
+/* ============================================================
+   RESTAURANT EXPLORE SCREEN
+   ============================================================ */
+
+/* ---- Search card ---- */
+.search-card {
+    -fx-background-color: white;
+    -fx-background-radius: 12px;
+    -fx-padding: 12 16 12 16;
+    -fx-spacing: 10;
+    -fx-alignment: CENTER_LEFT;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 8, 0.15, 0, 3);
+}
+.search-card .text-field {
+    -fx-background-color: #f5f7fa;
+    -fx-background-radius: 20px;
+    -fx-border-color: transparent;
+    -fx-border-radius: 20px;
+    -fx-padding: 10 16 10 16;
+    -fx-font-size: 14px;
+}
+.search-card .text-field:focused {
+    -fx-background-color: white;
+    -fx-border-color: #007161;
+    -fx-border-width: 1.5px;
+}
+.search-card .button {
+    -fx-background-radius: 20px;
+    -fx-padding: 10 20 10 20;
+}
+
+/* ---- Stats bar ---- */
+.stats-bar {
+    -fx-padding: 2 0 0 4;
+}
+.stats-label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #90a4ae;
+    -fx-font-weight: 400;
+}
+
+/* ---- Empty state ---- */
+.empty-state {
+    -fx-alignment: CENTER;
+    -fx-spacing: 8;
+    -fx-padding: 40 20 40 20;
+}
+.empty-state-icon {
+    -fx-font-size: 36px;
+}
+.empty-state-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #546e7a;
+}
+.empty-state-sub {
+    -fx-font-size: 13px;
+    -fx-text-fill: #90a4ae;
+    -fx-text-alignment: center;
+    -fx-wrap-text: true;
+}
+
+/* ---- Restaurant cell card ---- */
+.restaurant-card {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-border-color: #eceff1;
+    -fx-border-radius: 10px;
+    -fx-border-width: 1px;
+    -fx-padding: 0;
+    -fx-cursor: hand;
+    -fx-transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.restaurant-card:hover {
+    -fx-border-color: #b2dfdb;
+    -fx-background-color: #fafcfa;
+}
+
+/* Price-range accent bar (left edge) */
+.price-accent {
+    -fx-min-width: 4;
+    -fx-max-width: 4;
+    -fx-background-radius: 10 0 0 10;
+}
+.price-accent-budget  { -fx-background-color: #66bb6a; }
+.price-accent-moderate { -fx-background-color: #ffa726; }
+.price-accent-upscale  { -fx-background-color: #ef5350; }
+.price-accent-premium  { -fx-background-color: #ab47bc; }
+
+/* Card inner content */
+.restaurant-info {
+    -fx-padding: 12 14 12 14;
+    -fx-spacing: 5;
+}
+.restaurant-name {
+    -fx-font-size: 15px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #212121;
+}
+.restaurant-rating {
+    -fx-font-size: 13px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #ff8f00;
+}
+.restaurant-meta {
+    -fx-font-size: 12px;
+    -fx-text-fill: #78909c;
+}
+.restaurant-badges {
+    -fx-spacing: 6;
+    -fx-padding: 4 0 0 0;
+}
+.badge {
+    -fx-padding: 2 8 2 8;
+    -fx-background-radius: 10;
+    -fx-font-size: 11px;
+    -fx-font-weight: 500;
+}
+.badge-cuisine {
+    -fx-background-color: #e0f2f1;
+    -fx-text-fill: #00695c;
+}
+.badge-delivery {
+    -fx-background-color: #fff3e0;
+    -fx-text-fill: #e65100;
+}
+.badge-booking {
+    -fx-background-color: #e8eaf6;
+    -fx-text-fill: #283593;
+}
+.badge-green {
+    -fx-background-color: #e8f5e9;
+    -fx-text-fill: #2e7d32;
+}
+.badge-award {
+    -fx-background-color: #fce4ec;
+    -fx-text-fill: #c62828;
+}
+
+/* ---- Card header (title in top bar) ---- */
+.card-header {
+    -fx-font-size: 22px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #212121;
+}

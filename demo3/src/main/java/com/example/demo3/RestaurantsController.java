@@ -13,10 +13,14 @@ import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class RestaurantsController {
 
@@ -29,11 +33,15 @@ public class RestaurantsController {
     @FXML
     private HBox searchBar;
     @FXML
+    private HBox statsBar;
+    @FXML
     private TextField searchField;
     @FXML
     private ListView<Restaurant> restaurantListView;
     @FXML
     private Button btnIndietro;
+    @FXML
+    private VBox emptyState;
 
     public void inizializza() {
         restaurantListView.setCellFactory(lv -> new RestaurantCell());
@@ -48,7 +56,6 @@ public class RestaurantsController {
         searchBar.setVisible(true);
         searchBar.setManaged(true);
         caricaEMostra(restaurantRepository.caricaTutti());
-        infoLabel.setText("Cerca per nome, cucina o citta. Clicca su un ristorante per i dettagli.");
     }
 
     private void apriDettagli(Restaurant r) {
@@ -83,28 +90,109 @@ public class RestaurantsController {
 
     private void caricaEMostra(List<Restaurant> risultati) {
         restaurantListView.getItems().setAll(risultati);
+        boolean empty = risultati.isEmpty();
+        emptyState.setVisible(empty);
+        emptyState.setManaged(empty);
+        statsBar.setVisible(!empty);
+        statsBar.setManaged(!empty);
         infoLabel.setText(risultati.size() + " ristorant" + (risultati.size() == 1 ? "e trovato" : "i trovati"));
     }
 
     private static class RestaurantCell extends ListCell<Restaurant> {
+
+        private final HBox card = new HBox();
+        private final VBox accent = new VBox();
+        private final VBox content = new VBox();
+        private final HBox topRow = new HBox();
+        private final Label nameLabel = new Label();
+        private final Label ratingLabel = new Label();
+        private final Label metaLabel = new Label();
+        private final HBox badges = new HBox();
+
+        RestaurantCell() {
+            super();
+            card.getStyleClass().add("restaurant-card");
+            card.setSpacing(0);
+            accent.getStyleClass().add("price-accent");
+
+            nameLabel.getStyleClass().add("restaurant-name");
+            ratingLabel.getStyleClass().add("restaurant-rating");
+            metaLabel.getStyleClass().add("restaurant-meta");
+            badges.getStyleClass().add("restaurant-badges");
+
+            HBox.setHgrow(content, Priority.ALWAYS);
+            content.setStyle("-fx-padding: 6 10 6 10;");
+            topRow.getChildren().addAll(nameLabel, ratingLabel);
+            content.getChildren().addAll(topRow, metaLabel, badges);
+            card.getChildren().addAll(accent, content);
+        }
+
         @Override
         protected void updateItem(Restaurant r, boolean empty) {
             super.updateItem(r, empty);
             if (empty || r == null) {
                 setText(null);
+                setGraphic(null);
                 return;
             }
-            // Mostra nome, città e una valutazione media se disponibile
-            String city = r.getLocation() != null ? r.getLocation().getCity() : "";
-            String rating = "⭐ Nuovo";
+
+            nameLabel.setText(r.getName() != null ? r.getName() : "Ristorante");
+
+            // Rating
             if (r.getReviews() != null && !r.getReviews().isEmpty()) {
                 double avg = r.getReviews().values().stream()
                         .mapToInt(Review::getValue)
                         .average()
                         .orElse(0.0);
-                rating = String.format("★ %.1f", avg);
+                ratingLabel.setText(String.format("  ★ %.1f", avg));
+                ratingLabel.setVisible(true);
+                ratingLabel.setManaged(true);
+            } else {
+                ratingLabel.setVisible(false);
+                ratingLabel.setManaged(false);
             }
-            setText(r.getName() + " — " + city + "   " + rating);
+
+            // Meta: city + price range
+            String city = (r.getLocation() != null && r.getLocation().getCity() != null)
+                    ? r.getLocation().getCity() : "";
+            String price = r.getPriceRange() != null ? r.getPriceRange().getSymbol() : "";
+            String meta = city;
+            if (!price.isEmpty()) meta += meta.isEmpty() ? price : "  ·  " + price;
+            metaLabel.setText(meta);
+
+            // Price accent color
+            accent.getStyleClass().removeIf(s -> s.startsWith("price-accent-"));
+            String accentClass = switch (r.getPriceRange()) {
+                case ECONOMY -> "price-accent-budget";
+                case MODERATE -> "price-accent-moderate";
+                case EXPENSIVE -> "price-accent-upscale";
+                case LUXURY -> "price-accent-premium";
+                default -> "price-accent-moderate";
+            };
+            accent.getStyleClass().add(accentClass);
+
+            // Badges
+            badges.getChildren().clear();
+            Set<String> cuisineBadges = (r.getCuisinesTypes() != null)
+                    ? r.getCuisinesTypes().stream().limit(3).map(c -> c.toString()).collect(Collectors.toSet())
+                    : Set.of();
+            for (String c : cuisineBadges) {
+                badges.getChildren().add(makeBadge(c, "badge-cuisine"));
+            }
+            if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery"));
+            if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking"));
+            if (r.isGreenStar()) badges.getChildren().add(makeBadge("Green Star", "badge-green"));
+            if (r.getAward() != null && r.getAward() != it.uninsubria.laboratoriob.api.enums.Award.NONE) {
+                badges.getChildren().add(makeBadge(r.getAward().toString(), "badge-award"));
+            }
+
+            setGraphic(card);
+        }
+
+        private Label makeBadge(String text, String styleClass) {
+            Label l = new Label(text);
+            l.getStyleClass().addAll("badge", styleClass);
+            return l;
         }
     }
 }
