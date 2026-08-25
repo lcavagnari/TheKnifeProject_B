@@ -126,6 +126,43 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return restaurants;
     }
 
+    @Override
+    public List<Restaurant> findAll(int offset, int limit) {
+        List<Restaurant> restaurants = new ArrayList<>();
+        String query = """
+                SELECT r.id, r.owner_id, r.name, r.description, r.web_url, r.phone_number,
+                       r.award, r.green_star, r.has_delivery, r.has_booking, r.latitude, r.longitude,
+                       pr.description AS price_desc
+                FROM restaurant r
+                LEFT JOIN price_range pr ON r.price_range = pr.id
+                LIMIT ? OFFSET ?
+                """;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, limit);
+            stmt.setInt(2, offset);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) restaurants.add(mapRestaurant(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore findAll(offset, limit) in RestaurantDAO: " + e.getMessage());
+        }
+        return restaurants;
+    }
+
+    @Override
+    public long count() {
+        String query = "SELECT COUNT(*) FROM restaurant";
+        try (Connection conn = Database.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) return rs.getLong(1);
+        } catch (SQLException e) {
+            System.err.println("Errore count in RestaurantDAO: " + e.getMessage());
+        }
+        return 0;
+    }
+
     public List<Restaurant> findByOwner(UUID ownerId) {
         List<Restaurant> restaurants = new ArrayList<>();
         String query = """
