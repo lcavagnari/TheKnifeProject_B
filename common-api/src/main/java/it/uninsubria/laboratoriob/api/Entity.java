@@ -2,6 +2,7 @@ package it.uninsubria.laboratoriob.api;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ import java.util.UUID;
  * @author Luca Cavagnari
  * @version 2.0
  */
-public abstract class Entity {
+public abstract class Entity implements Serializable {
 
     /**
      * Identificatore univoco dell'entità.
