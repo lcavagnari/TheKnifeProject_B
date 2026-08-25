@@ -29,11 +29,11 @@
     <Label text="Account" styleClass="section-header" />
     <VBox spacing="2">
         <Label fx:id="usernameError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-        <TextField fx:id="usernameField" promptText="Username * (4-16 caratteri)" />
+        <TextField fx:id="usernameField" promptText="Username *" />
     </VBox>
     <VBox spacing="2">
         <Label fx:id="passwordError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-        <PasswordField fx:id="passwordField" promptText="Password * (min 4 caratteri)" />
+        <PasswordField fx:id="passwordField" promptText="Password *" />
     </VBox>
     <VBox fx:id="confirmPasswordWrapper" spacing="2" visible="false" managed="false">
         <Label fx:id="confirmPasswordError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
@@ -52,9 +52,9 @@
             <TextField fx:id="cognomeField" promptText="Cognome *" HBox.hgrow="ALWAYS" />
         </VBox>
     </HBox>
-    <VBox spacing="2">
+    <VBox spacing="2" alignment="CENTER">
         <Label fx:id="dataNascitaError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-        <DatePicker fx:id="dataNascitaPicker" promptText="Data di nascita *" />
+        <DatePicker fx:id="dataNascitaPicker" promptText="Data di nascita *" styleClass="date-picker-wide" />
     </VBox>
 
     <!-- Indirizzo -->

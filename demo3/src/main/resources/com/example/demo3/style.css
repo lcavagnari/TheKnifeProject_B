@@ -124,6 +124,9 @@
     -fx-border-color: #d32f2f;
     -fx-border-width: 2px;
 }
+.date-picker-wide {
+    -fx-max-width: 1.7976931348623157E308;
+}
 
 /* ---- ListView (shared) ---- */
 .list-view {

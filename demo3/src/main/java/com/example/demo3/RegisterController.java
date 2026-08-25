@@ -99,6 +99,9 @@ public class RegisterController {
         nazioneField.focusedProperty().addListener((obs, oldVal, focused) -> {
             if (!focused) validateNazione();
         });
+        dataNascitaPicker.focusedProperty().addListener((obs, oldVal, focused) -> {
+            if (!focused) validateDataNascita();
+        });
 
         // Clear errors on typing
         usernameField.textProperty().addListener((obs, old, n) -> { if (usernameError.isVisible()) clearFieldError(usernameError, usernameField); });
@@ -107,6 +110,7 @@ public class RegisterController {
         passwordField.textProperty().addListener((obs, old, n) -> { if (passwordError.isVisible()) clearFieldError(passwordError, passwordField); });
         confirmPasswordField.textProperty().addListener((obs, old, n) -> { if (confirmPasswordError.isVisible()) clearFieldError(confirmPasswordError, confirmPasswordField); });
         nazioneField.textProperty().addListener((obs, old, n) -> { if (nazioneError.isVisible()) clearFieldError(nazioneError, nazioneField); });
+        dataNascitaPicker.valueProperty().addListener((obs, old, n) -> { if (dataNascitaError.isVisible()) clearFieldError(dataNascitaError, dataNascitaPicker); });
     }
 
     private void selectRole(boolean cliente) {
@@ -130,7 +134,9 @@ public class RegisterController {
     private void validateUsername() {
         String val = usernameField.getText() != null ? usernameField.getText().trim() : "";
         if (val.isEmpty()) return;
-        if (val.length() < 4 || val.length() > 16) {
+        if (!val.matches("[a-zA-Z0-9_]+")) {
+            showFieldError(usernameError, "Solo lettere, numeri e underscore.", usernameField);
+        } else if (val.length() < 4 || val.length() > 16) {
             showFieldError(usernameError, "Deve avere tra 4 e 16 caratteri.", usernameField);
         } else if (userRepository.existsByUsername(val)) {
             showFieldError(usernameError, "Username non disponibile.", usernameField);
@@ -143,6 +149,8 @@ public class RegisterController {
         String val = nomeField.getText() != null ? nomeField.getText().trim() : "";
         if (val.isEmpty()) {
             showFieldError(nomeError, "Il nome è obbligatorio.", nomeField);
+        } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
+            showFieldError(nomeError, "Solo lettere, spazi, trattini e apostrofi.", nomeField);
         } else {
             clearFieldError(nomeError, nomeField);
         }
@@ -152,6 +160,8 @@ public class RegisterController {
         String val = cognomeField.getText() != null ? cognomeField.getText().trim() : "";
         if (val.isEmpty()) {
             showFieldError(cognomeError, "Il cognome è obbligatorio.", cognomeField);
+        } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
+            showFieldError(cognomeError, "Solo lettere, spazi, trattini e apostrofi.", cognomeField);
         } else {
             clearFieldError(cognomeError, cognomeField);
         }
@@ -175,6 +185,18 @@ public class RegisterController {
             showFieldError(confirmPasswordError, "Le password non corrispondono.", confirmPasswordField);
         } else {
             clearFieldError(confirmPasswordError, confirmPasswordField);
+        }
+    }
+
+    private void validateDataNascita() {
+        LocalDate val = dataNascitaPicker.getValue();
+        if (val == null) return;
+        if (val.isAfter(LocalDate.now())) {
+            showFieldError(dataNascitaError, "La data non può essere nel futuro.", dataNascitaPicker);
+        } else if (val.isAfter(LocalDate.now().minusYears(13))) {
+            showFieldError(dataNascitaError, "Devi avere almeno 13 anni.", dataNascitaPicker);
+        } else {
+            clearFieldError(dataNascitaError, dataNascitaPicker);
         }
     }
 
@@ -211,7 +233,10 @@ public class RegisterController {
 
         boolean valid = true;
 
-        if (username.length() < 4 || username.length() > 16) {
+        if (!username.matches("[a-zA-Z0-9_]+")) {
+            showFieldError(usernameError, "Solo lettere, numeri e underscore.", usernameField);
+            valid = false;
+        } else if (username.length() < 4 || username.length() > 16) {
             showFieldError(usernameError, "Deve avere tra 4 e 16 caratteri.", usernameField);
             valid = false;
         } else if (userRepository.existsByUsername(username)) {
@@ -222,15 +247,27 @@ public class RegisterController {
         if (nome.isEmpty()) {
             showFieldError(nomeError, "Il nome è obbligatorio.", nomeField);
             valid = false;
+        } else if (!nome.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
+            showFieldError(nomeError, "Solo lettere, spazi, trattini e apostrofi.", nomeField);
+            valid = false;
         }
 
         if (cognome.isEmpty()) {
             showFieldError(cognomeError, "Il cognome è obbligatorio.", cognomeField);
             valid = false;
+        } else if (!cognome.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
+            showFieldError(cognomeError, "Solo lettere, spazi, trattini e apostrofi.", cognomeField);
+            valid = false;
         }
 
         if (dataNascita == null) {
             showFieldError(dataNascitaError, "Seleziona la data di nascita.", dataNascitaPicker);
+            valid = false;
+        } else if (dataNascita.isAfter(LocalDate.now())) {
+            showFieldError(dataNascitaError, "La data non può essere nel futuro.", dataNascitaPicker);
+            valid = false;
+        } else if (dataNascita.isAfter(LocalDate.now().minusYears(13))) {
+            showFieldError(dataNascitaError, "Devi avere almeno 13 anni.", dataNascitaPicker);
             valid = false;
         }
 
@@ -250,7 +287,10 @@ public class RegisterController {
             valid = false;
         }
 
-        if (!valid) return;
+        if (!valid) {
+            shakeAllErrors();
+            return;
+        }
 
         Location location = new Location(nazione, citta, 0.0, 0.0, indirizzo);
         String salt = PasswordUtil.generateSalt();
@@ -305,5 +345,33 @@ public class RegisterController {
             errors[i].setManaged(false);
             fields[i].getStyleClass().remove("error");
         }
+    }
+
+    private void shakeField(Control field) {
+        TranslateTransition shake = new TranslateTransition(Duration.millis(50), field);
+        shake.setCycleCount(6);
+        shake.setAutoReverse(true);
+        shake.setByX(6);
+        shake.setOnFinished(e -> field.setTranslateX(0));
+        shake.play();
+    }
+
+    private void shakeAllErrors() {
+        btnRegistrati.setDisable(true);
+        Control[] fields = {usernameField, passwordField, confirmPasswordField, nomeField, cognomeField, dataNascitaPicker, nazioneField};
+        int count = 0;
+        for (Control f : fields) {
+            if (f.getStyleClass().contains("error")) {
+                shakeField(f);
+                count++;
+            }
+        }
+        if (count == 0) {
+            btnRegistrati.setDisable(false);
+            return;
+        }
+        PauseTransition pause = new PauseTransition(Duration.millis(350));
+        pause.setOnFinished(e -> btnRegistrati.setDisable(false));
+        pause.play();
     }
 }
