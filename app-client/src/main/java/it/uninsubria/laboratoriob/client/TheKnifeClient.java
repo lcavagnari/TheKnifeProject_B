@@ -48,6 +48,7 @@ public class TheKnifeClient {
 
         tcpHbeatClient.start();
         Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(IO::closeScanner));
     }
 
     public Optional<Customer> loginCustomer(String username, String password) {

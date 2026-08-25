@@ -1,17 +1,19 @@
 package it.uninsubria.laboratoriob.client.ui.menus;
 
+/*
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+*/
+
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
 import lombok.experimental.UtilityClass;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 /**
  * Classe di utility per la gestione del login e della registrazione utenti lato client.
@@ -23,6 +25,17 @@ public class LoginMenu {
         return user != null && user.isSystem();
     }
 
+    public static User register(ClientDataStore dataStore) {
+        IO.printErrorMessage("Al momento quest'operazione non è disponbile (W.I.P)");
+        return null;
+    }
+
+    public static User login(ClientDataStore dataStore) {
+        IO.printErrorMessage("Al momento quest'operazione non è disponbile (W.I.P)");
+        return null;
+    }
+
+    /*
     public static User register(ClientDataStore dataStore) {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
@@ -99,14 +112,10 @@ public class LoginMenu {
             }
         }
 
-        try {
-            String salt = "";
-            String hashedPassword = "";
 
-            /*
+        try {
             String salt = PasswordHasher.generateSalt();
             String hashedPassword = PasswordHasher.hash(password, salt);
-            */
 
 
             User user = isOwner
@@ -121,7 +130,7 @@ public class LoginMenu {
 
             return user;
 
-        } catch (IllegalArgumentException ex) {
+        } catch (IllegalArgumentException | UnsupportedOperationException ex) {
             IO.printErrorMessage(ex.getMessage() + ". Ritorno al menu principale.");
             return null;
         }
@@ -145,12 +154,11 @@ public class LoginMenu {
 
                 if (user == null || isSystemUser(user))
                     IO.printErrorMessage("Utente non trovato");
-                /*
+
                 else if (PasswordHasher.verify(password, user.getPasswordSalt(), user.getPasswordHash())) {
                     IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
                     return user;
-                 */
 
                 else {
                     IO.printErrorMessage("Username o password errati.");
@@ -167,4 +175,5 @@ public class LoginMenu {
 
         return null;
     }
+     */
 }

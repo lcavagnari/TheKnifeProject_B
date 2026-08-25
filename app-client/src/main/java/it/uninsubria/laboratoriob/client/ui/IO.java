@@ -217,12 +217,12 @@ public class IO {
 
     public static void printErrorMessage(String msg) {
         if (msg == null) return;
-        System.out.print("\n" + IO.replaceText(31, "! ") + msg);
+        System.out.println("\n" + IO.replaceText(31, "! ") + msg);
     }
 
     public static void printSuccessMessage(String msg) {
         if (msg == null) return;
-        System.out.print("\n" + IO.replaceText(32, " ⩥ ") + msg);
+        System.out.println("\n" + IO.replaceText(32, " ⩥ ") + msg);
     }
 
     public static void clearScreen() {
