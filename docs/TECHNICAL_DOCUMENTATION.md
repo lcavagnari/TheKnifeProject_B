@@ -1,7 +1,7 @@
 # The Knife Project — Technical Documentation
 
 ## 1. Introduction
-The Knife is a Java CLI system for restaurant discovery and management. It uses PostgreSQL for persistence, HikariCP for connection pooling, and a modular architecture with a shared domain API (`common-api`), a standalone executable module, and placeholder client/server modules for future expansion.
+The Knife is a Java CLI system for Michelin restaurant discovery and management. It uses a client-server architecture with PostgreSQL for server-side persistence, JSON-based local caching on the client, and a TCP heartbeat mechanism for connection monitoring. The shared domain model lives in `common-api`, with separate `app-server` and `app-client` modules.
 
 ---
 
@@ -11,56 +11,75 @@ The project is organized as a Maven multi-module build with the following module
 
 | Module | Artifact ID | Role |
 |--------|------------|------|
-| `common-api` | `theknifeapi` | Shared domain model, enums, validators, DAO interface |
-| `standalone` | `standalone` | Executable CLI application (fat JAR via maven-shade-plugin) |
-| `app-server` | `theknifeserver` | Placeholder for future server module |
-| `app-client` | `theknifeclient` | Placeholder for future client module |
+| `common-api` | `theknifeapi` | Shared domain model, enums, validators, DAO interface, heartbeat channel |
+| `app-server` | `theknifeserver` | Server-side: PostgreSQL persistence, data loading, CSV import, heartbeat server |
+| `app-client` | `theknifeclient` | Client-side: CLI UI, JSON-based local DAOs, heartbeat client |
 
-**Note:** The `standalone` module is treated as an executable (like `app-server`/`app-client`), not as a library module. It produces a self-contained JAR with all dependencies shaded and relocated.
+**Note:** Both `app-server` and `app-client` produce fat JARs via `maven-shade-plugin`, relocating `common-api` and `libphonenumber` packages.
 
 ### Module Dependency Graph
 ```
 common-api (theknifeapi)
     ^
-    |
-standalone (depends on theknifeapi + HikariCP + PostgreSQL driver + SLF4J)
+    |--- app-server (theknifeserver) + HikariCP + PostgreSQL driver + SLF4J
+    |--- app-client (theknifeclient) + Jackson (databind + core)
 ```
 
 ---
 
-## 3. Runtime Entry Point and Bootstrapping
+## 3. Runtime Entry Points
 
-The application starts via `TheKnife.main(...)` in the `standalone` module.
+### 3.1 Server Entry Point: `TheKnifeServer`
 
-### Responsibilities
+**File:** `app-server/src/main/java/it/uninsubria/laboratoriob/server/TheKnifeServer.java`
+
+Responsibilities:
+- Start TCP heartbeat server on port 5555.
 - Initialize database tables and constant data via `Database.initTables()` and `Database.initialiseConstants()`.
 - Optionally run Michelin dataset update with `--update [path]`.
 - Load in-memory data from PostgreSQL via `Loader.initialiseMaps()`.
-- Start guest menu navigation.
+
+### 3.2 Client Entry Point: `TheKnifeClient`
+
+**File:** `app-client/src/main/java/it/uninsubria/laboratoriob/client/TheKnifeClient.java`
+
+Responsibilities:
+- Initialize `ClientDataStore` (JSON-based local DAOs).
+- Start `HeartbeatClient` connection to server on port 5555.
+- Open `GuestMenus` as the initial UI.
 
 ### Diagram: Startup Activity Flow
 ```mermaid
 flowchart TD
-    A([Start app]) --> B[Database.initTables]
-    B --> C[Database.initialiseConstants]
-    C --> D{"--update flag?"}
-    D -- Yes --> E[Loader.updateMichelinDataset]
-    E --> Z([Exit])
-    D -- No --> F[Loader.initialiseMaps]
-    F --> G[GuestMenus.openMenu]
-    G --> H[Database.shutdown]
-    H --> Z
+    subgraph Server
+        A([TheKnifeServer.main]) --> B[Database.initTables]
+        B --> C[Database.initialiseConstants]
+        C --> D{"--update flag?"}
+        D -- Yes --> E[Loader.updateMichelinDataset]
+        E --> F[Loader.initialiseMaps]
+        D -- No --> F
+        F --> G([Server running])
+    end
+
+    subgraph Client
+        H([TheKnifeClient.main]) --> I[ClientDataStore init]
+        I --> J[HeartbeatClient start]
+        J --> K[GuestMenus.openMenu]
+        K --> L([CLI interactive])
+    end
+
+    G -.->|TCP heartbeat| J
 ```
 
 ---
 
 ## 4. Persistence Layer
 
-The persistence layer has been migrated from file-based JSON storage to a PostgreSQL relational database with HikariCP connection pooling.
+The persistence layer uses PostgreSQL on the server side with HikariCP connection pooling. The client maintains a local JSON-based cache of data.
 
-### Database Schema
+### 4.1 Database Schema
 
-The schema is defined in `Database.initTables()` and consists of:
+The schema is defined in `sql/create.sql` and consists of:
 
 | Table | Purpose | Key |
 |-------|---------|-----|
@@ -77,36 +96,52 @@ The schema is defined in `Database.initTables()` and consists of:
 | `restaurant_services` | Restaurant → Service (many-to-many) | `(restaurant_id, service) PK` |
 | `review` | Reviews (one per user per restaurant) | `UUID PK`, `UNIQUE(user_id, restaurant_id)` |
 
-### Connection Pool (HikariCP)
+### 4.2 Connection Pool (HikariCP)
 
-Configured in `Database`:
+Configured in `Database.java` (server):
 - Max pool size: 10 connections
 - Connection timeout: 30 seconds
 - Min idle: 2 connections
 - PreparedStatement cache: 250 entries, max 2048 bytes
 
+### 4.3 Client-Side JSON Storage
+
+The client persists data locally using Jackson `ObjectMapper` with the following files:
+
+| File | Entity | DAO Class |
+|------|--------|-----------|
+| `data/customers.json` | Customer | `JsonCustomerDAO` |
+| `data/owners.json` | Owner | `JsonOwnerDAO` |
+| `data/restaurants.json` | Restaurant | `JsonRestaurantDAO` |
+| `data/reviews.json` | Review | `JsonReviewDAO` |
+| `data/locations.json` | Location | `JsonLocationDAO` |
+
+The `ClientDataStore` facade orchestrates all JSON DAOs and is designed to be easily replaceable with an RMI implementation in the future.
+
 ### Diagram: Persistence Component Diagram
 ```mermaid
 flowchart TB
-    subgraph Application
-        Loader[Loader]
-        DAOs[DAO Layer]
+    subgraph Client
+        CUI[CLI UI]
+        CDS[ClientDataStore]
+        JSON[(JSON Files)]
     end
 
-    subgraph ConnectionPool[HikariCP]
-        Pool[(Connection Pool)]
+    subgraph Server
+        SDAOs[DAO Layer]
+        Pool[(HikariCP Pool)]
+        DB[(PostgreSQL)]
+        Cache[(In-Memory ConcurrentHashMap)]
     end
 
-    subgraph Database[PostgreSQL]
-        Tables[(Tables)]
-    end
-
-    Loader --> DAOs
-    DAOs --> Pool
-    Pool --> Tables
-    Tables --> Pool
-    Pool --> DAOs
-    DAOs --> Loader
+    CUI --> CDS
+    CDS --> JSON
+    CDS -.->|heartbeat| SDAOs
+    SDAOs --> Pool
+    Pool --> DB
+    DB --> Pool
+    Pool --> SDAOs
+    SDAOs --> Cache
 ```
 
 ---
@@ -125,7 +160,7 @@ public interface DAO<T> {
 }
 ```
 
-### DAO Hierarchy
+### 5.1 Server-Side DAO Hierarchy (JDBC)
 ```mermaid
 classDiagram
     class DAO~T~ {
@@ -187,6 +222,16 @@ classDiagram
     UserDAO~T~ <|-- CustomerDAO
     UserDAO~T~ <|-- OwnerDAO
 ```
+
+### 5.2 Client-Side DAO Hierarchy (JSON)
+
+| DAO Class | Storage File | Description |
+|-----------|-------------|-------------|
+| `JsonCustomerDAO` | `data/customers.json` | Customer CRUD via Jackson |
+| `JsonOwnerDAO` | `data/owners.json` | Owner CRUD via Jackson |
+| `JsonRestaurantDAO` | `data/restaurants.json` | Restaurant CRUD via Jackson |
+| `JsonReviewDAO` | `data/reviews.json` | Review CRUD via Jackson |
+| `JsonLocationDAO` | `data/locations.json` | Location CRUD via Jackson |
 
 ---
 
@@ -293,14 +338,14 @@ classDiagram
 | `Award` | `NONE`, `ONE_STAR`, `TWO_STARS`, `THREE_STARS`, `BIB_GOURMAND`, `SELECTED_RESTAURANTS` | Michelin recognition levels |
 | `PriceRange` | `ECONOMY`, `MODERATE`, `EXPENSIVE`, `LUXURY` | Price tier classification |
 | `CuisineType` | 249 values | Cuisine categories from around the world |
-| `Nation` | ~100 values | Supported countries with ISO codes |
+| `Nation` | ~70 values | Supported countries with ISO codes |
 
 ---
 
 ## 7. Security
 
 ### Password Hashing
-Passwords are hashed using PBKDF2 with HMAC-SHA256 via `PasswordHasher`:
+Passwords are hashed using PBKDF2 with HMAC-SHA256 via `PasswordHasher` (server-side):
 - Salt length: 16 bytes (random via `SecureRandom`)
 - Iterations: 10,000
 - Key length: 256 bits
@@ -312,11 +357,13 @@ Passwords are hashed using PBKDF2 with HMAC-SHA256 via `PasswordHasher`:
 3. `PasswordHasher.verify()` compares the attempted password hash with the stored hash.
 4. Maximum 4 login attempts before session termination.
 
+**Note:** Client-side password verification is currently bypassed (commented out in `LoginMenu`). Authentication is handled by comparing password hashes directly in `TheKnifeClient.loginCustomer()`/`loginOwner()`.
+
 ---
 
 ## 8. User Interface and Navigation Layer
 
-The CLI interface is implemented in the `standalone` module under `it.uninsubria.laboratoriob.ui`.
+The CLI interface is implemented in the `app-client` module under `it.uninsubria.laboratoriob.client.ui`.
 
 ### UI Component Hierarchy
 ```mermaid
@@ -358,13 +405,51 @@ stateDiagram-v2
 
 ---
 
-## 9. Operational Workflows
+## 9. Heartbeat Mechanism
 
-### 9.1 Browse and Search Restaurants
+The project implements a TCP heartbeat for connection monitoring between client and server.
+
+### Components
+
+| Component | Module | Role |
+|-----------|--------|------|
+| `HeartbeatChannel` | `common-api` | Shared bidirectional TCP heartbeat protocol (PING/PONG) |
+| `HeartbeatServer` | `app-server` | TCP server that accepts a connection and starts `HeartbeatChannel` |
+| `HeartbeatClient` | `app-client` | TCP client that connects to server heartbeat |
+
+### Protocol
+- **PING** (byte `0`): Sent by pinger, expects PONG response.
+- **PONG** (byte `1`): Response to PING.
+- Configurable interval (default: 5 minutes).
+- 10-second timeout for pong response.
+- `wakeUp()` method for immediate check on operation failure.
+
+### Diagram: Heartbeat Sequence
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant S as Server
+
+    C->>S: TCP Connect (port 5555)
+    loop Every 5 minutes
+        C->>S: PING (counter)
+        alt Reply within 10s
+            S-->>C: PONG (counter)
+        else Timeout
+            C-->>C: Log "no pong received"
+        end
+    end
+```
+
+---
+
+## 10. Operational Workflows
+
+### 10.1 Browse and Search Restaurants
 ```mermaid
 flowchart TD
     A[Open menu] --> B{Browse or Search?}
-    B -- Browse --> C[Show restaurants list from Loader]
+    B -- Browse --> C[Show restaurants list from local cache]
     B -- Search --> D[Input restaurant name]
     D --> E{Exists in restaurantsByName?}
     E -- Yes --> F[Show details]
@@ -372,7 +457,7 @@ flowchart TD
     C --> F
 ```
 
-### 9.2 Owner Creates/Edits a Restaurant
+### 10.2 Owner Creates/Edits a Restaurant
 ```mermaid
 sequenceDiagram
     actor O as Owner
@@ -390,7 +475,7 @@ sequenceDiagram
     OM-->>O: operation result
 ```
 
-### 9.3 Client Adds/Edits a Review
+### 10.3 Client Adds/Edits a Review
 ```mermaid
 sequenceDiagram
     actor C as Client
@@ -408,10 +493,10 @@ sequenceDiagram
     UM-->>C: confirmation
 ```
 
-### 9.4 Michelin Dataset Update
+### 10.4 Michelin Dataset Update
 ```mermaid
 sequenceDiagram
-    participant Main as TheKnife.main
+    participant Main as TheKnifeServer.main
     participant L as Loader
     participant CP as CsvParser
     participant DB as Database
@@ -421,13 +506,13 @@ sequenceDiagram
     L->>CP: parseFromDataset(path)
     CP->>CP: parse CSV lines
     CP->>Cache: addRestaurant (in-memory)
-    CP->>DB: save restaurant + location (async)
+    CP->>DB: save restaurant + location
     CP-->>L: update complete
 ```
 
 ---
 
-## 10. Utilities
+## 11. Utilities
 
 ### CsvParser
 Parses the Michelin restaurant CSV dataset and persists records to the database and in-memory cache. Handles:
@@ -439,7 +524,7 @@ Parses the Michelin restaurant CSV dataset and persists records to the database 
 Central in-memory data store with `ConcurrentHashMap` for thread-safe access. Provides:
 - Read operations (single entity lookup, bulk unmodifiable views).
 - Write operations (add, remove, update for restaurants and users).
-- Initialization from database via DAOs.
+- Initialization from database via DAOs using `CompletableFuture` for parallel queries.
 
 ### Database
 Manages the PostgreSQL connection pool and schema initialization via HikariCP.
@@ -447,27 +532,35 @@ Manages the PostgreSQL connection pool and schema initialization via HikariCP.
 ### PasswordHasher
 PBKDF2-based password hashing utility with configurable parameters.
 
----
-
-## 11. Technology Stack
-
-| Component | Technology | Version |
-|-----------|-----------|---------|
-| Language | Java | 17+ |
-| Build | Maven | 3.9.9+ |
-| Database | PostgreSQL | 42.7.7 (driver) |
-| Connection Pool | HikariCP | 7.0.2 |
-| Logging | SLF4J Simple | 2.0.17 |
-| Code Generation | Lombok | 1.18.38 |
-| Phone Validation | libphonenumber | 8.13.27 |
-| Testing | JUnit 5 | 5.10.2 |
+### IO
+Console I/O utility for the client: menu display, validated input (strings, ints, booleans, phone numbers, locations, enums, UUIDs), colored output, screen clearing.
 
 ---
 
-## 12. Observations and Improvement Opportunities
-- The `standalone` module is the current executable; `app-server` and `app-client` are placeholders for future client-server architecture.
-- The `UserDAO` uses a boolean `isOwner` flag to distinguish user types in the same table — a potential refactor to separate tables or use inheritance mapping.
+## 12. Technology Stack
+
+| Component | Technology | Version | Module |
+|-----------|-----------|---------|--------|
+| Language | Java | 17+ (server), 25 (client) | all |
+| Build | Maven | 3.9.9+ | all |
+| Database | PostgreSQL | 18 (Docker) | app-server |
+| Database Driver | PostgreSQL JDBC | 42.7.7 | app-server |
+| Connection Pool | HikariCP | 7.0.2 | app-server |
+| Logging | SLF4J Simple | 2.0.17 | app-server |
+| JSON Serialization | Jackson | 2.15.3 | app-client |
+| Code Generation | Lombok | 1.18.38 | common-api |
+| Phone Validation | libphonenumber | 8.13.27 | common-api |
+| Testing | JUnit 5 | 5.10.2 | common-api |
+
+---
+
+## 13. Observations and Improvement Opportunities
+- The client uses local JSON files as a data cache; no RMI/RPC layer is implemented yet for server synchronization.
+- Server-client communication is limited to the TCP heartbeat — data synchronization is pending.
+- Client-side password verification is commented out in `LoginMenu`.
+- The client targets Java 25 while the server and common-api target Java 17 — this inconsistency should be resolved.
 - `LocationDAO` uses composite primary key (latitude, longitude) instead of a UUID, which is non-standard compared to other entities.
 - `CsvParser` creates random lat/lon for locations that lack coordinates — this could be improved with geocoding.
 - The in-memory `Loader` caches all data at startup — suitable for the current scale but may need pagination or lazy loading for larger datasets.
 - Connection pool credentials are hardcoded in `Database.java` — should be externalized to configuration.
+- The `standalone` directory is an orphan with compiled artifacts but no source code — should be removed.
