@@ -270,19 +270,27 @@
    RESTAURANT EXPLORE SCREEN
    ============================================================ */
 
+/* ---- Overrides for green background ---- */
+.right-box .card-header {
+    -fx-text-fill: #ffffff;
+}
+.right-box .stats-label {
+    -fx-text-fill: rgba(255, 255, 255, 0.75);
+}
+
 /* ---- Search card ---- */
 .search-card {
-    -fx-background-color: #eef3f7;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 12px;
     -fx-padding: 12 16 12 16;
     -fx-spacing: 10;
     -fx-alignment: CENTER_LEFT;
-    -fx-border-color: #d5dbe3;
+    -fx-border-color: #e0d8d0;
     -fx-border-radius: 12px;
     -fx-border-width: 1px;
 }
 .search-card .text-field {
-    -fx-background-color: #f5f7fa;
+    -fx-background-color: #f5f0ea;
     -fx-background-radius: 20px;
     -fx-border-color: transparent;
     -fx-border-radius: 20px;
@@ -290,13 +298,17 @@
     -fx-font-size: 14px;
 }
 .search-card .text-field:focused {
-    -fx-background-color: #f5f7fa;
-    -fx-border-color: #007161;
+    -fx-background-color: #ffffff;
+    -fx-border-color: #c45d3e;
     -fx-border-width: 1.5px;
 }
 .search-card .button {
+    -fx-background-color: #c45d3e;
     -fx-background-radius: 20px;
     -fx-padding: 10 20 10 20;
+}
+.search-card .button:hover {
+    -fx-background-color: #a84e33;
 }
 
 /* ---- Stats bar ---- */
@@ -305,7 +317,7 @@
 }
 .stats-label {
     -fx-font-size: 13px;
-    -fx-text-fill: #90a4ae;
+    -fx-text-fill: #a09488;
     -fx-font-weight: 400;
 }
 
@@ -321,34 +333,34 @@
 .empty-state-title {
     -fx-font-size: 16px;
     -fx-font-weight: 600;
-    -fx-text-fill: #546e7a;
+    -fx-text-fill: #5a4e44;
 }
 .empty-state-sub {
     -fx-font-size: 13px;
-    -fx-text-fill: #90a4ae;
+    -fx-text-fill: #a09488;
     -fx-text-alignment: center;
     -fx-wrap-text: true;
 }
 
 /* ---- Restaurant cell card ---- */
 .restaurant-card {
-    -fx-background-color: #f5f7fa;
+    -fx-background-color: #ffffff;
     -fx-background-radius: 10px;
-    -fx-border-color: #d5dbe3;
+    -fx-border-color: #e0d8d0;
     -fx-border-radius: 10px;
     -fx-border-width: 1px;
     -fx-padding: 0;
     -fx-cursor: hand;
     -fx-translate-y: 0;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 4, 0.05, 0, 1);
+    -fx-effect: dropshadow(gaussian, rgba(60,40,20,0.05), 6, 0.06, 0, 2);
     -fx-transition: border-color 0.2s ease, background-color 0.2s ease,
                     -fx-translate-y 0.2s ease, -fx-effect 0.2s ease;
 }
 .restaurant-card:hover {
-    -fx-border-color: #007161;
-    -fx-background-color: #eef3f7;
+    -fx-border-color: #c45d3e;
+    -fx-background-color: #fffbf8;
     -fx-translate-y: -1;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 12, 0.15, 0, 4);
+    -fx-effect: dropshadow(gaussian, rgba(60,40,20,0.1), 12, 0.15, 0, 4);
 }
 
 /* Price-range accent bar (left edge) */
@@ -357,10 +369,10 @@
     -fx-max-width: 4;
     -fx-background-radius: 10 0 0 10;
 }
-.price-accent-budget  { -fx-background-color: #66bb6a; }
-.price-accent-moderate { -fx-background-color: #ffa726; }
-.price-accent-upscale  { -fx-background-color: #ef5350; }
-.price-accent-premium  { -fx-background-color: #ab47bc; }
+.price-accent-budget  { -fx-background-color: #7c8c5c; }
+.price-accent-moderate { -fx-background-color: #d4944a; }
+.price-accent-upscale  { -fx-background-color: #b54a5a; }
+.price-accent-premium  { -fx-background-color: #7a5a8a; }
 
 /* Card inner content */
 .restaurant-info {
@@ -370,20 +382,20 @@
 .restaurant-name {
     -fx-font-size: 15px;
     -fx-font-weight: 700;
-    -fx-text-fill: #212121;
+    -fx-text-fill: #2c2420;
     -fx-transition: -fx-text-fill 0.2s ease;
 }
 .restaurant-card:hover .restaurant-name {
-    -fx-text-fill: #007161;
+    -fx-text-fill: #c45d3e;
 }
 .restaurant-rating {
     -fx-font-size: 13px;
     -fx-font-weight: 600;
-    -fx-text-fill: #ff8f00;
+    -fx-text-fill: #d4944a;
 }
 .restaurant-meta {
     -fx-font-size: 12px;
-    -fx-text-fill: #78909c;
+    -fx-text-fill: #8a7e76;
 }
 .restaurant-badges {
     -fx-spacing: 6;
@@ -396,24 +408,24 @@
     -fx-font-weight: 500;
 }
 .badge-cuisine {
-    -fx-background-color: #e0f2f1;
-    -fx-text-fill: #00695c;
+    -fx-background-color: #f0ebe4;
+    -fx-text-fill: #5a4e44;
 }
 .badge-delivery {
-    -fx-background-color: #fff3e0;
-    -fx-text-fill: #e65100;
+    -fx-background-color: #fce8dc;
+    -fx-text-fill: #a84e33;
 }
 .badge-booking {
-    -fx-background-color: #e8eaf6;
-    -fx-text-fill: #283593;
+    -fx-background-color: #ece8f0;
+    -fx-text-fill: #5a4a6a;
 }
 .badge-green {
-    -fx-background-color: #e8f5e9;
-    -fx-text-fill: #2e7d32;
+    -fx-background-color: #dce8d8;
+    -fx-text-fill: #4a6a3e;
 }
 .badge-award {
-    -fx-background-color: #fce4ec;
-    -fx-text-fill: #c62828;
+    -fx-background-color: #f0dce0;
+    -fx-text-fill: #8a3a4a;
 }
 
 /* ---- Card header (title in top bar) ---- */
