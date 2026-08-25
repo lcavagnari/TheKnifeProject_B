@@ -211,13 +211,16 @@ public class GUIController {
 
     private void apriRestaurants(Button sourceButton) {
         try {
+            Stage stage = (Stage) sourceButton.getScene().getWindow();
+
+            Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
             javafx.scene.Parent root = loader.load();
 
             RestaurantsController controller = loader.getController();
             controller.inizializza();
 
-            Stage stage = (Stage) sourceButton.getScene().getWindow();
             javafx.scene.Scene scene = new javafx.scene.Scene(root, 650, 500);
             stage.setScene(scene);
             stage.setTitle("Trova Ristoranti");

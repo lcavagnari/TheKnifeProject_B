@@ -3,6 +3,11 @@ package com.example.demo3;
 import com.example.demo3.data.RestaurantRepository;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
+import javafx.animation.Animation;
+import javafx.animation.Interpolator;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Timeline;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -16,10 +21,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class RestaurantsController {
@@ -44,14 +51,8 @@ public class RestaurantsController {
     private VBox emptyState;
 
     public void inizializza() {
-        restaurantListView.setCellFactory(lv -> new RestaurantCell());
-
-        restaurantListView.setOnMouseClicked(event -> {
-            Restaurant selezionato = restaurantListView.getSelectionModel().getSelectedItem();
-            if (selezionato != null) {
-                apriDettagli(selezionato);
-            }
-        });
+        restaurantListView.getStyleClass().add("restaurant-list");
+        restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli));
 
         searchBar.setVisible(true);
         searchBar.setManaged(true);
@@ -60,13 +61,29 @@ public class RestaurantsController {
 
     private void apriDettagli(Restaurant r) {
         try {
+            Stage stage = (Stage) restaurantListView.getScene().getWindow();
+
+            Navigation.pushBack(() -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
+                    Parent root = loader.load();
+                    RestaurantsController controller = loader.getController();
+                    controller.inizializza();
+                    Scene scene = new Scene(root, 650, 500);
+                    stage.setScene(scene);
+                    stage.setTitle("Trova Ristoranti");
+                    stage.show();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("RestaurantDetails.fxml"));
             Parent root = loader.load();
 
             RestaurantDetailsController controller = loader.getController();
             controller.carica(r);
 
-            Stage stage = (Stage) restaurantListView.getScene().getWindow();
             Scene scene = new Scene(root, 650, 550);
             stage.setScene(scene);
             stage.setTitle(r.getName() != null ? r.getName() : "Dettagli ristorante");
@@ -84,8 +101,7 @@ public class RestaurantsController {
 
     @FXML
     private void onIndietroClick() {
-        Stage stage = (Stage) btnIndietro.getScene().getWindow();
-        Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 600, 400);
+        Navigation.goBack();
     }
 
     private void caricaEMostra(List<Restaurant> risultati) {
@@ -108,9 +124,14 @@ public class RestaurantsController {
         private final Label ratingLabel = new Label();
         private final Label metaLabel = new Label();
         private final HBox badges = new HBox();
+        private final Consumer<Restaurant> onNavigate;
+        private Restaurant currentRestaurant;
+        private Timeline runningAnimation;
 
-        RestaurantCell() {
+        RestaurantCell(Consumer<Restaurant> onNavigate) {
             super();
+            this.onNavigate = onNavigate;
+
             card.getStyleClass().add("restaurant-card");
             card.setSpacing(0);
             accent.getStyleClass().add("price-accent");
@@ -125,6 +146,31 @@ public class RestaurantsController {
             topRow.getChildren().addAll(nameLabel, ratingLabel);
             content.getChildren().addAll(topRow, metaLabel, badges);
             card.getChildren().addAll(accent, content);
+
+            card.setOnMousePressed(e -> {
+                if (currentRestaurant == null) return;
+                if (runningAnimation != null && runningAnimation.getStatus() == Animation.Status.RUNNING) return;
+                bounceForward();
+            });
+        }
+
+        private void bounceForward() {
+            Restaurant r = currentRestaurant;
+            runningAnimation = new Timeline(
+                    new KeyFrame(Duration.millis(180),
+                            new KeyValue(card.scaleXProperty(), 0.92, Interpolator.EASE_OUT),
+                            new KeyValue(card.scaleYProperty(), 0.95, Interpolator.EASE_OUT),
+                            new KeyValue(card.translateYProperty(), 4, Interpolator.EASE_OUT)),
+                    new KeyFrame(Duration.millis(300),
+                            new KeyValue(card.scaleXProperty(), 1.0, Interpolator.EASE_IN),
+                            new KeyValue(card.scaleYProperty(), 1.0, Interpolator.EASE_IN),
+                            new KeyValue(card.translateYProperty(), 0, Interpolator.EASE_IN))
+            );
+            runningAnimation.setOnFinished(e -> {
+                runningAnimation = null;
+                if (r != null) onNavigate.accept(r);
+            });
+            runningAnimation.play();
         }
 
         @Override
@@ -133,8 +179,10 @@ public class RestaurantsController {
             if (empty || r == null) {
                 setText(null);
                 setGraphic(null);
+                currentRestaurant = null;
                 return;
             }
+            currentRestaurant = r;
 
             nameLabel.setText(r.getName() != null ? r.getName() : "Ristorante");
 

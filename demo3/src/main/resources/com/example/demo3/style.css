@@ -151,6 +151,17 @@
     -fx-background-color: #f5f5f5;
 }
 
+/* ---- Restaurant list: empty cells stay invisible ---- */
+.restaurant-list .list-cell {
+    -fx-padding: 5 6 5 6;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+.restaurant-list .list-cell:hover,
+.restaurant-list .list-cell:selected {
+    -fx-background-color: transparent;
+}
+
 /* ---- RadioButton ---- */
 .radio-button {
     -fx-font-size: 14px;
@@ -317,11 +328,15 @@
     -fx-border-width: 1px;
     -fx-padding: 0;
     -fx-cursor: hand;
-    -fx-transition: border-color 0.15s ease, background-color 0.15s ease;
+    -fx-translate-y: 0;
+    -fx-transition: border-color 0.2s ease, background-color 0.2s ease,
+                    -fx-translate-y 0.2s ease, -fx-effect 0.2s ease;
 }
 .restaurant-card:hover {
-    -fx-border-color: #b2dfdb;
-    -fx-background-color: #fafcfa;
+    -fx-border-color: #a8d8ca;
+    -fx-background-color: #f7fbfa;
+    -fx-translate-y: -1;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 10, 0.15, 0, 3);
 }
 
 /* Price-range accent bar (left edge) */
@@ -344,6 +359,10 @@
     -fx-font-size: 15px;
     -fx-font-weight: 700;
     -fx-text-fill: #212121;
+    -fx-transition: -fx-text-fill 0.2s ease;
+}
+.restaurant-card:hover .restaurant-name {
+    -fx-text-fill: #007161;
 }
 .restaurant-rating {
     -fx-font-size: 13px;

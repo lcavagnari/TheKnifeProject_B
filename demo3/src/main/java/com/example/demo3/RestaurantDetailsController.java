@@ -68,8 +68,7 @@ public class RestaurantDetailsController {
 
     @FXML
     private void onIndietroClick() {
-        Stage stage = (Stage) btnIndietro.getScene().getWindow();
-        Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 600, 400);
+        Navigation.goBack();
     }
 
     private String valoreO(String valore, String fallback) {
