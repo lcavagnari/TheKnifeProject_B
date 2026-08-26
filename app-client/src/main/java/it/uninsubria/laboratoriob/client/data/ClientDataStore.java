@@ -1,6 +1,5 @@
 package it.uninsubria.laboratoriob.client.data;
 
-import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
@@ -15,8 +14,9 @@ import lombok.Getter;
  * dei dati del server.
  * </p>
  * <p>
- * Quando il server RMI è disponibile, gli stub remoti vengono iniettati
- * tramite costruttore e resi accessibili tramite i relativi campi.
+ * Gestisce internamente la connessione RMI al server: se il server è raggiungibile,
+ * gli stub remoti vengono usati per le operazioni di lettura/scrittura;
+ * altrimenti si fallback sui DAO locali JSON.
  * </p>
  */
 @Getter
@@ -37,14 +37,14 @@ public class ClientDataStore {
                            AuthServiceInter authService,
                            ReviewServiceInter reviewService,
                            FavouriteServiceInter favouriteService) {
-        this.customerDAO = new JsonCustomerDAO();
-        this.ownerDAO = new JsonOwnerDAO();
-        this.restaurantDAO = new JsonRestaurantDAO();
-        this.locationDAO = new JsonLocationDAO();
-        this.reviewDAO = new JsonReviewDAO(customerDAO);
         this.restaurantService = restaurantService;
         this.authService = authService;
         this.reviewService = reviewService;
         this.favouriteService = favouriteService;
+        this.customerDAO = new JsonCustomerDAO(authService);
+        this.ownerDAO = new JsonOwnerDAO(authService);
+        this.restaurantDAO = new JsonRestaurantDAO(restaurantService);
+        this.locationDAO = new JsonLocationDAO();
+        this.reviewDAO = new JsonReviewDAO(customerDAO, reviewService);
     }
 }

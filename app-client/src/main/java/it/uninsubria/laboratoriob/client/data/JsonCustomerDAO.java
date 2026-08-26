@@ -9,6 +9,7 @@ import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,9 +27,11 @@ public final class JsonCustomerDAO implements DAO<Customer> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
+    private final AuthServiceInter service;
 
-    public JsonCustomerDAO() {
+    public JsonCustomerDAO(AuthServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "customers.json");
+        this.service = service;
     }
 
     private ArrayNode loadAll() {
@@ -144,16 +147,26 @@ public final class JsonCustomerDAO implements DAO<Customer> {
     }
 
     @Override
+    public List<Customer> findAll(int offset, int limit) {
+        List<Customer> all = findAll();
+        if (offset >= all.size()) return List.of();
+        return all.subList(offset, Math.min(offset + limit, all.size()));
+    }
+
+    @Override
+    public long count() {
+        return loadAll().size();
+    }
+
+    @Override
     public boolean save(Customer customer) {
         if (customer == null) return false;
         ArrayNode array = loadAll();
-
         for (JsonNode node : array) {
             if (node.path("id").asText().equals(customer.getId().toString())) {
                 return false;
             }
         }
-
         array.add(toNode(customer));
         persist(array);
         return true;
@@ -163,7 +176,6 @@ public final class JsonCustomerDAO implements DAO<Customer> {
     public boolean update(Customer customer) {
         if (customer == null) return false;
         ArrayNode array = loadAll();
-
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i).path("id").asText().equals(customer.getId().toString())) {
                 array.set(i, toNode(customer));
