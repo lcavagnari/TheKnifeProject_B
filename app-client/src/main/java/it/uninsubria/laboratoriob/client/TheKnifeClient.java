@@ -1,15 +1,16 @@
 package it.uninsubria.laboratoriob.client;
 
-import it.uninsubria.laboratoriob.api.objects.Customer;
-import it.uninsubria.laboratoriob.api.objects.Owner;
-import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
 import it.uninsubria.laboratoriob.client.ui.menus.GuestMenus;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
 
-import java.util.List;
-import java.util.Optional;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 /**
  * Classe principale del client The Knife.
@@ -43,36 +44,28 @@ public class TheKnifeClient {
     private final ClientDataStore dataStore;
 
     public TheKnifeClient() {
-        this.dataStore = new ClientDataStore();
         this.tcpHbeatClient = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
+
+        RestaurantServiceInter restaurantService = null;
+        AuthServiceInter authService = null;
+        ReviewServiceInter reviewService = null;
+        FavouriteServiceInter favouriteService = null;
+
+        try {
+            Registry registry = LocateRegistry.getRegistry(serverHost, rmiPort);
+            restaurantService = (RestaurantServiceInter) registry.lookup("restaurant");
+            authService = (AuthServiceInter) registry.lookup("auth");
+            reviewService = (ReviewServiceInter) registry.lookup("review");
+            favouriteService = (FavouriteServiceInter) registry.lookup("favourite");
+            IO.printSuccessMessage("RMI connection established.");
+        } catch (Exception e) {
+            System.err.println("WARNING: RMI lookup failed: " + e.getMessage());
+        }
+
+        this.dataStore = new ClientDataStore(restaurantService, authService, reviewService, favouriteService);
 
         tcpHbeatClient.start();
         Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
         Runtime.getRuntime().addShutdownHook(new Thread(IO::closeScanner));
-    }
-
-    public Optional<Customer> loginCustomer(String username, String password) {
-        return dataStore.getCustomerDAO().findByUsername(username)
-                .filter(c -> c.getPasswordHash().equals(password));
-    }
-
-    public Optional<Owner> loginOwner(String username, String password) {
-        return dataStore.getOwnerDAO().findByUsername(username)
-                .filter(o -> o.getPasswordHash().equals(password));
-    }
-
-    public List<Restaurant> searchRestaurantsByName(String name) {
-        return dataStore.getRestaurantDAO().findAll().stream()
-                .filter(r -> r.getName().toLowerCase().contains(name.toLowerCase()))
-                .toList();
-    }
-
-    public List<Restaurant> getRestaurantsByOwner(Owner owner) {
-        return dataStore.getRestaurantDAO().findByOwner(owner.getId());
-    }
-
-    public void shutdown() {
-        tcpHbeatClient.shutdown();
-        IO.closeScanner();
     }
 }
