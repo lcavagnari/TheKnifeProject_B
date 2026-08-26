@@ -271,7 +271,7 @@ public class RestaurantsController {
         }
 
         private ImageView makeGreenStarIcon() {
-            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream("images/award-svgrepo-com.png")));
+            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream("images/ic_award.png")));
             ImageView iv = new ImageView(img);
             iv.setFitHeight(20);
             iv.setFitWidth(20);

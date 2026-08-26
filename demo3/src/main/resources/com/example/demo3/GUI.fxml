@@ -21,7 +21,7 @@
       <!-- App icon area -->
       <VBox alignment="CENTER" spacing="10">
          <ImageView fitHeight="480" fitWidth="480" preserveRatio="true">
-            <Image url="@images/app-icon.png"/>
+            <Image url="@images/ic_app.png"/>
          </ImageView>
       </VBox>
    </VBox>
@@ -47,14 +47,14 @@
                <Button fx:id="btnLogin" onAction="#onLoginClick" prefWidth="200" text="Accedi">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-login.png"/>
+                        <Image url="@images/ic_login.png"/>
                      </ImageView>
                   </graphic>
                </Button>
                <Button fx:id="btnRegister" onAction="#onRegisterClick" prefWidth="200" styleClass="button-secondary" text="Registrati">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-register.png"/>
+                        <Image url="@images/ic_register.png"/>
                      </ImageView>
                   </graphic>
                </Button>
@@ -63,7 +63,7 @@
                <Button fx:id="btnTrova" onAction="#onTrovaClick" prefWidth="240" text="Trova Ristoranti">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-search.png"/>
+                        <Image url="@images/ic_search.png"/>
                      </ImageView>
                   </graphic>
                </Button>
@@ -72,7 +72,7 @@
                <Button fx:id="btnEsci" onAction="#onEsciClick" prefWidth="200" styleClass="button-danger" text="Esci">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-exit.png"/>
+                        <Image url="@images/ic_exit.png"/>
                      </ImageView>
                   </graphic>
                </Button>
