@@ -23,8 +23,12 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -129,6 +133,7 @@ public class RestaurantsController {
         private final VBox content = new VBox();
         private final HBox topRow = new HBox();
         private final Label nameLabel = new Label();
+        private final HBox awardBox = new HBox();
         private final Label ratingLabel = new Label();
         private final Label metaLabel = new Label();
         private final HBox badges = new HBox();
@@ -151,7 +156,10 @@ public class RestaurantsController {
 
             HBox.setHgrow(content, Priority.ALWAYS);
             content.setStyle("-fx-padding: 6 10 6 10;");
-            topRow.getChildren().addAll(nameLabel, ratingLabel);
+            awardBox.setSpacing(3);
+            awardBox.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            topRow.setSpacing(4);
+            topRow.getChildren().addAll(nameLabel, awardBox, ratingLabel);
             content.getChildren().addAll(topRow, metaLabel, badges);
             card.getChildren().addAll(accent, content);
 
@@ -194,19 +202,28 @@ public class RestaurantsController {
 
             nameLabel.setText(r.getName() != null ? r.getName() : "Ristorante");
 
+            // Awards: Michelin stars + green star icon next to name
+            awardBox.getChildren().clear();
+            if (r.getAward() != null) awardBox.getChildren().add(makeStarLabel(r.getAward().getValue()));
+            if (r.isGreenStar()) awardBox.getChildren().add(makeGreenStarIcon());
+
+
             // Rating
-            if (r.getReviews() != null && !r.getReviews().isEmpty()) {
+            boolean isPresent = r.getReviews() != null && !r.getReviews().isEmpty();
+            if (isPresent) {
                 double avg = r.getReviews().values().stream()
                         .mapToInt(Review::getValue)
                         .average()
                         .orElse(0.0);
+
                 ratingLabel.setText(String.format("  ★ %.1f", avg));
-                ratingLabel.setVisible(true);
-                ratingLabel.setManaged(true);
-            } else {
-                ratingLabel.setVisible(false);
-                ratingLabel.setManaged(false);
             }
+
+            ratingLabel.setVisible(isPresent);
+            ratingLabel.setManaged(isPresent);
+
+
+
 
             // Meta: city + price range
             String city = (r.getLocation() != null && r.getLocation().getCity() != null)
@@ -237,10 +254,6 @@ public class RestaurantsController {
             }
             if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery"));
             if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking"));
-            if (r.isGreenStar()) badges.getChildren().add(makeBadge("Green Star", "badge-green"));
-            if (r.getAward() != null && r.getAward() != it.uninsubria.laboratoriob.api.enums.Award.NONE) {
-                badges.getChildren().add(makeBadge(r.getAward().toString(), "badge-award"));
-            }
 
             setGraphic(card);
         }
@@ -249,6 +262,22 @@ public class RestaurantsController {
             Label l = new Label(text);
             l.getStyleClass().addAll("badge", styleClass);
             return l;
+        }
+
+        private Label makeStarLabel(int count) {
+            Label l = new Label("★".repeat(count));
+            l.setStyle("-fx-text-fill: #f9a825; -fx-font-size: 18px;");
+            return l;
+        }
+
+        private ImageView makeGreenStarIcon() {
+            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream("images/award-svgrepo-com.png")));
+            ImageView iv = new ImageView(img);
+            iv.setFitHeight(20);
+            iv.setFitWidth(20);
+            iv.setPreserveRatio(true);
+            iv.setEffect(new javafx.scene.effect.DropShadow(3, 0, 1, Color.web("rgba(46,125,50,0.4)")));
+            return iv;
         }
     }
 }
