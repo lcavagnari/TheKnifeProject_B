@@ -1,10 +1,16 @@
 package it.uninsubria.laboratoriob.server;
 
+import it.uninsubria.laboratoriob.server.data.remote.AuthRemoteImpl;
+import it.uninsubria.laboratoriob.server.data.remote.FavouriteServiceImpl;
+import it.uninsubria.laboratoriob.server.data.remote.ResturantServiceImpl;
+import it.uninsubria.laboratoriob.server.data.remote.ReviewServiceImpl;
 import it.uninsubria.laboratoriob.server.utils.Database;
 import it.uninsubria.laboratoriob.server.utils.HeartbeatServer;
 import it.uninsubria.laboratoriob.server.utils.Loader;
 
 import java.io.IOException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 /**
  * Classe principale di ingresso dell'applicazione The Knife.
@@ -72,6 +78,13 @@ public class TheKnifeServer {
 
 
         Loader.initialiseMaps();
+
+        Registry registry = LocateRegistry.createRegistry(rmiPort);
+        registry.rebind("restaurant", new ResturantServiceImpl());
+        registry.rebind("auth", new AuthRemoteImpl());
+        registry.rebind("review", new ReviewServiceImpl());
+        registry.rebind("favourite", new FavouriteServiceImpl());
+        System.out.println("RMI registry created on port " + rmiPort);
     }
 
     private void shutdown() {
