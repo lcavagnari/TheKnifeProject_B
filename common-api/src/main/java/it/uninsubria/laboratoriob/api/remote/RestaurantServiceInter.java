@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public interface ResturantServiceInter extends Remote {
+public interface RestaurantServiceInter extends Remote {
     public List<Restaurant> findAll(int offset, int limit) throws RemoteException;
     public long count() throws RemoteException;
     public Optional<Restaurant> findById(UUID id) throws RemoteException;
