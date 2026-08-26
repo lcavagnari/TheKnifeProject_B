@@ -4,11 +4,15 @@ import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
 import it.uninsubria.laboratoriob.server.data.CustomerDAO;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
 import java.util.UUID;
 
-public class FavouriteServiceImpl implements FavouriteServiceInter {
+public class FavouriteServiceImpl extends UnicastRemoteObject implements FavouriteServiceInter {
     private final CustomerDAO cDAO = new CustomerDAO();
+
+    protected FavouriteServiceImpl() throws RemoteException {
+    }
 
     @Override
     public boolean addFavourites(UUID userID, UUID restaurantId) throws RemoteException {
