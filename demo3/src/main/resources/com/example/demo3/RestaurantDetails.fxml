@@ -13,6 +13,7 @@
 <?import javafx.scene.layout.FlowPane?>
 
 <VBox fx:id="root" spacing="10" styleClass="right-box" stylesheets="@style.css"
+      style="-fx-alignment: TOP_LEFT;"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.demo3.RestaurantDetailsController">
     <padding>
@@ -33,11 +34,7 @@
     </HBox>
 
     <!-- Ribbons row 2: delivery + online booking -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <padding><Insets left="5" right="5" /></padding>
-        <Label fx:id="deliveryLabel" styleClass="badge badge-delivery" visible="false" managed="false" />
-        <Label fx:id="onlineBookingLabel" styleClass="badge badge-booking" visible="false" managed="false" />
-    </HBox>
+    <FlowPane fx:id="deliveryBookingFlow" hgap="8" vgap="8" style="-fx-padding: 0 0 0 5;" />
 
     <!-- Main Card matching the Compose Elevation -->
     <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 3);" spacing="3">
@@ -95,7 +92,7 @@
             <VBox GridPane.columnIndex="0" alignment="CENTER_LEFT" spacing="2">
                 <HBox alignment="CENTER_LEFT" spacing="4">
                     <ImageView fitWidth="14" fitHeight="14" preserveRatio="true">
-                        <image><Image url="@images/geomarker.png" /></image>
+                        <image><Image url="@images/ic_geomarker.png" /></image>
                     </ImageView>
                     <Label text="LOCATION" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" />
                 </HBox>

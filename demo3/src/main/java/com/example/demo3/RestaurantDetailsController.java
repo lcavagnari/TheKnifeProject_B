@@ -26,10 +26,6 @@ public class RestaurantDetailsController {
     @FXML
     private Label priceRangeLabel;
     @FXML
-    private Label deliveryLabel;
-    @FXML
-    private Label onlineBookingLabel;
-    @FXML
     private Label awardLabel;
     @FXML
     private Label greenStarLabel;
@@ -39,6 +35,8 @@ public class RestaurantDetailsController {
     private FlowPane cuisinesFlow;
     @FXML
     private FlowPane servicesFlow;
+    @FXML
+    private FlowPane deliveryBookingFlow;
     @FXML
     private Button btnIndietro;
     @FXML
@@ -73,21 +71,7 @@ public class RestaurantDetailsController {
         locationLabel.setText(formattaLocation(r.getLocation()));
 
         // Price range
-        priceRangeLabel.setText(r.getPriceRange() != null ? r.getPriceRange().getSymbol() + " — " + r.getPriceRange().name() : "N/A");
-
-        // Delivery ribbon
-        if (r.isHasDelivery()) {
-            deliveryLabel.setVisible(true);
-            deliveryLabel.setManaged(true);
-            deliveryLabel.setText("Delivery");
-        }
-
-        // Online booking ribbon
-        if (r.isHasOnlineBooking()) {
-            onlineBookingLabel.setVisible(true);
-            onlineBookingLabel.setManaged(true);
-            onlineBookingLabel.setText("Online Booking");
-        }
+        priceRangeLabel.setText(r.getPriceRange() != null ? r.getPriceRange().getSymbol() + " - " + r.getPriceRange().name() : "N/A");
 
         // Award ribbon
         if (r.getAward() != null && r.getAward() != it.uninsubria.laboratoriob.api.enums.Award.NONE) {
@@ -101,6 +85,19 @@ public class RestaurantDetailsController {
             greenStarLabel.setVisible(true);
             greenStarLabel.setManaged(true);
             greenStarLabel.setText("Green Star");
+        }
+
+        // Delivery + Online Booking badges
+        deliveryBookingFlow.getChildren().clear();
+        if (r.isHasDelivery()) {
+            Label badge = new Label("Delivery");
+            badge.getStyleClass().addAll("badge", "badge-delivery");
+            deliveryBookingFlow.getChildren().add(badge);
+        }
+        if (r.isHasOnlineBooking()) {
+            Label badge = new Label("Online Booking");
+            badge.getStyleClass().addAll("badge", "badge-booking");
+            deliveryBookingFlow.getChildren().add(badge);
         }
 
         // Cuisine badges
@@ -126,7 +123,7 @@ public class RestaurantDetailsController {
         // Reviews count
         int numRecensioni = r.getReviews() != null ? r.getReviews().size() : 0;
         reviewsCountLabel.setText(numRecensioni + (numRecensioni == 0
-                ? " — No reviews yet" : " Reviews"));
+                ? " - No reviews yet" : " Reviews"));
     }
 
     @FXML
