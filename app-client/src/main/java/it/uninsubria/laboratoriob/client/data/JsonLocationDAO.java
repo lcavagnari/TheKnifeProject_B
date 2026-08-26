@@ -150,4 +150,16 @@ public final class JsonLocationDAO implements DAO<Location> {
     @Override public Optional<Location> findById(UUID id) {
         return Optional.empty();
     }
+
+    @Override
+    public List<Location> findAll(int offset, int limit) {
+        List<Location> all = findAll();
+        if (offset >= all.size()) return List.of();
+        return all.subList(offset, Math.min(offset + limit, all.size()));
+    }
+
+    @Override
+    public long count() {
+        return loadAll().size();
+    }
 }

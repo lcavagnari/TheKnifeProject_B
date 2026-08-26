@@ -9,12 +9,12 @@ import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Implementazione JSON del DAO per l'entità {@link Owner}.
@@ -26,9 +26,11 @@ public final class JsonOwnerDAO implements DAO<Owner> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
+    private final AuthServiceInter service;
 
-    public JsonOwnerDAO() {
+    public JsonOwnerDAO(AuthServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "owners.json");
+        this.service = service;
     }
 
     private ArrayNode loadAll() {
@@ -144,16 +146,26 @@ public final class JsonOwnerDAO implements DAO<Owner> {
     }
 
     @Override
+    public List<Owner> findAll(int offset, int limit) {
+        List<Owner> all = findAll();
+        if (offset >= all.size()) return List.of();
+        return all.subList(offset, Math.min(offset + limit, all.size()));
+    }
+
+    @Override
+    public long count() {
+        return loadAll().size();
+    }
+
+    @Override
     public boolean save(Owner owner) {
         if (owner == null) return false;
         ArrayNode array = loadAll();
-
         for (JsonNode node : array) {
             if (node.path("id").asText().equals(owner.getId().toString())) {
                 return false;
             }
         }
-
         array.add(toNode(owner));
         persist(array);
         return true;
@@ -163,7 +175,6 @@ public final class JsonOwnerDAO implements DAO<Owner> {
     public boolean update(Owner owner) {
         if (owner == null) return false;
         ArrayNode array = loadAll();
-
         for (int i = 0; i < array.size(); i++) {
             if (array.get(i).path("id").asText().equals(owner.getId().toString())) {
                 array.set(i, toNode(owner));
