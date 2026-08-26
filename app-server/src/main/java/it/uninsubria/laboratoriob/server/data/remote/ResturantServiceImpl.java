@@ -15,8 +15,13 @@ public class ResturantServiceImpl implements ResturantServiceInter {
     private final RestaurantDAO rDAO =  new RestaurantDAO();
 
     @Override
-    public List<Restaurant> findAll() throws RemoteException {
-        return rDAO.findAll();
+    public List<Restaurant> findAll(int offset, int limit) throws RemoteException {
+        return rDAO.findAll(offset, limit);
+    }
+
+    @Override
+    public long count() throws RemoteException {
+        return rDAO.count();
     }
 
     @Override
