@@ -79,12 +79,16 @@ public class TheKnifeServer {
 
         Loader.initialiseMaps();
 
-        Registry registry = LocateRegistry.createRegistry(rmiPort);
-        registry.rebind("restaurant", new ResturantServiceImpl());
-        registry.rebind("auth", new AuthRemoteImpl());
-        registry.rebind("review", new ReviewServiceImpl());
-        registry.rebind("favourite", new FavouriteServiceImpl());
-        System.out.println("RMI registry created on port " + rmiPort);
+        try {
+            Registry registry = LocateRegistry.createRegistry(rmiPort);
+            registry.rebind("restaurant", new ResturantServiceImpl());
+            registry.rebind("auth", new AuthRemoteImpl());
+            registry.rebind("review", new ReviewServiceImpl());
+            registry.rebind("favourite", new FavouriteServiceImpl());
+            System.out.println("RMI registry created on port " + rmiPort);
+        } catch (Exception e) {
+            System.err.println("ERROR while creating RMI registry: " + e);
+        }
     }
 
     private void shutdown() {
