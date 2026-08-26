@@ -4,11 +4,8 @@ import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.User;
-import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.util.List;
 
 /**
@@ -57,10 +54,7 @@ public abstract class Menus {
 
     protected void browseRestaurants() {
         try {
-            Registry registry = LocateRegistry.getRegistry("localhost", 1099);
-            RestaurantServiceInter service = (RestaurantServiceInter) registry.lookup("restaurant");
-
-            long total = service.count();
+            long total = dataStore.getRestaurantDAO().count();
             if (total == 0) {
                 IO.printErrorMessage("Nessun ristorante disponibile al momento.");
                 return;
@@ -70,7 +64,7 @@ public abstract class Menus {
             int offset = 0;
 
             while (true) {
-                List<Restaurant> page = service.findAll(offset, pageSize);
+                List<Restaurant> page = dataStore.getRestaurantDAO().findAll(offset, pageSize);
 
                 IO.clearScreen();
                 System.out.println("|============= Esplora Ristoranti =============|");

@@ -11,10 +11,6 @@ import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
  * Inizializza il {@link ClientDataStore} e fornisce un punto di accesso
  * ai dati memorizzati localmente in cache JSON.
  * </p>
- * <p>
- * In futuro, qui verrà integrato il layer di comunicazione RMI
- * per sincronizzare i dati con il server.
- * </p>
  */
 public class TheKnifeClient {
 
