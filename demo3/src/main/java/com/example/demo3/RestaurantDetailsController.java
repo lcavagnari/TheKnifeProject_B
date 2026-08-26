@@ -6,12 +6,10 @@ import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
 
 import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class RestaurantDetailsController {
 
@@ -36,15 +34,11 @@ public class RestaurantDetailsController {
     @FXML
     private Label greenStarLabel;
     @FXML
-    private Label ownerIdLabel;
-    @FXML
-    private Label cuisineTypesLabel;
-    @FXML
-    private Label servicesLabel;
-    @FXML
     private Label reviewsCountLabel;
     @FXML
-    private Label idLabel;
+    private FlowPane cuisinesFlow;
+    @FXML
+    private FlowPane servicesFlow;
     @FXML
     private Button btnIndietro;
     @FXML
@@ -62,22 +56,77 @@ public class RestaurantDetailsController {
 
     public void carica(Restaurant r) {
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
-        descriptionLabel.setText(valoreO(r.getDescription(), "?"));
-        websiteLabel.setText(valoreO(r.getWebsiteUrl(), "?"));
-        phoneLabel.setText(valoreO(r.getPhone(), "?"));
+        descriptionLabel.setText(valoreO(r.getDescription(), "No description available."));
+
+        // Website
+        String website = r.getWebsiteUrl();
+        if (website != null && !website.isBlank()) {
+            websiteLabel.setText(website);
+        } else {
+            websiteLabel.setText("N/A");
+        }
+
+        // Phone
+        phoneLabel.setText(valoreO(r.getPhone(), "N/A"));
+
+        // Location
         locationLabel.setText(formattaLocation(r.getLocation()));
-        priceRangeLabel.setText(r.getPriceRange() != null ? r.getPriceRange().toString() : "?");
-        deliveryLabel.setText(formattaBooleano(r.isHasDelivery()));
-        onlineBookingLabel.setText(formattaBooleano(r.isHasOnlineBooking()));
-        awardLabel.setText(r.getAward() != null ? r.getAward().toString() : "?");
-        greenStarLabel.setText(formattaBooleano(r.isGreenStar()));
-        ownerIdLabel.setText(r.getOwner() != null ? r.getOwner().getId().toString() : "N/A");
-        cuisineTypesLabel.setText(formattaCucine(r.getCuisinesTypes()));
-        servicesLabel.setText(formattaLista(r.getServices()));
+
+        // Price range
+        priceRangeLabel.setText(r.getPriceRange() != null ? r.getPriceRange().getSymbol() + " — " + r.getPriceRange().name() : "N/A");
+
+        // Delivery ribbon
+        if (r.isHasDelivery()) {
+            deliveryLabel.setVisible(true);
+            deliveryLabel.setManaged(true);
+            deliveryLabel.setText("Delivery");
+        }
+
+        // Online booking ribbon
+        if (r.isHasOnlineBooking()) {
+            onlineBookingLabel.setVisible(true);
+            onlineBookingLabel.setManaged(true);
+            onlineBookingLabel.setText("Online Booking");
+        }
+
+        // Award ribbon
+        if (r.getAward() != null && r.getAward() != it.uninsubria.laboratoriob.api.enums.Award.NONE) {
+            awardLabel.setVisible(true);
+            awardLabel.setManaged(true);
+            awardLabel.setText("★ " + r.getAward().toString());
+        }
+
+        // Green star ribbon
+        if (r.isGreenStar()) {
+            greenStarLabel.setVisible(true);
+            greenStarLabel.setManaged(true);
+            greenStarLabel.setText("Green Star");
+        }
+
+        // Cuisine badges
+        cuisinesFlow.getChildren().clear();
+        if (r.getCuisinesTypes() != null) {
+            for (CuisineType c : r.getCuisinesTypes()) {
+                Label badge = new Label(c.toString());
+                badge.getStyleClass().addAll("badge", "badge-cuisine");
+                cuisinesFlow.getChildren().add(badge);
+            }
+        }
+
+        // Services badges
+        servicesFlow.getChildren().clear();
+        if (r.getServices() != null) {
+            for (String s : r.getServices()) {
+                Label badge = new Label(s);
+                badge.getStyleClass().addAll("badge", "badge-booking");
+                servicesFlow.getChildren().add(badge);
+            }
+        }
+
+        // Reviews count
         int numRecensioni = r.getReviews() != null ? r.getReviews().size() : 0;
         reviewsCountLabel.setText(numRecensioni + (numRecensioni == 0
-                ? " - Nessuna recensione disponibile" : ""));
-        idLabel.setText(r.getId() != null ? r.getId().toString() : "?");
+                ? " — No reviews yet" : " Reviews"));
     }
 
     @FXML
@@ -89,27 +138,12 @@ public class RestaurantDetailsController {
         return (valore == null || valore.isBlank()) ? fallback : valore;
     }
 
-    private String formattaBooleano(boolean valore) {
-        return valore ? "Sì" : "No";
-    }
-
-    private String formattaLista(Set<String> insieme) {
-        if (insieme == null || insieme.isEmpty()) return "?";
-        return String.join(", ", insieme);
-    }
-
-    private String formattaCucine(Set<CuisineType> insieme) {
-        if (insieme == null || insieme.isEmpty()) return "?";
-        return insieme.stream().map(CuisineType::toString).collect(Collectors.joining(", "));
-    }
-
     private String formattaLocation(Location loc) {
-        if (loc == null) return "?";
+        if (loc == null) return "N/A";
         StringBuilder sb = new StringBuilder();
         if (loc.getAddress() != null) sb.append(loc.getAddress());
         if (loc.getCity() != null) sb.append(sb.isEmpty() ? "" : ", ").append(loc.getCity());
-        if (loc.getNation() != null) sb.append(" (").append(loc.getNation()).append(")");
-        sb.append(" [lat=").append(loc.getLatitude()).append(", lon=").append(loc.getLongitude()).append("]");
-        return sb.isEmpty() ? "?" : sb.toString();
+        if (loc.getNation() != null) sb.append(" (").append(loc.getNation().name().replace("_", " ")).append(")");
+        return sb.isEmpty() ? "N/A" : sb.toString();
     }
 }
