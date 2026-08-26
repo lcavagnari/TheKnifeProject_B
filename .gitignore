@@ -1,4 +1,8 @@
 # Project exclude paths
-/merged/common-api/target/
-/demo3/data
-/data/
+common-api/target/
+demo3/target/
+target/
+demo3/data/
+data/
+
+*.class
