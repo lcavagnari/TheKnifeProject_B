@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,7 @@ public class RestaurantDetailsController {
 
     @FXML
     public void initialize() {
-        String css = getClass().getResource("style.css").toExternalForm();
+        String css = Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm();
         root.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null && !newScene.getRoot().getStylesheets().contains(css)) {
                 newScene.getRoot().getStylesheets().add(css);

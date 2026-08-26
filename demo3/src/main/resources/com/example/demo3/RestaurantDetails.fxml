@@ -8,7 +8,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="20" stylesheets="@style.css"
+<VBox fx:id="root" spacing="20" styleClass="right-box" stylesheets="@style.css"
       xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.demo3.RestaurantDetailsController">
     <padding>
