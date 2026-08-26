@@ -5,11 +5,16 @@ import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.server.data.ReviewDAO;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.UUID;
 
-public class ReviewServiceImpl implements ReviewServiceInter {
+public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
     ReviewDAO rDAO = new  ReviewDAO();
+
+    protected ReviewServiceImpl() throws RemoteException {
+    }
+
     @Override
     public List<Review> findByRestaurant(UUID restaurantId) throws RemoteException {
         return rDAO.findByRestaurant(restaurantId);

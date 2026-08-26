@@ -2,7 +2,7 @@ package it.uninsubria.laboratoriob.server;
 
 import it.uninsubria.laboratoriob.server.data.remote.AuthRemoteImpl;
 import it.uninsubria.laboratoriob.server.data.remote.FavouriteServiceImpl;
-import it.uninsubria.laboratoriob.server.data.remote.ResturantServiceImpl;
+import it.uninsubria.laboratoriob.server.data.remote.RestaurantServiceImpl;
 import it.uninsubria.laboratoriob.server.data.remote.ReviewServiceImpl;
 import it.uninsubria.laboratoriob.server.utils.Database;
 import it.uninsubria.laboratoriob.server.utils.HeartbeatServer;
@@ -81,7 +81,7 @@ public class TheKnifeServer {
 
         try {
             Registry registry = LocateRegistry.createRegistry(rmiPort);
-            registry.rebind("restaurant", new ResturantServiceImpl());
+            registry.rebind("restaurant", new RestaurantServiceImpl());
             registry.rebind("auth", new AuthRemoteImpl());
             registry.rebind("review", new ReviewServiceImpl());
             registry.rebind("favourite", new FavouriteServiceImpl());
