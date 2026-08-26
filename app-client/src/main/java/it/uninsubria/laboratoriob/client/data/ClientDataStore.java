@@ -1,11 +1,11 @@
 package it.uninsubria.laboratoriob.client.data;
 
-import it.uninsubria.laboratoriob.client.ui.IO;
-import it.uninsubria.laboratoriob.client.utils.RmiRepository;
+import it.uninsubria.laboratoriob.api.objects.*;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import lombok.Getter;
-
-import java.util.Set;
-import java.util.UUID;
 
 /**
  * Facade che orchestra tutti i DAO del client.
@@ -15,9 +15,8 @@ import java.util.UUID;
  * dei dati del server.
  * </p>
  * <p>
- * Gestisce internamente la connessione RMI al server: se il server è raggiungibile,
- * gli stub remoti vengono usati per le operazioni di lettura/scrittura;
- * altrimenti si fallback sui DAO locali JSON.
+ * Quando il server RMI è disponibile, gli stub remoti vengono iniettati
+ * tramite costruttore e resi accessibili tramite i relativi campi.
  * </p>
  */
 @Getter
@@ -29,49 +28,23 @@ public class ClientDataStore {
     private final JsonReviewDAO reviewDAO;
     private final JsonLocationDAO locationDAO;
 
-    public ClientDataStore() {
-        this.customerDAO = new JsonCustomerDAO(null, null);
-        this.ownerDAO = new JsonOwnerDAO(null, null);
+    private final RestaurantServiceInter restaurantService;
+    private final AuthServiceInter authService;
+    private final ReviewServiceInter reviewService;
+    private final FavouriteServiceInter favouriteService;
+
+    public ClientDataStore(RestaurantServiceInter restaurantService,
+                           AuthServiceInter authService,
+                           ReviewServiceInter reviewService,
+                           FavouriteServiceInter favouriteService) {
+        this.customerDAO = new JsonCustomerDAO();
+        this.ownerDAO = new JsonOwnerDAO();
+        this.restaurantDAO = new JsonRestaurantDAO();
         this.locationDAO = new JsonLocationDAO();
-        this.restaurantDAO = new JsonRestaurantDAO(null, locationDAO);
-        this.reviewDAO = new JsonReviewDAO(customerDAO, null);
-    }
-
-    /**
-     * Acquires all RMI stubs (via {@link RmiRepository}, which must already be
-     * {@code configure()}d) and pushes the ones that succeeded onto the DAOs.
-     * Safe to call again later (e.g. after a manual reconnect).
-     */
-    public boolean acquireRemoteServices() {
-        Set<String> acquired = RmiRepository.acquireAll();
-        propagateServices();
-
-        if (acquired.isEmpty()) {
-            System.err.println("WARNING: RMI connection unavailable, running in local-only mode.");
-        } else {
-            IO.printSuccessMessage("RMI connection established.");
-        }
-        return !acquired.isEmpty();
-    }
-
-    private void propagateServices() {
-        customerDAO.setRemoteAuthService(RmiRepository.getAuthService());
-        customerDAO.setRemoteFavService(RmiRepository.getFavouriteService());
-        ownerDAO.setRemoteAuthService(RmiRepository.getAuthService());
-        ownerDAO.setRemoteRestaurantService(RmiRepository.getRestaurantService());
-        restaurantDAO.setRemoteRestaurantService(RmiRepository.getRestaurantService());
-        reviewDAO.setRemoteReviewService(RmiRepository.getReviewService());
-    }
-
-    /**
-     * Ripunta la cache locale di ogni DAO alla cartella dell'utente autenticato,
-     * cosi' che i dati di sessioni diverse non si mescolino sullo stesso client.
-     */
-    public void switchUser(UUID userId) {
-        customerDAO.repointTo(userId);
-        ownerDAO.repointTo(userId);
-        restaurantDAO.repointTo(userId);
-        reviewDAO.repointTo(userId);
-        locationDAO.repointTo(userId);
+        this.reviewDAO = new JsonReviewDAO(customerDAO);
+        this.restaurantService = restaurantService;
+        this.authService = authService;
+        this.reviewService = reviewService;
+        this.favouriteService = favouriteService;
     }
 }
