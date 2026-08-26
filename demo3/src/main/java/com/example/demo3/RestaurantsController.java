@@ -50,12 +50,18 @@ public class RestaurantsController {
     @FXML
     private VBox emptyState;
 
+    @FXML
+    private VBox root;
+
     public void inizializza() {
         restaurantListView.getStyleClass().add("restaurant-list");
         restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli));
 
         searchBar.setVisible(true);
         searchBar.setManaged(true);
+
+        root.setOnMousePressed(e -> root.requestFocus());
+
         caricaEMostra(restaurantRepository.caricaTutti());
     }
 
@@ -74,6 +80,7 @@ public class RestaurantsController {
                     stage.setTitle("Trova Ristoranti");
                     stage.show();
                 } catch (IOException ex) {
+                    // TODO: MORE ROBUST LOGGING
                     ex.printStackTrace();
                 }
             });
@@ -89,6 +96,7 @@ public class RestaurantsController {
             stage.setTitle(r.getName() != null ? r.getName() : "Dettagli ristorante");
             stage.show();
         } catch (IOException e) {
+            // TODO: MORE ROBUST LOGGING
             e.printStackTrace();
         }
     }

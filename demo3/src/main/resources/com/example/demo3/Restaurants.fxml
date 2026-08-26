@@ -8,9 +8,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="18" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.RestaurantsController">
+<VBox fx:id="root" spacing="24" focusTraversable="true" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.RestaurantsController">
     <padding>
-        <Insets bottom="25" left="25" right="25" top="25" />
+        <Insets bottom="32" left="32" right="32" top="32" />
     </padding>
     <!-- Top bar -->
     <HBox alignment="CENTER_LEFT" spacing="20">
@@ -23,7 +23,7 @@
         <Button onAction="#onCercaClick" text="Cerca" />
     </HBox>
     <!-- Stats -->
-    <HBox fx:id="statsBar" alignment="CENTER_LEFT">
+    <HBox fx:id="statsBar" alignment="CENTER">
         <Label fx:id="infoLabel" styleClass="stats-label" />
     </HBox>
     <!-- Empty state (hidden by default) -->
