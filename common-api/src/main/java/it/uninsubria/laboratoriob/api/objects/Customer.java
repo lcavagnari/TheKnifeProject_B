@@ -25,6 +25,8 @@ import java.util.UUID;
  */
 public class Customer extends User {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Insieme degli ID dei ristoranti preferiti dal cliente.
      */

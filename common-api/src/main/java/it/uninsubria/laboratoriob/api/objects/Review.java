@@ -22,6 +22,8 @@ import java.util.UUID;
  */
 @Getter
 public class Review extends Entity {
+
+    private static final long serialVersionUID = 1L;
     /**
      * Timestamp di creazione o aggiornamento della recensione.
      */

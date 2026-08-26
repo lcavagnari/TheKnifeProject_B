@@ -32,6 +32,8 @@ import java.util.UUID;
 @Getter
 public class Owner extends User {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Mappa dei ristoranti indicizzati per ID UUID.
      * <p>

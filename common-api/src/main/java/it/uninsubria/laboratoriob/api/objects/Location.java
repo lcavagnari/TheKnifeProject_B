@@ -24,6 +24,8 @@ import java.util.UUID;
 @Setter
 public class Location extends Entity {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Nazione di appartenenza.
      */

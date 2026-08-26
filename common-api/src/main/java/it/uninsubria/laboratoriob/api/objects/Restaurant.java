@@ -31,6 +31,8 @@ import java.util.*;
 @Setter
 public class Restaurant extends Entity {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Insieme di tipi di cucina proposti dal ristorante.
      */

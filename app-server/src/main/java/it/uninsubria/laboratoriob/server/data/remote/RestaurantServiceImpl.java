@@ -2,17 +2,21 @@ package it.uninsubria.laboratoriob.server.data.remote;
 
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
-import it.uninsubria.laboratoriob.api.remote.ResturantServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class RestaurantServiceImpl implements ResturantServiceInter {
+public class RestaurantServiceImpl extends UnicastRemoteObject implements RestaurantServiceInter {
     private final RestaurantDAO rDAO =  new RestaurantDAO();
+
+    protected RestaurantServiceImpl() throws RemoteException {
+    }
 
     @Override
     public List<Restaurant> findAll(int offset, int limit) throws RemoteException {
