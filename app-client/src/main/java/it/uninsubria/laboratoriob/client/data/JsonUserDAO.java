@@ -26,12 +26,17 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
     protected final File storeFile;
+    private final Class<T> type;
+
     protected final AuthServiceInter authService;
+
     protected final ConcurrentHashMap<UUID, T> cacheById = new ConcurrentHashMap<>();
     protected final ConcurrentHashMap<String, T> cacheByUsername = new ConcurrentHashMap<>();
+
     private volatile boolean cacheLoaded = false;
 
-    protected JsonUserDAO(AuthServiceInter authService) {
+    protected JsonUserDAO(Class<T> type, AuthServiceInter authService) {
+        this.type = type;
         this.storeFile = new File(Constants.ROOT, "users.json");
         this.authService = authService;
     }
@@ -202,14 +207,13 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     @SuppressWarnings("unchecked")
     public Optional<T> login(String username, String password) {
         ensureCacheLoaded();
+
         T cached = cacheByUsername.get(username);
         if (cached != null) return Optional.of(cached);
         if (authService != null) {
             try {
-                User remote = isOwner()
-                        ? authService.loginOwner(username, password)
-                        : authService.loginCustomer(username, password);
-                if (remote != null) {
+                User remote = authService.login(username, password);
+                if (remote != null && type.isInstance(remote)) {
                     T entity = (T) remote;
                     cacheById.put(entity.getId(), entity);
                     cacheByUsername.put(entity.getUsername(), entity);
@@ -222,6 +226,4 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         }
         return Optional.empty();
     }
-
-    protected abstract boolean isOwner();
 }

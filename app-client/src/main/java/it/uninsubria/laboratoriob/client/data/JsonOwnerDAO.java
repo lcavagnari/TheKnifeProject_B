@@ -8,13 +8,8 @@ import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
 public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
 
-    public JsonOwnerDAO(AuthServiceInter authService) {
-        super(authService);
-    }
-
-    @Override
-    protected boolean isOwner() {
-        return true;
+    JsonOwnerDAO(AuthServiceInter authService) {
+        super(Owner.class, authService);
     }
 
     @Override

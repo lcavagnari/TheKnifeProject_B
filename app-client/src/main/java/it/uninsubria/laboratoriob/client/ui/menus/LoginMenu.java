@@ -128,15 +128,11 @@ public class LoginMenu {
 
                 if (dataStore.getAuthService() != null) {
                     try {
-                        user = dataStore.getAuthService().loginCustomer(username, password);
-                    } catch (RemoteException ignored) {
-                        try {
-                            user = dataStore.getAuthService().loginOwner(username, password);
-                        } catch (RemoteException ex) {
-                            throw new AbortOperationException(
-                                    (ex.getMessage().isEmpty()) ? "Server non raggiungibile." : "Errore: "+ex.getMessage()
-                            );
-                        }
+                        user = dataStore.getAuthService().login(username, password);
+                    } catch (RemoteException ex) {
+                        throw new AbortOperationException(
+                                (ex.getMessage().isEmpty()) ? "Server non raggiungibile." : "Errore: "+ex.getMessage()
+                        );
                     }
                 } else {
                     IO.printErrorMessage("Servizio auth non disponibile.");
