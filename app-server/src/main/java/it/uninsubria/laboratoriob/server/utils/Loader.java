@@ -12,18 +12,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
-/**
- * Classe di utilità responsabile del caricamento e della gestione dei dati
- * dell'applicazione
- * a partire dal database.
- * <p>
- * Gestisce la lettura delle entità tramite i relativi it.uninsubria.laboratoriob.api.data.DAO e le inserisce in
- * strutture dati statiche.
- * <p>
- *
- * @author Luca Cavagnari
- * @version 2.0
- */
 public class Loader {
 
     private final ServerDataStore store;
@@ -31,8 +19,6 @@ public class Loader {
     public Loader(ServerDataStore store) {
         this.store = store;
     }
-
-    // ── Initialisation ──
 
     public void initialise() {
         try {
@@ -47,9 +33,9 @@ public class Loader {
     }
 
     private void resolveOwners() {
-        for (Restaurant r : store.getAllRestaurants()) {
+        for (Restaurant r : store.restaurants().findAll()) {
             if (r.getOwner() != null) {
-                User u = store.findUserById(r.getOwner().getId());
+                User u = store.users().findById(r.getOwner().getId());
                 if (u instanceof Owner) {
                     r.setOwner((Owner) u);
                 }
@@ -59,7 +45,7 @@ public class Loader {
 
     private void loadRestaurants() throws CompletionException {
         List<Restaurant> restaurants = CompletableFuture
-                .supplyAsync(store.restaurantDAO()::findAll)
+                .supplyAsync(store.restaurants()::loadAllFromDb)
                 .exceptionally(ex -> {
                     System.err.println("Errore caricamento restaurants: " + ex.getMessage());
                     return new ArrayList<>();
@@ -71,7 +57,7 @@ public class Loader {
         for (Restaurant restaurant : restaurants) {
             tasks.add(
                     CompletableFuture
-                            .supplyAsync(() -> store.reviewDAO().findByRestaurant(restaurant.getId()))
+                            .supplyAsync(() -> store.reviews().loadForRestaurant(restaurant.getId()))
                             .exceptionally(ex -> {
                                 System.err.println("Errore caricamento review for restaurant #"
                                         + restaurant.getId() + ": " + ex.getMessage());
@@ -86,20 +72,20 @@ public class Loader {
             Restaurant restaurant = restaurants.get(i);
             List<Review> reviews = tasks.get(i).join();
             for (Review review : reviews) restaurant.addReview(review);
-            store.addRestaurant(restaurant);
+            store.restaurants().putCache(restaurant);
         }
     }
 
     private void loadUsers() throws CompletionException {
         CompletableFuture<List<Owner>> owners = CompletableFuture
-                .supplyAsync(store.ownerDAO()::findAll)
+                .supplyAsync(store.users()::loadAllOwnersFromDb)
                 .exceptionally(ex -> {
                     System.err.println("Errore caricamento proprietari: " + ex.getMessage());
                     return null;
                 });
 
         CompletableFuture<List<Customer>> customers = CompletableFuture
-                .supplyAsync(store.customerDAO()::findAll)
+                .supplyAsync(store.users()::loadAllCustomersFromDb)
                 .exceptionally(ex -> {
                     System.err.println("Errore caricamento clienti: " + ex.getMessage());
                     return null;
@@ -110,11 +96,9 @@ public class Loader {
         List<Owner> o = owners.join();
         List<Customer> c = customers.join();
 
-        if (o != null) for (Owner owner : o) store.addUser(owner);
-        if (c != null) for (Customer customer : c) store.addUser(customer);
+        if (o != null) for (Owner owner : o) store.users().putCache(owner);
+        if (c != null) for (Customer customer : c) store.users().putCache(customer);
     }
-
-    // ── Dataset update ──
 
     public void updateMichelinDataset(String path) throws IOException {
         path = (path != null && !path.isBlank()) ? path : "michelin_my_maps.csv";
