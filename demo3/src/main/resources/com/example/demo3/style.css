@@ -425,8 +425,8 @@
     -fx-text-fill: #4a6a3e;
 }
 .badge-award {
-    -fx-background-color: #f0dce0;
-    -fx-text-fill: #8a3a4a;
+    -fx-background-color: #fff3cd;
+    -fx-text-fill: #b8860b;
 }
 
 /* ---- Card header (title in top bar) ---- */
@@ -434,4 +434,11 @@
     -fx-font-size: 22px;
     -fx-font-weight: 700;
     -fx-text-fill: #212121;
+}
+
+.review-ribbon {
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-text-fill: #424242;
+    -fx-padding: 0;
 }

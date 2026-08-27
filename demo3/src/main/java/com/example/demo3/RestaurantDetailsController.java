@@ -3,9 +3,11 @@ package com.example.demo3;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.objects.Review;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.geometry.Insets;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 
@@ -37,6 +39,8 @@ public class RestaurantDetailsController {
     private FlowPane servicesFlow;
     @FXML
     private FlowPane deliveryBookingFlow;
+    @FXML
+    private FlowPane starsFlow;
     @FXML
     private Button btnIndietro;
     @FXML
@@ -77,7 +81,7 @@ public class RestaurantDetailsController {
         if (r.getAward() != null && r.getAward() != it.uninsubria.laboratoriob.api.enums.Award.NONE) {
             awardLabel.setVisible(true);
             awardLabel.setManaged(true);
-            awardLabel.setText("★ " + r.getAward().toString());
+            awardLabel.setText(r.getAward().getValue() + " Michelin " + (r.getAward().getValue() == 1 ? "star" : "stars"));
         }
 
         // Green star ribbon
@@ -120,10 +124,26 @@ public class RestaurantDetailsController {
             }
         }
 
-        // Reviews count
+        // Reviews count + stars
         int numRecensioni = r.getReviews() != null ? r.getReviews().size() : 0;
-        reviewsCountLabel.setText(numRecensioni + (numRecensioni == 0
-                ? " - No reviews yet" : " Reviews"));
+        double avg = 0;
+        if (numRecensioni > 0) {
+            avg = r.getReviews().values().stream()
+                    .mapToInt(Review::getValue)
+                    .average()
+                    .orElse(0.0);
+        }
+        int filledStars = (int) Math.round(avg);
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= 5; i++) {
+            sb.append(i <= filledStars ? "★" : "☆");
+        }
+        Label starLabel = new Label(sb.toString());
+        starLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-size: 28px; -fx-padding: 0;");
+        starLabel.setPadding(Insets.EMPTY);
+        starsFlow.getChildren().setAll(starLabel);
+
+        reviewsCountLabel.setText(numRecensioni + (numRecensioni == 1 ? " review" : " reviews"));
     }
 
     @FXML

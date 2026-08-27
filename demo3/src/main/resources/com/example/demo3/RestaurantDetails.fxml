@@ -7,74 +7,102 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.text.Font?>
 
-<VBox fx:id="root" spacing="10" styleClass="right-box" stylesheets="@style.css"
-      style="-fx-alignment: TOP_LEFT;"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.demo3.RestaurantDetailsController">
+<VBox fx:id="root" spacing="10" style="-fx-alignment: TOP_LEFT;" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.RestaurantDetailsController">
     <padding>
-        <Insets top="10" right="10" bottom="10" left="10" />
+        <Insets bottom="10" left="10" right="10" top="10" />
     </padding>
 
     <!-- Top bar: back button + restaurant name -->
     <HBox alignment="CENTER_LEFT" spacing="10">
-        <Button fx:id="btnIndietro" text="← Back" onAction="#onIndietroClick" styleClass="button-secondary" />
-        <Label fx:id="nameLabel" text="*restaurant name*" styleClass="card-header" />
+        <Button fx:id="btnIndietro" graphicTextGap="2.0" onAction="#onIndietroClick" prefHeight="29.0" prefWidth="101.0" styleClass="button-secondary" text="← Back">
+         <font>
+            <Font size="14.0" />
+         </font></Button>
+        <Label fx:id="nameLabel" styleClass="card-header" text="*restaurant name*" />
     </HBox>
 
-    <!-- Ribbons row 1: Michelin stars + green star -->
-    <HBox spacing="8" alignment="CENTER_LEFT">
-        <padding><Insets left="5" right="5" /></padding>
-        <Label fx:id="awardLabel" styleClass="badge badge-award" text="☆☆☆ 0 Michelin" style="-fx-text-fill: #d4944a;" />
-        <Label fx:id="greenStarLabel" styleClass="badge badge-green" visible="false" managed="false" />
-    </HBox>
+    <!-- Ribbons: Reviews on top, Awards below -->
+    <VBox alignment="CENTER_LEFT" spacing="0">
 
-    <!-- Ribbons row 2: delivery + online booking -->
-    <FlowPane fx:id="deliveryBookingFlow" hgap="8" vgap="8" style="-fx-padding: 0 0 0 5;" />
+        <!-- Riga 1: Stelle e Conteggio recensioni attaccati -->
+        <HBox alignment="CENTER_LEFT">
+            <FlowPane fx:id="starsFlow" prefHeight="20.0" prefWidth="106.0" prefWrapLength="0.0" />
+            <Label fx:id="reviewsCountLabel" prefWidth="116.0" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #424242; -fx-padding: 0; -fix-text-fill: #FFD700;" stylesheets="@style.css" text="*reviews_count*" />
+        </HBox>
+
+        <!-- Riga 2: Michelin Award e Green Star (Sotto le recensioni) -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <Label fx:id="awardLabel" managed="false" style="-fx-font-size: 20px; -fx-text-fill: #b8860b; -fx-background-color: #fff3cd; -fx-padding: 4 10; -fx-background-radius: 8;" text="" visible="false" />
+            <Label fx:id="greenStarLabel" managed="false" style="-fx-font-size: 20px;" styleClass="badge badge-green" visible="false" />
+        </HBox>
+
+    </VBox>
+
+    <!-- Riga 3: Delivery + Online booking -->
+    <FlowPane fx:id="deliveryBookingFlow" hgap="8" style="-fx-padding: 0 0 0 5;" vgap="8" />
 
     <!-- Main Card matching the Compose Elevation -->
-    <VBox style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 3);" spacing="3">
-        <padding><Insets top="14" right="14" bottom="14" left="14" /></padding>
+    <VBox spacing="3" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 3);">
+        <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
+      <HBox alignment="CENTER_LEFT" spacing="4">
+         <children>
+            <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+               <image>
+                  <Image url="@images/ic_info.png" />
+               </image>
+            </ImageView>
+            <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="DESCRIPTION" />
+         </children>
+      </HBox>
 
         <!-- Description -->
-        <Label fx:id="descriptionLabel" text="*restaurant description*" wrapText="true" style="-fx-font-size: 14px; -fx-text-fill: #424242;" maxWidth="Infinity"/>
+        <Label fx:id="descriptionLabel" style="-fx-font-size: 18px; -fx-text-fill: #424242;" text="*restaurant description*" wrapText="true">
+         <opaqueInsets>
+            <Insets top="10.0" />
+         </opaqueInsets></Label>
 
         <VBox spacing="5" style="-fx-padding: 3 0 0 0;">
             <Separator style="-fx-border-width: 3 0 0 0; -fx-border-color: #E0E0E0;" />
         </VBox>
 
         <!-- Website + Phone Number Row -->
-        <GridPane hgap="10" vgap="10" style="-fx-padding: 3 0 3 0;">
+        <GridPane hgap="10" style="-fx-padding: 3 0 3 0;" vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" halignment="LEFT" />
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" halignment="LEFT" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
             </columnConstraints>
 
             <!-- Website column -->
-            <VBox GridPane.columnIndex="0" alignment="CENTER_LEFT" spacing="2">
+            <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="0">
                 <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitWidth="14" fitHeight="14" preserveRatio="true">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                         <image><Image url="@images/ic_globe.png" /></image>
                     </ImageView>
-                    <Label text="WEBSITE" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="WEBSITE" />
                 </HBox>
-                <Label fx:id="websiteLabel" text="*clickable_restaurant_url*" style="-fx-text-fill: #007161; -fx-font-size: 13px;" wrapText="true" />
+                <Label fx:id="websiteLabel" style="-fx-text-fill: #007161; -fx-font-size: 13px;" text="*clickable_restaurant_url*" wrapText="true" />
             </VBox>
 
             <!-- Phone column -->
-            <VBox GridPane.columnIndex="1" alignment="CENTER_LEFT" spacing="2">
+            <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="1">
                 <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitWidth="14" fitHeight="14" preserveRatio="true">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                         <image><Image url="@images/ic_phone.png" /></image>
                     </ImageView>
-                    <Label text="PHONE NUMBER" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="PHONE NUMBER" />
                 </HBox>
-                <Label fx:id="phoneLabel" text="*national_prefixed_phone_number*" style="-fx-text-fill: #424242; -fx-font-size: 13px;" />
+                <Label fx:id="phoneLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*national_prefixed_phone_number*" />
             </VBox>
+         <rowConstraints>
+            <RowConstraints />
+         </rowConstraints>
         </GridPane>
 
         <VBox spacing="5" style="-fx-padding: 5 0 0 0;">
@@ -82,33 +110,36 @@
         </VBox>
 
         <!-- Location + Price Range Row -->
-        <GridPane hgap="10" vgap="10" style="-fx-padding: 3 0 3 0;">
+        <GridPane hgap="10" style="-fx-padding: 3 0 3 0;" vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" halignment="LEFT" />
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" halignment="LEFT" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
             </columnConstraints>
 
             <!-- Location column -->
-            <VBox GridPane.columnIndex="0" alignment="CENTER_LEFT" spacing="2">
+            <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="0">
                 <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitWidth="14" fitHeight="14" preserveRatio="true">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                         <image><Image url="@images/ic_geomarker.png" /></image>
                     </ImageView>
-                    <Label text="LOCATION" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="LOCATION" />
                 </HBox>
-                <Label fx:id="locationLabel" text="*full_restaurant_address*" wrapText="true" style="-fx-text-fill: #424242; -fx-font-size: 13px;" />
+                <Label fx:id="locationLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*full_restaurant_address*" wrapText="true" />
             </VBox>
 
             <!-- Price Range column -->
-            <VBox GridPane.columnIndex="1" alignment="CENTER_LEFT" spacing="2">
+            <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="1">
                 <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitWidth="14" fitHeight="14" preserveRatio="true">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                         <image><Image url="@images/ic_money.png" /></image>
                     </ImageView>
-                    <Label text="PRICE RANGE (per-person)" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="PRICE RANGE (per-person)" />
                 </HBox>
-                <Label fx:id="priceRangeLabel" text="*restaurant_full_price_range*" style="-fx-text-fill: #424242; -fx-font-size: 13px;" />
+                <Label fx:id="priceRangeLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*restaurant_full_price_range*" />
             </VBox>
+         <rowConstraints>
+            <RowConstraints />
+         </rowConstraints>
         </GridPane>
 
         <VBox spacing="5" style="-fx-padding: 3 0 0 0;">
@@ -116,49 +147,41 @@
         </VBox>
 
         <!-- Cuisine + Services Row -->
-        <GridPane hgap="10" vgap="10" style="-fx-padding: 3 0 3 0;">
+        <GridPane hgap="10" style="-fx-padding: 3 0 3 0;" vgap="10">
             <columnConstraints>
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" halignment="LEFT" />
-                <ColumnConstraints hgrow="ALWAYS" percentWidth="50" halignment="LEFT" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
+                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
             </columnConstraints>
 
             <!-- Cuisine column -->
-            <VBox GridPane.columnIndex="0" alignment="CENTER_LEFT" spacing="4">
+            <VBox alignment="CENTER_LEFT" spacing="4" GridPane.columnIndex="0">
                 <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitWidth="14" fitHeight="14" preserveRatio="true">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                         <image><Image url="@images/ic_knifeandfork.png" /></image>
                     </ImageView>
-                    <Label text="CUISINE" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="CUISINE" />
                 </HBox>
                 <FlowPane fx:id="cuisinesFlow" hgap="5" vgap="5" />
             </VBox>
 
             <!-- Services column -->
-            <VBox GridPane.columnIndex="1" alignment="CENTER_LEFT" spacing="4">
+            <VBox alignment="CENTER_LEFT" spacing="4" GridPane.columnIndex="1">
                 <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitWidth="14" fitHeight="14" preserveRatio="true">
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
                         <image><Image url="@images/ic_info.png" /></image>
                     </ImageView>
-                    <Label text="SERVICES" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" />
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="SERVICES" />
                 </HBox>
                 <FlowPane fx:id="servicesFlow" hgap="5" vgap="5" />
             </VBox>
+         <rowConstraints>
+            <RowConstraints />
+         </rowConstraints>
         </GridPane>
 
         <VBox spacing="5" style="-fx-padding: 3 0 0 0;">
             <Separator style="-fx-border-width: 3 0 0 0; -fx-border-color: #E0E0E0;" />
         </VBox>
-
-        <!-- Reviews row -->
-        <HBox style="-fx-background-color: transparent; -fx-padding: 5 0 0 0;" alignment="CENTER_LEFT">
-            <HBox alignment="CENTER_LEFT" spacing="5">
-                <ImageView fitWidth="16" fitHeight="16" preserveRatio="true">
-                    <image><Image url="@images/ic_star.png" /></image>
-                </ImageView>
-                <Label fx:id="reviewsCountLabel" text="*reviews_cnt*" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: gold;" />
-                <Label text="Reviews" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: gold;" />
-            </HBox>
-        </HBox>
 
     </VBox>
 </VBox>
