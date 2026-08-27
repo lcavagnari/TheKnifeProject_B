@@ -1,10 +1,10 @@
 package it.uninsubria.laboratoriob.server;
 
 import it.uninsubria.laboratoriob.server.data.ServerDataStore;
-import it.uninsubria.laboratoriob.server.data.remote.AuthRemoteImpl;
-import it.uninsubria.laboratoriob.server.data.remote.FavouriteServiceImpl;
-import it.uninsubria.laboratoriob.server.data.remote.RestaurantServiceImpl;
-import it.uninsubria.laboratoriob.server.data.remote.ReviewServiceImpl;
+import it.uninsubria.laboratoriob.server.remote.AuthRemoteImpl;
+import it.uninsubria.laboratoriob.server.remote.FavouriteServiceImpl;
+import it.uninsubria.laboratoriob.server.remote.RestaurantServiceImpl;
+import it.uninsubria.laboratoriob.server.remote.ReviewServiceImpl;
 import it.uninsubria.laboratoriob.server.utils.Database;
 import it.uninsubria.laboratoriob.server.utils.HeartbeatServer;
 import it.uninsubria.laboratoriob.server.utils.Loader;

@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.data;
+package it.uninsubria.laboratoriob.server.data.dao;
 
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.objects.Location;

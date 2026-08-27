@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.data.remote;
+package it.uninsubria.laboratoriob.server.remote;
 
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
@@ -19,7 +19,7 @@ public class AuthRemoteImpl extends UnicastRemoteObject implements AuthServiceIn
 
     @Override
     public User login(String username, String password) throws RemoteException {
-        User cached = store.findUserByName(username);
+        User cached = store.users().findByName(username);
 
         if (cached == null) throw new RemoteException("Error occurred during login");
 
@@ -30,13 +30,12 @@ public class AuthRemoteImpl extends UnicastRemoteObject implements AuthServiceIn
     @Override
     public User register(User utente) throws RemoteException {
         if (utente == null) throw new RemoteException("No user was provided");
-        else if (store.findUserById(utente.getId()) != null) throw new RemoteException("Error occurred during registration");
+        else if (store.users().findById(utente.getId()) != null) throw new RemoteException("Error occurred during registration");
 
-        if (utente instanceof Customer) store.customerDAO().save((Customer) utente);
-        else if (utente instanceof Owner) store.ownerDAO().save((Owner) utente);
+        if (utente instanceof Customer c) store.users().saveCustomer(c);
+        else if (utente instanceof Owner o) store.users().saveOwner(o);
         else throw new RemoteException("Unsupported user type: " + utente.getClass().getSimpleName());
 
-        store.addUser(utente);
         return utente;
     }
 }

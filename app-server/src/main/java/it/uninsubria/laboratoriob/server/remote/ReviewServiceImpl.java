@@ -1,7 +1,6 @@
-package it.uninsubria.laboratoriob.server.data.remote;
+package it.uninsubria.laboratoriob.server.remote;
 
 import it.uninsubria.laboratoriob.api.objects.Review;
-import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 
@@ -19,43 +18,38 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
 
     @Override
     public List<Review> findByRestaurant(UUID restaurantId) throws RemoteException {
-        return store.findReviewsByRestaurant(restaurantId);
+        return store.reviews().findByRestaurant(restaurantId);
     }
 
     @Override
     public List<Review> findByUser(UUID userId) throws RemoteException {
-        return store.findReviewsByUser(userId);
+        return store.reviews().findByUser(userId);
     }
 
     @Override
     public List<Review> findAll() throws RemoteException {
-        return store.findAllReviews();
+        return store.reviews().findAll();
     }
 
     @Override
     public List<Review> findAll(int offset, int limit) throws RemoteException {
-        List<Review> all = store.findAllReviews();
+        List<Review> all = store.reviews().findAll();
         if (offset >= all.size()) return List.of();
         return all.subList(offset, Math.min(offset + limit, all.size()));
     }
 
     @Override
     public boolean save(Review review) throws RemoteException {
-        boolean ok = store.reviewDAO().save(review);
-        if (ok && review.getRestaurant() != null) {
-            Restaurant r = store.findRestaurantById(review.getRestaurant().getId());
-            if (r != null) r.addReview(review);
-        }
-        return ok;
+        return store.reviews().save(review);
     }
 
     @Override
     public boolean update(Review review) throws RemoteException {
-        return store.reviewDAO().update(review);
+        return store.reviews().update(review);
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        return store.reviewDAO().delete(id);
+        return store.reviews().delete(id);
     }
 }
