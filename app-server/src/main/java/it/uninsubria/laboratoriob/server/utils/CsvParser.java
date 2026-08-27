@@ -13,6 +13,7 @@ import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.server.data.LocationDAO;
 import it.uninsubria.laboratoriob.server.data.OwnerDAO;
 import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
@@ -267,7 +268,7 @@ public class CsvParser {
                 services);
     }
 
-    public static void parseFromDataset(Path path) {
+    public static void parseFromDataset(Path path, ServerDataStore store) {
         if (path == null)
             return;
 
@@ -299,8 +300,8 @@ public class CsvParser {
             });
 
             CompletableFuture<Void> cacheFuture = CompletableFuture.runAsync(() -> {
-                Loader.addUser(systemOwner);
-                for (Restaurant r : restaurants) Loader.addRestaurant(r);
+                store.addUser(systemOwner);
+                for (Restaurant r : restaurants) store.addRestaurant(r);
                 System.out.println("✅ Ristoranti aggiunti alla cache in memoria!");
             });
 
