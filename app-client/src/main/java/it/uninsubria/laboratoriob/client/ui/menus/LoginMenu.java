@@ -124,17 +124,18 @@ public class LoginMenu {
                 String username = IO.getUserInput("Inserisci il nome utente:");
                 String password = IO.getUserInput("Inserisci la password:");
 
-                User user = null;
+                User user;
 
                 if (dataStore.getAuthService() != null) {
                     try {
                         user = dataStore.getAuthService().loginCustomer(username, password);
-                    } catch (RemoteException e1) {
+                    } catch (RemoteException ignored) {
                         try {
                             user = dataStore.getAuthService().loginOwner(username, password);
-                        } catch (RemoteException e2) {
-                            IO.printErrorMessage("Server non raggiungibile.");
-                            return null;
+                        } catch (RemoteException ex) {
+                            throw new AbortOperationException(
+                                    (ex.getMessage().isEmpty()) ? "Server non raggiungibile." : "Errore: "+ex.getMessage()
+                            );
                         }
                     }
                 } else {
