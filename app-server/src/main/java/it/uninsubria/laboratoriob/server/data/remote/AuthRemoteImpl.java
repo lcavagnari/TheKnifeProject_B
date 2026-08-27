@@ -48,6 +48,16 @@ public class AuthRemoteImpl extends UnicastRemoteObject implements AuthServiceIn
 
     @Override
     public User register(User utente) throws RemoteException {
-        return null;
+        if (utente == null) throw new RemoteException("User is null");
+        if (utente instanceof Customer) {
+            cDAO.save((Customer) utente);
+        } else if (utente instanceof Owner) {
+            oDAO.save((Owner) utente);
+        } else {
+            throw new RemoteException("Unsupported user type: " + utente.getClass().getSimpleName());
+        }
+        Loader.getAllUsersById().put(utente.getId(), utente);
+        Loader.getAllUsersByName().put(utente.getUsername(), utente);
+        return utente;
     }
 }
