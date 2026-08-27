@@ -31,20 +31,15 @@
     <!-- Ribbons: Reviews on top, Awards below -->
     <VBox alignment="CENTER_LEFT" spacing="0">
 
-        <!-- Riga 1: Stelle, Conteggio recensioni, e Green Star ribbon -->
+        <!-- Riga 1: Michelin stars, then Green Star ribbon -->
         <HBox alignment="CENTER_LEFT" spacing="10">
-            <FlowPane fx:id="starsFlow" prefWrapLength="0.0" />
-            <Label fx:id="reviewsCountLabel" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #CDA532; -fx-padding: 0;" styleClass="review-ribbon-text" stylesheets="@style.css" text="*reviews_count*" />
-            <HBox fx:id="greenStarRibbon" alignment="CENTER_LEFT" managed="false" spacing="5" styleClass="ribbon-greenstar" visible="false">
-                <ImageView fitHeight="24" fitWidth="24" preserveRatio="true" styleClass="ribbon-greenstar-icon">
+            <Label fx:id="awardLabel" managed="false" styleClass="michelin-stars" text="" visible="false" />
+            <HBox fx:id="greenStarRibbon" alignment="CENTER_LEFT" managed="false" spacing="6" styleClass="ribbon-greenstar" visible="false">
+                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true" styleClass="ribbon-greenstar-icon">
                     <Image url="@images/ic_award.png" />
                 </ImageView>
+                <Label styleClass="ribbon-greenstar-text" text="Green Star" />
             </HBox>
-        </HBox>
-
-        <!-- Riga 2: Michelin Award (Sotto le recensioni) -->
-        <HBox alignment="CENTER_LEFT" spacing="10">
-            <Label fx:id="awardLabel" managed="false" style="-fx-font-size: 20px; -fx-text-fill: #b8860b; -fx-background-color: #fff3cd; -fx-padding: 4 10; -fx-background-radius: 8;" text="" visible="false" />
         </HBox>
 
     </VBox>
@@ -55,6 +50,7 @@
     <!-- Main Card matching the Compose Elevation -->
     <VBox spacing="3" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 3);">
         <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
+
       <HBox alignment="CENTER_LEFT" spacing="4">
          <children>
             <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
@@ -186,6 +182,27 @@
         <VBox spacing="5" style="-fx-padding: 3 0 0 0;">
             <Separator style="-fx-border-width: 3 0 0 0; -fx-border-color: #E0E0E0;" />
         </VBox>
+
+    </VBox>
+
+    <!-- Reviews Card matching the Compose Elevation -->
+    <VBox spacing="3" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 3);">
+        <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
+
+        <HBox alignment="CENTER_LEFT" spacing="4">
+            <children>
+                <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                    <image>
+                        <Image url="@images/ic_star.png" />
+                    </image>
+                </ImageView>
+                <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="REVIEWS" />
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 2 0 0 0;">
+            <FlowPane fx:id="starsFlow" prefWrapLength="0.0" />
+            <Label fx:id="reviewsCountLabel" styleClass="review-ribbon-text" text="*reviews_count*" />
+        </HBox>
 
     </VBox>
 </VBox>

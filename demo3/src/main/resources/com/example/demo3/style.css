@@ -429,23 +429,31 @@
     -fx-text-fill: #b8860b;
 }
 
-/* ---- Green Star ribbon (icon tinted #00FF7F, muted-white pill) ---- */
+/* ---- Michelin stars (matches list-card star glyphs) ---- */
+.michelin-stars {
+    -fx-text-fill: #f9a825;
+    -fx-font-weight: bold;
+    -fx-font-size: 20px;
+    -fx-padding: 0;
+}
+
+/* ---- Green Star ribbon (solid green badge, white icon + label) ---- */
 .ribbon-greenstar {
-    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-color: linear-gradient(to bottom, #00c853, #00a344);
     -fx-background-radius: 20px;
-    -fx-border-color: #e0e0e0;
+    -fx-border-color: #008a3a;
     -fx-border-radius: 20px;
     -fx-border-width: 1px;
-    -fx-padding: 4 12 4 10;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0.1, 0, 1);
+    -fx-padding: 5 14 5 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,168,68,0.45), 8, 0.25, 0, 2);
 }
 .ribbon-greenstar-icon {
-    -fx-effect: innershadow(one-pass-box, #00FF7F, 50, 1.0, 0, 0);
+    -fx-effect: colorAdjust(0, 0, 1, 0);
 }
 .ribbon-greenstar-text {
     -fx-font-size: 13px;
-    -fx-font-weight: 700;
-    -fx-text-fill: #2c2420;
+    -fx-font-weight: 800;
+    -fx-text-fill: #ffffff;
 }
 
 /* ---- Card header (title in top bar) ---- */
@@ -455,9 +463,16 @@
     -fx-text-fill: #212121;
 }
 
-.review-ribbon-text {
+.reviews-stars {
+    -fx-text-fill: #B8860B;
     -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-text-fill: #CDA532;
+    -fx-font-size: 22px;
+    -fx-padding: 0;
+}
+
+.review-ribbon-text {
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-text-fill: #757575;
     -fx-padding: 0;
 }

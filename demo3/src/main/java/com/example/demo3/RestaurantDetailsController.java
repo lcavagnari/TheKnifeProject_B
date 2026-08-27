@@ -79,11 +79,11 @@ public class RestaurantDetailsController {
         // Price range
         priceRangeLabel.setText(r.getPriceRange() != null ? r.getPriceRange().getSymbol() + " - " + r.getPriceRange().name() : "N/A");
 
-        // Award ribbon
+        // Michelin stars
         if (r.getAward() != null && r.getAward() != it.uninsubria.laboratoriob.api.enums.Award.NONE) {
             awardLabel.setVisible(true);
             awardLabel.setManaged(true);
-            awardLabel.setText(r.getAward().getValue() + " Michelin " + (r.getAward().getValue() == 1 ? "star" : "stars"));
+            awardLabel.setText("★".repeat(r.getAward().getValue()));
         }
 
         // Green star ribbon
@@ -140,7 +140,7 @@ public class RestaurantDetailsController {
             sb.append(i <= filledStars ? "★" : "☆");
         }
         Label starLabel = new Label(sb.toString());
-        starLabel.setStyle("-fx-text-fill: #CDA532; -fx-font-weight: bold; -fx-font-size: 28px; -fx-padding: 0;");
+        starLabel.getStyleClass().add("reviews-stars");
         starLabel.setPadding(Insets.EMPTY);
         starsFlow.getChildren().setAll(starLabel);
 
