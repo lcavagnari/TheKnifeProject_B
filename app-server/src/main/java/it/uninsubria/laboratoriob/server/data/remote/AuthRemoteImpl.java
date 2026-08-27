@@ -6,6 +6,7 @@ import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.server.data.CustomerDAO;
 import it.uninsubria.laboratoriob.server.data.OwnerDAO;
+import it.uninsubria.laboratoriob.server.utils.Loader;
 import it.uninsubria.laboratoriob.server.utils.PasswordHasher;
 
 import java.rmi.RemoteException;
@@ -21,15 +22,26 @@ public class AuthRemoteImpl extends UnicastRemoteObject implements AuthServiceIn
 
     @Override
     public User loginCustomer(String username, String password) throws RemoteException {
-        Customer customer =  cDAO.findByUsername(username).orElseThrow(() -> new RemoteException("Username not found"));
-
+        User cached = Loader.findUserByName(username);
+        if (cached instanceof Customer) {
+            Customer customer = (Customer) cached;
+            if (PasswordHasher.verify(password, customer.getPasswordSalt(), customer.getPasswordHash())) return customer;
+            else throw new RemoteException("Invalid password");
+        }
+        Customer customer = cDAO.findByUsername(username).orElseThrow(() -> new RemoteException("Username not found"));
         if (PasswordHasher.verify(password, customer.getPasswordSalt(), customer.getPasswordHash())) return customer;
         else throw new RemoteException("Invalid password");
     }
+
     @Override
     public User loginOwner(String username, String password) throws RemoteException {
-        Owner owner =  oDAO.findByUsername(username).orElseThrow(() -> new RemoteException("Username not found"));
-
+        User cached = Loader.findUserByName(username);
+        if (cached instanceof Owner) {
+            Owner owner = (Owner) cached;
+            if (PasswordHasher.verify(password, owner.getPasswordSalt(), owner.getPasswordHash())) return owner;
+            else throw new RemoteException("Invalid password");
+        }
+        Owner owner = oDAO.findByUsername(username).orElseThrow(() -> new RemoteException("Username not found"));
         if (PasswordHasher.verify(password, owner.getPasswordSalt(), owner.getPasswordHash())) return owner;
         else throw new RemoteException("Invalid password");
     }

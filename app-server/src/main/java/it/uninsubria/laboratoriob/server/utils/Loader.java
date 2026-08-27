@@ -129,6 +129,44 @@ public class Loader {
         return Collections.unmodifiableMap(usersByName);
     }
 
+    public static Collection<Restaurant> getAllRestaurants() {
+        return Collections.unmodifiableCollection(restaurantsById.values());
+    }
+
+    public static long countRestaurants() {
+        return restaurantsById.size();
+    }
+
+    public static long countUsers() {
+        return usersById.size();
+    }
+
+    public static List<Review> findReviewsByRestaurant(UUID restaurantId) {
+        Restaurant r = restaurantsById.get(restaurantId);
+        if (r == null) return List.of();
+        return List.copyOf(r.getReviews().values());
+    }
+
+    public static List<Review> findReviewsByUser(UUID userId) {
+        List<Review> result = new ArrayList<>();
+        for (Restaurant r : restaurantsById.values()) {
+            for (Review review : r.getReviews().values()) {
+                if (review.getUser() != null && review.getUser().getId().equals(userId)) {
+                    result.add(review);
+                }
+            }
+        }
+        return result;
+    }
+
+    public static List<Review> findAllReviews() {
+        List<Review> result = new ArrayList<>();
+        for (Restaurant r : restaurantsById.values()) {
+            result.addAll(r.getReviews().values());
+        }
+        return result;
+    }
+
     private void loadRestaurants() throws CompletionException {
         List<Restaurant> restaurants = CompletableFuture
                 .supplyAsync(restaurantDAO::findAll)
