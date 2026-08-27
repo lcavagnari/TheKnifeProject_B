@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * Classe astratta base per i DAO che gestiscono gli utenti ({@link Customer}, {@link Owner}).
+ * Classe astratta base per i DAO che gestiscono gli utenti ({@link it.uninsubria.laboratoriob.api.objects.Customer}, {@link it.uninsubria.laboratoriob.api.objects.Owner}).
  * <p>
  * Fornisce le operazioni CRUD comuni a tutti i tipi di utente, gestendo la tabella
  * {@code "user"} nel database PostgreSQL. Utilizza un flag {@code isOwner} per distinguere
