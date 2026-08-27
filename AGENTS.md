@@ -42,15 +42,19 @@ Dependency chain: `app-server` and `app-client` both depend on `common-api`.
 
 ## Server architecture
 
-- `TheKnifeServer.main()` → creates DB schema → seeds constants → optional `--update` → `Loader.initialiseMaps()` (loads all data into `ConcurrentHashMap` caches).
+- `TheKnifeServer.main()` → creates DB schema → seeds constants → optional `--update` → `Loader.initialise()` (loads all data into Repository caches).
 - RMI registry on port 1099, heartbeat TCP on port 5555.
-- `Loader` is the in-memory data layer — all reads go through it, not directly to DB.
+- `ServerDataStore` is a thin facade delegating to `RestaurantRepository`, `ReviewRepository`, `UserRepository`.
+- Repositories encapsulate `ConcurrentHashMap` caching + DAO access. RMI service impls read from repositories.
+- DAO classes in `server.data.dao/`: `CustomerDAO`, `LocationDAO`, `OwnerDAO`, `ReviewDAO`, `RestaurantDAO`, `UserDAO`
+- RMI service impls in `server.remote/`: `AuthRemoteImpl`, `RestaurantServiceImpl`, `ReviewServiceImpl`, `FavouriteServiceImpl`
 
 ## Testing
 
-- Tests exist only in `common-api` module (JUnit 5 + JUnit 3).
-- No integration tests, no server/client tests.
-- Run tests: `mvn test -pl common-api`
+- `common-api`: unit tests (JUnit 5 + JUnit 3) for entities and enums.
+- `app-client`: unit tests (JUnit 5 + Mockito) for all client DAOs and data flow sync patterns.
+- No server integration tests yet.
+- Run tests: `mvn test -pl common-api` or `mvn test -pl app-client`
 
 ## CI
 
