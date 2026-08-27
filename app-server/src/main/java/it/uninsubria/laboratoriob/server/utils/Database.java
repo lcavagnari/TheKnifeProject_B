@@ -542,13 +542,17 @@ public final class Database {
 
             String systemSalt = PasswordHasher.generateSalt();
             String systemHash = PasswordHasher.hash(UUID.randomUUID().toString(), systemSalt);
-            String systemId = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes()).toString();
+            byte[] systemIdBytes = "theknife-system-owner".getBytes();
 
-            stmt.execute("""
-                    INSERT INTO "user" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system)
-                    VALUES ('%s', 'system', '%s', '%s', 'System', 'Michelin', '2000-01-01', true, true)
-                    ON CONFLICT (id) DO NOTHING;
-                    """.formatted(systemId, systemHash, systemSalt));
+            try (PreparedStatement systemStmt = conn.prepareStatement(
+                    "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system) "
+                            + "VALUES (?, 'system', ?, ?, 'System', 'Michelin', '2000-01-01', true, true) "
+                            + "ON CONFLICT (id) DO NOTHING")) {
+                systemStmt.setObject(1, java.util.UUID.nameUUIDFromBytes(systemIdBytes), Types.OTHER);
+                systemStmt.setString(2, systemHash);
+                systemStmt.setString(3, systemSalt);
+                systemStmt.execute();
+            }
 
             return true;
         } catch (SQLException ex) {
