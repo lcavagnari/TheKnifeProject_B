@@ -13,7 +13,7 @@ import java.util.UUID;
 public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
 
     public JsonCustomerDAO(AuthServiceInter authService) {
-        super("customers.json", authService);
+        super(authService);
     }
 
     @Override
