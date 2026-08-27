@@ -54,11 +54,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         Set<CuisineType> cuisinesTypes = findCuisines(restaurantId);
         Set<String> services = findServices(restaurantId);
 
-        String priceDesc = rs.getString("price_desc");
-
-        PriceRange priceRange = (priceDesc != null && !priceDesc.isBlank())
-                ? PriceRange.byDollarAmount(priceDesc.length())
-                : PriceRange.MODERATE;
+        PriceRange priceRange = PriceRange.byDollarAmount(rs.getInt("price_range"));
         Award award = Award.fromInt(rs.getInt("award"));
 
         return new Restaurant(
@@ -84,9 +80,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
         String query = """
                 SELECT r.id, r.owner_id, r.name, r.description, r.web_url, r.phone_number,
                        r.award, r.green_star, r.has_delivery, r.has_booking, r.latitude, r.longitude,
-                       pr.description AS price_desc
+                       r.price_range
                 FROM restaurant r
-                LEFT JOIN price_range pr ON r.price_range = pr.id
                 WHERE r.id = ?
                 """;
         try (Connection conn = Database.getConnection();
@@ -109,9 +104,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
         String query = """
                 SELECT r.id, r.owner_id, r.name, r.description, r.web_url, r.phone_number,
                        r.award, r.green_star, r.has_delivery, r.has_booking, r.latitude, r.longitude,
-                       pr.description AS price_desc
+                       r.price_range
                 FROM restaurant r
-                LEFT JOIN price_range pr ON r.price_range = pr.id
                 """;
         try (Connection conn = Database.getConnection();
              Statement stmt = conn.createStatement();
@@ -132,9 +126,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
         String query = """
                 SELECT r.id, r.owner_id, r.name, r.description, r.web_url, r.phone_number,
                        r.award, r.green_star, r.has_delivery, r.has_booking, r.latitude, r.longitude,
-                       pr.description AS price_desc
+                       r.price_range
                 FROM restaurant r
-                LEFT JOIN price_range pr ON r.price_range = pr.id
                 LIMIT ? OFFSET ?
                 """;
         try (Connection conn = Database.getConnection();
@@ -168,9 +161,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
         String query = """
                 SELECT r.id, r.owner_id, r.name, r.description, r.web_url, r.phone_number,
                        r.award, r.green_star, r.has_delivery, r.has_booking, r.latitude, r.longitude,
-                       pr.description AS price_desc
+                       r.price_range
                 FROM restaurant r
-                LEFT JOIN price_range pr ON r.price_range = pr.id
                 WHERE r.owner_id = ?
                 """;
         try (Connection conn = Database.getConnection();
@@ -201,7 +193,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     try {
-                        cuisines.add(CuisineType.valueOf(rs.getString("description")));
+                        cuisines.add(CuisineType.valueOf(rs.getString("description").toUpperCase()));
                     } catch (Exception ignored) {
                     }
                 }
@@ -258,6 +250,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
             stmt.setBoolean(11, restaurant.isHasOnlineBooking());
 
             if (restaurant.getLocation() != null) {
+                locationDAO.save(restaurant.getLocation());
                 stmt.setDouble(12, restaurant.getLocation().getLatitude());
                 stmt.setDouble(13, restaurant.getLocation().getLongitude());
             } else {
@@ -296,6 +289,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
             stmt.setBoolean(10, restaurant.isHasOnlineBooking());
 
             if (restaurant.getLocation() != null) {
+                locationDAO.save(restaurant.getLocation());
                 stmt.setDouble(11, restaurant.getLocation().getLatitude());
                 stmt.setDouble(12, restaurant.getLocation().getLongitude());
             } else {
@@ -328,7 +322,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
     public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) {
         String deleteQuery = "DELETE FROM restaurant_cuisine WHERE restaurant_id = ?";
         String insertQuery = "INSERT INTO restaurant_cuisine (restaurant_id, type) VALUES (?, ?)";
-        String findTypeQuery = "SELECT id FROM cuisine_type WHERE description = ?";
+        String findTypeQuery = "SELECT id FROM cuisine_type WHERE LOWER(description) = LOWER(?)";
 
         try (Connection conn = Database.getConnection()) {
             conn.setAutoCommit(false);
@@ -350,7 +344,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 }
 
                 if (typeId == -1) {
-                    String insertTypeQuery = "INSERT INTO cuisine_type (id, description) VALUES (DEFAULT, ?) RETURNING id";
+                    String insertTypeQuery = "INSERT INTO cuisine_type (id, description) "
+                            + "VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM cuisine_type), ?) RETURNING id";
                     try (PreparedStatement insertTypeStmt = conn.prepareStatement(insertTypeQuery)) {
                         insertTypeStmt.setString(1, cuisine.name());
                         try (ResultSet rs = insertTypeStmt.executeQuery()) {
@@ -385,7 +380,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
     public boolean updateServices(UUID restaurantId, Set<String> services) {
         String deleteQuery = "DELETE FROM restaurant_services WHERE restaurant_id = ?";
         String insertQuery = "INSERT INTO restaurant_services (restaurant_id, service) VALUES (?, ?)";
-        String findServiceQuery = "SELECT id FROM services_and_facilities WHERE description = ?";
+        String findServiceQuery = "SELECT id FROM services_and_facilities WHERE LOWER(description) = LOWER(?)";
 
         try (Connection conn = Database.getConnection()) {
             conn.setAutoCommit(false);
@@ -407,7 +402,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 }
 
                 if (serviceId == -1) {
-                    String insertServiceQuery = "INSERT INTO services_and_facilities (id, description) VALUES (DEFAULT, ?) RETURNING id";
+                    String insertServiceQuery = "INSERT INTO services_and_facilities (id, description) "
+                            + "VALUES ((SELECT COALESCE(MAX(id), 0) + 1 FROM services_and_facilities), ?) RETURNING id";
                     try (PreparedStatement insertServiceStmt = conn.prepareStatement(insertServiceQuery)) {
                         insertServiceStmt.setString(1, service);
                         try (ResultSet rs = insertServiceStmt.executeQuery()) {
