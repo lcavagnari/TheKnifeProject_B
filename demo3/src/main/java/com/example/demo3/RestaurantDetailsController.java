@@ -139,7 +139,7 @@ public class RestaurantDetailsController {
             sb.append(i <= filledStars ? "★" : "☆");
         }
         Label starLabel = new Label(sb.toString());
-        starLabel.setStyle("-fx-text-fill: #FFD700; -fx-font-size: 28px; -fx-padding: 0;");
+        starLabel.setStyle("-fx-text-fill: #CDA532; -fx-font-weight: bold; -fx-font-size: 28px; -fx-padding: 0;");
         starLabel.setPadding(Insets.EMPTY);
         starsFlow.getChildren().setAll(starLabel);
 
