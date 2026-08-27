@@ -19,45 +19,27 @@ public class AuthRemoteImpl extends UnicastRemoteObject implements AuthServiceIn
     public AuthRemoteImpl() throws RemoteException {}
 
     // TODO: add auth implementation via token and session context
-
     @Override
-    public User loginCustomer(String username, String password) throws RemoteException {
+    public User login(String username, String password) throws RemoteException {
         User cached = Loader.findUserByName(username);
-        if (cached instanceof Customer) {
-            Customer customer = (Customer) cached;
-            if (PasswordHasher.verify(password, customer.getPasswordSalt(), customer.getPasswordHash())) return customer;
-            else throw new RemoteException("Invalid password");
-        }
-        Customer customer = cDAO.findByUsername(username).orElseThrow(() -> new RemoteException("Username not found"));
-        if (PasswordHasher.verify(password, customer.getPasswordSalt(), customer.getPasswordHash())) return customer;
-        else throw new RemoteException("Invalid password");
-    }
 
-    @Override
-    public User loginOwner(String username, String password) throws RemoteException {
-        User cached = Loader.findUserByName(username);
-        if (cached instanceof Owner) {
-            Owner owner = (Owner) cached;
-            if (PasswordHasher.verify(password, owner.getPasswordSalt(), owner.getPasswordHash())) return owner;
-            else throw new RemoteException("Invalid password");
-        }
-        Owner owner = oDAO.findByUsername(username).orElseThrow(() -> new RemoteException("Username not found"));
-        if (PasswordHasher.verify(password, owner.getPasswordSalt(), owner.getPasswordHash())) return owner;
-        else throw new RemoteException("Invalid password");
+        if (cached == null) throw new RemoteException("Error occurred during login");
+
+        if (PasswordHasher.verify(password, cached.getPasswordSalt(), cached.getPasswordHash())) return cached;
+        else throw new RemoteException("Invalid user or password");
     }
 
     @Override
     public User register(User utente) throws RemoteException {
-        if (utente == null) throw new RemoteException("User is null");
-        if (utente instanceof Customer) {
-            cDAO.save((Customer) utente);
-        } else if (utente instanceof Owner) {
-            oDAO.save((Owner) utente);
-        } else {
-            throw new RemoteException("Unsupported user type: " + utente.getClass().getSimpleName());
-        }
-        Loader.getAllUsersById().put(utente.getId(), utente);
-        Loader.getAllUsersByName().put(utente.getUsername(), utente);
+        if (utente == null) throw new RemoteException("No user was provided");
+        else if (Loader.findUserById(utente.getId()) != null) throw new RemoteException("Error occurred during registration");
+
+
+        if (utente instanceof Customer) cDAO.save((Customer) utente);
+        else if (utente instanceof Owner) oDAO.save((Owner) utente);
+        else throw new RemoteException("Unsupported user type: " + utente.getClass().getSimpleName());
+
+        Loader.addUser(utente);
         return utente;
     }
 }
