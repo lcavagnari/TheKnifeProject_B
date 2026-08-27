@@ -9,10 +9,12 @@ import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.User;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,12 +23,14 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
     protected final File storeFile;
+    protected final AuthServiceInter authService;
     protected final ConcurrentHashMap<UUID, T> cacheById = new ConcurrentHashMap<>();
     protected final ConcurrentHashMap<String, T> cacheByUsername = new ConcurrentHashMap<>();
     private volatile boolean cacheLoaded = false;
 
-    protected JsonUserDAO(String fileName) {
+    protected JsonUserDAO(String fileName, AuthServiceInter authService) {
         this.storeFile = new File(Constants.ROOT, fileName);
+        this.authService = authService;
     }
 
     protected abstract T mapNode(JsonNode node);
@@ -161,6 +165,11 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         cacheById.put(user.getId(), user);
         cacheByUsername.put(user.getUsername(), user);
         persistAtomic(toArrayNode());
+        if (authService != null) {
+            try { authService.register(user); } catch (RemoteException e) {
+                System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
+            }
+        }
         return true;
     }
 
@@ -186,4 +195,30 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         persistAtomic(toArrayNode());
         return true;
     }
+
+    @SuppressWarnings("unchecked")
+    public Optional<T> login(String username, String password) {
+        ensureCacheLoaded();
+        T cached = cacheByUsername.get(username);
+        if (cached != null) return Optional.of(cached);
+        if (authService != null) {
+            try {
+                User remote = isOwner()
+                        ? authService.loginOwner(username, password)
+                        : authService.loginCustomer(username, password);
+                if (remote != null) {
+                    T entity = (T) remote;
+                    cacheById.put(entity.getId(), entity);
+                    cacheByUsername.put(entity.getUsername(), entity);
+                    persistAtomic(toArrayNode());
+                    return Optional.of(entity);
+                }
+            } catch (RemoteException e) {
+                System.err.println("RMI login " + getClass().getSimpleName() + ": " + e.getMessage());
+            }
+        }
+        return Optional.empty();
+    }
+
+    protected abstract boolean isOwner();
 }

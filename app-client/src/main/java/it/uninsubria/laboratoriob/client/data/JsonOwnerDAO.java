@@ -4,11 +4,17 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.objects.Owner;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
 public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
 
-    public JsonOwnerDAO() {
-        super("owners.json");
+    public JsonOwnerDAO(AuthServiceInter authService) {
+        super("owners.json", authService);
+    }
+
+    @Override
+    protected boolean isOwner() {
+        return true;
     }
 
     @Override
