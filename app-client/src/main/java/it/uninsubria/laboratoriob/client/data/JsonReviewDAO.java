@@ -12,20 +12,15 @@ import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Implementazione JSON del DAO per l'entità {@link Review}.
- * <p>
- * Gestisce le operazioni CRUD sulle recensioni usando file JSON come storage locale.
- * </p>
- */
 public final class JsonReviewDAO implements DAO<Review> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -33,30 +28,57 @@ public final class JsonReviewDAO implements DAO<Review> {
     private final JsonCustomerDAO customerDAO;
     private final ReviewServiceInter service;
 
+    private final ConcurrentHashMap<UUID, Review> cacheById = new ConcurrentHashMap<>();
+    private volatile boolean cacheLoaded = false;
+
     public JsonReviewDAO(JsonCustomerDAO customerDAO, ReviewServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "reviews.json");
         this.customerDAO = customerDAO;
         this.service = service;
     }
 
-    private ArrayNode loadAll() {
-        if (!storeFile.exists()) return mapper.createArrayNode();
-        try {
-            JsonNode node = mapper.readTree(storeFile);
-            return node.isArray() ? (ArrayNode) node : mapper.createArrayNode();
-        } catch (IOException e) {
-            System.err.println("Errore loadAll in JsonReviewDAO: " + e.getMessage());
-            return mapper.createArrayNode();
+    private void ensureCacheLoaded() {
+        if (cacheLoaded) return;
+        synchronized (this) {
+            if (cacheLoaded) return;
+            loadFromDisk();
+            cacheLoaded = true;
         }
     }
 
-    private void persist(ArrayNode array) {
+    private void loadFromDisk() {
+        cacheById.clear();
+        if (!storeFile.exists()) return;
+        try {
+            JsonNode node = mapper.readTree(storeFile);
+            if (!node.isArray()) return;
+            for (JsonNode n : (ArrayNode) node) {
+                Review review = mapNode(n);
+                cacheById.put(review.getId(), review);
+            }
+        } catch (IOException e) {
+            System.err.println("Errore loadFromDisk in JsonReviewDAO: " + e.getMessage());
+        }
+    }
+
+    private void persistAtomic(ArrayNode array) {
         try {
             if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(storeFile, array);
+            File tmp = File.createTempFile("reviews_", ".json", storeFile.getParentFile());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(tmp, array);
+            Files.move(tmp.toPath(), storeFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            System.err.println("Errore persist in JsonReviewDAO: " + e.getMessage());
+            System.err.println("Errore persistAtomic in JsonReviewDAO: " + e.getMessage());
         }
+    }
+
+    private ArrayNode toArrayNode() {
+        ArrayNode array = mapper.createArrayNode();
+        for (Review review : cacheById.values()) {
+            array.add(toNode(review));
+        }
+        return array;
     }
 
     private Review mapNode(JsonNode node) {
@@ -90,28 +112,23 @@ public final class JsonReviewDAO implements DAO<Review> {
 
     @Override
     public Optional<Review> findById(UUID id) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(id.toString())) {
-                return Optional.of(mapNode(node));
-            }
-        }
+        ensureCacheLoaded();
+        Review cached = cacheById.get(id);
+        if (cached != null) return Optional.of(cached);
         return Optional.empty();
     }
 
     @Override
     public List<Review> findAll() {
-        ArrayNode array = loadAll();
-        List<Review> local = new ArrayList<>();
-        for (JsonNode node : array) {
-            local.add(mapNode(node));
-        }
+        ensureCacheLoaded();
+        List<Review> local = new ArrayList<>(cacheById.values());
         if (!local.isEmpty()) return local;
         if (service != null) {
             try {
                 List<Review> remote = service.findAll();
-                remote.forEach(this::save);
-                return remote;
+                for (Review r : remote) cacheById.put(r.getId(), r);
+                persistAtomic(toArrayNode());
+                return new ArrayList<>(cacheById.values());
             } catch (RemoteException e) {
                 System.err.println("RMI fallback findAll review: " + e.getMessage());
             }
@@ -128,18 +145,21 @@ public final class JsonReviewDAO implements DAO<Review> {
 
     @Override
     public long count() {
-        return loadAll().size();
+        ensureCacheLoaded();
+        return cacheById.size();
     }
 
     public List<Review> findByRestaurant(UUID restaurantId) {
-        List<Review> local = findAll().stream()
+        ensureCacheLoaded();
+        List<Review> local = cacheById.values().stream()
                 .filter(r -> r.getRestaurant() != null && r.getRestaurant().getId().equals(restaurantId))
-                .collect(Collectors.toList());
+                .toList();
         if (!local.isEmpty()) return local;
         if (service != null) {
             try {
                 List<Review> remote = service.findByRestaurant(restaurantId);
-                remote.forEach(this::save);
+                for (Review r : remote) cacheById.put(r.getId(), r);
+                persistAtomic(toArrayNode());
                 return remote;
             } catch (RemoteException e) {
                 System.err.println("RMI fallback findByRestaurant review: " + e.getMessage());
@@ -148,17 +168,32 @@ public final class JsonReviewDAO implements DAO<Review> {
         return local;
     }
 
+    public List<Review> findByUser(UUID userId) {
+        ensureCacheLoaded();
+        List<Review> local = cacheById.values().stream()
+                .filter(r -> r.getUser() != null && r.getUser().getId().equals(userId))
+                .toList();
+        if (!local.isEmpty()) return local;
+        if (service != null) {
+            try {
+                List<Review> remote = service.findByUser(userId);
+                for (Review r : remote) cacheById.put(r.getId(), r);
+                persistAtomic(toArrayNode());
+                return remote;
+            } catch (RemoteException e) {
+                System.err.println("RMI fallback findByUser review: " + e.getMessage());
+            }
+        }
+        return local;
+    }
+
     @Override
     public boolean save(Review review) {
         if (review == null) return false;
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(review.getId().toString())) {
-                return false;
-            }
-        }
-        array.add(toNode(review));
-        persist(array);
+        ensureCacheLoaded();
+        if (cacheById.containsKey(review.getId())) return false;
+        cacheById.put(review.getId(), review);
+        persistAtomic(toArrayNode());
         if (service != null) {
             try { service.save(review); } catch (RemoteException e) {
                 System.err.println("RMI sync save review: " + e.getMessage());
@@ -170,37 +205,29 @@ public final class JsonReviewDAO implements DAO<Review> {
     @Override
     public boolean update(Review review) {
         if (review == null) return false;
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(review.getId().toString())) {
-                array.set(i, toNode(review));
-                persist(array);
-                if (service != null) {
-                    try { service.update(review); } catch (RemoteException e) {
-                        System.err.println("RMI sync update review: " + e.getMessage());
-                    }
-                }
-                return true;
+        ensureCacheLoaded();
+        if (!cacheById.containsKey(review.getId())) return false;
+        cacheById.put(review.getId(), review);
+        persistAtomic(toArrayNode());
+        if (service != null) {
+            try { service.update(review); } catch (RemoteException e) {
+                System.err.println("RMI sync update review: " + e.getMessage());
             }
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean delete(UUID id) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(id.toString())) {
-                array.remove(i);
-                persist(array);
-                if (service != null) {
-                    try { service.delete(id); } catch (RemoteException e) {
-                        System.err.println("RMI sync delete review: " + e.getMessage());
-                    }
-                }
-                return true;
+        ensureCacheLoaded();
+        Review removed = cacheById.remove(id);
+        if (removed == null) return false;
+        persistAtomic(toArrayNode());
+        if (service != null) {
+            try { service.delete(id); } catch (RemoteException e) {
+                System.err.println("RMI sync delete review: " + e.getMessage());
             }
         }
-        return false;
+        return true;
     }
 }

@@ -17,47 +17,69 @@ import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/**
- * Implementazione JSON del DAO per l'entità {@link Restaurant}.
- * <p>
- * Gestisce le operazioni CRUD sui ristoranti usando file JSON come storage locale.
- * I dati vengono memorizzati in un singolo file JSON array.
- * </p>
- */
 public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
     private final RestaurantServiceInter service;
 
+    private final ConcurrentHashMap<UUID, Restaurant> cacheById = new ConcurrentHashMap<>();
+    private volatile boolean cacheLoaded = false;
+
     public JsonRestaurantDAO(RestaurantServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "restaurants.json");
         this.service = service;
     }
 
-    private ArrayNode loadAll() {
-        if (!storeFile.exists()) return mapper.createArrayNode();
-        try {
-            JsonNode node = mapper.readTree(storeFile);
-            return node.isArray() ? (ArrayNode) node : mapper.createArrayNode();
-        } catch (IOException e) {
-            System.err.println("Errore loadAll in JsonRestaurantDAO: " + e.getMessage());
-            return mapper.createArrayNode();
+    private void ensureCacheLoaded() {
+        if (cacheLoaded) return;
+        synchronized (this) {
+            if (cacheLoaded) return;
+            loadFromDisk();
+            cacheLoaded = true;
         }
     }
 
-    private void persist(ArrayNode array) {
+    private void loadFromDisk() {
+        cacheById.clear();
+        if (!storeFile.exists()) return;
+        try {
+            JsonNode node = mapper.readTree(storeFile);
+            if (!node.isArray()) return;
+            for (JsonNode n : (ArrayNode) node) {
+                Restaurant r = mapNode(n);
+                cacheById.put(r.getId(), r);
+            }
+        } catch (IOException e) {
+            System.err.println("Errore loadFromDisk in JsonRestaurantDAO: " + e.getMessage());
+        }
+    }
+
+    private void persistAtomic(ArrayNode array) {
         try {
             if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(storeFile, array);
+            File tmp = File.createTempFile("restaurants_", ".json", storeFile.getParentFile());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(tmp, array);
+            Files.move(tmp.toPath(), storeFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            System.err.println("Errore persist in JsonRestaurantDAO: " + e.getMessage());
+            System.err.println("Errore persistAtomic in JsonRestaurantDAO: " + e.getMessage());
         }
+    }
+
+    private ArrayNode toArrayNode() {
+        ArrayNode array = mapper.createArrayNode();
+        for (Restaurant r : cacheById.values()) {
+            array.add(toNode(r));
+        }
+        return array;
     }
 
     private Restaurant mapNode(JsonNode node) {
@@ -162,17 +184,17 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     @Override
     public Optional<Restaurant> findById(UUID id) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(id.toString())) {
-                return Optional.of(mapNode(node));
-            }
-        }
+        ensureCacheLoaded();
+        Restaurant cached = cacheById.get(id);
+        if (cached != null) return Optional.of(cached);
         if (service != null) {
             try {
-                Optional<Restaurant> remote = service.findById(id);
-                remote.ifPresent(this::save);
-                return remote;
+                Restaurant remote = service.findById(id);
+                if (remote != null) {
+                    cacheById.put(remote.getId(), remote);
+                    persistAtomic(toArrayNode());
+                    return Optional.of(remote);
+                }
             } catch (RemoteException e) {
                 System.err.println("RMI fallback findById restaurant: " + e.getMessage());
             }
@@ -182,17 +204,15 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     @Override
     public List<Restaurant> findAll() {
-        ArrayNode array = loadAll();
-        List<Restaurant> local = new ArrayList<>();
-        for (JsonNode node : array) {
-            local.add(mapNode(node));
-        }
+        ensureCacheLoaded();
+        List<Restaurant> local = new ArrayList<>(cacheById.values());
         if (!local.isEmpty()) return local;
         if (service != null) {
             try {
                 List<Restaurant> remote = service.findAll(0, 1000);
-                remote.forEach(this::save);
-                return remote;
+                for (Restaurant r : remote) cacheById.put(r.getId(), r);
+                persistAtomic(toArrayNode());
+                return new ArrayList<>(cacheById.values());
             } catch (RemoteException e) {
                 System.err.println("RMI fallback findAll restaurant: " + e.getMessage());
             }
@@ -209,8 +229,8 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     @Override
     public long count() {
-        ArrayNode array = loadAll();
-        if (array.size() > 0) return array.size();
+        ensureCacheLoaded();
+        if (!cacheById.isEmpty()) return cacheById.size();
         if (service != null) {
             try {
                 return service.count();
@@ -222,14 +242,16 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     }
 
     public List<Restaurant> findByOwner(UUID ownerId) {
-        List<Restaurant> local = findAll().stream()
+        ensureCacheLoaded();
+        List<Restaurant> local = cacheById.values().stream()
                 .filter(r -> r.getOwner() != null && r.getOwner().getId().equals(ownerId))
                 .collect(Collectors.toList());
         if (!local.isEmpty()) return local;
         if (service != null) {
             try {
                 List<Restaurant> remote = service.findByOwner(ownerId);
-                remote.forEach(this::save);
+                for (Restaurant r : remote) cacheById.put(r.getId(), r);
+                persistAtomic(toArrayNode());
                 return remote;
             } catch (RemoteException e) {
                 System.err.println("RMI fallback findByOwner restaurant: " + e.getMessage());
@@ -241,14 +263,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     @Override
     public boolean save(Restaurant restaurant) {
         if (restaurant == null) return false;
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(restaurant.getId().toString())) {
-                return false;
-            }
-        }
-        array.add(toNode(restaurant));
-        persist(array);
+        ensureCacheLoaded();
+        if (cacheById.containsKey(restaurant.getId())) return false;
+        cacheById.put(restaurant.getId(), restaurant);
+        persistAtomic(toArrayNode());
         if (service != null) {
             try { service.save(restaurant); } catch (RemoteException e) {
                 System.err.println("RMI sync save restaurant: " + e.getMessage());
@@ -260,77 +278,59 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     @Override
     public boolean update(Restaurant restaurant) {
         if (restaurant == null) return false;
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(restaurant.getId().toString())) {
-                array.set(i, toNode(restaurant));
-                persist(array);
-                if (service != null) {
-                    try { service.update(restaurant); } catch (RemoteException e) {
-                        System.err.println("RMI sync update restaurant: " + e.getMessage());
-                    }
-                }
-                return true;
+        ensureCacheLoaded();
+        if (!cacheById.containsKey(restaurant.getId())) return false;
+        cacheById.put(restaurant.getId(), restaurant);
+        persistAtomic(toArrayNode());
+        if (service != null) {
+            try { service.update(restaurant); } catch (RemoteException e) {
+                System.err.println("RMI sync update restaurant: " + e.getMessage());
             }
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean delete(UUID id) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(id.toString())) {
-                array.remove(i);
-                persist(array);
-                if (service != null) {
-                    try { service.delete(id); } catch (RemoteException e) {
-                        System.err.println("RMI sync delete restaurant: " + e.getMessage());
-                    }
-                }
-                return true;
+        ensureCacheLoaded();
+        Restaurant removed = cacheById.remove(id);
+        if (removed == null) return false;
+        persistAtomic(toArrayNode());
+        if (service != null) {
+            try { service.delete(id); } catch (RemoteException e) {
+                System.err.println("RMI sync delete restaurant: " + e.getMessage());
             }
         }
-        return false;
+        return true;
     }
 
     public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(restaurantId.toString())) {
-                ObjectNode node = (ObjectNode) array.get(i);
-                ArrayNode cuisinesArray = mapper.createArrayNode();
-                cuisines.forEach(c -> cuisinesArray.add(c.name()));
-                node.set("cuisinesTypes", cuisinesArray);
-                persist(array);
-                if (service != null) {
-                    try { service.updateCuisines(restaurantId, cuisines); } catch (RemoteException e) {
-                        System.err.println("RMI sync updateCuisines: " + e.getMessage());
-                    }
-                }
-                return true;
+        ensureCacheLoaded();
+        Restaurant r = cacheById.get(restaurantId);
+        if (r == null) return false;
+        r.getCuisinesTypes().clear();
+        r.getCuisinesTypes().addAll(cuisines);
+        persistAtomic(toArrayNode());
+        if (service != null) {
+            try { service.updateCuisines(restaurantId, cuisines); } catch (RemoteException e) {
+                System.err.println("RMI sync updateCuisines: " + e.getMessage());
             }
         }
-        return false;
+        return true;
     }
 
     public boolean updateServices(UUID restaurantId, Set<String> services) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(restaurantId.toString())) {
-                ObjectNode node = (ObjectNode) array.get(i);
-                ArrayNode servicesArray = mapper.createArrayNode();
-                services.forEach(servicesArray::add);
-                node.set("services", servicesArray);
-                persist(array);
-                if (service != null) {
-                    try { service.updateServices(restaurantId, services); } catch (RemoteException e) {
-                        System.err.println("RMI sync updateServices: " + e.getMessage());
-                    }
-                }
-                return true;
+        ensureCacheLoaded();
+        Restaurant r = cacheById.get(restaurantId);
+        if (r == null) return false;
+        r.getServices().clear();
+        r.getServices().addAll(services);
+        persistAtomic(toArrayNode());
+        if (service != null) {
+            try { service.updateServices(restaurantId, services); } catch (RemoteException e) {
+                System.err.println("RMI sync updateServices: " + e.getMessage());
             }
         }
-        return false;
+        return true;
     }
 }

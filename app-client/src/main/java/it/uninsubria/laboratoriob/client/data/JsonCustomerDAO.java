@@ -13,45 +13,70 @@ import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Implementazione JSON del DAO per l'entità {@link Customer}.
- * <p>
- * Gestisce le operazioni CRUD sui clienti usando file JSON come storage locale.
- * I dati vengono memorizzati in un singolo file JSON array.
- * </p>
- */
 public final class JsonCustomerDAO implements DAO<Customer> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
     private final AuthServiceInter service;
 
+    private final ConcurrentHashMap<UUID, Customer> cacheById = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Customer> cacheByUsername = new ConcurrentHashMap<>();
+    private volatile boolean cacheLoaded = false;
+
     public JsonCustomerDAO(AuthServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "customers.json");
         this.service = service;
     }
 
-    private ArrayNode loadAll() {
-        if (!storeFile.exists()) return mapper.createArrayNode();
-        try {
-            JsonNode node = mapper.readTree(storeFile);
-            return node.isArray() ? (ArrayNode) node : mapper.createArrayNode();
-        } catch (IOException e) {
-            System.err.println("Errore loadAll in JsonCustomerDAO: " + e.getMessage());
-            return mapper.createArrayNode();
+    private void ensureCacheLoaded() {
+        if (cacheLoaded) return;
+        synchronized (this) {
+            if (cacheLoaded) return;
+            loadFromDisk();
+            cacheLoaded = true;
         }
     }
 
-    private void persist(ArrayNode array) {
+    private void loadFromDisk() {
+        cacheById.clear();
+        cacheByUsername.clear();
+        if (!storeFile.exists()) return;
+        try {
+            JsonNode node = mapper.readTree(storeFile);
+            if (!node.isArray()) return;
+            for (JsonNode n : (ArrayNode) node) {
+                Customer customer = mapNode(n);
+                cacheById.put(customer.getId(), customer);
+                cacheByUsername.put(customer.getUsername(), customer);
+            }
+        } catch (IOException e) {
+            System.err.println("Errore loadFromDisk in JsonCustomerDAO: " + e.getMessage());
+        }
+    }
+
+    private void persistAtomic(ArrayNode array) {
         try {
             if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(storeFile, array);
+            File tmp = File.createTempFile("customers_", ".json", storeFile.getParentFile());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(tmp, array);
+            Files.move(tmp.toPath(), storeFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            System.err.println("Errore persist in JsonCustomerDAO: " + e.getMessage());
+            System.err.println("Errore persistAtomic in JsonCustomerDAO: " + e.getMessage());
         }
+    }
+
+    private ArrayNode toArrayNode() {
+        ArrayNode array = mapper.createArrayNode();
+        for (Customer customer : cacheById.values()) {
+            array.add(toNode(customer));
+        }
+        return array;
     }
 
     private Customer mapNode(JsonNode node) {
@@ -117,33 +142,23 @@ public final class JsonCustomerDAO implements DAO<Customer> {
 
     @Override
     public Optional<Customer> findById(UUID id) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(id.toString())) {
-                return Optional.of(mapNode(node));
-            }
-        }
+        ensureCacheLoaded();
+        Customer cached = cacheById.get(id);
+        if (cached != null) return Optional.of(cached);
         return Optional.empty();
     }
 
     public Optional<Customer> findByUsername(String username) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("username").asText().equals(username)) {
-                return Optional.of(mapNode(node));
-            }
-        }
+        ensureCacheLoaded();
+        Customer cached = cacheByUsername.get(username);
+        if (cached != null) return Optional.of(cached);
         return Optional.empty();
     }
 
     @Override
     public List<Customer> findAll() {
-        ArrayNode array = loadAll();
-        List<Customer> customers = new ArrayList<>();
-        for (JsonNode node : array) {
-            customers.add(mapNode(node));
-        }
-        return customers;
+        ensureCacheLoaded();
+        return new ArrayList<>(cacheById.values());
     }
 
     @Override
@@ -155,68 +170,65 @@ public final class JsonCustomerDAO implements DAO<Customer> {
 
     @Override
     public long count() {
-        return loadAll().size();
+        ensureCacheLoaded();
+        return cacheById.size();
     }
 
     @Override
     public boolean save(Customer customer) {
         if (customer == null) return false;
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(customer.getId().toString())) {
-                return false;
-            }
-        }
-        array.add(toNode(customer));
-        persist(array);
+        ensureCacheLoaded();
+        if (cacheById.containsKey(customer.getId())) return false;
+        cacheById.put(customer.getId(), customer);
+        cacheByUsername.put(customer.getUsername(), customer);
+        persistAtomic(toArrayNode());
         return true;
     }
 
     @Override
     public boolean update(Customer customer) {
         if (customer == null) return false;
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(customer.getId().toString())) {
-                array.set(i, toNode(customer));
-                persist(array);
-                return true;
-            }
-        }
-        return false;
+        ensureCacheLoaded();
+        Customer old = cacheById.get(customer.getId());
+        if (old == null) return false;
+        cacheByUsername.remove(old.getUsername());
+        cacheById.put(customer.getId(), customer);
+        cacheByUsername.put(customer.getUsername(), customer);
+        persistAtomic(toArrayNode());
+        return true;
     }
 
     @Override
     public boolean delete(UUID id) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(id.toString())) {
-                array.remove(i);
-                persist(array);
-                return true;
-            }
-        }
-        return false;
+        ensureCacheLoaded();
+        Customer removed = cacheById.remove(id);
+        if (removed == null) return false;
+        cacheByUsername.remove(removed.getUsername());
+        persistAtomic(toArrayNode());
+        return true;
     }
 
     public boolean addFavourite(UUID customerId, UUID restaurantId) {
-        Optional<Customer> opt = findById(customerId);
-        if (opt.isEmpty()) return false;
-        Customer customer = opt.get();
+        ensureCacheLoaded();
+        Customer customer = cacheById.get(customerId);
+        if (customer == null) return false;
         customer.getFavouriteRestourants().add(restaurantId);
-        return update(customer);
+        persistAtomic(toArrayNode());
+        return true;
     }
 
     public boolean removeFavourite(UUID customerId, UUID restaurantId) {
-        Optional<Customer> opt = findById(customerId);
-        if (opt.isEmpty()) return false;
-        Customer customer = opt.get();
+        ensureCacheLoaded();
+        Customer customer = cacheById.get(customerId);
+        if (customer == null) return false;
         customer.getFavouriteRestourants().remove(restaurantId);
-        return update(customer);
+        persistAtomic(toArrayNode());
+        return true;
     }
 
     public Set<UUID> findFavourites(UUID customerId) {
-        Optional<Customer> opt = findById(customerId);
-        return opt.map(Customer::getFavouriteRestourants).orElse(Set.of());
+        ensureCacheLoaded();
+        Customer customer = cacheById.get(customerId);
+        return customer != null ? Set.copyOf(customer.getFavouriteRestourants()) : Set.of();
     }
 }

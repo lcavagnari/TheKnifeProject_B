@@ -16,7 +16,7 @@ import java.util.UUID;
 public class RestaurantServiceImpl extends UnicastRemoteObject implements RestaurantServiceInter {
     private final RestaurantDAO rDAO = new RestaurantDAO();
 
-    protected RestaurantServiceImpl() throws RemoteException {
+    public RestaurantServiceImpl() throws RemoteException {
     }
 
     @Override

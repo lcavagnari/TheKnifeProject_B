@@ -13,44 +13,70 @@ import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Implementazione JSON del DAO per l'entità {@link Owner}.
- * <p>
- * Gestisce le operazioni CRUD sui proprietari usando file JSON come storage locale.
- * </p>
- */
 public final class JsonOwnerDAO implements DAO<Owner> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
     private final AuthServiceInter service;
 
+    private final ConcurrentHashMap<UUID, Owner> cacheById = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Owner> cacheByUsername = new ConcurrentHashMap<>();
+    private volatile boolean cacheLoaded = false;
+
     public JsonOwnerDAO(AuthServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "owners.json");
         this.service = service;
     }
 
-    private ArrayNode loadAll() {
-        if (!storeFile.exists()) return mapper.createArrayNode();
-        try {
-            JsonNode node = mapper.readTree(storeFile);
-            return node.isArray() ? (ArrayNode) node : mapper.createArrayNode();
-        } catch (IOException e) {
-            System.err.println("Errore loadAll in JsonOwnerDAO: " + e.getMessage());
-            return mapper.createArrayNode();
+    private void ensureCacheLoaded() {
+        if (cacheLoaded) return;
+        synchronized (this) {
+            if (cacheLoaded) return;
+            loadFromDisk();
+            cacheLoaded = true;
         }
     }
 
-    private void persist(ArrayNode array) {
+    private void loadFromDisk() {
+        cacheById.clear();
+        cacheByUsername.clear();
+        if (!storeFile.exists()) return;
+        try {
+            JsonNode node = mapper.readTree(storeFile);
+            if (!node.isArray()) return;
+            for (JsonNode n : (ArrayNode) node) {
+                Owner owner = mapNode(n);
+                cacheById.put(owner.getId(), owner);
+                cacheByUsername.put(owner.getUsername(), owner);
+            }
+        } catch (IOException e) {
+            System.err.println("Errore loadFromDisk in JsonOwnerDAO: " + e.getMessage());
+        }
+    }
+
+    private void persistAtomic(ArrayNode array) {
         try {
             if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(storeFile, array);
+            File tmp = File.createTempFile("owners_", ".json", storeFile.getParentFile());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(tmp, array);
+            Files.move(tmp.toPath(), storeFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            System.err.println("Errore persist in JsonOwnerDAO: " + e.getMessage());
+            System.err.println("Errore persistAtomic in JsonOwnerDAO: " + e.getMessage());
         }
+    }
+
+    private ArrayNode toArrayNode() {
+        ArrayNode array = mapper.createArrayNode();
+        for (Owner owner : cacheById.values()) {
+            array.add(toNode(owner));
+        }
+        return array;
     }
 
     private Owner mapNode(JsonNode node) {
@@ -73,14 +99,6 @@ public final class JsonOwnerDAO implements DAO<Owner> {
                     locNode.path("longitude").asDouble(),
                     locNode.path("address").asText()
             );
-        }
-
-        Set<UUID> restaurantIds = new HashSet<>();
-        JsonNode restNode = node.path("restaurantIds");
-        if (restNode.isArray()) {
-            for (JsonNode r : restNode) {
-                restaurantIds.add(UUID.fromString(r.asText()));
-            }
         }
 
         return new Owner(id, username, passwordHash, passwordSalt, name, lastName, loc, dateOfBirth, system);
@@ -107,42 +125,28 @@ public final class JsonOwnerDAO implements DAO<Owner> {
             node.set("location", locNode);
         }
 
-        ArrayNode restArray = mapper.createArrayNode();
-        owner.getRestaurantsById().keySet().forEach(id -> restArray.add(id.toString()));
-        node.set("restaurantIds", restArray);
-
         return node;
     }
 
     @Override
     public Optional<Owner> findById(UUID id) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(id.toString())) {
-                return Optional.of(mapNode(node));
-            }
-        }
+        ensureCacheLoaded();
+        Owner cached = cacheById.get(id);
+        if (cached != null) return Optional.of(cached);
         return Optional.empty();
     }
 
     public Optional<Owner> findByUsername(String username) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("username").asText().equals(username)) {
-                return Optional.of(mapNode(node));
-            }
-        }
+        ensureCacheLoaded();
+        Owner cached = cacheByUsername.get(username);
+        if (cached != null) return Optional.of(cached);
         return Optional.empty();
     }
 
     @Override
     public List<Owner> findAll() {
-        ArrayNode array = loadAll();
-        List<Owner> owners = new ArrayList<>();
-        for (JsonNode node : array) {
-            owners.add(mapNode(node));
-        }
-        return owners;
+        ensureCacheLoaded();
+        return new ArrayList<>(cacheById.values());
     }
 
     @Override
@@ -154,47 +158,41 @@ public final class JsonOwnerDAO implements DAO<Owner> {
 
     @Override
     public long count() {
-        return loadAll().size();
+        ensureCacheLoaded();
+        return cacheById.size();
     }
 
     @Override
     public boolean save(Owner owner) {
         if (owner == null) return false;
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(owner.getId().toString())) {
-                return false;
-            }
-        }
-        array.add(toNode(owner));
-        persist(array);
+        ensureCacheLoaded();
+        if (cacheById.containsKey(owner.getId())) return false;
+        cacheById.put(owner.getId(), owner);
+        cacheByUsername.put(owner.getUsername(), owner);
+        persistAtomic(toArrayNode());
         return true;
     }
 
     @Override
     public boolean update(Owner owner) {
         if (owner == null) return false;
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(owner.getId().toString())) {
-                array.set(i, toNode(owner));
-                persist(array);
-                return true;
-            }
-        }
-        return false;
+        ensureCacheLoaded();
+        Owner old = cacheById.get(owner.getId());
+        if (old == null) return false;
+        cacheByUsername.remove(old.getUsername());
+        cacheById.put(owner.getId(), owner);
+        cacheByUsername.put(owner.getUsername(), owner);
+        persistAtomic(toArrayNode());
+        return true;
     }
 
     @Override
     public boolean delete(UUID id) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(id.toString())) {
-                array.remove(i);
-                persist(array);
-                return true;
-            }
-        }
-        return false;
+        ensureCacheLoaded();
+        Owner removed = cacheById.remove(id);
+        if (removed == null) return false;
+        cacheByUsername.remove(removed.getUsername());
+        persistAtomic(toArrayNode());
+        return true;
     }
 }

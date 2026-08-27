@@ -167,6 +167,17 @@ public class Loader {
         return result;
     }
 
+    private void resolveOwners() {
+        for (Restaurant r : restaurantsById.values()) {
+            if (r.getOwner() != null) {
+                User u = usersById.get(r.getOwner().getId());
+                if (u instanceof Owner) {
+                    r.setOwner((Owner) u);
+                }
+            }
+        }
+    }
+
     private void loadRestaurants() throws CompletionException {
         List<Restaurant> restaurants = CompletableFuture
                 .supplyAsync(restaurantDAO::findAll)
@@ -240,7 +251,7 @@ public class Loader {
         try {
             loadUsers();
             loadRestaurants();
-
+            resolveOwners();
 
         } catch (CompletionException ex) {
             System.err.println("Errore/i durante il caricamento: ");
