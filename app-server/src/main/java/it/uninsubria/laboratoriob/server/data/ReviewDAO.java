@@ -95,6 +95,18 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    @Override
+    public long count() {
+        try (Connection conn = Database.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM review")) {
+            if (rs.next()) return rs.getLong(1);
+        } catch (SQLException e) {
+            System.err.println("Errore count in ReviewDAO: " + e.getMessage());
+        }
+        return 0;
+    }
+
     public List<Review> findByRestaurant(UUID restaurantId) {
         List<Review> reviews = new ArrayList<>();
         String query = """

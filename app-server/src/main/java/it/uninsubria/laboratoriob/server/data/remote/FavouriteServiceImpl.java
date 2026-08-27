@@ -14,7 +14,7 @@ import java.util.UUID;
 public class FavouriteServiceImpl extends UnicastRemoteObject implements FavouriteServiceInter {
     private final CustomerDAO cDAO = new CustomerDAO();
 
-    protected FavouriteServiceImpl() throws RemoteException {
+    public FavouriteServiceImpl() throws RemoteException {
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -98,6 +99,42 @@ public final class LocationDAO implements DAO<Location> {
         }
 
         return locations;
+    }
+
+    @Override
+    public List<Location> findAll(int offset, int limit) {
+        String query = "SELECT * FROM location OFFSET ? LIMIT ?";
+        List<Location> locations = new ArrayList<>();
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, offset);
+            stmt.setInt(2, limit);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    locations.add(new Location(
+                            Nation.fromString(rs.getString("country")),
+                            rs.getString("city"),
+                            rs.getDouble("latitude"),
+                            rs.getDouble("longitude"),
+                            rs.getString("address")));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore findAll(offset,limit) in LocationDAO: " + e.getMessage());
+        }
+        return locations;
+    }
+
+    @Override
+    public long count() {
+        try (Connection conn = Database.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM location")) {
+            if (rs.next()) return rs.getLong(1);
+        } catch (SQLException e) {
+            System.err.println("Errore count in LocationDAO: " + e.getMessage());
+        }
+        return 0;
     }
 
     @Override

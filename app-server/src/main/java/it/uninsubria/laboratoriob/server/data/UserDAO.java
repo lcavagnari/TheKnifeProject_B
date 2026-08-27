@@ -103,6 +103,45 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return users;
     }
 
+    public List<T> findAll(int offset, int limit) {
+        List<T> users = new ArrayList<>();
+
+        final String query = "SELECT id, username, psw_hash, psw_salt, first_name,last_name, latitude, longitude, birth_date, is_system FROM \"user\" where is_owner = " + isOwner + " OFFSET ? LIMIT ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, offset);
+            stmt.setInt(2, limit);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    T user = mapRow(rs);
+                    users.add(user);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.printf("Errore findAll(offset,limit) in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
+        }
+
+        return users;
+    }
+
+    public long count() {
+        final String query = "SELECT COUNT(*) FROM \"user\" where is_owner = " + isOwner;
+
+        try (Connection conn = Database.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) return rs.getLong(1);
+
+        } catch (SQLException e) {
+            System.err.printf("Errore count in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
+        }
+
+        return 0;
+    }
+
     public boolean save(T user) {
         Location loc = user.getLocation();
 

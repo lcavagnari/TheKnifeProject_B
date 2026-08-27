@@ -13,7 +13,7 @@ import java.util.UUID;
 public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
     private final ReviewDAO rDAO = new ReviewDAO();
 
-    protected ReviewServiceImpl() throws RemoteException {
+    public ReviewServiceImpl() throws RemoteException {
     }
 
     @Override
