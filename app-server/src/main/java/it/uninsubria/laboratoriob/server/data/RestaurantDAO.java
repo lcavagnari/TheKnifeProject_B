@@ -375,6 +375,10 @@ public class RestaurantDAO implements DAO<Restaurant> {
         } catch (SQLException e) {
             System.err.println("Errore updateCuisines in RestaurantDAO: " + e.getMessage());
             return false;
+        } finally {
+            try (Connection conn = Database.getConnection()) {
+                conn.setAutoCommit(true);
+            } catch (SQLException ignored) {}
         }
     }
 
@@ -428,6 +432,10 @@ public class RestaurantDAO implements DAO<Restaurant> {
         } catch (SQLException e) {
             System.err.println("Errore updateServices in RestaurantDAO: " + e.getMessage());
             return false;
+        } finally {
+            try (Connection conn = Database.getConnection()) {
+                conn.setAutoCommit(true);
+            } catch (SQLException ignored) {}
         }
     }
 }
