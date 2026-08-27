@@ -16,7 +16,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class JsonUserDAO<T extends User> implements DAO<T> {
@@ -28,8 +31,8 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     protected final ConcurrentHashMap<String, T> cacheByUsername = new ConcurrentHashMap<>();
     private volatile boolean cacheLoaded = false;
 
-    protected JsonUserDAO(String fileName, AuthServiceInter authService) {
-        this.storeFile = new File(Constants.ROOT, fileName);
+    protected JsonUserDAO(AuthServiceInter authService) {
+        this.storeFile = new File(Constants.ROOT, "users.json");
         this.authService = authService;
     }
 

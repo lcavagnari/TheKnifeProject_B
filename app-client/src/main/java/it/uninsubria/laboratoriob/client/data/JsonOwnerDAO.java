@@ -9,7 +9,7 @@ import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
 
     public JsonOwnerDAO(AuthServiceInter authService) {
-        super("owners.json", authService);
+        super(authService);
     }
 
     @Override
