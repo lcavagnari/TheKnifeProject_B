@@ -12,13 +12,8 @@ import java.util.UUID;
 
 public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
 
-    public JsonCustomerDAO(AuthServiceInter authService) {
-        super(authService);
-    }
-
-    @Override
-    protected boolean isOwner() {
-        return false;
+    JsonCustomerDAO(AuthServiceInter authService) {
+        super(Customer.class, authService);
     }
 
     @Override
@@ -48,12 +43,12 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
     @Override
     protected ArrayNode toArrayNode() {
         ArrayNode array = mapper.createArrayNode();
-        for (Customer customer : cacheById.values()) {
+        for (Customer c : cacheById.values()) {
             ObjectNode node = mapper.createObjectNode();
-            writeUserFields(node, customer);
+            writeUserFields(node, c);
 
             ArrayNode favArray = mapper.createArrayNode();
-            customer.getFavouriteRestourants().forEach(fav -> favArray.add(fav.toString()));
+            ((Customer) c).getFavouriteRestourants().forEach(fav -> favArray.add(fav.toString()));
             node.set("favouriteRestourants", favArray);
 
             array.add(node);
@@ -62,7 +57,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
     }
 
     public boolean addFavourite(UUID customerId, UUID restaurantId) {
-        Customer customer = cacheById.get(customerId);
+        Customer customer = (Customer) cacheById.get(customerId);
         if (customer == null) return false;
         customer.getFavouriteRestourants().add(restaurantId);
         persistAtomic(toArrayNode());
@@ -70,7 +65,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
     }
 
     public boolean removeFavourite(UUID customerId, UUID restaurantId) {
-        Customer customer = cacheById.get(customerId);
+        Customer customer = (Customer) cacheById.get(customerId);
         if (customer == null) return false;
         customer.getFavouriteRestourants().remove(restaurantId);
         persistAtomic(toArrayNode());
@@ -78,7 +73,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
     }
 
     public Set<UUID> findFavourites(UUID customerId) {
-        Customer customer = cacheById.get(customerId);
+        Customer customer = (Customer) cacheById.get(customerId);
         return customer != null ? Set.copyOf(customer.getFavouriteRestourants()) : Set.of();
     }
 }
