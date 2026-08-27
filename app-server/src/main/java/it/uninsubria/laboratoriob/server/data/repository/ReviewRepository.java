@@ -29,11 +29,22 @@ public class ReviewRepository {
     }
 
     public boolean update(Review review) {
-        return dao.update(review);
+        boolean ok = dao.update(review);
+        if (ok && review.getRestaurant() != null) {
+            Restaurant r = restaurantRepo.findById(review.getRestaurant().getId());
+            if (r != null) r.getReviews().put(review.getId(), review);
+        }
+        return ok;
     }
 
     public boolean delete(UUID id) {
-        return dao.delete(id);
+        boolean ok = dao.delete(id);
+        if (ok) {
+            for (Restaurant r : restaurantRepo.findAll()) {
+                if (r.getReviews().remove(id) != null) break;
+            }
+        }
+        return ok;
     }
 
     // ── Read operations ──
