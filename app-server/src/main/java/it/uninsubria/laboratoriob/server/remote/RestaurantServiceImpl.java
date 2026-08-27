@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.data.remote;
+package it.uninsubria.laboratoriob.server.remote;
 
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -21,57 +21,48 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
 
     @Override
     public List<Restaurant> findAll(int offset, int limit) throws RemoteException {
-        List<Restaurant> all = new ArrayList<>(store.getAllRestaurants());
+        List<Restaurant> all = new ArrayList<>(store.restaurants().findAll());
         if (offset >= all.size()) return List.of();
         return all.subList(offset, Math.min(offset + limit, all.size()));
     }
 
     @Override
     public long count() throws RemoteException {
-        return store.restaurantDAO().count();
+        return store.restaurants().count();
     }
 
     @Override
     public Restaurant findById(UUID id) throws RemoteException {
-        return store.findRestaurantById(id);
+        return store.restaurants().findById(id);
     }
 
     @Override
     public List<Restaurant> findByOwner(UUID id) throws RemoteException {
-        return store.getAllRestaurants().stream()
-                .filter(r -> r.getOwner() != null && r.getOwner().getId().equals(id))
-                .toList();
+        return store.restaurants().findByOwner(id);
     }
 
     @Override
     public boolean save(Restaurant restaurant) throws RemoteException {
-        boolean ok = store.restaurantDAO().save(restaurant);
-        if (ok) store.addRestaurant(restaurant);
-        return ok;
+        return store.restaurants().save(restaurant);
     }
 
     @Override
     public boolean update(Restaurant restaurant) throws RemoteException {
-        Restaurant old = store.findRestaurantById(restaurant.getId());
-        boolean ok = store.restaurantDAO().update(restaurant);
-        if (ok) store.updateRestaurant(old, restaurant);
-        return ok;
+        return store.restaurants().update(restaurant);
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        boolean ok = store.restaurantDAO().delete(id);
-        if (ok) store.removeRestaurant(id);
-        return ok;
+        return store.restaurants().delete(id);
     }
 
     @Override
     public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) throws RemoteException {
-        return store.restaurantDAO().updateCuisines(restaurantId, cuisines);
+        return store.restaurants().updateCuisines(restaurantId, cuisines);
     }
 
     @Override
     public boolean updateServices(UUID restaurantId, Set<String> services) throws RemoteException {
-        return store.restaurantDAO().updateServices(restaurantId, services);
+        return store.restaurants().updateServices(restaurantId, services);
     }
 }

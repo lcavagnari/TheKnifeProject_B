@@ -1,8 +1,8 @@
-package it.uninsubria.laboratoriob.server.data;
+package it.uninsubria.laboratoriob.server.data.dao;
 
-
-import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.objects.Owner;
+import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.server.utils.Database;
 
 import java.sql.Connection;
@@ -10,47 +10,48 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
 /**
- * Implementazione del DAO per l'entità {@link Customer}.
+ * Implementazione del DAO per l'entità {@link Owner}.
  * <p>
- * Estende {@link UserDAO} specializzando le operazioni per i clienti.
- * Gestisce l'associazione many-to-many tra clienti e ristoranti preferiti
- * tramite la tabella {@code user_favorites}.
+ * Estende {@link UserDAO} specializzando le operazioni per i proprietari di ristoranti.
+ * Gestisce la associazione many-to-many tra owner e ristoranti tramite la tabella
+ * {@code user_restaurants}.
  * </p>
  *
  * <h2>Responsabilità</h2>
  * <ul>
- *   <li>Mappatura delle righe del ResultSet in oggetti {@link Customer} con i preferiti associati.</li>
- *   <li>Gestione del salvataggio e aggiornamento del customer con i suoi preferiti.</li>
- *   <li>Operazioni di aggiunta, rimozione e ricerca ristoranti preferiti.</li>
+ *   <li>Mappatura delle righe del ResultSet in oggetti {@link Owner} con i ristoranti associati.</li>
+ *   <li>Gestione del salvataggio e aggiornamento dell'owner con i suoi ristoranti.</li>
+ *   <li>Operazioni di aggiunta, rimozione e ricerca ristoranti per owner.</li>
  * </ul>
  *
  * @author Luca Cavagnari
  * @version 2.0
  * @see UserDAO
- * @see Customer
+ * @see Owner
  */
-public final class CustomerDAO extends UserDAO<Customer> {
+public class OwnerDAO extends UserDAO<Owner> {
 
-    public CustomerDAO() {
-        super(false);
+    public OwnerDAO() {
+        super(true);
     }
 
     @Override
-    protected Customer mapRow(ResultSet rs) throws SQLException {
+    protected Owner mapRow(ResultSet rs) throws SQLException {
         UUID uId = UUID.fromString(rs.getString("id"));
-        Set<UUID> favourites = findFavourites(uId);
+        Set<Restaurant> restaurants = new HashSet<>(restaurantDAO.findByOwner(uId));
 
         Optional<Location> loc = locationDAO.findByCoordinates(
                 rs.getDouble("latitude"),
                 rs.getDouble("longitude")
         );
 
-        return new Customer(
+        return new Owner(
                 uId,                                                         //  id
                 rs.getString("username"),                       //  username
                 rs.getString("psw_hash"),                       //  password_hash
@@ -59,18 +60,32 @@ public final class CustomerDAO extends UserDAO<Customer> {
                 rs.getString("last_name"),                      //  last_name
                 loc.orElse(null),                                     //  location
                 LocalDate.parse(rs.getString("birth_date")),    //  date_of_birth
-                favourites,                                                //  favourites
+                restaurants,                                               //  restaurants
                 rs.getBoolean("is_system")                      //  system
         );
     }
 
-
-    // TODO: aggiungere sistema intelligente per diff.
     @Override
-    public boolean update(Customer user) {
+    public boolean save(Owner user) {
+        boolean succeded = super.save(user);
+         if (succeded) {
+            for (Restaurant r : user.getRestaurantsById().values()) {
+                Optional<Restaurant> r1 = restaurantDAO.findById(r.getId());
+                if (r1.isEmpty()) restaurantDAO.save(r);
+
+                addSpecial(user.getId(), r.getId());
+            }
+        }
+
+
+        return succeded;
+    }
+
+    @Override
+    public boolean update(Owner user) {
         boolean succeded = super.update(user);
         if (succeded) {
-            String query = "DELETE FROM user_favorites WHERE user_id=?";
+            String query = "DELETE FROM user_restaurants WHERE user_id=?";
 
             try (Connection conn = Database.getConnection();
                  PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -78,38 +93,26 @@ public final class CustomerDAO extends UserDAO<Customer> {
                 stmt.executeUpdate();
 
             } catch (SQLException e) {
-                System.err.println("Errore update in CustomerDAO: " + e.getMessage());
+                System.err.println("Errore update in OwnerDAO: " + e.getMessage());
                 return false;
             }
 
-            for (UUID restId : user.getFavouriteRestourants())
-                addSpecial(user.getId(), restId);
+            for (Restaurant r : user.getRestaurantsById().values())
+                addSpecial(user.getId(), r.getId());
         }
 
         return succeded;
     }
 
-
-    @Override
-    public boolean save(Customer user) {
-        boolean succeded = super.save(user);
-        if (succeded) {
-            for (UUID id : user.getFavouriteRestourants()) addSpecial(user.getId(), id);
-        }
-
-
-        return succeded;
-    }
-
-    public boolean addFavourites(UUID ownerId, UUID restaurantId) {
+    public boolean addRestaurant(UUID ownerId, UUID restaurantId) {
         return super.addSpecial(ownerId, restaurantId);
     }
 
-    public boolean removeFavourites(UUID ownerId, UUID restaurantId) {
+    public boolean removeRestaurant(UUID ownerId, UUID restaurantId) {
         return super.removeSpecial(ownerId, restaurantId);
     }
 
-    public Set<UUID> findFavourites(UUID ownerId) {
+    public Set<UUID> findRestaurants(UUID ownerId) {
         return super.findSpecial(ownerId);
     }
 }
