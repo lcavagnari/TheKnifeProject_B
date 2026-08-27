@@ -21,8 +21,18 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
     }
 
     @Override
+    public List<Review> findByUser(UUID userId) throws RemoteException {
+        return rDAO.findByUser(userId);
+    }
+
+    @Override
     public List<Review> findAll() throws RemoteException {
         return rDAO.findAll();
+    }
+
+    @Override
+    public List<Review> findAll(int offset, int limit) throws RemoteException {
+        return rDAO.findAll(offset, limit);
     }
 
     @Override

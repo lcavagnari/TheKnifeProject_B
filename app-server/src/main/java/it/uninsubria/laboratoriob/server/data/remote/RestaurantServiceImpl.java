@@ -8,7 +8,6 @@ import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -29,8 +28,8 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     }
 
     @Override
-    public Optional<Restaurant> findById(UUID id) throws RemoteException {
-        return rDAO.findById(id);
+    public Restaurant findById(UUID id) throws RemoteException {
+        return rDAO.findById(id).orElse(null);
     }
 
     @Override

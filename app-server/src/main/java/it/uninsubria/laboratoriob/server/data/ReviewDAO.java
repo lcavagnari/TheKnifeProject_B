@@ -116,6 +116,50 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    public List<Review> findByUser(UUID userId) {
+        List<Review> reviews = new ArrayList<>();
+        String query = """
+                SELECT id, restaurant_id, user_id, rating, text, response, created_at
+                FROM review
+                WHERE user_id = ?
+                """;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setObject(1, userId, Types.OTHER);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reviews.add(mapReview(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore findByUser in ReviewDAO: " + e.getMessage());
+        }
+        return reviews;
+    }
+
+    @Override
+    public List<Review> findAll(int offset, int limit) {
+        List<Review> reviews = new ArrayList<>();
+        String query = """
+                SELECT id, restaurant_id, user_id, rating, text, response, created_at
+                FROM review
+                LIMIT ? OFFSET ?
+                """;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, limit);
+            stmt.setInt(2, offset);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reviews.add(mapReview(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore findAll(offset, limit) in ReviewDAO: " + e.getMessage());
+        }
+        return reviews;
+    }
+
     @Override
     public boolean save(Review review) {
         String query = """
