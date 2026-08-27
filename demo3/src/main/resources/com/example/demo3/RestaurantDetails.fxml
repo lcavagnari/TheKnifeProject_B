@@ -31,16 +31,20 @@
     <!-- Ribbons: Reviews on top, Awards below -->
     <VBox alignment="CENTER_LEFT" spacing="0">
 
-        <!-- Riga 1: Stelle e Conteggio recensioni attaccati -->
-        <HBox alignment="CENTER_LEFT">
-            <FlowPane fx:id="starsFlow" prefHeight="20.0" prefWidth="135.0" prefWrapLength="0.0" />
-            <Label fx:id="reviewsCountLabel" prefHeight="14.0" prefWidth="117.0" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #CDA532; -fx-padding: 0;" styleClass="review-ribbon-text" stylesheets="@style.css" text="*reviews_count*" />
+        <!-- Riga 1: Stelle, Conteggio recensioni, e Green Star ribbon -->
+        <HBox alignment="CENTER_LEFT" spacing="10">
+            <FlowPane fx:id="starsFlow" prefWrapLength="0.0" />
+            <Label fx:id="reviewsCountLabel" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #CDA532; -fx-padding: 0;" styleClass="review-ribbon-text" stylesheets="@style.css" text="*reviews_count*" />
+            <HBox fx:id="greenStarRibbon" alignment="CENTER_LEFT" managed="false" spacing="5" styleClass="ribbon-greenstar" visible="false">
+                <ImageView fitHeight="24" fitWidth="24" preserveRatio="true" styleClass="ribbon-greenstar-icon">
+                    <Image url="@images/ic_award.png" />
+                </ImageView>
+            </HBox>
         </HBox>
 
-        <!-- Riga 2: Michelin Award e Green Star (Sotto le recensioni) -->
+        <!-- Riga 2: Michelin Award (Sotto le recensioni) -->
         <HBox alignment="CENTER_LEFT" spacing="10">
             <Label fx:id="awardLabel" managed="false" style="-fx-font-size: 20px; -fx-text-fill: #b8860b; -fx-background-color: #fff3cd; -fx-padding: 4 10; -fx-background-radius: 8;" text="" visible="false" />
-            <Label fx:id="greenStarLabel" managed="false" style="-fx-font-size: 20px;" styleClass="badge badge-green" visible="false" />
         </HBox>
 
     </VBox>

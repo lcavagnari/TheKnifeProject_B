@@ -355,7 +355,7 @@
     -fx-translate-y: 0;
     -fx-effect: dropshadow(gaussian, rgba(60,40,20,0.05), 6, 0.06, 0, 2);
     -fx-transition: border-color 0.2s ease, background-color 0.2s ease,
-                    -fx-translate-y 0.2s ease, -fx-effect 0.2s ease;
+    -fx-translate-y 0.2s ease, -fx-effect 0.2s ease;
 }
 .restaurant-card:hover {
     -fx-border-color: #c45d3e;
@@ -427,6 +427,25 @@
 .badge-award {
     -fx-background-color: #fff3cd;
     -fx-text-fill: #b8860b;
+}
+
+/* ---- Green Star ribbon (icon tinted #00FF7F, muted-white pill) ---- */
+.ribbon-greenstar {
+    -fx-background-color: rgba(255, 255, 255, 0.85);
+    -fx-background-radius: 20px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 20px;
+    -fx-border-width: 1px;
+    -fx-padding: 4 12 4 10;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 4, 0.1, 0, 1);
+}
+.ribbon-greenstar-icon {
+    -fx-effect: innershadow(one-pass-box, #00FF7F, 50, 1.0, 0, 0);
+}
+.ribbon-greenstar-text {
+    -fx-font-size: 13px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #2c2420;
 }
 
 /* ---- Card header (title in top bar) ---- */

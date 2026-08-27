@@ -32,6 +32,8 @@ public class RestaurantDetailsController {
     @FXML
     private Label greenStarLabel;
     @FXML
+    private javafx.scene.layout.HBox greenStarRibbon;
+    @FXML
     private Label reviewsCountLabel;
     @FXML
     private FlowPane cuisinesFlow;
@@ -86,9 +88,8 @@ public class RestaurantDetailsController {
 
         // Green star ribbon
         if (r.isGreenStar()) {
-            greenStarLabel.setVisible(true);
-            greenStarLabel.setManaged(true);
-            greenStarLabel.setText("Green Star");
+            greenStarRibbon.setVisible(true);
+            greenStarRibbon.setManaged(true);
         }
 
         // Delivery + Online Booking badges
