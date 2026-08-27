@@ -42,8 +42,8 @@ public class ReviewDAO implements DAO<Review> {
         UUID customerId = UUID.fromString(rs.getString("user_id"));
         Restaurant restaurant = restaurantDAO.findById(restaurantId).orElse(null);
         User user = CustomerDAO.findById(customerId).orElse(null);
-        String tsStr = rs.getString("created_at");
-        LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
+        Timestamp ts = rs.getTimestamp("created_at");
+        LocalDateTime timestamp = ts != null ? ts.toLocalDateTime() : LocalDateTime.now();
 
         return new Review(
                 UUID.fromString(rs.getString("id")),
@@ -186,7 +186,8 @@ public class ReviewDAO implements DAO<Review> {
             stmt.setInt(4, review.getValue());
             stmt.setString(5, review.getText());
             stmt.setString(6, review.getReply());
-            stmt.setString(7, review.getTimestamp() != null ? review.getTimestamp().toString() : null);
+            if (review.getTimestamp() != null) stmt.setTimestamp(7, Timestamp.valueOf(review.getTimestamp()));
+            else stmt.setNull(7, Types.TIMESTAMP);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Errore save in ReviewDAO: " + e.getMessage());
@@ -208,7 +209,8 @@ public class ReviewDAO implements DAO<Review> {
             stmt.setInt(3, review.getValue());
             stmt.setString(4, review.getText());
             stmt.setString(5, review.getReply());
-            stmt.setString(6, review.getTimestamp() != null ? review.getTimestamp().toString() : null);
+            if (review.getTimestamp() != null) stmt.setTimestamp(6, Timestamp.valueOf(review.getTimestamp()));
+            else stmt.setNull(6, Types.TIMESTAMP);
             stmt.setObject(7, review.getId(), Types.OTHER);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
