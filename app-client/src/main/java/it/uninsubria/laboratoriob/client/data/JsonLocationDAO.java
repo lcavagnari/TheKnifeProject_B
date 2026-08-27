@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class JsonLocationDAO implements DAO<Location> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private File storeFile;
+    private final File storeFile;
 
     private record LocKey(double lat, double lon) {}
     private final ConcurrentHashMap<LocKey, Location> cache = new ConcurrentHashMap<>();
@@ -29,13 +29,6 @@ public final class JsonLocationDAO implements DAO<Location> {
 
     public JsonLocationDAO() {
         this.storeFile = new File(Constants.ROOT, "locations.json");
-    }
-
-    public void repointTo(UUID userId) {
-        File userDir = new File(Constants.ROOT, userId.toString());
-        this.storeFile = new File(userDir, storeFile.getName());
-        this.cacheLoaded = false;
-        cache.clear();
     }
 
     private void ensureCacheLoaded() {
@@ -82,7 +75,7 @@ public final class JsonLocationDAO implements DAO<Location> {
         return array;
     }
 
-    Location mapNode(JsonNode node) {
+    private Location mapNode(JsonNode node) {
         return new Location(
                 Nation.fromString(node.path("nation").asText()),
                 node.path("city").asText(),
@@ -92,7 +85,7 @@ public final class JsonLocationDAO implements DAO<Location> {
         );
     }
 
-    ObjectNode toNode(Location loc) {
+    private ObjectNode toNode(Location loc) {
         ObjectNode node = mapper.createObjectNode();
         node.put("nation", loc.getNation() != null ? loc.getNation().name() : "");
         node.put("city", loc.getCity());
