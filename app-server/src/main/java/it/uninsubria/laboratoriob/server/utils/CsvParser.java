@@ -10,9 +10,8 @@ import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
-import it.uninsubria.laboratoriob.server.data.LocationDAO;
-import it.uninsubria.laboratoriob.server.data.OwnerDAO;
-import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.server.data.ServerDataStore;
+import it.uninsubria.laboratoriob.server.data.dao.LocationDAO;
 import lombok.experimental.UtilityClass;
 
 import java.io.IOException;
@@ -25,28 +24,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-/**
- * Parser/trasformatore per il dataset CSV Michelin dell’applicazione.
- * <p>
- * Responsabilità:
- * <ul>
- * <li>Parsing robusto di righe CSV “sporche” (address/location/phone formati in
- * modo irregolare).</li>
- * <li>Normalizzazione di città, nazione, indirizzo, premi, green star, cucine e
- * servizi.</li>
- * <li>Costruzione di entità {@link Restaurant} e persistenza su database e
- * cache.</li>
- * </ul>
- * </p>
- */
 @UtilityClass
 public class CsvParser {
 
     private final static SecureRandom rd = new SecureRandom();
-
-    private final static RestaurantDAO RESTAURANT_DAO = new RestaurantDAO();
     private final static LocationDAO LOCATION_DAO = new LocationDAO();
-    private final static OwnerDAO OWNER_DAO = new OwnerDAO();
 
     public static final UUID SYSTEM_OWNER_ID = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes());
     private static final String SYSTEM_OWNER_USERNAME = "system";
@@ -221,7 +203,7 @@ public class CsvParser {
             System.err.println("Errore verifica system owner: " + e.getMessage());
         }
 
-        Owner systemOwner = new Owner(
+        return new Owner(
                 SYSTEM_OWNER_ID,
                 SYSTEM_OWNER_USERNAME,
                 SYSTEM_OWNER_PASSWORD_HASH,
@@ -232,10 +214,6 @@ public class CsvParser {
                 LocalDate.of(2000, 1, 1),
                 true
         );
-
-        OWNER_DAO.save(systemOwner);
-
-        return systemOwner;
     }
 
     private static Restaurant createRestaurant(String[] fields, Owner owner) {
@@ -267,7 +245,7 @@ public class CsvParser {
                 services);
     }
 
-    public static void parseFromDataset(Path path) {
+    public static void parseFromDataset(Path path, ServerDataStore store) {
         if (path == null)
             return;
 
@@ -285,12 +263,12 @@ public class CsvParser {
             System.out.println("✅ Elaborati " + restaurants.size() + "/" + csvLines.size() + " ristoranti");
 
             CompletableFuture<Void> persistFuture = CompletableFuture.runAsync(() -> {
-                OWNER_DAO.save(systemOwner);
+                store.users().saveOwner(systemOwner);
                 for (Restaurant r : restaurants) {
                     try {
                         if (r.getLocation() != null)
                             LOCATION_DAO.save(r.getLocation());
-                        RESTAURANT_DAO.save(r);
+                        store.restaurants().save(r);
                     } catch (Exception ex) {
                         System.err.println("Errore salvataggio su database per " + r.getName() + ": " + ex.getMessage());
                     }
@@ -299,8 +277,8 @@ public class CsvParser {
             });
 
             CompletableFuture<Void> cacheFuture = CompletableFuture.runAsync(() -> {
-                Loader.addUser(systemOwner);
-                for (Restaurant r : restaurants) Loader.addRestaurant(r);
+                store.users().putCache(systemOwner);
+                for (Restaurant r : restaurants) store.restaurants().putCache(r);
                 System.out.println("✅ Ristoranti aggiunti alla cache in memoria!");
             });
 

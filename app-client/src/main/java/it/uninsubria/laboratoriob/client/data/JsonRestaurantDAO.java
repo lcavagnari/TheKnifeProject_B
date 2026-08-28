@@ -8,52 +8,108 @@ import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
-import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.rmi.RemoteException;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-/**
- * Implementazione JSON del DAO per l'entità {@link Restaurant}.
- * <p>
- * Gestisce le operazioni CRUD sui ristoranti usando file JSON come storage locale.
- * I dati vengono memorizzati in un singolo file JSON array.
- * </p>
- */
 public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private final File storeFile;
+    // TODO: fix Arraylist is not serialisable issue and ensure data is cached appropriately.
 
-    public JsonRestaurantDAO() {
+    private static final ObjectMapper mapper = new ObjectMapper();
+    private File storeFile;
+    private volatile RestaurantServiceInter service;
+    private final JsonLocationDAO locationDAO;
+
+    private final ConcurrentHashMap<UUID, Restaurant> cacheById = new ConcurrentHashMap<>();
+    private volatile boolean cacheLoaded = false;
+
+    public JsonRestaurantDAO(RestaurantServiceInter service, JsonLocationDAO locationDAO) {
         this.storeFile = new File(Constants.ROOT, "restaurants.json");
+        this.service = service;
+        this.locationDAO = locationDAO;
     }
 
-    private ArrayNode loadAll() {
-        if (!storeFile.exists()) return mapper.createArrayNode();
+    void setRemoteRestaurantService(RestaurantServiceInter service) {
+        this.service = service;
+    }
+
+    private RestaurantServiceInter ensureService() {
+        RestaurantServiceInter current = service;
+        if (current != null) return current;
+        RestaurantServiceInter fresh = RmiRepository.lookupRestaurantService();
+        if (fresh != null) this.service = fresh;
+        return fresh;
+    }
+
+    public void repointTo(UUID userId) {
+        File userDir = new File(Constants.ROOT, userId.toString());
+
+        this.storeFile = new File(userDir, storeFile.getName());
+        this.cacheLoaded = false;
+
+        cacheById.clear();
+    }
+
+    private void ensureCacheLoaded() {
+        if (cacheLoaded) return;
+
+        synchronized (this) {
+            if (cacheLoaded) return;
+            loadFromDisk();
+
+            cacheLoaded = true;
+        }
+    }
+
+    private void loadFromDisk() {
+        cacheById.clear();
+        if (!storeFile.exists()) return;
+
         try {
             JsonNode node = mapper.readTree(storeFile);
-            return node.isArray() ? (ArrayNode) node : mapper.createArrayNode();
+
+            if (!node.isArray()) return;
+
+            for (JsonNode n : (ArrayNode) node) {
+                Restaurant r = mapNode(n);
+                cacheById.put(r.getId(), r);
+            }
         } catch (IOException e) {
-            System.err.println("Errore loadAll in JsonRestaurantDAO: " + e.getMessage());
-            return mapper.createArrayNode();
+            System.err.println("Errore loadFromDisk in JsonRestaurantDAO: " + e.getMessage());
         }
     }
 
-    private void persist(ArrayNode array) {
+    private void persistAtomic(ArrayNode array) {
         try {
             if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(storeFile, array);
+            File tmp = File.createTempFile("restaurants_", ".json", storeFile.getParentFile());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(tmp, array);
+            Files.move(tmp.toPath(), storeFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            System.err.println("Errore persist in JsonRestaurantDAO: " + e.getMessage());
+            System.err.println("Errore persistAtomic in JsonRestaurantDAO: " + e.getMessage());
         }
+    }
+
+    private ArrayNode toArrayNode() {
+        ArrayNode array = mapper.createArrayNode();
+        for (Restaurant r : cacheById.values()) array.add(toNode(r));
+
+        return array;
     }
 
     private Restaurant mapNode(JsonNode node) {
@@ -73,13 +129,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         Location loc = null;
         JsonNode locNode = node.path("location");
         if (!locNode.isMissingNode() && !locNode.isNull()) {
-            loc = new Location(
-                    Nation.fromString(locNode.path("nation").asText()),
-                    locNode.path("city").asText(),
-                    locNode.path("latitude").asDouble(),
-                    locNode.path("longitude").asDouble(),
-                    locNode.path("address").asText()
-            );
+            loc = locationDAO.mapNode(locNode);
         }
 
         PriceRange priceRange = PriceRange.MODERATE;
@@ -104,17 +154,14 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
             for (JsonNode c : cuisinesNode) {
                 try {
                     cuisinesTypes.add(CuisineType.valueOf(c.asText()));
-                } catch (IllegalArgumentException ignored) {
-                }
+                } catch (IllegalArgumentException ignored) {}
             }
         }
 
         Set<String> services = new HashSet<>();
         JsonNode servicesNode = node.path("services");
         if (servicesNode.isArray()) {
-            for (JsonNode s : servicesNode) {
-                services.add(s.asText());
-            }
+            for (JsonNode s : servicesNode) services.add(s.asText());
         }
 
         return new Restaurant(id, name, description, websiteUrl, owner, phone, loc,
@@ -135,15 +182,9 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         node.put("hasOnlineBooking", restaurant.isHasOnlineBooking());
         node.put("priceRange", restaurant.getPriceRange().name());
 
-        if (restaurant.getLocation() != null) {
-            ObjectNode locNode = mapper.createObjectNode();
-            locNode.put("nation", restaurant.getLocation().getNation().name());
-            locNode.put("city", restaurant.getLocation().getCity());
-            locNode.put("latitude", restaurant.getLocation().getLatitude());
-            locNode.put("longitude", restaurant.getLocation().getLongitude());
-            locNode.put("address", restaurant.getLocation().getAddress());
-            node.set("location", locNode);
-        }
+        if (restaurant.getLocation() != null)
+            node.set("location", locationDAO.toNode(restaurant.getLocation()));
+
 
         ArrayNode cuisinesArray = mapper.createArrayNode();
         restaurant.getCuisinesTypes().forEach(c -> cuisinesArray.add(c.name()));
@@ -158,10 +199,23 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     @Override
     public Optional<Restaurant> findById(UUID id) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(id.toString())) {
-                return Optional.of(mapNode(node));
+        ensureCacheLoaded();
+
+        Restaurant cached = cacheById.get(id);
+        if (cached != null) return Optional.of(cached);
+
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try {
+                Restaurant remote = svc.findById(id);
+                if (remote != null) {
+                    cacheById.put(remote.getId(), remote);
+                    persistAtomic(toArrayNode());
+                    return Optional.of(remote);
+                }
+            } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return Optional.empty();
@@ -169,61 +223,165 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     @Override
     public List<Restaurant> findAll() {
-        ArrayNode array = loadAll();
-        List<Restaurant> restaurants = new ArrayList<>();
-        for (JsonNode node : array) {
-            restaurants.add(mapNode(node));
+        ensureCacheLoaded();
+
+        List<Restaurant> local = new ArrayList<>(cacheById.values());
+
+        // TODO: the fact that cache isnt empty doesnt mean that it is up to date.
+        if (!local.isEmpty() && countLocal() == countRemote()) return local;
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try {
+                List<Restaurant> remote = svc.findAll(0, 1000);
+
+                for (Restaurant r : remote) cacheById.put(r.getId(), r);
+                persistAtomic(toArrayNode());
+
+                return new ArrayList<>(cacheById.values());
+            } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
+            }
         }
-        return restaurants;
+        return local;
+    }
+
+    @Override
+    public List<Restaurant> findAll(int offset, int limit) {
+        List<Restaurant> all = findAll();
+        if (offset >= all.size()) return List.of();
+        return all.subList(offset, Math.min(offset + limit, all.size()));
+    }
+
+    public long countRemote() {
+        RestaurantServiceInter svc = ensureService();
+        if (svc == null) return 0;
+        try {
+            return svc.count();
+        } catch (RemoteException e) {
+            this.service = null;
+            throw new ServiceUnavailableException("Server non disponibile", e);
+        }
+    }
+
+    public long countLocal() {
+        ensureCacheLoaded();
+        return (!cacheById.isEmpty()) ? cacheById.size() : 0;
+    }
+
+    @Override
+    public long count() {
+        long local = countLocal();
+        long remote = countRemote();
+
+        return local+remote;
     }
 
     public List<Restaurant> findByOwner(UUID ownerId) {
-        return findAll().stream()
+        ensureCacheLoaded();
+        List<Restaurant> local = cacheById.values().stream()
                 .filter(r -> r.getOwner() != null && r.getOwner().getId().equals(ownerId))
                 .collect(Collectors.toList());
+        if (!local.isEmpty()) return local;
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try {
+                List<Restaurant> remote = svc.findByOwner(ownerId);
+                for (Restaurant r : remote) cacheById.put(r.getId(), r);
+                persistAtomic(toArrayNode());
+                return remote;
+            } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
+            }
+        }
+        return local;
     }
 
     @Override
     public boolean save(Restaurant restaurant) {
         if (restaurant == null) return false;
-        ArrayNode array = loadAll();
-
-        for (JsonNode node : array) {
-            if (node.path("id").asText().equals(restaurant.getId().toString())) {
-                return false;
+        ensureCacheLoaded();
+        if (cacheById.containsKey(restaurant.getId())) return false;
+        cacheById.put(restaurant.getId(), restaurant);
+        persistAtomic(toArrayNode());
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.save(restaurant); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
-
-        array.add(toNode(restaurant));
-        persist(array);
         return true;
     }
 
     @Override
     public boolean update(Restaurant restaurant) {
         if (restaurant == null) return false;
-        ArrayNode array = loadAll();
 
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(restaurant.getId().toString())) {
-                array.set(i, toNode(restaurant));
-                persist(array);
-                return true;
+        ensureCacheLoaded();
+        if (!cacheById.containsKey(restaurant.getId())) return false;
+
+        cacheById.put(restaurant.getId(), restaurant);
+        persistAtomic(toArrayNode());
+
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.update(restaurant); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
-        return false;
+        return true;
     }
 
     @Override
     public boolean delete(UUID id) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            if (array.get(i).path("id").asText().equals(id.toString())) {
-                array.remove(i);
-                persist(array);
-                return true;
+        ensureCacheLoaded();
+        Restaurant removed = cacheById.remove(id);
+        if (removed == null) return false;
+        persistAtomic(toArrayNode());
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.delete(id); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
-        return false;
+        return true;
+    }
+
+    public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) {
+        ensureCacheLoaded();
+        Restaurant r = cacheById.get(restaurantId);
+        if (r == null) return false;
+        r.getCuisinesTypes().clear();
+        r.getCuisinesTypes().addAll(cuisines);
+        persistAtomic(toArrayNode());
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.updateCuisines(restaurantId, cuisines); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
+            }
+        }
+        return true;
+    }
+
+    public boolean updateServices(UUID restaurantId, Set<String> services) {
+        ensureCacheLoaded();
+        Restaurant r = cacheById.get(restaurantId);
+        if (r == null) return false;
+        r.getServices().clear();
+        r.getServices().addAll(services);
+        persistAtomic(toArrayNode());
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.updateServices(restaurantId, services); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
+            }
+        }
+        return true;
     }
 }

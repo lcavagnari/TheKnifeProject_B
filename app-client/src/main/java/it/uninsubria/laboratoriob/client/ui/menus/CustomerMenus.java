@@ -2,6 +2,7 @@ package it.uninsubria.laboratoriob.client.ui.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
@@ -158,6 +159,8 @@ public class CustomerMenus extends Menus {
             } catch (AbortOperationException e) {
                 IO.printErrorMessage("Abort: " + e.getMessage());
                 break;
+            } catch (ServiceUnavailableException e) {
+                IO.printErrorMessage("Server non disponibile. Operazione non completata.");
             }
 
             IO.getUserInput("Premi invio per continuare.");

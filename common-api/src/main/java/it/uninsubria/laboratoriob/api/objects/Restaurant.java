@@ -31,6 +31,8 @@ import java.util.*;
 @Setter
 public class Restaurant extends Entity {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * Insieme di tipi di cucina proposti dal ristorante.
      */
@@ -145,9 +147,9 @@ public class Restaurant extends Entity {
 
         this.owner = owner;
 
-        this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : cuisinesTypes;
-        this.services = (services == null) ? new HashSet<>() : services;
-        this.reviews = (reviews == null) ? new HashMap<>() : reviews;
+        this.cuisinesTypes = (cuisinesTypes == null) ? new HashSet<>() : new HashSet<>(cuisinesTypes);
+        this.services = (services == null) ? new HashSet<>() : new HashSet<>(services);
+        this.reviews = (reviews == null) ? new HashMap<>() : new HashMap<>(reviews);
     }
 
     /**

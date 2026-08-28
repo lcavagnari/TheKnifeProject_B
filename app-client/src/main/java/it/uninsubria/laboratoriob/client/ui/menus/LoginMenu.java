@@ -1,19 +1,20 @@
 package it.uninsubria.laboratoriob.client.ui.menus;
 
-/*
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-*/
-
 import it.uninsubria.laboratoriob.api.objects.User;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 import lombok.experimental.UtilityClass;
+
+import java.rmi.RemoteException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * Classe di utility per la gestione del login e della registrazione utenti lato client.
@@ -26,17 +27,6 @@ public class LoginMenu {
     }
 
     public static User register(ClientDataStore dataStore) {
-        IO.printErrorMessage("Al momento quest'operazione non è disponbile (W.I.P)");
-        return null;
-    }
-
-    public static User login(ClientDataStore dataStore) {
-        IO.printErrorMessage("Al momento quest'operazione non è disponbile (W.I.P)");
-        return null;
-    }
-
-    /*
-    public static User register(ClientDataStore dataStore) {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
 
@@ -46,10 +36,6 @@ public class LoginMenu {
         while (username == null) {
             try {
                 username = IO.getUserInput("Scegli un nome utente [4-16 caratteri]:").trim();
-                if (dataStore.getCustomerDAO().findByUsername(username).isPresent()
-                        || dataStore.getOwnerDAO().findByUsername(username).isPresent())
-                    throw new IllegalArgumentException("Username non disponibile");
-
                 Validators.validateString("^[\\p{L}][\\p{L}'\\- ]{3,39}$", username);
             } catch (IllegalArgumentException ex) {
                 username = null;
@@ -112,23 +98,38 @@ public class LoginMenu {
             }
         }
 
+        AuthServiceInter authService = RmiRepository.getAuthService();
+        if (authService == null) authService = RmiRepository.lookupAuthService();
+        if (authService == null) {
+            IO.printErrorMessage("Servizio auth non disponibile.");
+            return null;
+        }
 
         try {
-            String salt = PasswordHasher.generateSalt();
-            String hashedPassword = PasswordHasher.hash(password, salt);
+            User registered;
+            try {
+                registered = authService.register(
+                        username, password, firstName, lastName, dateOfBirth, location, isOwner);
+            } catch (RemoteException e) {
+                IO.printErrorMessage("Registrazione fallita: " + e.getMessage());
+                return null;
+            }
 
+            if (!Validators.validateUser(registered)) return null;
 
-            User user = isOwner
-                    ? new Owner(username, hashedPassword, salt, firstName, lastName, location, dateOfBirth)
-                    : new Customer(username, hashedPassword, salt, firstName, lastName, location, dateOfBirth);
+            dataStore.switchUser(registered.getId());
 
-            if (Validators.validateUser(user))
-                IO.getUserInput("Registrazione completata! Premi un qualsiasi tasto + Invio per tornare al menu principale.");
+            boolean cached = isOwner
+                    ? dataStore.getOwnerDAO().cacheOnly((Owner) registered)
+                    : dataStore.getCustomerDAO().cacheOnly((Customer) registered);
 
-            if (isOwner) dataStore.getOwnerDAO().save((Owner) user);
-            else dataStore.getCustomerDAO().save((Customer) user);
+            if (!cached) {
+                IO.printErrorMessage("Registrazione riuscita ma impossibile salvare la cache locale.");
+                return null;
+            }
 
-            return user;
+            IO.getUserInput("Registrazione completata! Premi un qualsiasi tasto + Invio per tornare al menu principale.");
+            return registered;
 
         } catch (IllegalArgumentException | UnsupportedOperationException ex) {
             IO.printErrorMessage(ex.getMessage() + ". Ritorno al menu principale.");
@@ -142,30 +143,40 @@ public class LoginMenu {
         int attempts = 0;
         try {
             while (attempts < 4) {
-                if (attempts >= 4) throw new AbortOperationException("Raggiunto limite massimo di tentativi");
-
                 String username = IO.getUserInput("Inserisci il nome utente:");
                 String password = IO.getUserInput("Inserisci la password:");
 
-                User user = dataStore.getCustomerDAO().findByUsername(username)
-                        .map(u -> (User) u)
-                        .or(() -> dataStore.getOwnerDAO().findByUsername(username))
-                        .orElse(null);
+                User user;
+
+                AuthServiceInter authService = RmiRepository.getAuthService();
+                if (authService == null) authService = RmiRepository.lookupAuthService();
+
+                if (authService != null) {
+                    try {
+                        user = authService.login(username, password);
+                    } catch (RemoteException ex) {
+                        throw new AbortOperationException(
+                                (ex.getMessage().isEmpty()) ? "Server non raggiungibile." : "Errore: "+ex.getMessage()
+                        );
+                    }
+                } else {
+                    IO.printErrorMessage("Servizio auth non disponibile.");
+                    return null;
+                }
 
                 if (user == null || isSystemUser(user))
                     IO.printErrorMessage("Utente non trovato");
-
-                else if (PasswordHasher.verify(password, user.getPasswordSalt(), user.getPasswordHash())) {
+                else {
                     IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
+                    dataStore.switchUser(user.getId());
                     return user;
-
-                else {
-                    IO.printErrorMessage("Username o password errati.");
-                    IO.getUserInput("Premi Invio per riprovare.");
-                    attempts++;
                 }
+
+                attempts++;
             }
+
+            throw new AbortOperationException("Raggiunto limite massimo di tentativi");
 
         } catch (IllegalArgumentException ex) {
             IO.printErrorMessage(ex.getMessage());
@@ -175,5 +186,4 @@ public class LoginMenu {
 
         return null;
     }
-     */
 }

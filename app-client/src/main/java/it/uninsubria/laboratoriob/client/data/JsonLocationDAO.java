@@ -11,48 +11,78 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Implementazione JSON del DAO per l'entità {@link Location}.
- * <p>
- * Gestisce le operazioni CRUD sulle posizioni geografiche usando file JSON come storage locale.
- * Le location sono identificate dalla coppia (latitude, longitude) anziché da UUID.
- * </p>
- */
 public final class JsonLocationDAO implements DAO<Location> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private final File storeFile;
+    private File storeFile;
+
+    private record LocKey(double lat, double lon) {}
+    private final ConcurrentHashMap<LocKey, Location> cache = new ConcurrentHashMap<>();
+    private volatile boolean cacheLoaded = false;
 
     public JsonLocationDAO() {
         this.storeFile = new File(Constants.ROOT, "locations.json");
     }
 
-    private ArrayNode loadAll() {
-        if (!storeFile.exists()) return mapper.createArrayNode();
+    public void repointTo(UUID userId) {
+        File userDir = new File(Constants.ROOT, userId.toString());
+        this.storeFile = new File(userDir, storeFile.getName());
+        this.cacheLoaded = false;
+        cache.clear();
+    }
+
+    private void ensureCacheLoaded() {
+        if (cacheLoaded) return;
+        synchronized (this) {
+            if (cacheLoaded) return;
+            loadFromDisk();
+            cacheLoaded = true;
+        }
+    }
+
+    private void loadFromDisk() {
+        cache.clear();
+        if (!storeFile.exists()) return;
         try {
             JsonNode node = mapper.readTree(storeFile);
-            return node.isArray() ? (ArrayNode) node : mapper.createArrayNode();
+            if (!node.isArray()) return;
+            for (JsonNode n : (ArrayNode) node) {
+                Location loc = mapNode(n);
+                cache.put(new LocKey(loc.getLatitude(), loc.getLongitude()), loc);
+            }
         } catch (IOException e) {
-            System.err.println("Errore loadAll in JsonLocationDAO: " + e.getMessage());
-            return mapper.createArrayNode();
+            System.err.println("Errore loadFromDisk in JsonLocationDAO: " + e.getMessage());
         }
     }
 
-    private void persist(ArrayNode array) {
+    private void persistAtomic(ArrayNode array) {
         try {
             if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
-            mapper.writerWithDefaultPrettyPrinter().writeValue(storeFile, array);
+            File tmp = File.createTempFile("locations_", ".json", storeFile.getParentFile());
+            mapper.writerWithDefaultPrettyPrinter().writeValue(tmp, array);
+            Files.move(tmp.toPath(), storeFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            System.err.println("Errore persist in JsonLocationDAO: " + e.getMessage());
+            System.err.println("Errore persistAtomic in JsonLocationDAO: " + e.getMessage());
         }
     }
 
-    private Location mapNode(JsonNode node) {
+    private ArrayNode toArrayNode() {
+        ArrayNode array = mapper.createArrayNode();
+        for (Location loc : cache.values()) {
+            array.add(toNode(loc));
+        }
+        return array;
+    }
+
+    Location mapNode(JsonNode node) {
         return new Location(
                 Nation.fromString(node.path("nation").asText()),
                 node.path("city").asText(),
@@ -62,7 +92,7 @@ public final class JsonLocationDAO implements DAO<Location> {
         );
     }
 
-    private ObjectNode toNode(Location loc) {
+    ObjectNode toNode(Location loc) {
         ObjectNode node = mapper.createObjectNode();
         node.put("nation", loc.getNation() != null ? loc.getNation().name() : "");
         node.put("city", loc.getCity());
@@ -73,11 +103,10 @@ public final class JsonLocationDAO implements DAO<Location> {
     }
 
     public Optional<Location> findByCoordinates(double lat, double lon) {
-        ArrayNode array = loadAll();
-        for (JsonNode node : array) {
-            if (Math.abs(node.path("latitude").asDouble() - lat) < 1e-6
-                    && Math.abs(node.path("longitude").asDouble() - lon) < 1e-6) {
-                return Optional.of(mapNode(node));
+        ensureCacheLoaded();
+        for (LocKey key : cache.keySet()) {
+            if (Math.abs(key.lat() - lat) < 1e-6 && Math.abs(key.lon() - lon) < 1e-6) {
+                return Optional.of(cache.get(key));
             }
         }
         return Optional.empty();
@@ -85,46 +114,30 @@ public final class JsonLocationDAO implements DAO<Location> {
 
     @Override
     public List<Location> findAll() {
-        ArrayNode array = loadAll();
-        List<Location> locations = new ArrayList<>();
-        for (JsonNode node : array) {
-            locations.add(mapNode(node));
-        }
-        return locations;
+        ensureCacheLoaded();
+        return new ArrayList<>(cache.values());
     }
 
     @Override
     public boolean save(Location location) {
         if (location == null) return false;
-        ArrayNode array = loadAll();
-
-        for (JsonNode node : array) {
-            if (Math.abs(node.path("latitude").asDouble() - location.getLatitude()) < 1e-6
-                    && Math.abs(node.path("longitude").asDouble() - location.getLongitude()) < 1e-6) {
-                return false;
-            }
-        }
-
-        array.add(toNode(location));
-        persist(array);
+        ensureCacheLoaded();
+        LocKey key = new LocKey(location.getLatitude(), location.getLongitude());
+        if (cache.containsKey(key)) return false;
+        cache.put(key, location);
+        persistAtomic(toArrayNode());
         return true;
     }
 
     @Override
     public boolean update(Location location) {
         if (location == null) return false;
-        ArrayNode array = loadAll();
-
-        for (int i = 0; i < array.size(); i++) {
-            JsonNode node = array.get(i);
-            if (Math.abs(node.path("latitude").asDouble() - location.getLatitude()) < 1e-6
-                    && Math.abs(node.path("longitude").asDouble() - location.getLongitude()) < 1e-6) {
-                array.set(i, toNode(location));
-                persist(array);
-                return true;
-            }
-        }
-        return false;
+        ensureCacheLoaded();
+        LocKey key = new LocKey(location.getLatitude(), location.getLongitude());
+        if (!cache.containsKey(key)) return false;
+        cache.put(key, location);
+        persistAtomic(toArrayNode());
+        return true;
     }
 
     @Override
@@ -133,21 +146,29 @@ public final class JsonLocationDAO implements DAO<Location> {
     }
 
     public boolean deleteByCoordinates(double lat, double lon) {
-        ArrayNode array = loadAll();
-        for (int i = 0; i < array.size(); i++) {
-            JsonNode node = array.get(i);
-            if (Math.abs(node.path("latitude").asDouble() - lat) < 1e-6
-                    && Math.abs(node.path("longitude").asDouble() - lon) < 1e-6) {
-                array.remove(i);
-                persist(array);
-                return true;
-            }
-        }
-        return false;
+        ensureCacheLoaded();
+        LocKey key = new LocKey(lat, lon);
+        Location removed = cache.remove(key);
+        if (removed == null) return false;
+        persistAtomic(toArrayNode());
+        return true;
     }
 
-    // Location has no ID attribute
-    @Override public Optional<Location> findById(UUID id) {
+    @Override
+    public Optional<Location> findById(UUID id) {
         return Optional.empty();
+    }
+
+    @Override
+    public List<Location> findAll(int offset, int limit) {
+        List<Location> all = findAll();
+        if (offset >= all.size()) return List.of();
+        return all.subList(offset, Math.min(offset + limit, all.size()));
+    }
+
+    @Override
+    public long count() {
+        ensureCacheLoaded();
+        return cache.size();
     }
 }

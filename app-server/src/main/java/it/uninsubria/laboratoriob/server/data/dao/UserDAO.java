@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.data;
+package it.uninsubria.laboratoriob.server.data.dao;
 
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.objects.Location;
@@ -9,7 +9,7 @@ import java.sql.*;
 import java.util.*;
 
 /**
- * Classe astratta base per i DAO che gestiscono gli utenti ({@link Customer}, {@link Owner}).
+ * Classe astratta base per i DAO che gestiscono gli utenti ({@link it.uninsubria.laboratoriob.api.objects.Customer}, {@link it.uninsubria.laboratoriob.api.objects.Owner}).
  * <p>
  * Fornisce le operazioni CRUD comuni a tutti i tipi di utente, gestendo la tabella
  * {@code "user"} nel database PostgreSQL. Utilizza un flag {@code isOwner} per distinguere
@@ -101,6 +101,45 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         }
 
         return users;
+    }
+
+    public List<T> findAll(int offset, int limit) {
+        List<T> users = new ArrayList<>();
+
+        final String query = "SELECT id, username, psw_hash, psw_salt, first_name,last_name, latitude, longitude, birth_date, is_system FROM \"user\" where is_owner = " + isOwner + " OFFSET ? LIMIT ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, offset);
+            stmt.setInt(2, limit);
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    T user = mapRow(rs);
+                    users.add(user);
+                }
+            }
+
+        } catch (SQLException e) {
+            System.err.printf("Errore findAll(offset,limit) in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
+        }
+
+        return users;
+    }
+
+    public long count() {
+        final String query = "SELECT COUNT(*) FROM \"user\" where is_owner = " + isOwner;
+
+        try (Connection conn = Database.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+            if (rs.next()) return rs.getLong(1);
+
+        } catch (SQLException e) {
+            System.err.printf("Errore count in %sDAO: %s", this.getClass().getCanonicalName(), e.getMessage());
+        }
+
+        return 0;
     }
 
     public boolean save(T user) {
@@ -210,7 +249,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     }
 
     protected boolean addSpecial(UUID userId, UUID restaurantId) {
-        String query = "INSERT INTO " + ((isOwner) ? "user_restaurants" : "user_favorites") + " VALUES (?,?)";
+        String query = "INSERT INTO " + ((isOwner) ? "user_restaurants" : "user_favorites") + " (user_id, restaurant_id) VALUES (?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {

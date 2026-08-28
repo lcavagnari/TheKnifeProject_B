@@ -1,137 +1,51 @@
 package it.uninsubria.laboratoriob.server.utils;
 
-
 import it.uninsubria.laboratoriob.api.objects.*;
-import it.uninsubria.laboratoriob.server.data.CustomerDAO;
-import it.uninsubria.laboratoriob.server.data.OwnerDAO;
-import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
-import it.uninsubria.laboratoriob.server.data.ReviewDAO;
-import lombok.experimental.UtilityClass;
+import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Classe di utilità responsabile del caricamento e della gestione dei dati
- * dell'applicazione
- * a partire dal database.
- * <p>
- * Gestisce la lettura delle entità tramite i relativi it.uninsubria.laboratoriob.api.data.DAO e le inserisce in
- * strutture dati statiche.
- * <p>
- *
- * @author Luca Cavagnari
- * @version 2.0
- */
-@UtilityClass
 public class Loader {
 
-    private final static Map<UUID, Restaurant> restaurantsById = new ConcurrentHashMap<>();
-    private final static Map<String, Restaurant> restaurantsByName = new ConcurrentHashMap<>();
-    private final static Map<UUID, User> usersById = new ConcurrentHashMap<>();
-    private final static Map<String, User> usersByName = new ConcurrentHashMap<>();
+    private final ServerDataStore store;
 
-    private final static RestaurantDAO restaurantDAO = new RestaurantDAO();
-    private final static ReviewDAO reviewDAO = new ReviewDAO();
-
-    private final static CustomerDAO CUSTOMER_DAO = new CustomerDAO();
-    private final static OwnerDAO OWNER_DAO = new OwnerDAO();
-
-
-
-    // ── Write operations ──
-
-    public static void addRestaurant(Restaurant r) {
-        restaurantsById.put(r.getId(), r);
-        restaurantsByName.put(r.getName(), r);
+    public Loader(ServerDataStore store) {
+        this.store = store;
     }
 
-    public static void removeRestaurant(UUID id) {
-        Restaurant r = restaurantsById.remove(id);
-        if (r != null) restaurantsByName.remove(r.getName());
+    public void initialise() {
+        try {
+            loadUsers();
+            loadRestaurants();
+            resolveOwners();
+        } catch (CompletionException ex) {
+            System.err.println("Errore/i durante il caricamento: " + ex.getMessage());
+        } catch (Exception ex) {
+            System.err.println("Errore/i durante il caricamento: " + ex.getMessage());
+        }
     }
 
-    public static void updateRestaurant(Restaurant oldRestaurant, Restaurant newRestaurant) {
-        if (oldRestaurant == null || newRestaurant == null) return;
-
-        restaurantsById.remove(oldRestaurant.getId());
-        restaurantsByName.remove(oldRestaurant.getName());
-
-        addRestaurant(newRestaurant);
-    }
-
-    public static void addUser(User u) {
-        usersById.put(u.getId(), u);
-        usersByName.put(u.getUsername(), u);
-    }
-
-    public static void removeUser(UUID id) {
-        User u = usersById.remove(id);
-        if (u != null) usersByName.remove(u.getUsername());
-    }
-
-    public static void updateUser(User oldUser, User newUser) {
-        if (oldUser == null || newUser == null) return;
-
-        usersById.remove(oldUser.getId());
-        usersByName.remove(oldUser.getUsername());
-
-        addUser(newUser);
-    }
-
-    // ── Read operations (single entity) ──
-
-    public static Restaurant findRestaurantById(UUID id) {
-        return restaurantsById.get(id);
-    }
-
-    public static Restaurant findRestaurantByName(String name) {
-        return restaurantsByName.get(name);
-    }
-
-    public static boolean hasRestaurantByName(String name) {
-        return restaurantsByName.containsKey(name);
-    }
-
-    public static User findUserById(UUID id) {
-        return usersById.get(id);
-    }
-
-    public static User findUserByName(String name) {
-        return usersByName.get(name);
-    }
-
-    public static boolean hasUserByName(String name) {
-        return usersByName.containsKey(name);
-    }
-
-    // ── Read operations (bulk / unmodifiable views) ──
-
-    public static Map<UUID, Restaurant> getAllRestaurantsById() {
-        return Collections.unmodifiableMap(restaurantsById);
-    }
-
-    public static Map<String, Restaurant> getAllRestaurantsByName() {
-        return Collections.unmodifiableMap(restaurantsByName);
-    }
-
-    public static Map<UUID, User> getAllUsersById() {
-        return Collections.unmodifiableMap(usersById);
-    }
-
-    public static Map<String, User> getAllUsersByName() {
-        return Collections.unmodifiableMap(usersByName);
+    private void resolveOwners() {
+        for (Restaurant r : store.restaurants().findAll()) {
+            if (r.getOwner() != null) {
+                User u = store.users().findById(r.getOwner().getId());
+                if (u instanceof Owner) {
+                    r.setOwner((Owner) u);
+                }
+            }
+        }
     }
 
     private void loadRestaurants() throws CompletionException {
         List<Restaurant> restaurants = CompletableFuture
-                .supplyAsync(restaurantDAO::findAll)
+                .supplyAsync(store.restaurants()::loadAllFromDb)
                 .exceptionally(ex -> {
                     System.err.println("Errore caricamento restaurants: " + ex.getMessage());
                     return new ArrayList<>();
@@ -143,12 +57,10 @@ public class Loader {
         for (Restaurant restaurant : restaurants) {
             tasks.add(
                     CompletableFuture
-                            .supplyAsync(() -> reviewDAO.findByRestaurant(restaurant.getId()))
+                            .supplyAsync(() -> store.reviews().loadForRestaurant(restaurant.getId()))
                             .exceptionally(ex -> {
-                                System.err.println(
-                                        "Errore caricamento review for restaurant #"
-                                                + restaurant.getId() + ": " + ex.getMessage()
-                                );
+                                System.err.println("Errore caricamento review for restaurant #"
+                                        + restaurant.getId() + ": " + ex.getMessage());
                                 return new ArrayList<>();
                             })
             );
@@ -159,59 +71,36 @@ public class Loader {
         for (int i = 0; i < restaurants.size(); i++) {
             Restaurant restaurant = restaurants.get(i);
             List<Review> reviews = tasks.get(i).join();
-
-
             for (Review review : reviews) restaurant.addReview(review);
-
-            addRestaurant(restaurant);
+            store.restaurants().putCache(restaurant);
         }
     }
 
     private void loadUsers() throws CompletionException {
         CompletableFuture<List<Owner>> owners = CompletableFuture
-                .supplyAsync(OWNER_DAO::findAll)
-                .exceptionally(ex -> {
-                    System.err.println("Errore caricamento clienti: " + ex.getMessage());
-                    return null;
-                });
-
-        CompletableFuture<List<Customer>> customers = CompletableFuture
-                .supplyAsync(CUSTOMER_DAO::findAll)
+                .supplyAsync(store.users()::loadAllOwnersFromDb)
                 .exceptionally(ex -> {
                     System.err.println("Errore caricamento proprietari: " + ex.getMessage());
                     return null;
                 });
 
-        // join a barriera in attesa del completamento
-        CompletableFuture.allOf(owners, customers).join();
+        CompletableFuture<List<Customer>> customers = CompletableFuture
+                .supplyAsync(store.users()::loadAllCustomersFromDb)
+                .exceptionally(ex -> {
+                    System.err.println("Errore caricamento clienti: " + ex.getMessage());
+                    return null;
+                });
 
+        CompletableFuture.allOf(owners, customers).join();
 
         List<Owner> o = owners.join();
         List<Customer> c = customers.join();
 
-        for (Owner owner : o) {
-            addUser(owner);
-        }
-
-        for (Customer customer : c) {
-            addUser(customer);
-        }
+        if (o != null) for (Owner owner : o) store.users().putCache(owner);
+        if (c != null) for (Customer customer : c) store.users().putCache(customer);
     }
 
-    public void initialiseMaps() {
-        try {
-            loadUsers();
-            loadRestaurants();
-
-
-        } catch (CompletionException ex) {
-            System.err.println("Errore/i durante il caricamento: ");
-        } catch (Exception ex) {
-            System.err.println("Errore/i durante il caricamento: " + ex.getMessage());
-        }
-    }
-
-    public static void updateMichelinDataset(String path) throws IOException {
+    public void updateMichelinDataset(String path) throws IOException {
         path = (path != null && !path.isBlank()) ? path : "michelin_my_maps.csv";
         Path inputPath = Paths.get(path).normalize().toRealPath();
 
@@ -224,10 +113,8 @@ public class Loader {
         }
 
         System.err.println("Updating michelin data from file...");
-
         long timestamp = System.currentTimeMillis();
-        CsvParser.parseFromDataset(inputPath);
-
-        System.out.println("Update completed in " + ((System.currentTimeMillis() - timestamp) + "ms"));
+        CsvParser.parseFromDataset(inputPath, store);
+        System.out.println("Update completed in " + (System.currentTimeMillis() - timestamp) + "ms");
     }
 }

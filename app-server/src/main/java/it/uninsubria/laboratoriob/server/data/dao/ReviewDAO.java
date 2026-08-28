@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.server.data;
+package it.uninsubria.laboratoriob.server.data.dao;
 
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -42,10 +42,10 @@ public class ReviewDAO implements DAO<Review> {
         UUID customerId = UUID.fromString(rs.getString("user_id"));
         Restaurant restaurant = restaurantDAO.findById(restaurantId).orElse(null);
         User user = CustomerDAO.findById(customerId).orElse(null);
-        String tsStr = rs.getString("created_at");
-        LocalDateTime timestamp = tsStr != null ? LocalDateTime.parse(tsStr) : LocalDateTime.now();
+        Timestamp ts = rs.getTimestamp("created_at");
+        LocalDateTime timestamp = ts != null ? ts.toLocalDateTime() : LocalDateTime.now();
 
-        return new Review(
+        Review review = new Review(
                 UUID.fromString(rs.getString("id")),
                 restaurant,
                 user,
@@ -53,12 +53,17 @@ public class ReviewDAO implements DAO<Review> {
                 timestamp,
                 rs.getString("text"),
                 rs.getString("response"));
+
+        Timestamp respondedAt = rs.getTimestamp("responded_at");
+        if (respondedAt != null) review.setRespondedAt(respondedAt.toLocalDateTime());
+
+        return review;
     }
 
     @Override
     public Optional<Review> findById(UUID id) {
         String query = """
-                SELECT id, restaurant_id, user_id, rating, text, response, created_at
+                SELECT id, restaurant_id, user_id, rating, text, response, responded_at, created_at
                 FROM review
                 WHERE id = ?
                 """;
@@ -80,7 +85,7 @@ public class ReviewDAO implements DAO<Review> {
     public List<Review> findAll() {
         List<Review> reviews = new ArrayList<>();
         String query = """
-                SELECT id, restaurant_id, user_id, rating, text, response, created_at
+                SELECT id, restaurant_id, user_id, rating, text, response, responded_at, created_at
                 FROM review
                 """;
         try (Connection conn = Database.getConnection();
@@ -95,10 +100,22 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    @Override
+    public long count() {
+        try (Connection conn = Database.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT COUNT(*) FROM review")) {
+            if (rs.next()) return rs.getLong(1);
+        } catch (SQLException e) {
+            System.err.println("Errore count in ReviewDAO: " + e.getMessage());
+        }
+        return 0;
+    }
+
     public List<Review> findByRestaurant(UUID restaurantId) {
         List<Review> reviews = new ArrayList<>();
         String query = """
-                SELECT id, restaurant_id, user_id, rating, text, response, created_at
+                SELECT id, restaurant_id, user_id, rating, text, response, responded_at, created_at
                 FROM review
                 WHERE restaurant_id = ?
                 """;
@@ -116,11 +133,55 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    public List<Review> findByUser(UUID userId) {
+        List<Review> reviews = new ArrayList<>();
+        String query = """
+                SELECT id, restaurant_id, user_id, rating, text, response, responded_at, created_at
+                FROM review
+                WHERE user_id = ?
+                """;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setObject(1, userId, Types.OTHER);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reviews.add(mapReview(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore findByUser in ReviewDAO: " + e.getMessage());
+        }
+        return reviews;
+    }
+
+    @Override
+    public List<Review> findAll(int offset, int limit) {
+        List<Review> reviews = new ArrayList<>();
+        String query = """
+                SELECT id, restaurant_id, user_id, rating, text, response, responded_at, created_at
+                FROM review
+                LIMIT ? OFFSET ?
+                """;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setInt(1, limit);
+            stmt.setInt(2, offset);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    reviews.add(mapReview(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Errore findAll(offset, limit) in ReviewDAO: " + e.getMessage());
+        }
+        return reviews;
+    }
+
     @Override
     public boolean save(Review review) {
         String query = """
-                INSERT INTO review (id, restaurant_id, user_id, rating, text, response, created_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                INSERT INTO review (id, restaurant_id, user_id, rating, text, response, responded_at, created_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """;
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
@@ -130,7 +191,10 @@ public class ReviewDAO implements DAO<Review> {
             stmt.setInt(4, review.getValue());
             stmt.setString(5, review.getText());
             stmt.setString(6, review.getReply());
-            stmt.setString(7, review.getTimestamp() != null ? review.getTimestamp().toString() : null);
+            if (review.getRespondedAt() != null) stmt.setTimestamp(7, Timestamp.valueOf(review.getRespondedAt()));
+            else stmt.setNull(7, Types.TIMESTAMP);
+            if (review.getTimestamp() != null) stmt.setTimestamp(8, Timestamp.valueOf(review.getTimestamp()));
+            else stmt.setNull(8, Types.TIMESTAMP);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Errore save in ReviewDAO: " + e.getMessage());
@@ -142,7 +206,7 @@ public class ReviewDAO implements DAO<Review> {
     public boolean update(Review review) {
         String query = """
                 UPDATE review
-                SET restaurant_id = ?, user_id = ?, rating = ?, text = ?, response = ?, created_at = ?
+                SET restaurant_id = ?, user_id = ?, rating = ?, text = ?, response = ?, responded_at = ?, created_at = ?
                 WHERE id = ?
                 """;
         try (Connection conn = Database.getConnection();
@@ -152,8 +216,11 @@ public class ReviewDAO implements DAO<Review> {
             stmt.setInt(3, review.getValue());
             stmt.setString(4, review.getText());
             stmt.setString(5, review.getReply());
-            stmt.setString(6, review.getTimestamp() != null ? review.getTimestamp().toString() : null);
-            stmt.setObject(7, review.getId(), Types.OTHER);
+            if (review.getRespondedAt() != null) stmt.setTimestamp(6, Timestamp.valueOf(review.getRespondedAt()));
+            else stmt.setNull(6, Types.TIMESTAMP);
+            if (review.getTimestamp() != null) stmt.setTimestamp(7, Timestamp.valueOf(review.getTimestamp()));
+            else stmt.setNull(7, Types.TIMESTAMP);
+            stmt.setObject(8, review.getId(), Types.OTHER);
             return stmt.executeUpdate() > 0;
         } catch (SQLException e) {
             System.err.println("Errore update in ReviewDAO: " + e.getMessage());

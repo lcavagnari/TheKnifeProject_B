@@ -4,7 +4,11 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.experimental.UtilityClass;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
 import java.util.UUID;
 
 /**
@@ -31,9 +35,9 @@ import java.util.UUID;
 @UtilityClass
 public final class Database {
 
-    private static final String URL = System.getenv().getOrDefault("THEKNIFE_DB_URL", "jdbc:postgresql://localhost:5432/mydb");
-    private static final String USERNAME = System.getenv().getOrDefault("THEKNIFE_DB_USER", "testuser");
-    private static final String PASSWORD = System.getenv().getOrDefault("THEKNIFE_DB_PASS", "test1234");
+    private static final String URL = "jdbc:postgresql://localhost:5432/mydb";
+    private static final String USERNAME = "testuser";
+    private static final String PASSWORD = "test1234";
 
     private static final HikariDataSource ds;
 
@@ -175,9 +179,10 @@ public final class Database {
                     CREATE TABLE IF NOT EXISTS user_restaurants (
                         user_id UUID NOT NULL,
                         restaurant_id UUID NOT NULL,
-                    
+                        created_at TIMESTAMP NOT NULL DEFAULT now(),
+
                         PRIMARY KEY (user_id, restaurant_id),
-                    
+
                         FOREIGN KEY (user_id) REFERENCES "user"(id),
                         FOREIGN KEY (restaurant_id) REFERENCES restaurant(id)
                     );
@@ -236,7 +241,10 @@ public final class Database {
             return true;
 
         } catch (SQLException e) {
-            System.err.println("Errore durante l'inizializzazione del database: " + e.getMessage());
+            System.err.println(
+                    "Errore durante l'inizializzazione del database: "
+                            + e.getMessage()
+            );
             return false;
         }
     }
@@ -537,20 +545,20 @@ public final class Database {
 
             String systemSalt = PasswordHasher.generateSalt();
             String systemHash = PasswordHasher.hash(UUID.randomUUID().toString(), systemSalt);
-            String systemId = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes()).toString();
+            byte[] systemIdBytes = "theknife-system-owner".getBytes();
 
-            try (PreparedStatement userStmt = conn.prepareStatement(
-                    "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system) VALUES (?, ?, ?, ?, 'System', 'Michelin', '2000-01-01', true, true) ON CONFLICT (id) DO NOTHING")) {
-                userStmt.setObject(1, UUID.fromString(systemId), Types.OTHER);
-                userStmt.setString(2, "system");
-                userStmt.setString(3, systemHash);
-                userStmt.setString(4, systemSalt);
-                userStmt.execute();
+            try (PreparedStatement systemStmt = conn.prepareStatement(
+                    "INSERT INTO \"user\" (id, username, psw_hash, psw_salt, first_name, last_name, birth_date, is_owner, is_system) "
+                            + "VALUES (?, 'system', ?, ?, 'System', 'Michelin', '2000-01-01', true, true) "
+                            + "ON CONFLICT (id) DO NOTHING")) {
+                systemStmt.setObject(1, java.util.UUID.nameUUIDFromBytes(systemIdBytes), Types.OTHER);
+                systemStmt.setString(2, systemHash);
+                systemStmt.setString(3, systemSalt);
+                systemStmt.execute();
             }
 
             return true;
         } catch (SQLException ex) {
-            System.err.println("Errore durante l'inizializzazione delle costanti: " + ex.getMessage());
             return false;
         }
     }

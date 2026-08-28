@@ -22,6 +22,8 @@ import java.util.UUID;
  */
 @Getter
 public class Review extends Entity {
+
+    private static final long serialVersionUID = 1L;
     /**
      * Timestamp di creazione o aggiornamento della recensione.
      */
@@ -51,6 +53,11 @@ public class Review extends Entity {
      * Risposta del ristorante alla recensione (opzionale).
      */
     private String reply;
+
+    /**
+     * Timestamp della risposta del ristorante (opzionale, valorizzato solo insieme a reply).
+     */
+    private LocalDateTime respondedAt;
 
     /**
      * Costruttore completo con tutti i campi, incluso reply.
@@ -104,6 +111,10 @@ public class Review extends Entity {
         if (reply == null || reply.isBlank())
             return;
         this.reply = reply;
+    }
+
+    public void setRespondedAt(LocalDateTime respondedAt) {
+        this.respondedAt = respondedAt;
     }
 
     @Override
