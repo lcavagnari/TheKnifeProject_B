@@ -5,6 +5,7 @@ import it.uninsubria.laboratoriob.api.utils.HeartbeatChannel;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Server-side setup for the shared HeartbeatChannel: binds and accepts
@@ -16,7 +17,7 @@ public class HeartbeatServer {
     private final long intervalMinutes;
 
     private volatile ServerSocket serverSocket;
-    private volatile HeartbeatChannel channel;
+    private final CopyOnWriteArrayList<HeartbeatChannel> channels = new CopyOnWriteArrayList<>();
     private volatile boolean shuttingDown = false;
 
     public HeartbeatServer(int port, long intervalMinutes) {
@@ -30,11 +31,6 @@ public class HeartbeatServer {
         setupThread.start();
     }
 
-    /**
-     * Keeps accepting new heartbeat connections for the life of the server,
-     * so a client that reconnects after a drop is picked back up instead of
-     * the server having stopped listening after the first connection.
-     */
     private void acceptLoop() {
         try {
             serverSocket = new ServerSocket(port);
@@ -47,8 +43,11 @@ public class HeartbeatServer {
             try {
                 Socket socket = serverSocket.accept();
                 HeartbeatChannel newChannel = new HeartbeatChannel(socket, intervalMinutes);
-                newChannel.setOnDisconnect(newChannel::shutdown);
-                channel = newChannel;
+                newChannel.setOnDisconnect(() -> {
+                    channels.remove(newChannel);
+                    newChannel.shutdown();
+                });
+                channels.add(newChannel);
                 newChannel.start();
             } catch (IOException e) {
                 if (!shuttingDown) {
@@ -59,18 +58,17 @@ public class HeartbeatServer {
     }
 
     public void wakeUp() {
-        HeartbeatChannel c = channel;
-        if (c != null) {
+        for (HeartbeatChannel c : channels) {
             c.wakeUp();
         }
     }
 
     public void shutdown() {
         shuttingDown = true;
-        HeartbeatChannel c = channel;
-        if (c != null) {
+        for (HeartbeatChannel c : channels) {
             c.shutdown();
         }
+        channels.clear();
         try {
             if (serverSocket != null) serverSocket.close();
         } catch (IOException ignored) {
