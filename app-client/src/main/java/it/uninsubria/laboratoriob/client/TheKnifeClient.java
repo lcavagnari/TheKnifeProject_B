@@ -1,16 +1,9 @@
 package it.uninsubria.laboratoriob.client;
 
-import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
-import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
-import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
-import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
 import it.uninsubria.laboratoriob.client.ui.menus.GuestMenus;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
-
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 
 /**
  * Classe principale del client The Knife.
@@ -47,7 +40,7 @@ public class TheKnifeClient {
     public TheKnifeClient() {
         this.tcpHbeatClient = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
 
-        this.dataStore = new ClientDataStore(restaurantService, authService, reviewService, favouriteService);
+        this.dataStore = new ClientDataStore();
 
         tcpHbeatClient.start();
         Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
