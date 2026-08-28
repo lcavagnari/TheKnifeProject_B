@@ -8,6 +8,7 @@ import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 
 import java.rmi.RemoteException;
 import java.util.Set;
@@ -15,11 +16,23 @@ import java.util.UUID;
 
 public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
 
-    private final RestaurantServiceInter restaurantService;
+    private volatile RestaurantServiceInter restaurantService;
 
     JsonOwnerDAO(AuthServiceInter authService, RestaurantServiceInter restaurantService) {
         super(Owner.class, UserRole.OWNER, authService);
         this.restaurantService = restaurantService;
+    }
+
+    void setRemoteRestaurantService(RestaurantServiceInter restaurantService) {
+        this.restaurantService = restaurantService;
+    }
+
+    private RestaurantServiceInter ensureRestaurantService() {
+        RestaurantServiceInter current = restaurantService;
+        if (current != null) return current;
+        RestaurantServiceInter fresh = RmiRepository.lookupRestaurantService();
+        if (fresh != null) this.restaurantService = fresh;
+        return fresh;
     }
 
     @Override
@@ -52,9 +65,13 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         Owner owner = cacheById.get(ownerId);
         if (owner == null || restaurant == null) return false;
 
+        RestaurantServiceInter svc = ensureRestaurantService();
+        if (svc == null) return false;
+
         try {
-            restaurantService.saveForOwner(restaurant, ownerId);
+            svc.saveForOwner(restaurant, ownerId);
         } catch (RemoteException e) {
+            this.restaurantService = null;
             System.err.println("RMI sync addOwnedRestaurant " + getClass().getSimpleName() + ": " + e.getMessage());
             return false;
         }
@@ -69,9 +86,13 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         Restaurant restaurant = owner.getRestaurantsById().get(restaurantId);
         if (restaurant == null) return false;
 
+        RestaurantServiceInter svc = ensureRestaurantService();
+        if (svc == null) return false;
+
         try {
-            restaurantService.deleteOwnedRestaurant(ownerId, restaurantId);
+            svc.deleteOwnedRestaurant(ownerId, restaurantId);
         } catch (RemoteException e) {
+            this.restaurantService = null;
             System.err.println("RMI sync removeOwnedRestaurant " + getClass().getSimpleName() + ": " + e.getMessage());
             return false;
         }

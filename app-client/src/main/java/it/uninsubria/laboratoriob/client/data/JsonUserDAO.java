@@ -12,6 +12,7 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,7 +31,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     protected File storeFile;
     private final Class<T> type;
 
-    protected final AuthServiceInter authService;
+    protected volatile AuthServiceInter authService;
     private final UserRole role;
 
     protected final ConcurrentHashMap<UUID, T> cacheById = new ConcurrentHashMap<>();
@@ -43,6 +44,18 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         this.role = role;
         this.storeFile = new File(Constants.ROOT, "users.json");
         this.authService = authService;
+    }
+
+    void setRemoteAuthService(AuthServiceInter authService) {
+        this.authService = authService;
+    }
+
+    private AuthServiceInter ensureAuthService() {
+        AuthServiceInter current = authService;
+        if (current != null) return current;
+        AuthServiceInter fresh = RmiRepository.lookupAuthService();
+        if (fresh != null) this.authService = fresh;
+        return fresh;
     }
 
     protected abstract T mapNode(JsonNode node);
@@ -185,9 +198,10 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     public boolean save(T user) {
         if (user == null) return false;
 
-        if (authService != null) {
+        AuthServiceInter svc = ensureAuthService();
+        if (svc != null) {
             try {
-                authService.register(
+                svc.register(
                         user.getUsername(), user.getPasswordHash(),
                         user.getName(), user.getLastName(),
                         user.getDateOfBirth(), user.getLocation(),
@@ -195,6 +209,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
                 );
 
             } catch (RemoteException e) {
+                this.authService = null;
                 System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
                 return false;
             }
@@ -226,15 +241,17 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
                         boolean isOwner) {
 
         T user = null;
-        if (authService != null) {
+        AuthServiceInter svc = ensureAuthService();
+        if (svc != null) {
             try {
-                user = (T) authService.register(
+                user = (T) svc.register(
                         username, rawPassword,
                         firstName, lastName,
                         birthDate, location, isOwner
                 );
 
             } catch (RemoteException e) {
+                this.authService = null;
                 System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
                 return false;
             } finally {
@@ -280,9 +297,10 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
         T cached = cacheByUsername.get(username);
         if (cached != null) return Optional.of(cached);
-        if (authService != null) {
+        AuthServiceInter svc = ensureAuthService();
+        if (svc != null) {
             try {
-                User remote = authService.login(username, password);
+                User remote = svc.login(username, password);
                 if (remote != null && type.isInstance(remote)) {
                     T entity = (T) remote;
                     cacheById.put(entity.getId(), entity);
@@ -291,6 +309,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
                     return Optional.of(entity);
                 }
             } catch (RemoteException e) {
+                this.authService = null;
                 System.err.println("RMI login " + getClass().getSimpleName() + ": " + e.getMessage());
             }
         }

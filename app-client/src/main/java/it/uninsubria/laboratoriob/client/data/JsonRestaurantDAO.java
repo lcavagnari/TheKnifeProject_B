@@ -13,6 +13,7 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +30,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private File storeFile;
-    private final RestaurantServiceInter service;
+    private volatile RestaurantServiceInter service;
     private final JsonLocationDAO locationDAO;
 
     private final ConcurrentHashMap<UUID, Restaurant> cacheById = new ConcurrentHashMap<>();
@@ -39,6 +40,18 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         this.storeFile = new File(Constants.ROOT, "restaurants.json");
         this.service = service;
         this.locationDAO = locationDAO;
+    }
+
+    void setRemoteRestaurantService(RestaurantServiceInter service) {
+        this.service = service;
+    }
+
+    private RestaurantServiceInter ensureService() {
+        RestaurantServiceInter current = service;
+        if (current != null) return current;
+        RestaurantServiceInter fresh = RmiRepository.lookupRestaurantService();
+        if (fresh != null) this.service = fresh;
+        return fresh;
     }
 
     public void repointTo(UUID userId) {
@@ -190,15 +203,17 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         Restaurant cached = cacheById.get(id);
         if (cached != null) return Optional.of(cached);
 
-        if (service != null) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
             try {
-                Restaurant remote = service.findById(id);
+                Restaurant remote = svc.findById(id);
                 if (remote != null) {
                     cacheById.put(remote.getId(), remote);
                     persistAtomic(toArrayNode());
                     return Optional.of(remote);
                 }
             } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI fallback findById restaurant: " + e.getMessage());
             }
         }
@@ -213,15 +228,17 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
         // TODO: the fact that cache isnt empty doesnt mean that it is up to date.
         if (!local.isEmpty() && countLocal() == countRemote()) return local;
-        if (service != null) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
             try {
-                List<Restaurant> remote = service.findAll(0, 1000);
+                List<Restaurant> remote = svc.findAll(0, 1000);
 
                 for (Restaurant r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
 
                 return new ArrayList<>(cacheById.values());
             } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI fallback findAll restaurant: " + e.getMessage());
             }
         }
@@ -236,14 +253,15 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     }
 
     public long countRemote() {
-        if (service != null) {
-            try {
-                return service.count();
-            } catch (RemoteException e) {
-                System.err.println("RMI fallback count restaurant: " + e.getMessage());
-                return 0;
-            }
-        } else return 0;
+        RestaurantServiceInter svc = ensureService();
+        if (svc == null) return 0;
+        try {
+            return svc.count();
+        } catch (RemoteException e) {
+            this.service = null;
+            System.err.println("RMI fallback count restaurant: " + e.getMessage());
+            return 0;
+        }
     }
 
     public long countLocal() {
@@ -265,13 +283,15 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
                 .filter(r -> r.getOwner() != null && r.getOwner().getId().equals(ownerId))
                 .collect(Collectors.toList());
         if (!local.isEmpty()) return local;
-        if (service != null) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
             try {
-                List<Restaurant> remote = service.findByOwner(ownerId);
+                List<Restaurant> remote = svc.findByOwner(ownerId);
                 for (Restaurant r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
                 return remote;
             } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI fallback findByOwner restaurant: " + e.getMessage());
             }
         }
@@ -285,8 +305,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         if (cacheById.containsKey(restaurant.getId())) return false;
         cacheById.put(restaurant.getId(), restaurant);
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.save(restaurant); } catch (RemoteException e) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.save(restaurant); } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI sync save restaurant: " + e.getMessage());
             }
         }
@@ -300,8 +322,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         if (!cacheById.containsKey(restaurant.getId())) return false;
         cacheById.put(restaurant.getId(), restaurant);
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.update(restaurant); } catch (RemoteException e) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.update(restaurant); } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI sync update restaurant: " + e.getMessage());
             }
         }
@@ -314,8 +338,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         Restaurant removed = cacheById.remove(id);
         if (removed == null) return false;
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.delete(id); } catch (RemoteException e) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.delete(id); } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI sync delete restaurant: " + e.getMessage());
             }
         }
@@ -329,8 +355,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         r.getCuisinesTypes().clear();
         r.getCuisinesTypes().addAll(cuisines);
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.updateCuisines(restaurantId, cuisines); } catch (RemoteException e) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.updateCuisines(restaurantId, cuisines); } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI sync updateCuisines: " + e.getMessage());
             }
         }
@@ -344,8 +372,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         r.getServices().clear();
         r.getServices().addAll(services);
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.updateServices(restaurantId, services); } catch (RemoteException e) {
+        RestaurantServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.updateServices(restaurantId, services); } catch (RemoteException e) {
+                this.service = null;
                 System.err.println("RMI sync updateServices: " + e.getMessage());
             }
         }
