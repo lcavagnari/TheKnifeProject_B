@@ -30,17 +30,15 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     // TODO: fix Arraylist is not serialisable issue and ensure data is cached appropriately.
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private File storeFile;
+    private final File storeFile;
     private volatile RestaurantServiceInter service;
-    private final JsonLocationDAO locationDAO;
 
     private final ConcurrentHashMap<UUID, Restaurant> cacheById = new ConcurrentHashMap<>();
     private volatile boolean cacheLoaded = false;
 
-    public JsonRestaurantDAO(RestaurantServiceInter service, JsonLocationDAO locationDAO) {
+    public JsonRestaurantDAO(RestaurantServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "restaurants.json");
         this.service = service;
-        this.locationDAO = locationDAO;
     }
 
     void setRemoteRestaurantService(RestaurantServiceInter service) {
@@ -53,15 +51,6 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         RestaurantServiceInter fresh = RmiRepository.lookupRestaurantService();
         if (fresh != null) this.service = fresh;
         return fresh;
-    }
-
-    public void repointTo(UUID userId) {
-        File userDir = new File(Constants.ROOT, userId.toString());
-
-        this.storeFile = new File(userDir, storeFile.getName());
-        this.cacheLoaded = false;
-
-        cacheById.clear();
     }
 
     private void ensureCacheLoaded() {
@@ -126,11 +115,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
             owner = new Owner(ownerId, "", "", "", "", "", null, LocalDate.MIN);
         }
 
-        Location loc = null;
-        JsonNode locNode = node.path("location");
-        if (!locNode.isMissingNode() && !locNode.isNull()) {
-            loc = locationDAO.mapNode(locNode);
-        }
+        Location loc = LocationMapper.fromNode(node.path("location"));
 
         PriceRange priceRange = PriceRange.MODERATE;
         JsonNode prNode = node.path("priceRange");
@@ -183,7 +168,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         node.put("priceRange", restaurant.getPriceRange().name());
 
         if (restaurant.getLocation() != null)
-            node.set("location", locationDAO.toNode(restaurant.getLocation()));
+            node.set("location", LocationMapper.toNode(mapper, restaurant.getLocation()));
 
 
         ArrayNode cuisinesArray = mapper.createArrayNode();
