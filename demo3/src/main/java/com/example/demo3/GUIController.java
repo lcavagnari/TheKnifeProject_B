@@ -164,6 +164,10 @@ public class GUIController {
                 node.setTranslateX(0);
             }
 
+            // Drop any form already showing (e.g. Login handing off to Home) so it
+            // doesn't stay stacked underneath the one we're about to show.
+            menuCard.getChildren().removeIf(child -> child != titleBlock && child != menuButtons && child != form);
+
             form.setTranslateX(dist);
             form.setVisible(false);
             form.setManaged(false);
