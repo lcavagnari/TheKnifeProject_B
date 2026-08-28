@@ -1,15 +1,10 @@
 package it.uninsubria.laboratoriob.client.data;
 
-import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
-import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
-import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
-import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 import lombok.Getter;
 
-import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -34,68 +29,38 @@ public class ClientDataStore {
     private final JsonReviewDAO reviewDAO;
     private final JsonLocationDAO locationDAO;
 
-    private final RestaurantServiceInter restaurantService;
-    private final AuthServiceInter authService;
-    private final ReviewServiceInter reviewService;
-    private final FavouriteServiceInter favouriteService;
-
     public ClientDataStore() {
-        this.restaurantService = restaurantService;
-        this.authService = authService;
-        this.reviewService = reviewService;
-        this.favouriteService = favouriteService;
-        this.customerDAO = new JsonCustomerDAO(authService,favouriteService);
-        this.ownerDAO = new JsonOwnerDAO(authService, restaurantService);
+        this.customerDAO = new JsonCustomerDAO(null, null);
+        this.ownerDAO = new JsonOwnerDAO(null, null);
         this.locationDAO = new JsonLocationDAO();
-        this.restaurantDAO = new JsonRestaurantDAO(restaurantService, locationDAO);
-        this.reviewDAO = new JsonReviewDAO(customerDAO, reviewService);
+        this.restaurantDAO = new JsonRestaurantDAO(null, locationDAO);
+        this.reviewDAO = new JsonReviewDAO(customerDAO, null);
     }
 
-    public boolean acquireRemoteServices(String hostname, int rmiPort, int maxAttempts) {
-        Registry registry = null;
-        try {
-            registry = LocateRegistry.getRegistry(hostname, rmiPort);
+    /**
+     * Acquires all RMI stubs (via {@link RmiRepository}, which must already be
+     * {@code configure()}d) and pushes the ones that succeeded onto the DAOs.
+     * Safe to call again later (e.g. after a manual reconnect).
+     */
+    public boolean acquireRemoteServices() {
+        Set<String> acquired = RmiRepository.acquireAll();
+        propagateServices();
 
-        } catch (RemoteException ignored) {
-            int attempts = 0;
-
-            while (attempts <= maxAttempts) {
-                try {
-                    Thread.currentThread().wait(500);
-                } catch (InterruptedException ignored1) {}
-
-                try {
-                    registry = LocateRegistry.getRegistry(hostname, rmiPort);
-                } catch (RemoteException e) { attempts++; }
-            }
-
-            if (registry == null) return false;
-        }
-
-
-        // TODO: add retrieving of services via completable futures.
-
-        try {
-
-
-            restaurantService = (RestaurantServiceInter) registry.lookup("restaurant");
-            authService = (AuthServiceInter) registry.lookup("auth");
-            reviewService = (ReviewServiceInter) registry.lookup("review");
-            favouriteService = (FavouriteServiceInter) registry.lookup("favourite");
+        if (acquired.isEmpty()) {
+            System.err.println("WARNING: RMI connection unavailable, running in local-only mode.");
+        } else {
             IO.printSuccessMessage("RMI connection established.");
-        } catch (Exception ignored) {
-            try {
-                Registry registry = LocateRegistry.getRegistry(hostname, rmiPort);
-
-                restaurantService = (RestaurantServiceInter) registry.lookup("restaurant");
-                authService = (AuthServiceInter) registry.lookup("auth");
-                reviewService = (ReviewServiceInter) registry.lookup("review");
-                favouriteService = (FavouriteServiceInter) registry.lookup("favourite");
-                IO.printSuccessMessage("RMI connection established.");
-            } catch (Exception e) {
-                System.err.println("WARNING: RMI lookup failed: " + e.getMessage());
-            }
         }
+        return !acquired.isEmpty();
+    }
+
+    private void propagateServices() {
+        customerDAO.setRemoteAuthService(RmiRepository.getAuthService());
+        customerDAO.setRemoteFavService(RmiRepository.getFavouriteService());
+        ownerDAO.setRemoteAuthService(RmiRepository.getAuthService());
+        ownerDAO.setRemoteRestaurantService(RmiRepository.getRestaurantService());
+        restaurantDAO.setRemoteRestaurantService(RmiRepository.getRestaurantService());
+        reviewDAO.setRemoteReviewService(RmiRepository.getReviewService());
     }
 
     /**
