@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
@@ -85,8 +86,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
                 svc.addFavourites(customerId, restaurantId);
             } catch (RemoteException e) {
                 this.favService = null;
-                System.err.println("RMI sync addFavourite " + getClass().getSimpleName() + ": " + e.getMessage());
-                return false;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
 
@@ -105,8 +105,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
                 svc.removeFavourites(customerId, restaurantId);
             } catch (RemoteException e) {
                 this.favService = null;
-                System.err.println("RMI sync removeFavourite " + getClass().getSimpleName() + ": " + e.getMessage());
-                return false;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
 

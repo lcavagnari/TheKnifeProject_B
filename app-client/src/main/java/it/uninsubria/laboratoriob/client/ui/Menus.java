@@ -2,6 +2,7 @@ package it.uninsubria.laboratoriob.client.ui;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
@@ -45,6 +46,10 @@ public abstract class Menus {
             } catch (AbortOperationException e) {
                 IO.printErrorMessage(e.getMessage() +
                         ((e.getReason() != null) ? "Reason: " + e.getReason() : ""));
+                return;
+
+            } catch (ServiceUnavailableException e) {
+                IO.printErrorMessage("Server non disponibile. Riprova più tardi.");
                 return;
             }
         }
@@ -104,6 +109,8 @@ public abstract class Menus {
             }
         } catch (AbortOperationException e) {
             IO.printErrorMessage(e.getMessage() + ((e.getReason() != null) ? "Reason: " + e.getReason() : ""));
+        } catch (ServiceUnavailableException e) {
+            IO.printErrorMessage("Server non disponibile. Riprova più tardi.");
         } catch (Exception e) {
             IO.printErrorMessage("Errore di connessione al server: " + e.getMessage());
         }

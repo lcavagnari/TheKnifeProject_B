@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.data.DAO;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
@@ -159,7 +160,7 @@ public final class JsonReviewDAO implements DAO<Review> {
                 return new ArrayList<>(cacheById.values());
             } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI fallback findAll review: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -193,7 +194,7 @@ public final class JsonReviewDAO implements DAO<Review> {
                 return remote;
             } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI fallback findByRestaurant review: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -214,7 +215,7 @@ public final class JsonReviewDAO implements DAO<Review> {
                 return remote;
             } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI fallback findByUser review: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -231,7 +232,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         if (svc != null) {
             try { svc.save(review); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync save review: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
@@ -248,7 +249,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         if (svc != null) {
             try { svc.update(review); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync update review: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
@@ -264,8 +265,7 @@ public final class JsonReviewDAO implements DAO<Review> {
             synced = svc != null && svc.replyToReview(review.getId(), reply);
         } catch (RemoteException e) {
             this.service = null;
-            System.err.println("RMI sync replyToReview: " + e.getMessage());
-            return false;
+            throw new ServiceUnavailableException("Server non disponibile", e);
         }
         if (!synced) return false;
 
@@ -287,7 +287,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         if (svc != null) {
             try { svc.delete(id); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync delete review: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
