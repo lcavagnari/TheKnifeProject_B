@@ -96,19 +96,36 @@ public class LoginMenu {
             }
         }
 
+        if (dataStore.getAuthService() == null) {
+            IO.printErrorMessage("Servizio auth non disponibile.");
+            return null;
+        }
+
         try {
-            User user = isOwner
-                    ? new Owner(username, "", "", firstName, lastName, location, dateOfBirth)
-                    : new Customer(username, "", "", firstName, lastName, location, dateOfBirth);
+            User registered;
+            try {
+                registered = dataStore.getAuthService().register(
+                        username, password, firstName, lastName, dateOfBirth, location, isOwner);
+            } catch (RemoteException e) {
+                IO.printErrorMessage("Registrazione fallita: " + e.getMessage());
+                return null;
+            }
 
-            if (Validators.validateUser(user))
-                IO.getUserInput("Registrazione completata! Premi un qualsiasi tasto + Invio per tornare al menu principale.");
+            if (!Validators.validateUser(registered)) return null;
 
-            dataStore.switchUser(user.getId());
-            if (isOwner) dataStore.getOwnerDAO().save((Owner) user);
-            else dataStore.getCustomerDAO().save((Customer) user);
+            dataStore.switchUser(registered.getId());
 
-            return user;
+            boolean cached = isOwner
+                    ? dataStore.getOwnerDAO().cacheOnly((Owner) registered)
+                    : dataStore.getCustomerDAO().cacheOnly((Customer) registered);
+
+            if (!cached) {
+                IO.printErrorMessage("Registrazione riuscita ma impossibile salvare la cache locale.");
+                return null;
+            }
+
+            IO.getUserInput("Registrazione completata! Premi un qualsiasi tasto + Invio per tornare al menu principale.");
+            return registered;
 
         } catch (IllegalArgumentException | UnsupportedOperationException ex) {
             IO.printErrorMessage(ex.getMessage() + ". Ritorno al menu principale.");

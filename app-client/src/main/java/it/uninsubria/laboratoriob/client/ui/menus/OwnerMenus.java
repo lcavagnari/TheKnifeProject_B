@@ -42,8 +42,8 @@ public class OwnerMenus extends Menus {
             int choice = IO.getInt("Enter choice:");
 
             switch (choice) {
-                case 1 -> searchRestaurant();
-                case 2 -> browseRestaurants();
+                case 1 -> browseRestaurants();
+                case 2 -> searchRestaurant();
                 case 3 -> viewOwnedRestaurants();
                 case 4 -> viewOwnerLatestReviews();
                 case 5 -> {
