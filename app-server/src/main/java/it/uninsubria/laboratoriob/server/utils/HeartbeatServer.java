@@ -17,6 +17,7 @@ public class HeartbeatServer {
 
     private volatile ServerSocket serverSocket;
     private volatile HeartbeatChannel channel;
+    private volatile boolean shuttingDown = false;
 
     public HeartbeatServer(int port, long intervalMinutes) {
         this.port = port;
@@ -24,39 +25,51 @@ public class HeartbeatServer {
     }
 
     public void start() {
-        Thread setupThread = new Thread(this::acceptAndRun, "heartbeat-setup");
+        Thread setupThread = new Thread(this::acceptLoop, "heartbeat-setup");
+        setupThread.setDaemon(true);
         setupThread.start();
     }
 
-    private void acceptAndRun() {
+    /**
+     * Keeps accepting new heartbeat connections for the life of the server,
+     * so a client that reconnects after a drop is picked back up instead of
+     * the server having stopped listening after the first connection.
+     */
+    private void acceptLoop() {
         try {
             serverSocket = new ServerSocket(port);
-            System.out.println("Heartbeat server listening on port " + port);
-            while (!Thread.currentThread().isInterrupted()) {
-                Socket socket = serverSocket.accept();
-                System.out.println("Client connected to heartbeat: " + socket.getRemoteSocketAddress());
-                if (channel != null) {
-                    channel.shutdown();
-                }
-                channel = new HeartbeatChannel(socket, intervalMinutes);
-                channel.start();
-            }
         } catch (IOException e) {
-            if (!serverSocket.isClosed()) {
-                System.err.println("Heartbeat server error: " + e.getMessage());
+            System.err.println("Heartbeat server bind failed, continuing without it: " + e.getMessage());
+            return;
+        }
+
+        while (!shuttingDown) {
+            try {
+                Socket socket = serverSocket.accept();
+                HeartbeatChannel newChannel = new HeartbeatChannel(socket, intervalMinutes);
+                newChannel.setOnDisconnect(newChannel::shutdown);
+                channel = newChannel;
+                newChannel.start();
+            } catch (IOException e) {
+                if (!shuttingDown) {
+                    System.err.println("Heartbeat accept failed, retrying: " + e.getMessage());
+                }
             }
         }
     }
 
     public void wakeUp() {
-        if (channel != null) {
-            channel.wakeUp();
+        HeartbeatChannel c = channel;
+        if (c != null) {
+            c.wakeUp();
         }
     }
 
     public void shutdown() {
-        if (channel != null) {
-            channel.shutdown();
+        shuttingDown = true;
+        HeartbeatChannel c = channel;
+        if (c != null) {
+            c.shutdown();
         }
         try {
             if (serverSocket != null) serverSocket.close();

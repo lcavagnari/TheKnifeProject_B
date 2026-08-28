@@ -5,18 +5,24 @@ import it.uninsubria.laboratoriob.client.ui.IO;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Client-side setup for the shared HeartbeatChannel: connects out on a
- * background thread so a failure never blocks application startup.
+ * background thread so a failure never blocks application startup, and
+ * keeps retrying the connection if the server drops it instead of giving
+ * up after the first disconnect.
  */
 public class HeartbeatClient {
+
+    private static final long RECONNECT_DELAY_SECONDS = 10;
 
     private final String host;
     private final int port;
     private final long intervalMinutes;
 
     private volatile HeartbeatChannel channel;
+    private volatile boolean shuttingDown = false;
 
     public HeartbeatClient(String host, int port, long intervalMinutes) {
         this.host = host;
@@ -25,25 +31,55 @@ public class HeartbeatClient {
     }
 
     public void start() {
+        connect();
+    }
+
+    private void connect() {
+        if (shuttingDown) return;
         try {
             Socket socket = new Socket(host, port);
-            System.out.println("[Heartbeat] Client connected to " + host + ":" + port);
-            channel = new HeartbeatChannel(socket, intervalMinutes);
-            channel.start();
+            HeartbeatChannel newChannel = new HeartbeatChannel(socket, intervalMinutes);
+            newChannel.setOnDisconnect(this::handleDisconnect);
+            channel = newChannel;
+            newChannel.start();
         } catch (IOException e) {
-            IO.printErrorMessage("Heartbeat connection setup failed, continuing without it: " + e.getMessage());
+            IO.printErrorMessage("Heartbeat connection setup failed, retrying: " + e.getMessage());
+            scheduleReconnect();
         }
     }
 
+    private void handleDisconnect() {
+        if (shuttingDown) return;
+        HeartbeatChannel dead = channel;
+        if (dead != null) dead.shutdown();
+        scheduleReconnect();
+    }
+
+    private void scheduleReconnect() {
+        if (shuttingDown) return;
+        Thread retryThread = new Thread(() -> {
+            try {
+                Thread.sleep(TimeUnit.SECONDS.toMillis(RECONNECT_DELAY_SECONDS));
+            } catch (InterruptedException ignored) {
+            }
+            connect();
+        }, "heartbeat-reconnect");
+        retryThread.setDaemon(true);
+        retryThread.start();
+    }
+
     public void wakeUp() {
-        if (channel != null) {
-            channel.wakeUp();
+        HeartbeatChannel c = channel;
+        if (c != null) {
+            c.wakeUp();
         }
     }
 
     public void shutdown() {
-        if (channel != null) {
-            channel.shutdown();
+        shuttingDown = true;
+        HeartbeatChannel c = channel;
+        if (c != null) {
+            c.shutdown();
         }
     }
 }
