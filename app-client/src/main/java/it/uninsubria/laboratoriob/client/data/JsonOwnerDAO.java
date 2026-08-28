@@ -1,198 +1,161 @@
 package it.uninsubria.laboratoriob.client.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.Constants;
-import it.uninsubria.laboratoriob.api.data.DAO;
-import it.uninsubria.laboratoriob.api.enums.Nation;
-import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Owner;
+import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.nio.file.StandardCopyOption;
+import java.rmi.RemoteException;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
-public final class JsonOwnerDAO implements DAO<Owner> {
+public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
 
-    private static final ObjectMapper mapper = new ObjectMapper();
-    private final File storeFile;
-    private final AuthServiceInter service;
+    private volatile RestaurantServiceInter restaurantService;
+    private final JsonRestaurantDAO restaurantDAO;
+    private File ownedRestaurantsFile;
 
-    private final ConcurrentHashMap<UUID, Owner> cacheById = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, Owner> cacheByUsername = new ConcurrentHashMap<>();
-    private volatile boolean cacheLoaded = false;
-
-    public JsonOwnerDAO(AuthServiceInter service) {
-        this.storeFile = new File(Constants.ROOT, "owners.json");
-        this.service = service;
+    JsonOwnerDAO(AuthServiceInter authService, RestaurantServiceInter restaurantService, JsonRestaurantDAO restaurantDAO) {
+        super(Owner.class, UserRole.OWNER, authService);
+        this.restaurantService = restaurantService;
+        this.restaurantDAO = restaurantDAO;
     }
 
-    private void ensureCacheLoaded() {
-        if (cacheLoaded) return;
-        synchronized (this) {
-            if (cacheLoaded) return;
-            loadFromDisk();
-            cacheLoaded = true;
-        }
+    @Override
+    public void repointTo(UUID userId) {
+        super.repointTo(userId);
+        File userDir = new File(Constants.ROOT, userId.toString());
+        this.ownedRestaurantsFile = new File(userDir, "restaurants.json");
     }
 
-    private void loadFromDisk() {
-        cacheById.clear();
-        cacheByUsername.clear();
-        if (!storeFile.exists()) return;
+    private Set<UUID> loadOwnedRestaurantIds() {
+        if (ownedRestaurantsFile == null || !ownedRestaurantsFile.exists()) return Set.of();
         try {
-            JsonNode node = mapper.readTree(storeFile);
-            if (!node.isArray()) return;
-            for (JsonNode n : (ArrayNode) node) {
-                Owner owner = mapNode(n);
-                cacheById.put(owner.getId(), owner);
-                cacheByUsername.put(owner.getUsername(), owner);
-            }
+            JsonNode node = mapper.readTree(ownedRestaurantsFile);
+            if (!node.isArray()) return Set.of();
+            Set<UUID> ids = new HashSet<>();
+            for (JsonNode n : node) ids.add(UUID.fromString(n.asText()));
+            return ids;
         } catch (IOException e) {
-            System.err.println("Errore loadFromDisk in JsonOwnerDAO: " + e.getMessage());
+            System.err.println("Errore loadOwnedRestaurantIds in JsonOwnerDAO: " + e.getMessage());
+            return Set.of();
         }
     }
 
-    private void persistAtomic(ArrayNode array) {
+    private void persistOwnedRestaurantIds(Set<UUID> restaurantIds) {
+        if (ownedRestaurantsFile == null) return;
         try {
-            if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
-            File tmp = File.createTempFile("owners_", ".json", storeFile.getParentFile());
+            if (!ownedRestaurantsFile.getParentFile().exists()) ownedRestaurantsFile.getParentFile().mkdirs();
+            ArrayNode array = mapper.createArrayNode();
+            for (UUID id : restaurantIds) array.add(id.toString());
+            File tmp = File.createTempFile("owned_restaurants_", ".json", ownedRestaurantsFile.getParentFile());
             mapper.writerWithDefaultPrettyPrinter().writeValue(tmp, array);
-            Files.move(tmp.toPath(), storeFile.toPath(), java.nio.file.StandardCopyOption.REPLACE_EXISTING,
-                    java.nio.file.StandardCopyOption.ATOMIC_MOVE);
+            Files.move(tmp.toPath(), ownedRestaurantsFile.toPath(), StandardCopyOption.REPLACE_EXISTING,
+                    StandardCopyOption.ATOMIC_MOVE);
         } catch (IOException e) {
-            System.err.println("Errore persistAtomic in JsonOwnerDAO: " + e.getMessage());
+            System.err.println("Errore persistOwnedRestaurantIds in JsonOwnerDAO: " + e.getMessage());
         }
     }
 
-    private ArrayNode toArrayNode() {
+    void setRemoteRestaurantService(RestaurantServiceInter restaurantService) {
+        this.restaurantService = restaurantService;
+    }
+
+    private RestaurantServiceInter ensureRestaurantService() {
+        RestaurantServiceInter current = restaurantService;
+        if (current != null) return current;
+        RestaurantServiceInter fresh = RmiRepository.lookupRestaurantService();
+        if (fresh != null) this.restaurantService = fresh;
+        return fresh;
+    }
+
+    @Override
+    protected Owner mapNode(JsonNode node) {
+        Owner owner = new Owner(
+                readId(node),
+                readString(node, "username"),
+                readString(node, "passwordHash"),
+                readString(node, "passwordSalt"),
+                readString(node, "name"),
+                readString(node, "lastName"),
+                readLocation(node),
+                readDate(node),
+                readBoolean(node, "system", false)
+        );
+
+        for (UUID restaurantId : loadOwnedRestaurantIds()) {
+            restaurantDAO.findById(restaurantId).ifPresent(owner::addRestaurant);
+        }
+
+        return owner;
+    }
+
+    @Override
+    protected ArrayNode toArrayNode() {
         ArrayNode array = mapper.createArrayNode();
         for (Owner owner : cacheById.values()) {
-            array.add(toNode(owner));
+            ObjectNode node = mapper.createObjectNode();
+            writeUserFields(node, owner);
+            array.add(node);
         }
         return array;
     }
 
-    private Owner mapNode(JsonNode node) {
-        UUID id = UUID.fromString(node.path("id").asText());
-        String username = node.path("username").asText();
-        String passwordHash = node.path("passwordHash").asText();
-        String passwordSalt = node.path("passwordSalt").asText();
-        String name = node.path("name").asText();
-        String lastName = node.path("lastName").asText();
-        LocalDate dateOfBirth = LocalDate.parse(node.path("dateOfBirth").asText());
-        boolean system = node.path("system").asBoolean(false);
+    public boolean addOwnedRestaurant(UUID ownerId, Restaurant restaurant) {
+        Owner owner = cacheById.get(ownerId);
+        if (owner == null || restaurant == null) return false;
 
-        Location loc = null;
-        JsonNode locNode = node.path("location");
-        if (!locNode.isMissingNode() && !locNode.isNull()) {
-            loc = new Location(
-                    Nation.fromString(locNode.path("nation").asText()),
-                    locNode.path("city").asText(),
-                    locNode.path("latitude").asDouble(),
-                    locNode.path("longitude").asDouble(),
-                    locNode.path("address").asText()
-            );
+        RestaurantServiceInter svc = ensureRestaurantService();
+        if (svc == null) return false;
+
+        try {
+            svc.saveForOwner(restaurant, ownerId);
+        } catch (RemoteException e) {
+            this.restaurantService = null;
+            throw new ServiceUnavailableException("Server non disponibile", e);
         }
 
-        return new Owner(id, username, passwordHash, passwordSalt, name, lastName, loc, dateOfBirth, system);
+        boolean added = owner.addRestaurant(restaurant);
+        if (added) persistOwnedRestaurantIds(owner.getRestaurantsById().keySet());
+        return added;
     }
 
-    private ObjectNode toNode(Owner owner) {
-        ObjectNode node = mapper.createObjectNode();
-        node.put("id", owner.getId().toString());
-        node.put("username", owner.getUsername());
-        node.put("passwordHash", owner.getPasswordHash());
-        node.put("passwordSalt", owner.getPasswordSalt());
-        node.put("name", owner.getName());
-        node.put("lastName", owner.getLastName());
-        node.put("dateOfBirth", owner.getDateOfBirth().toString());
-        node.put("system", owner.isSystem());
+    public boolean removeOwnedRestaurant(UUID ownerId, UUID restaurantId) {
+        Owner owner = cacheById.get(ownerId);
+        if (owner == null) return false;
 
-        if (owner.getLocation() != null) {
-            ObjectNode locNode = mapper.createObjectNode();
-            locNode.put("nation", owner.getLocation().getNation().name());
-            locNode.put("city", owner.getLocation().getCity());
-            locNode.put("latitude", owner.getLocation().getLatitude());
-            locNode.put("longitude", owner.getLocation().getLongitude());
-            locNode.put("address", owner.getLocation().getAddress());
-            node.set("location", locNode);
+        Restaurant restaurant = owner.getRestaurantsById().get(restaurantId);
+        if (restaurant == null) return false;
+
+        RestaurantServiceInter svc = ensureRestaurantService();
+        if (svc == null) return false;
+
+        try {
+            svc.deleteOwnedRestaurant(ownerId, restaurantId);
+        } catch (RemoteException e) {
+            this.restaurantService = null;
+            throw new ServiceUnavailableException("Server non disponibile", e);
         }
 
-        return node;
+        boolean removed = owner.removeRestaurant(restaurant);
+        if (removed) persistOwnedRestaurantIds(owner.getRestaurantsById().keySet());
+        return removed;
     }
 
-    @Override
-    public Optional<Owner> findById(UUID id) {
-        ensureCacheLoaded();
-        Owner cached = cacheById.get(id);
-        if (cached != null) return Optional.of(cached);
-        return Optional.empty();
-    }
-
-    public Optional<Owner> findByUsername(String username) {
-        ensureCacheLoaded();
-        Owner cached = cacheByUsername.get(username);
-        if (cached != null) return Optional.of(cached);
-        return Optional.empty();
-    }
-
-    @Override
-    public List<Owner> findAll() {
-        ensureCacheLoaded();
-        return new ArrayList<>(cacheById.values());
-    }
-
-    @Override
-    public List<Owner> findAll(int offset, int limit) {
-        List<Owner> all = findAll();
-        if (offset >= all.size()) return List.of();
-        return all.subList(offset, Math.min(offset + limit, all.size()));
-    }
-
-    @Override
-    public long count() {
-        ensureCacheLoaded();
-        return cacheById.size();
-    }
-
-    @Override
-    public boolean save(Owner owner) {
-        if (owner == null) return false;
-        ensureCacheLoaded();
-        if (cacheById.containsKey(owner.getId())) return false;
-        cacheById.put(owner.getId(), owner);
-        cacheByUsername.put(owner.getUsername(), owner);
-        persistAtomic(toArrayNode());
-        return true;
-    }
-
-    @Override
-    public boolean update(Owner owner) {
-        if (owner == null) return false;
-        ensureCacheLoaded();
-        Owner old = cacheById.get(owner.getId());
-        if (old == null) return false;
-        cacheByUsername.remove(old.getUsername());
-        cacheById.put(owner.getId(), owner);
-        cacheByUsername.put(owner.getUsername(), owner);
-        persistAtomic(toArrayNode());
-        return true;
-    }
-
-    @Override
-    public boolean delete(UUID id) {
-        ensureCacheLoaded();
-        Owner removed = cacheById.remove(id);
-        if (removed == null) return false;
-        cacheByUsername.remove(removed.getUsername());
-        persistAtomic(toArrayNode());
-        return true;
+    public Set<UUID> findOwnedRestaurants(UUID ownerId) {
+        Owner owner = cacheById.get(ownerId);
+        return owner != null ? Set.copyOf(owner.getRestaurantsById().keySet()) : Set.of();
     }
 }
