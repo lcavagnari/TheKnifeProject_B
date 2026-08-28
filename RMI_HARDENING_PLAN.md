@@ -1,5 +1,7 @@
 # RMI Hardening Plan — TheKnifeProject Client
 
+**Status: done.** All steps below are implemented; `mvn compile` passes clean. Kept as a record of the design (cooldown + bounded-retry rationale) in case it needs revisiting.
+
 ## Situation
 
 The client's RMI connection is fragile: all four service stubs (`restaurant`, `auth`, `review`, `favourite`) are looked up in a single try-catch block. If any one fails, all fail. The stubs are `private final` fields in `ClientDataStore` — they can't be reassigned on reconnect. The `acquireRemoteServices` method has bugs: `Thread.currentThread().wait(500)` throws `IllegalMonitorStateException`, and the retry logic re-declares variables.
@@ -161,4 +163,4 @@ Also drop the now-unused imports left over from the old constructor-injection ap
 | `JsonOwnerDAO` | `volatile` field + setter (done) + `ensureRestaurantService()` + callsite updates |
 | `JsonReviewDAO` | `volatile` field + setter (done) + `ensureService()` + callsite updates |
 | `TheKnifeClient` | Use `RmiRepository.configure()`, remove old imports |
-| `LoginMenu` | Already uses `RmiRepository.getAuthService()` — no change |
+| `LoginMenu` | **Correction: did NOT already use RmiRepository** — was calling the now-removed `dataStore.getAuthService()`. Updated to check `RmiRepository.getAuthService()` then fall back to `RmiRepository.lookupAuthService()`. |
