@@ -23,6 +23,7 @@ public class HeartbeatClient {
 
     private volatile HeartbeatChannel channel;
     private volatile boolean shuttingDown = false;
+    private volatile boolean shownErrorMesage = false;
 
     public HeartbeatClient(String host, int port, long intervalMinutes) {
         this.host = host;
@@ -42,8 +43,13 @@ public class HeartbeatClient {
             newChannel.setOnDisconnect(this::handleDisconnect);
             channel = newChannel;
             newChannel.start();
+
+            shownErrorMesage = false;
         } catch (IOException e) {
-            IO.printErrorMessage("Heartbeat connection setup failed, retrying: " + e.getMessage());
+            if (!shownErrorMesage) {
+                IO.printErrorMessage("Heartbeat connection setup failed, retrying: " + e.getMessage());
+                shownErrorMesage = true;
+            }
             scheduleReconnect();
         }
     }

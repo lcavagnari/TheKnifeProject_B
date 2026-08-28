@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public final class JsonReviewDAO implements DAO<Review> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private File storeFile;
+    private final File storeFile;
     private final JsonCustomerDAO customerDAO;
     private volatile ReviewServiceInter service;
 
@@ -49,13 +49,6 @@ public final class JsonReviewDAO implements DAO<Review> {
         ReviewServiceInter fresh = RmiRepository.lookupReviewService();
         if (fresh != null) this.service = fresh;
         return fresh;
-    }
-
-    public void repointTo(UUID userId) {
-        File userDir = new File(Constants.ROOT, userId.toString());
-        this.storeFile = new File(userDir, storeFile.getName());
-        this.cacheLoaded = false;
-        cacheById.clear();
     }
 
     private void ensureCacheLoaded() {

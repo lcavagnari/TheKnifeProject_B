@@ -27,13 +27,11 @@ public class ClientDataStore {
     private final JsonOwnerDAO ownerDAO;
     private final JsonRestaurantDAO restaurantDAO;
     private final JsonReviewDAO reviewDAO;
-    private final JsonLocationDAO locationDAO;
 
     public ClientDataStore() {
         this.customerDAO = new JsonCustomerDAO(null, null);
-        this.ownerDAO = new JsonOwnerDAO(null, null);
-        this.locationDAO = new JsonLocationDAO();
-        this.restaurantDAO = new JsonRestaurantDAO(null, locationDAO);
+        this.restaurantDAO = new JsonRestaurantDAO(null);
+        this.ownerDAO = new JsonOwnerDAO(null, null, restaurantDAO);
         this.reviewDAO = new JsonReviewDAO(customerDAO, null);
     }
 
@@ -64,14 +62,12 @@ public class ClientDataStore {
     }
 
     /**
-     * Ripunta la cache locale di ogni DAO alla cartella dell'utente autenticato,
-     * cosi' che i dati di sessioni diverse non si mescolino sullo stesso client.
+     * Ripunta la cache locale dei DAO utente (profilo, ristoranti posseduti, preferiti)
+     * alla cartella dell'utente autenticato. Ristoranti e recensioni restano globali:
+     * sono dati di consultazione condivisi, non legati a un singolo utente.
      */
     public void switchUser(UUID userId) {
         customerDAO.repointTo(userId);
         ownerDAO.repointTo(userId);
-        restaurantDAO.repointTo(userId);
-        reviewDAO.repointTo(userId);
-        locationDAO.repointTo(userId);
     }
 }
