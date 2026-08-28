@@ -7,6 +7,7 @@ import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 
 import java.rmi.RemoteException;
 import java.util.HashSet;
@@ -15,12 +16,24 @@ import java.util.UUID;
 
 public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
 
-    private final FavouriteServiceInter favService;
+    private volatile FavouriteServiceInter favService;
 
     JsonCustomerDAO(AuthServiceInter authService, FavouriteServiceInter favService) {
         super(Customer.class, UserRole.CLIENT, authService);
 
         this.favService = favService;
+    }
+
+    void setRemoteFavService(FavouriteServiceInter favService) {
+        this.favService = favService;
+    }
+
+    private FavouriteServiceInter ensureFavService() {
+        FavouriteServiceInter current = favService;
+        if (current != null) return current;
+        FavouriteServiceInter fresh = RmiRepository.lookupFavouriteService();
+        if (fresh != null) this.favService = fresh;
+        return fresh;
     }
 
     @Override
@@ -66,13 +79,13 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         Customer customer = cacheById.get(customerId);
         if (customer == null) return false;
 
-        try {
-            favService.addFavourites(customerId,restaurantId);
-        } catch (RemoteException ignored) {
+        FavouriteServiceInter svc = ensureFavService();
+        if (svc != null) {
             try {
-                favService.removeFavourites(customerId,restaurantId);
+                svc.addFavourites(customerId, restaurantId);
             } catch (RemoteException e) {
-                System.err.println("RMI sync removeFavourite " + getClass().getSimpleName() + ": " + e.getMessage());
+                this.favService = null;
+                System.err.println("RMI sync addFavourite " + getClass().getSimpleName() + ": " + e.getMessage());
                 return false;
             }
         }
@@ -86,12 +99,12 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         Customer customer = cacheById.get(customerId);
         if (customer == null) return false;
 
-        try {
-            favService.removeFavourites(customerId,restaurantId);
-        } catch (RemoteException ignored) {
+        FavouriteServiceInter svc = ensureFavService();
+        if (svc != null) {
             try {
-                favService.removeFavourites(customerId,restaurantId);
+                svc.removeFavourites(customerId, restaurantId);
             } catch (RemoteException e) {
+                this.favService = null;
                 System.err.println("RMI sync removeFavourite " + getClass().getSimpleName() + ": " + e.getMessage());
                 return false;
             }
