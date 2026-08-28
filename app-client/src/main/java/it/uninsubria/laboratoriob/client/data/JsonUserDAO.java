@@ -200,6 +200,48 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
             }
         }
 
+        return cacheOnly(user);
+    }
+
+    /**
+     * Inserisce l'utente direttamente nella cache locale, senza passare per
+     * {@code authService.register()}. Usato quando l'utente e' gia' stato
+     * registrato lato server (che genera id, salt e hash reali - il client
+     * non ha accesso a {@code PasswordHasher}) e va solo memorizzato in cache.
+     */
+    public boolean cacheOnly(T user) {
+        if (user == null) return false;
+
+        ensureCacheLoaded();
+        if (cacheById.containsKey(user.getId())) return false;
+        cacheById.put(user.getId(), user);
+        cacheByUsername.put(user.getUsername(), user);
+        persistAtomic(toArrayNode());
+
+        return true;
+    }
+
+    public boolean save(String username, String rawPassword, String firstName,
+                        String lastName, LocalDate birthDate, Location location,
+                        boolean isOwner) {
+
+        T user = null;
+        if (authService != null) {
+            try {
+                user = (T) authService.register(
+                        username, rawPassword,
+                        firstName, lastName,
+                        birthDate, location, isOwner
+                );
+
+            } catch (RemoteException e) {
+                System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
+                return false;
+            } finally {
+                if (user == null) return false;
+            }
+        }
+
         ensureCacheLoaded();
         if (cacheById.containsKey(user.getId())) return false;
         cacheById.put(user.getId(), user);
