@@ -74,7 +74,7 @@
         </HBox>
 
         <!-- Description -->
-        <Label fx:id="descriptionLabel" style="-fx-font-size: 18px; -fx-text-fill: #424242;" text="*restaurant description*" wrapText="true">
+        <Label fx:id="descriptionLabel" style="-fx-font-size: 16px; -fx-text-fill: #424242;" text="*restaurant description*" wrapText="true">
             <opaqueInsets>
                 <Insets top="10.0" />
             </opaqueInsets></Label>
@@ -98,7 +98,7 @@
                     </ImageView>
                     <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="WEBSITE" />
                 </HBox>
-                <Label fx:id="websiteLabel" style="-fx-text-fill: #007161; -fx-font-size: 13px;" text="*clickable_restaurant_url*" wrapText="true" />
+                <Label fx:id="websiteLabel" style="-fx-text-fill: #007161; -fx-font-size: 15px;" text="*clickable_restaurant_url*" wrapText="true" />
             </VBox>
 
             <!-- Phone column -->
@@ -109,7 +109,7 @@
                     </ImageView>
                     <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="PHONE NUMBER" />
                 </HBox>
-                <Label fx:id="phoneLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*national_prefixed_phone_number*" />
+                <Label fx:id="phoneLabel" style="-fx-text-fill: #424242; -fx-font-size: 15px;" text="*national_prefixed_phone_number*" />
             </VBox>
             <rowConstraints>
                 <RowConstraints />
@@ -135,7 +135,7 @@
                     </ImageView>
                     <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="LOCATION" />
                 </HBox>
-                <Label fx:id="locationLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*full_restaurant_address*" wrapText="true" />
+                <Label fx:id="locationLabel" style="-fx-text-fill: #424242; -fx-font-size: 15px;" text="*full_restaurant_address*" wrapText="true" />
             </VBox>
 
             <!-- Price Range column -->
@@ -146,7 +146,7 @@
                     </ImageView>
                     <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="PRICE RANGE (per-person)" />
                 </HBox>
-                <Label fx:id="priceRangeLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*restaurant_full_price_range*" />
+                <Label fx:id="priceRangeLabel" style="-fx-text-fill: #424242; -fx-font-size: 15px;" text="*restaurant_full_price_range*" />
             </VBox>
             <rowConstraints>
                 <RowConstraints />
@@ -235,7 +235,7 @@
                         </ImageView>
                         <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="BEST REVIEW" />
                     </HBox>
-                    <Label fx:id="bestReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*best_review*" />
+                    <Label fx:id="bestReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 15px;" text="*best_review*" />
                 </VBox>
 
                 <!-- Worst review column -->
@@ -246,7 +246,7 @@
                         </ImageView>
                         <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="WORST REVIEW" />
                     </HBox>
-                    <Label fx:id="worstReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*worst_review*" />
+                    <Label fx:id="worstReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 15px;" text="*worst_review*" />
                 </VBox>
                 <rowConstraints>
                     <RowConstraints />

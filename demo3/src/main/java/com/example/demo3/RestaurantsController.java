@@ -24,6 +24,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -269,6 +270,11 @@ public class RestaurantsController {
                     iv.setFitHeight(14);
                     iv.setFitWidth(14);
                     iv.setPreserveRatio(true);
+                    // Black tint for icon (like the text)
+                    ColorAdjust blackTint = new ColorAdjust();
+                    blackTint.setSaturation(-1.0);
+                    blackTint.setBrightness(-1.0);
+                    iv.setEffect(blackTint);
                     l.setGraphic(iv);
                     l.setContentDisplay(ContentDisplay.LEFT);
                     l.setGraphicTextGap(4);

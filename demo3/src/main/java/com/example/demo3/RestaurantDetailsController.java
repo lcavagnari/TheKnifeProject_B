@@ -18,6 +18,7 @@ import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.geometry.Insets;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -228,7 +229,7 @@ public class RestaurantDetailsController {
                     });
         } else {
             Label noReviews = new Label("No reviews yet.");
-            noReviews.setStyle("-fx-text-fill: #757575; -fx-font-size: 13px; -fx-padding: 10;");
+            noReviews.setStyle("-fx-text-fill: #757575; -fx-font-size: 15px; -fx-padding: 10;");
             reviewsList.getChildren().add(noReviews);
         }
     }
@@ -326,6 +327,11 @@ public class RestaurantDetailsController {
             iv.setFitHeight(14);
             iv.setFitWidth(14);
             iv.setPreserveRatio(true);
+            // Black tint for icon (like the text)
+            ColorAdjust blackTint = new ColorAdjust();
+            blackTint.setSaturation(-1.0);
+            blackTint.setBrightness(-1.0);
+            iv.setEffect(blackTint);
             l.setGraphic(iv);
             l.setContentDisplay(ContentDisplay.LEFT);
             l.setGraphicTextGap(4);
