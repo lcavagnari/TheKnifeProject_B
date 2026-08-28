@@ -3,10 +3,7 @@ package it.uninsubria.laboratoriob.server.data.dao;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
-import it.uninsubria.laboratoriob.server.utils.Database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -14,6 +11,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Implementazione del DAO per l'entità {@link Owner}.
@@ -44,7 +42,10 @@ public class OwnerDAO extends UserDAO<Owner> {
     @Override
     protected Owner mapRow(ResultSet rs) throws SQLException {
         UUID uId = UUID.fromString(rs.getString("id"));
-        Set<Restaurant> restaurants = new HashSet<>(restaurantDAO.findByOwner(uId));
+        Set<Restaurant> restaurants = findSpecial(uId).stream()
+                .map(restaurantDAO::findById)
+                .flatMap(Optional::stream)
+                .collect(Collectors.toSet());
 
         Optional<Location> loc = locationDAO.findByCoordinates(
                 rs.getDouble("latitude"),
@@ -85,20 +86,17 @@ public class OwnerDAO extends UserDAO<Owner> {
     public boolean update(Owner user) {
         boolean succeded = super.update(user);
         if (succeded) {
-            String query = "DELETE FROM user_restaurants WHERE user_id=?";
+            Set<UUID> current = findSpecial(user.getId());
+            Set<UUID> target = user.getRestaurantsById().keySet();
 
-            try (Connection conn = Database.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setObject(1, user.getId(), java.sql.Types.OTHER);
-                stmt.executeUpdate();
+            Set<UUID> toRemove = new HashSet<>(current);
+            toRemove.removeAll(target);
 
-            } catch (SQLException e) {
-                System.err.println("Errore update in OwnerDAO: " + e.getMessage());
-                return false;
-            }
+            Set<UUID> toAdd = new HashSet<>(target);
+            toAdd.removeAll(current);
 
-            for (Restaurant r : user.getRestaurantsById().values())
-                addSpecial(user.getId(), r.getId());
+            for (UUID id : toRemove) removeSpecial(user.getId(), id);
+            for (UUID id : toAdd) addSpecial(user.getId(), id);
         }
 
         return succeded;

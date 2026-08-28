@@ -17,6 +17,8 @@ public interface RestaurantServiceInter extends Remote {
     boolean save(Restaurant restaurant) throws RemoteException;
     boolean update(Restaurant restaurant) throws RemoteException;
     boolean delete(UUID id) throws RemoteException;
+    boolean saveForOwner(Restaurant restaurant, UUID ownerId) throws RemoteException;
+    boolean deleteOwnedRestaurant(UUID ownerId, UUID restaurantId) throws RemoteException;
     public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) throws RemoteException;
     boolean updateServices(UUID restaurantId, Set<String> services) throws RemoteException;
 }

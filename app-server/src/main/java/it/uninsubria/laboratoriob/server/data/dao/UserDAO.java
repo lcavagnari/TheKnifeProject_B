@@ -249,7 +249,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     }
 
     protected boolean addSpecial(UUID userId, UUID restaurantId) {
-        String query = "INSERT INTO " + ((isOwner) ? "user_restaurants" : "user_favorites") + " VALUES (?,?)";
+        String query = "INSERT INTO " + ((isOwner) ? "user_restaurants" : "user_favorites") + " (user_id, restaurant_id) VALUES (?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
