@@ -3,6 +3,7 @@ package it.uninsubria.laboratoriob.client.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
@@ -13,7 +14,7 @@ import java.util.UUID;
 public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
 
     JsonCustomerDAO(AuthServiceInter authService) {
-        super(Customer.class, authService);
+        super(Customer.class, UserRole.CLIENT, authService);
     }
 
     @Override

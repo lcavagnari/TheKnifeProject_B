@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Nation;
+import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
@@ -29,14 +30,16 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     private final Class<T> type;
 
     protected final AuthServiceInter authService;
+    private final UserRole role;
 
     protected final ConcurrentHashMap<UUID, T> cacheById = new ConcurrentHashMap<>();
     protected final ConcurrentHashMap<String, T> cacheByUsername = new ConcurrentHashMap<>();
 
     private volatile boolean cacheLoaded = false;
 
-    protected JsonUserDAO(Class<T> type, AuthServiceInter authService) {
+    protected JsonUserDAO(Class<T> type, UserRole role, AuthServiceInter authService) {
         this.type = type;
+        this.role = role;
         this.storeFile = new File(Constants.ROOT, "users.json");
         this.authService = authService;
     }
@@ -61,6 +64,8 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
             JsonNode node = mapper.readTree(storeFile);
             if (!node.isArray()) return;
             for (JsonNode n : (ArrayNode) node) {
+                String nodeRole = n.path("role").asText(null);
+                if (nodeRole != null && !nodeRole.equals(role.name())) continue;
                 T entity = mapNode(n);
                 cacheById.put(entity.getId(), entity);
                 cacheByUsername.put(entity.getUsername(), entity);
@@ -112,6 +117,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
     protected void writeUserFields(ObjectNode node, User user) {
         node.put("id", user.getId().toString());
+        node.put("role", user.getRole().name());
         node.put("username", user.getUsername());
         node.put("passwordHash", user.getPasswordHash());
         node.put("passwordSalt", user.getPasswordSalt());
