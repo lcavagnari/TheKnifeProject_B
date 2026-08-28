@@ -20,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class JsonLocationDAO implements DAO<Location> {
 
+    // TOOD: ensure this works only as dependency for user and restaurants
+
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
 

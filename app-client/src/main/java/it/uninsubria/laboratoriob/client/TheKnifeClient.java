@@ -14,6 +14,10 @@ import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
  */
 public class TheKnifeClient {
 
+    // TODO: ensure all files have copyright notice and javadoc comments
+    // TODO: update technical documentation.
+    // TOOD: resolve lint.
+
     public static void main(String[] args) {
         IO.printSuccessMessage("Loading The Knife Client...");
 

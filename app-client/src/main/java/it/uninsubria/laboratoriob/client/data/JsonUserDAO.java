@@ -9,6 +9,7 @@ import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 
@@ -45,6 +46,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     }
 
     protected abstract T mapNode(JsonNode node);
+
     protected abstract ArrayNode toArrayNode();
 
     private void ensureCacheLoaded() {
@@ -174,16 +176,28 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     @Override
     public boolean save(T user) {
         if (user == null) return false;
+
+        if (authService != null) {
+            try {
+                authService.register(
+                        user.getUsername(), user.getPasswordHash(),
+                        user.getName(), user.getLastName(),
+                        user.getDateOfBirth(), user.getLocation(),
+                        user instanceof Owner
+                );
+
+            } catch (RemoteException e) {
+                System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
+                return false;
+            }
+        }
+
         ensureCacheLoaded();
         if (cacheById.containsKey(user.getId())) return false;
         cacheById.put(user.getId(), user);
         cacheByUsername.put(user.getUsername(), user);
         persistAtomic(toArrayNode());
-        if (authService != null) {
-            try { authService.register(user); } catch (RemoteException e) {
-                System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
-            }
-        }
+
         return true;
     }
 
