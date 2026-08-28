@@ -23,7 +23,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     public List<Restaurant> findAll(int offset, int limit) throws RemoteException {
         List<Restaurant> all = new ArrayList<>(store.restaurants().findAll());
         if (offset >= all.size()) return List.of();
-        return all.subList(offset, Math.min(offset + limit, all.size()));
+        return new ArrayList<>(all.subList(offset, Math.min(offset + limit, all.size())));
     }
 
     @Override

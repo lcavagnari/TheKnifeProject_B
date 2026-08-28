@@ -7,6 +7,7 @@ import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +37,7 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
     public List<Review> findAll(int offset, int limit) throws RemoteException {
         List<Review> all = store.reviews().findAll();
         if (offset >= all.size()) return List.of();
-        return all.subList(offset, Math.min(offset + limit, all.size()));
+        return new ArrayList<>(all.subList(offset, Math.min(offset + limit, all.size())));
     }
 
     @Override
