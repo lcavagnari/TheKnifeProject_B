@@ -3,19 +3,28 @@ package com.example.demo3;
 import com.example.demo3.data.Session;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.geometry.Insets;
+import javafx.scene.effect.ColorAdjust;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -61,11 +70,17 @@ public class RestaurantDetailsController {
     @FXML
     private Button btnIndietro;
     @FXML
+    private Button btnModifica;
+    @FXML
+    private Button btnPreferito;
+    @FXML
     private VBox root;
     @FXML
     private ScrollPane reviewsScrollPane;
     @FXML
     private VBox reviewsList;
+
+    private Restaurant restaurant;
 
     @FXML
     public void initialize() {
@@ -78,6 +93,23 @@ public class RestaurantDetailsController {
     }
 
     public void carica(Restaurant r) {
+        this.restaurant = r;
+
+        User currentUser = Session.getCurrentUser();
+        boolean isOwner = currentUser != null
+                && currentUser.getRole() == UserRole.OWNER
+                && r.getOwnerId() != null
+                && currentUser.getId().toString().equals(r.getOwnerId().toString());
+        btnModifica.setVisible(isOwner);
+        btnModifica.setManaged(isOwner);
+
+        boolean isCustomer = currentUser instanceof Customer;
+        btnPreferito.setVisible(isCustomer);
+        btnPreferito.setManaged(isCustomer);
+        if (isCustomer) {
+            aggiornaTestoPreferito((Customer) currentUser, r);
+        }
+
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
         descriptionLabel.setText(valoreO(r.getDescription(), "No description available."));
 
@@ -114,14 +146,10 @@ public class RestaurantDetailsController {
         // Delivery + Online Booking badges
         deliveryBookingFlow.getChildren().clear();
         if (r.isHasDelivery()) {
-            Label badge = new Label("Delivery");
-            badge.getStyleClass().addAll("badge", "badge-delivery");
-            deliveryBookingFlow.getChildren().add(badge);
+            deliveryBookingFlow.getChildren().add(makeIconBadge("Delivery", "badge-delivery", "images/ic_geomarker.png"));
         }
         if (r.isHasOnlineBooking()) {
-            Label badge = new Label("Online Booking");
-            badge.getStyleClass().addAll("badge", "badge-booking");
-            deliveryBookingFlow.getChildren().add(badge);
+            deliveryBookingFlow.getChildren().add(makeIconBadge("Online Booking", "badge-booking", "images/ic_globe.png"));
         }
 
         // Cuisine badges
@@ -183,14 +211,7 @@ public class RestaurantDetailsController {
         if (reviewsList != null) reviewsList.getChildren().clear();
 
         if (r.getReviews() != null && !r.getReviews().isEmpty()) {
-            // Ottieni utente corrente
-            User currentUser = Session.getCurrentUser();
             final String currentUserId = currentUser != null ? currentUser.getId().toString() : null;
-            final boolean isOwner = currentUser != null
-                    && currentUser.getRole() == UserRole.OWNER
-                    && r.getOwnerId() != null
-                    && currentUser.getId().toString().equals(r.getOwnerId().toString());
-
 
             // Ordina per data decrescente e crea le card
             r.getReviews().values().stream()
@@ -208,7 +229,7 @@ public class RestaurantDetailsController {
                     });
         } else {
             Label noReviews = new Label("No reviews yet.");
-            noReviews.setStyle("-fx-text-fill: #757575; -fx-font-size: 13px; -fx-padding: 10;");
+            noReviews.setStyle("-fx-text-fill: #757575; -fx-font-size: 15px; -fx-padding: 10;");
             reviewsList.getChildren().add(noReviews);
         }
     }
@@ -224,6 +245,66 @@ public class RestaurantDetailsController {
         Navigation.goBack();
     }
 
+    @FXML
+    private void onModificaClick() {
+        if (!(Session.getCurrentUser() instanceof Owner owner) || restaurant == null) {
+            return;
+        }
+        try {
+            Stage stage = (Stage) btnModifica.getScene().getWindow();
+            Restaurant target = restaurant;
+
+            Navigation.pushBack(() -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("RestaurantDetails.fxml"));
+                    Parent detailsRoot = loader.load();
+                    RestaurantDetailsController controller = loader.getController();
+                    controller.carica(target);
+                    Scene scene = new Scene(detailsRoot, 650, 550);
+                    stage.setScene(scene);
+                    stage.setTitle(target.getName() != null ? target.getName() : "Dettagli ristorante");
+                    stage.show();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
+            Parent formRoot = loader.load();
+            AddEditRestaurantController controller = loader.getController();
+            controller.configuraModifica(owner, target);
+
+            Scene scene = new Scene(formRoot, 650, 600);
+            stage.setScene(scene);
+            stage.setTitle("Modifica Ristorante");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void onPreferitoClick() {
+        if (!(Session.getCurrentUser() instanceof Customer customer) || restaurant == null) {
+            return;
+        }
+        if (customer.getFavouriteRestourants().contains(restaurant.getId())) {
+            customer.removeFavourite(restaurant);
+        } else {
+            customer.addFavourite(restaurant);
+        }
+        aggiornaTestoPreferito(customer, restaurant);
+    }
+
+    private void aggiornaTestoPreferito(Customer customer, Restaurant r) {
+        boolean isPreferito = customer.getFavouriteRestourants().contains(r.getId());
+        btnPreferito.setText(isPreferito ? "Nei Preferiti" : "Aggiungi ai Preferiti");
+        btnPreferito.getStyleClass().removeAll("button-secondary");
+        if (!isPreferito) {
+            btnPreferito.getStyleClass().add("button-secondary");
+        }
+    }
+
     private String valoreO(String valore, String fallback) {
         return (valore == null || valore.isBlank()) ? fallback : valore;
     }
@@ -235,5 +316,26 @@ public class RestaurantDetailsController {
         if (loc.getCity() != null) sb.append(sb.isEmpty() ? "" : ", ").append(loc.getCity());
         if (loc.getNation() != null) sb.append(" (").append(loc.getNation().name().replace("_", " ")).append(")");
         return sb.isEmpty() ? "N/A" : sb.toString();
+    }
+
+    private Label makeIconBadge(String text, String styleClass, String iconPath) {
+        Label l = new Label(text);
+        l.getStyleClass().addAll("badge", styleClass);
+        try {
+            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconPath)));
+            ImageView iv = new ImageView(img);
+            iv.setFitHeight(14);
+            iv.setFitWidth(14);
+            iv.setPreserveRatio(true);
+            // Black tint for icon (like the text)
+            ColorAdjust blackTint = new ColorAdjust();
+            blackTint.setSaturation(-1.0);
+            blackTint.setBrightness(-1.0);
+            iv.setEffect(blackTint);
+            l.setGraphic(iv);
+            l.setContentDisplay(ContentDisplay.LEFT);
+            l.setGraphicTextGap(4);
+        } catch (Exception ignored) {}
+        return l;
     }
 }

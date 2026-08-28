@@ -54,6 +54,8 @@ public class RestaurantRepository {
             try {
                 JsonNode node = MAPPER.readTree(file);
                 risultato.add(fromJson(node));
+            } catch (IllegalArgumentException e) {
+                System.err.println("VALIDAZIONE FALLITA in " + file.getName() + ": " + e.getMessage());
             } catch (IOException e) {
                 System.err.println("Errore leggendo " + file.getName() + ": " + e.getMessage());
             }

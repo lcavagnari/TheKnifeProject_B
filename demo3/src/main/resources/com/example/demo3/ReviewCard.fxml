@@ -14,7 +14,7 @@
         <Label fx:id="starsLabel" style="-fx-text-fill: #F4B400; -fx-font-size: 14px;" text="★★★★★" />
         <Label fx:id="timeLabel" style="-fx-text-fill: #757575; -fx-font-size: 11px;" text="01/01/2025 12:00" />
     </HBox>
-    <Label fx:id="commentLabel" wrapText="true" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="Review text..." />
+    <Label fx:id="commentLabel" wrapText="true" style="-fx-text-fill: #424242; -fx-font-size: 15px;" text="Review text..." />
 
     <!-- Riga per i bottoni -->
     <HBox alignment="CENTER_RIGHT" spacing="10" style="-fx-padding: 6 0 0 0;">

@@ -2,6 +2,7 @@ package com.example.demo3;
 
 import com.example.demo3.data.PasswordUtil;
 import com.example.demo3.data.Session;
+import com.example.demo3.data.SessionRepository;
 import com.example.demo3.data.UserRepository;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
@@ -15,7 +16,9 @@ import java.util.Optional;
 public class LoginController {
 
     private final UserRepository userRepository = new UserRepository();
+    private final SessionRepository sessionRepository = new SessionRepository();
     private Runnable onCancelCallback;
+    private Runnable onLoginSuccessCallback;
 
     @FXML
     private Label errorLabel;
@@ -34,6 +37,10 @@ public class LoginController {
 
     public void setOnCancelCallback(Runnable callback) {
         this.onCancelCallback = callback;
+    }
+
+    public void setOnLoginSuccessCallback(Runnable callback) {
+        this.onLoginSuccessCallback = callback;
     }
 
     @FXML
@@ -64,10 +71,15 @@ public class LoginController {
         }
 
         Session.login(utente);
+        sessionRepository.save(utente);
         errorLabel.getStyleClass().removeAll("label-error", "label-success");
         errorLabel.getStyleClass().add("label-success");
         errorLabel.setText("Login riuscito! Benvenuto " + utente.getName() + ".");
         System.out.println("Login riuscito per: " + username + " (" + utente.getRole() + ")");
+
+        if (onLoginSuccessCallback != null) {
+            onLoginSuccessCallback.run();
+        }
     }
 
     @FXML

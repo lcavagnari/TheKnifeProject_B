@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox fx:id="root" spacing="24" focusTraversable="true" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.FavoritesController">
+    <padding>
+        <Insets bottom="32" left="32" right="32" top="32" />
+    </padding>
+    <!-- Top bar -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button fx:id="btnIndietro" onAction="#onIndietroClick" styleClass="button-secondary" text="← Indietro" />
+        <Label styleClass="card-header" text="Preferiti" />
+    </HBox>
+    <!-- Stats -->
+    <HBox alignment="CENTER">
+        <Label fx:id="infoLabel" styleClass="stats-label" />
+    </HBox>
+    <!-- Empty state (hidden by default) -->
+    <VBox fx:id="emptyState" managed="false" styleClass="empty-state" visible="false">
+        <Label styleClass="empty-state-icon" text="★" />
+        <Label styleClass="empty-state-title" text="Nessun ristorante preferito" />
+        <Label styleClass="empty-state-sub" text="Apri un ristorante e tocca &quot;Aggiungi ai Preferiti&quot; per trovarlo qui" />
+    </VBox>
+    <!-- List -->
+    <ListView fx:id="restaurantListView" prefHeight="320" VBox.vgrow="ALWAYS" />
+</VBox>

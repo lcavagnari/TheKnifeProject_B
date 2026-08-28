@@ -120,7 +120,7 @@
     -fx-background-color: #f5f7fa;
     -fx-effect: dropshadow(gaussian, rgba(0,113,97,0.15), 6, 0.2, 0, 2);
 }
-.text-field.error, .password-field.error, .date-picker.error {
+.text-field.error, .password-field.error, .date-picker.error, .combo-box.error {
     -fx-border-color: #d32f2f;
     -fx-border-width: 2px;
 }
@@ -415,10 +415,12 @@
 .badge-delivery {
     -fx-background-color: #fce8dc;
     -fx-text-fill: #a84e33;
+    -fx-font-size: 13px;
 }
 .badge-booking {
     -fx-background-color: #ece8f0;
     -fx-text-fill: #5a4a6a;
+    -fx-font-size: 13px;
 }
 .badge-green {
     -fx-background-color: #dce8d8;

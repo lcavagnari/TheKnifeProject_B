@@ -1,5 +1,8 @@
 package com.example.demo3;
 
+import com.example.demo3.data.Session;
+import com.example.demo3.data.SessionRepository;
+import com.example.demo3.data.UserRepository;
 import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -13,12 +16,16 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.io.IOException;
+import java.util.Optional;
 
 public class GUIController {
 
     private static final Duration SLIDE_DURATION = Duration.millis(250);
     private static final Duration PAUSE_DURATION = Duration.millis(100);
     private static final double BLUR_RADIUS = 6;
+
+    private final UserRepository userRepository = new UserRepository();
+    private final SessionRepository sessionRepository = new SessionRepository();
 
     @FXML private VBox menuCard;
     @FXML private VBox titleBlock;
@@ -30,8 +37,10 @@ public class GUIController {
 
     private Node loginForm;
     private Node registerForm;
+    private Node homeForm;
     private LoginController loginController;
     private RegisterController registerController;
+    private HomeController homeController;
     private boolean animating = false;
 
     @FXML
@@ -41,6 +50,11 @@ public class GUIController {
                     newBounds.getWidth(), newBounds.getHeight()));
         });
         preloadForms();
+        ripristinaSessioneSalvata();
+
+        if (Session.isLoggedIn()) {
+            mostraHomeSenzaAnimazione();
+        }
     }
 
     private void preloadForms() {
@@ -49,14 +63,53 @@ public class GUIController {
             loginForm = loginLoader.load();
             loginController = loginLoader.getController();
             loginController.setOnCancelCallback(this::showMenu);
+            loginController.setOnLoginSuccessCallback(this::showHome);
 
             FXMLLoader registerLoader = new FXMLLoader(getClass().getResource("Register.fxml"));
             registerForm = registerLoader.load();
             registerController = registerLoader.getController();
             registerController.setOnCancelCallback(this::showMenu);
+            registerController.setOnRegisterSuccessCallback(this::showHome);
+
+            FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("Home.fxml"));
+            homeForm = homeLoader.load();
+            homeController = homeLoader.getController();
+            homeController.setOnDisconnettiCallback(this::showMenu);
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Se nessuno è già loggato in questa sessione dell'app, prova a
+     * ripristinare l'ultimo utente loggato salvato su disco.
+     */
+    private void ripristinaSessioneSalvata() {
+        if (Session.isLoggedIn()) {
+            return;
+        }
+        Optional<String> username = sessionRepository.loadUsername();
+        username.flatMap(userRepository::findByUsername).ifPresent(Session::login);
+    }
+
+    /**
+     * Mostra subito Home al posto di titleBlock/menuButtons, senza
+     * animazione: usata all'avvio quando una sessione salvata è stata
+     * ripristinata prima che la scena sia visibile.
+     */
+    private void mostraHomeSenzaAnimazione() {
+        homeController.aggiorna();
+
+        titleBlock.setVisible(false);
+        titleBlock.setManaged(false);
+        menuButtons.setVisible(false);
+        menuButtons.setManaged(false);
+
+        if (!menuCard.getChildren().contains(homeForm)) {
+            menuCard.getChildren().add(homeForm);
+        }
+        homeForm.setVisible(true);
+        homeForm.setManaged(true);
     }
 
     private double getCardWidth() {
@@ -83,6 +136,12 @@ public class GUIController {
         showForm(registerForm);
     }
 
+    private void showHome() {
+        if (animating) return;
+        homeController.aggiorna();
+        showForm(homeForm);
+    }
+
     private void showForm(Node form) {
         animating = true;
         menuCard.setMouseTransparent(true);
@@ -105,6 +164,10 @@ public class GUIController {
                 node.setManaged(false);
                 node.setTranslateX(0);
             }
+
+            // Drop any form already showing (e.g. Login handing off to Home) so it
+            // doesn't stay stacked underneath the one we're about to show.
+            menuCard.getChildren().removeIf(child -> child != titleBlock && child != menuButtons && child != form);
 
             form.setTranslateX(dist);
             form.setVisible(false);

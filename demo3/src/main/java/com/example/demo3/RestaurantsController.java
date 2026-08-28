@@ -23,6 +23,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -250,17 +252,34 @@ public class RestaurantsController {
                     ? r.getCuisinesTypes().stream().limit(3).map(c -> c.toString()).collect(Collectors.toSet())
                     : Set.of();
             for (String c : cuisineBadges) {
-                badges.getChildren().add(makeBadge(c, "badge-cuisine"));
+                badges.getChildren().add(makeBadge(c, "badge-cuisine", null));
             }
-            if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery"));
-            if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking"));
+            if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery", "images/ic_geomarker.png"));
+            if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking", "images/ic_globe.png"));
 
             setGraphic(card);
         }
 
-        private Label makeBadge(String text, String styleClass) {
+        private Label makeBadge(String text, String styleClass, String iconPath) {
             Label l = new Label(text);
             l.getStyleClass().addAll("badge", styleClass);
+            if (iconPath != null && !iconPath.isBlank()) {
+                try {
+                    Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconPath)));
+                    ImageView iv = new ImageView(img);
+                    iv.setFitHeight(14);
+                    iv.setFitWidth(14);
+                    iv.setPreserveRatio(true);
+                    // Black tint for icon (like the text)
+                    ColorAdjust blackTint = new ColorAdjust();
+                    blackTint.setSaturation(-1.0);
+                    blackTint.setBrightness(-1.0);
+                    iv.setEffect(blackTint);
+                    l.setGraphic(iv);
+                    l.setContentDisplay(ContentDisplay.LEFT);
+                    l.setGraphicTextGap(4);
+                } catch (Exception ignored) {}
+            }
             return l;
         }
 

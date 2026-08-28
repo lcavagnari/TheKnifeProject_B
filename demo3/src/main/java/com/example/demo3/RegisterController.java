@@ -1,6 +1,8 @@
 package com.example.demo3;
 
 import com.example.demo3.data.PasswordUtil;
+import com.example.demo3.data.Session;
+import com.example.demo3.data.SessionRepository;
 import com.example.demo3.data.UserRepository;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Customer;
@@ -19,7 +21,9 @@ import java.time.LocalDate;
 public class RegisterController {
 
     private final UserRepository userRepository = new UserRepository();
+    private final SessionRepository sessionRepository = new SessionRepository();
     private Runnable onCancelCallback;
+    private Runnable onRegisterSuccessCallback;
 
     @FXML private Label errorLabel;
     @FXML private RadioButton radioGestore;
@@ -129,6 +133,10 @@ public class RegisterController {
         this.onCancelCallback = callback;
     }
 
+    public void setOnRegisterSuccessCallback(Runnable callback) {
+        this.onRegisterSuccessCallback = callback;
+    }
+
     // --- Blur validation ---
 
     private void validateUsername() {
@@ -151,6 +159,8 @@ public class RegisterController {
             showFieldError(nomeError, "Il nome è obbligatorio.", nomeField);
         } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(nomeError, "Solo lettere, spazi, trattini e apostrofi.", nomeField);
+        } else if (val.length() < 4) {
+            showFieldError(nomeError, "Deve avere almeno 4 caratteri.", nomeField);
         } else {
             clearFieldError(nomeError, nomeField);
         }
@@ -162,6 +172,8 @@ public class RegisterController {
             showFieldError(cognomeError, "Il cognome è obbligatorio.", cognomeField);
         } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(cognomeError, "Solo lettere, spazi, trattini e apostrofi.", cognomeField);
+        } else if (val.length() < 4) {
+            showFieldError(cognomeError, "Deve avere almeno 4 caratteri.", cognomeField);
         } else {
             clearFieldError(cognomeError, cognomeField);
         }
@@ -233,6 +245,14 @@ public class RegisterController {
 
         boolean valid = true;
 
+        // Validate that a role is selected
+        if (!radioCliente.isSelected() && !radioGestore.isSelected()) {
+            errorLabel.getStyleClass().removeAll("label-success", "label-error");
+            errorLabel.getStyleClass().add("label-error");
+            errorLabel.setText("Seleziona un tipo di utente (Cliente o Gestore).");
+            valid = false;
+        }
+
         if (!username.matches("[a-zA-Z0-9_]+")) {
             showFieldError(usernameError, "Solo lettere, numeri e underscore.", usernameField);
             valid = false;
@@ -250,6 +270,9 @@ public class RegisterController {
         } else if (!nome.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(nomeError, "Solo lettere, spazi, trattini e apostrofi.", nomeField);
             valid = false;
+        } else if (nome.length() < 4) {
+            showFieldError(nomeError, "Deve avere almeno 4 caratteri.", nomeField);
+            valid = false;
         }
 
         if (cognome.isEmpty()) {
@@ -257,6 +280,9 @@ public class RegisterController {
             valid = false;
         } else if (!cognome.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(cognomeError, "Solo lettere, spazi, trattini e apostrofi.", cognomeField);
+            valid = false;
+        } else if (cognome.length() < 4) {
+            showFieldError(cognomeError, "Deve avere almeno 4 caratteri.", cognomeField);
             valid = false;
         }
 
@@ -303,9 +329,15 @@ public class RegisterController {
         boolean salvato = userRepository.save(nuovoUtente);
 
         if (salvato) {
+            Session.login(nuovoUtente);
+            sessionRepository.save(nuovoUtente);
             errorLabel.getStyleClass().removeAll("label-error", "label-success");
             errorLabel.getStyleClass().add("label-success");
-            errorLabel.setText("Registrazione completata! File salvato in data/users.");
+            errorLabel.setText("Registrazione completata! Benvenuto " + nuovoUtente.getName() + ".");
+
+            if (onRegisterSuccessCallback != null) {
+                onRegisterSuccessCallback.run();
+            }
         } else {
             errorLabel.getStyleClass().removeAll("label-error", "label-success");
             errorLabel.getStyleClass().add("label-error");

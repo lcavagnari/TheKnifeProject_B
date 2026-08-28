@@ -2,7 +2,9 @@
 common-api/target/
 demo3/target/
 target/
-demo3/data/
-data/
+/demo3/data/
+/data/
 
 *.class
+*.code-workspace
+.vscode/
