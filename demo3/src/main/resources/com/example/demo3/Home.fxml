@@ -1,48 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.HomeController">
+<VBox alignment="CENTER" prefHeight="400" spacing="0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.HomeController">
+    <!-- Top cluster: title + subtitle, pinned to the top -->
     <VBox alignment="CENTER" spacing="10">
         <Label fx:id="welcomeLabel" styleClass="label-title" text="Benvenuto" />
         <Label fx:id="roleLabel" styleClass="label-info" text="Cliente" />
     </VBox>
-    <VBox alignment="CENTER" spacing="50">
-        <padding>
-            <Insets top="50" />
-        </padding>
-        <VBox alignment="CENTER" spacing="8">
-            <Button fx:id="btnTrova" onAction="#onTrovaClick" prefWidth="240" text="Trova Ristoranti">
-                <graphic>
-                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/ic_search.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
-            <Button fx:id="btnMieiRistoranti" managed="false" onAction="#onMieiRistorantiClick" prefWidth="240" styleClass="button-secondary" text="I Miei Ristoranti" visible="false">
-                <graphic>
-                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/ic_knifeandfork.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
-        </VBox>
-        <VBox alignment="CENTER" spacing="8">
-            <Button fx:id="btnDisconnetti" onAction="#onDisconnettiClick" prefWidth="200" styleClass="button-secondary" text="Disconnetti" />
-        </VBox>
-        <VBox alignment="CENTER" spacing="8">
-            <Button fx:id="btnEsci" onAction="#onEsciClick" prefWidth="200" styleClass="button-danger" text="Esci">
-                <graphic>
-                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/ic_exit.png" />
-                    </ImageView>
-                </graphic>
-            </Button>
-        </VBox>
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <!-- Center cluster: explore actions, vertically centered -->
+    <VBox alignment="CENTER" spacing="8">
+        <Button fx:id="btnTrova" onAction="#onTrovaClick" prefWidth="240" text="Trova Ristoranti">
+            <graphic>
+                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                    <Image url="@images/ic_search.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+        <Button fx:id="btnMieiRistoranti" managed="false" onAction="#onMieiRistorantiClick" prefWidth="240" styleClass="button-secondary" text="I Miei Ristoranti" visible="false">
+            <graphic>
+                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                    <Image url="@images/ic_knifeandfork.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+    </VBox>
+
+    <Region VBox.vgrow="ALWAYS" />
+
+    <!-- Bottom cluster: Disconnetti above Esci, pinned to the bottom -->
+    <VBox alignment="CENTER" spacing="8">
+        <Button fx:id="btnDisconnetti" onAction="#onDisconnettiClick" prefWidth="200" styleClass="button-secondary" text="Disconnetti" />
+        <Button fx:id="btnEsci" onAction="#onEsciClick" prefWidth="200" styleClass="button-danger" text="Esci">
+            <graphic>
+                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                    <Image url="@images/ic_exit.png" />
+                </ImageView>
+            </graphic>
+        </Button>
     </VBox>
 </VBox>
