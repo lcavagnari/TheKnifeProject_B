@@ -1,15 +1,10 @@
 {
-  "id" : "ba63af62-d986-4f9d-ac88-0fdbc61fafeb",
-  "username" : "prova2",
-  "name" : "aa",
-  "lastName" : "aa",
-  "dateOfBirth" : "2026-07-28",
-  "location" : {
-    "nation" : "aaa",
-    "city" : "aa",
-    "address" : "aa"
-  },
-  "role" : "client",
-  "password" : "aaaa",
-  "favourites" : [ ]
+  "id": "12ec73a5-c06c-4e57-329c-61ddaa2f657d",
+  "username": "prova2",
+  "name": "aa",
+  "lastName": "aa",
+  "dateOfBirth": "2026-07-28",
+  "role": "client",
+  "passwordHash": "3cATwQ0CfP8NFam4cGfC1zwnz/aOvrS8UVo9Y1Y1Crw=",
+  "passwordSalt": "C85ty6qLWy7z4+g7GyMAGw=="
 }
