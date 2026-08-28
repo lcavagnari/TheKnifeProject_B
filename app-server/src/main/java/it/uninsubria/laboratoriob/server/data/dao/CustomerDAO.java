@@ -3,13 +3,11 @@ package it.uninsubria.laboratoriob.server.data.dao;
 
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
-import it.uninsubria.laboratoriob.server.utils.Database;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -65,25 +63,21 @@ public final class CustomerDAO extends UserDAO<Customer> {
     }
 
 
-    // TODO: aggiungere sistema intelligente per diff.
     @Override
     public boolean update(Customer user) {
         boolean succeded = super.update(user);
         if (succeded) {
-            String query = "DELETE FROM user_favorites WHERE user_id=?";
+            Set<UUID> current = findFavourites(user.getId());
+            Set<UUID> target = user.getFavouriteRestourants();
 
-            try (Connection conn = Database.getConnection();
-                 PreparedStatement stmt = conn.prepareStatement(query)) {
-                stmt.setObject(1, user.getId(), java.sql.Types.OTHER);
-                stmt.executeUpdate();
+            Set<UUID> toRemove = new HashSet<>(current);
+            toRemove.removeAll(target);
 
-            } catch (SQLException e) {
-                System.err.println("Errore update in CustomerDAO: " + e.getMessage());
-                return false;
-            }
+            Set<UUID> toAdd = new HashSet<>(target);
+            toAdd.removeAll(current);
 
-            for (UUID restId : user.getFavouriteRestourants())
-                addSpecial(user.getId(), restId);
+            for (UUID id : toRemove) removeSpecial(user.getId(), id);
+            for (UUID id : toAdd) addSpecial(user.getId(), id);
         }
 
         return succeded;
