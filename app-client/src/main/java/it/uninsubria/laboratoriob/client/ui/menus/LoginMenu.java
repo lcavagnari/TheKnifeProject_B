@@ -6,8 +6,10 @@ import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 import lombok.experimental.UtilityClass;
 
 import java.rmi.RemoteException;
@@ -96,7 +98,9 @@ public class LoginMenu {
             }
         }
 
-        if (dataStore.getAuthService() == null) {
+        AuthServiceInter authService = RmiRepository.getAuthService();
+        if (authService == null) authService = RmiRepository.lookupAuthService();
+        if (authService == null) {
             IO.printErrorMessage("Servizio auth non disponibile.");
             return null;
         }
@@ -104,7 +108,7 @@ public class LoginMenu {
         try {
             User registered;
             try {
-                registered = dataStore.getAuthService().register(
+                registered = authService.register(
                         username, password, firstName, lastName, dateOfBirth, location, isOwner);
             } catch (RemoteException e) {
                 IO.printErrorMessage("Registrazione fallita: " + e.getMessage());
@@ -144,9 +148,12 @@ public class LoginMenu {
 
                 User user;
 
-                if (dataStore.getAuthService() != null) {
+                AuthServiceInter authService = RmiRepository.getAuthService();
+                if (authService == null) authService = RmiRepository.lookupAuthService();
+
+                if (authService != null) {
                     try {
-                        user = dataStore.getAuthService().login(username, password);
+                        user = authService.login(username, password);
                     } catch (RemoteException ex) {
                         throw new AbortOperationException(
                                 (ex.getMessage().isEmpty()) ? "Server non raggiungibile." : "Errore: "+ex.getMessage()
