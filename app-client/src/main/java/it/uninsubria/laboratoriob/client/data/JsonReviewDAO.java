@@ -23,6 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class JsonReviewDAO implements DAO<Review> {
 
+    // TODO: Ensure this one works only in regards to the restaurants.
+
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
     private final JsonCustomerDAO customerDAO;

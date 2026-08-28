@@ -21,6 +21,10 @@ import java.rmi.registry.Registry;
  */
 public class TheKnifeClient {
 
+    // TODO: ensure all files have copyright notice and javadoc comments
+    // TODO: update technical documentation.
+    // TOOD: resolve lint.
+
     public static void main(String[] args) {
         IO.printSuccessMessage("Loading The Knife Client...");
 

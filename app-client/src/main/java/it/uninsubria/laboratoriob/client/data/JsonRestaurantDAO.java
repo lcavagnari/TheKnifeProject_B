@@ -161,6 +161,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         node.put("hasOnlineBooking", restaurant.isHasOnlineBooking());
         node.put("priceRange", restaurant.getPriceRange().name());
 
+        // TODO: extract this method to JsonLocationDao
         if (restaurant.getLocation() != null) {
             ObjectNode locNode = mapper.createObjectNode();
             locNode.put("nation", restaurant.getLocation().getNation().name());

@@ -38,4 +38,7 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         }
         return array;
     }
+
+    // TODO: Owner lacks add and remove restaurant cache methods
+    // TODO: add function to restaurant RMI service to add restaurant to server data layer. / new ad-hoc service.
 }
