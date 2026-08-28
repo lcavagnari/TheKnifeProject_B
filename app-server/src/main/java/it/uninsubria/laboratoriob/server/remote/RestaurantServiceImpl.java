@@ -65,4 +65,17 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     public boolean updateServices(UUID restaurantId, Set<String> services) throws RemoteException {
         return store.restaurants().updateServices(restaurantId, services);
     }
+
+    @Override
+    public boolean saveForOwner(Restaurant restaurant, UUID ownerId) throws RemoteException {
+        boolean saved = store.restaurants().save(restaurant);
+        if (saved) store.users().addOwnedRestaurant(ownerId, restaurant);
+        return saved;
+    }
+
+    @Override
+    public boolean deleteOwnedRestaurant(UUID ownerId, UUID restaurantId) throws RemoteException {
+        store.users().removeOwnedRestaurant(ownerId, restaurantId);
+        return store.restaurants().delete(restaurantId);
+    }
 }

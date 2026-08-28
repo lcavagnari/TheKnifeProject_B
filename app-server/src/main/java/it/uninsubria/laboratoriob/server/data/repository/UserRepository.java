@@ -2,6 +2,7 @@ package it.uninsubria.laboratoriob.server.data.repository;
 
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
+import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.server.data.dao.CustomerDAO;
 import it.uninsubria.laboratoriob.server.data.dao.OwnerDAO;
@@ -77,6 +78,29 @@ public class UserRepository {
         User u = byId.get(userId);
         if (u instanceof Customer c) return Set.copyOf(c.getFavouriteRestourants());
         return customerDAO.findFavourites(userId);
+    }
+
+    // ── Owned-restaurant operations ──
+
+    public boolean addOwnedRestaurant(UUID ownerId, Restaurant restaurant) {
+        boolean ok = ownerDAO.addRestaurant(ownerId, restaurant.getId());
+        if (ok) {
+            User u = byId.get(ownerId);
+            if (u instanceof Owner o) o.addRestaurant(restaurant);
+        }
+        return ok;
+    }
+
+    public boolean removeOwnedRestaurant(UUID ownerId, UUID restaurantId) {
+        boolean ok = ownerDAO.removeRestaurant(ownerId, restaurantId);
+        if (ok) {
+            User u = byId.get(ownerId);
+            if (u instanceof Owner o) {
+                Restaurant r = o.getRestaurantsById().get(restaurantId);
+                if (r != null) o.removeRestaurant(r);
+            }
+        }
+        return ok;
     }
 
     // ── Read operations (cache) ──

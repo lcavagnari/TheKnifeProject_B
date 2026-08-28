@@ -5,12 +5,21 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Owner;
+import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+
+import java.rmi.RemoteException;
+import java.util.Set;
+import java.util.UUID;
 
 public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
 
-    JsonOwnerDAO(AuthServiceInter authService) {
+    private final RestaurantServiceInter restaurantService;
+
+    JsonOwnerDAO(AuthServiceInter authService, RestaurantServiceInter restaurantService) {
         super(Owner.class, UserRole.OWNER, authService);
+        this.restaurantService = restaurantService;
     }
 
     @Override
@@ -39,6 +48,39 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         return array;
     }
 
-    // TODO: Owner lacks add and remove restaurant cache methods
-    // TODO: add function to restaurant RMI service to add restaurant to server data layer. / new ad-hoc service.
+    public boolean addOwnedRestaurant(UUID ownerId, Restaurant restaurant) {
+        Owner owner = cacheById.get(ownerId);
+        if (owner == null || restaurant == null) return false;
+
+        try {
+            restaurantService.saveForOwner(restaurant, ownerId);
+        } catch (RemoteException e) {
+            System.err.println("RMI sync addOwnedRestaurant " + getClass().getSimpleName() + ": " + e.getMessage());
+            return false;
+        }
+
+        return owner.addRestaurant(restaurant);
+    }
+
+    public boolean removeOwnedRestaurant(UUID ownerId, UUID restaurantId) {
+        Owner owner = cacheById.get(ownerId);
+        if (owner == null) return false;
+
+        Restaurant restaurant = owner.getRestaurantsById().get(restaurantId);
+        if (restaurant == null) return false;
+
+        try {
+            restaurantService.deleteOwnedRestaurant(ownerId, restaurantId);
+        } catch (RemoteException e) {
+            System.err.println("RMI sync removeOwnedRestaurant " + getClass().getSimpleName() + ": " + e.getMessage());
+            return false;
+        }
+
+        return owner.removeRestaurant(restaurant);
+    }
+
+    public Set<UUID> findOwnedRestaurants(UUID ownerId) {
+        Owner owner = cacheById.get(ownerId);
+        return owner != null ? Set.copyOf(owner.getRestaurantsById().keySet()) : Set.of();
+    }
 }
