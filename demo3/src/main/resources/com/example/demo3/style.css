@@ -415,10 +415,12 @@
 .badge-delivery {
     -fx-background-color: #fce8dc;
     -fx-text-fill: #a84e33;
+    -fx-font-size: 13px;
 }
 .badge-booking {
     -fx-background-color: #ece8f0;
     -fx-text-fill: #5a4a6a;
+    -fx-font-size: 13px;
 }
 .badge-green {
     -fx-background-color: #dce8d8;

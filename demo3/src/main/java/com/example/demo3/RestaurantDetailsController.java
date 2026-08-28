@@ -14,9 +14,12 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.geometry.Insets;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -142,14 +145,10 @@ public class RestaurantDetailsController {
         // Delivery + Online Booking badges
         deliveryBookingFlow.getChildren().clear();
         if (r.isHasDelivery()) {
-            Label badge = new Label("Delivery");
-            badge.getStyleClass().addAll("badge", "badge-delivery");
-            deliveryBookingFlow.getChildren().add(badge);
+            deliveryBookingFlow.getChildren().add(makeIconBadge("Delivery", "badge-delivery", "images/ic_geomarker.png"));
         }
         if (r.isHasOnlineBooking()) {
-            Label badge = new Label("Online Booking");
-            badge.getStyleClass().addAll("badge", "badge-booking");
-            deliveryBookingFlow.getChildren().add(badge);
+            deliveryBookingFlow.getChildren().add(makeIconBadge("Online Booking", "badge-booking", "images/ic_globe.png"));
         }
 
         // Cuisine badges
@@ -316,5 +315,21 @@ public class RestaurantDetailsController {
         if (loc.getCity() != null) sb.append(sb.isEmpty() ? "" : ", ").append(loc.getCity());
         if (loc.getNation() != null) sb.append(" (").append(loc.getNation().name().replace("_", " ")).append(")");
         return sb.isEmpty() ? "N/A" : sb.toString();
+    }
+
+    private Label makeIconBadge(String text, String styleClass, String iconPath) {
+        Label l = new Label(text);
+        l.getStyleClass().addAll("badge", styleClass);
+        try {
+            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream(iconPath)));
+            ImageView iv = new ImageView(img);
+            iv.setFitHeight(14);
+            iv.setFitWidth(14);
+            iv.setPreserveRatio(true);
+            l.setGraphic(iv);
+            l.setContentDisplay(ContentDisplay.LEFT);
+            l.setGraphicTextGap(4);
+        } catch (Exception ignored) {}
+        return l;
     }
 }
