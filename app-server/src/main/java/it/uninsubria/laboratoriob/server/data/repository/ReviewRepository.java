@@ -49,6 +49,14 @@ public class ReviewRepository {
 
     // ── Read operations ──
 
+    public Review findById(UUID id) {
+        for (Restaurant r : restaurantRepo.findAll())
+            for (Review review : r.getReviews().values())
+                if (review.getId().equals(id))
+                    return review;
+        return null;
+    }
+
     public List<Review> findByRestaurant(UUID restaurantId) {
         Restaurant r = restaurantRepo.findById(restaurantId);
         if (r == null) return List.of();

@@ -15,4 +15,5 @@ public interface ReviewServiceInter extends Remote {
     public boolean save(Review review) throws RemoteException;
     public boolean update(Review review) throws RemoteException;
     public boolean delete(UUID id) throws RemoteException;
+    public boolean replyToReview(UUID reviewId, String reply) throws RemoteException;
 }
