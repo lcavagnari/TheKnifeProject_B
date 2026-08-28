@@ -151,6 +151,8 @@ public class RegisterController {
             showFieldError(nomeError, "Il nome è obbligatorio.", nomeField);
         } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(nomeError, "Solo lettere, spazi, trattini e apostrofi.", nomeField);
+        } else if (val.length() < 4) {
+            showFieldError(nomeError, "Deve avere almeno 4 caratteri.", nomeField);
         } else {
             clearFieldError(nomeError, nomeField);
         }
@@ -162,6 +164,8 @@ public class RegisterController {
             showFieldError(cognomeError, "Il cognome è obbligatorio.", cognomeField);
         } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(cognomeError, "Solo lettere, spazi, trattini e apostrofi.", cognomeField);
+        } else if (val.length() < 4) {
+            showFieldError(cognomeError, "Deve avere almeno 4 caratteri.", cognomeField);
         } else {
             clearFieldError(cognomeError, cognomeField);
         }
@@ -250,6 +254,9 @@ public class RegisterController {
         } else if (!nome.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(nomeError, "Solo lettere, spazi, trattini e apostrofi.", nomeField);
             valid = false;
+        } else if (nome.length() < 4) {
+            showFieldError(nomeError, "Deve avere almeno 4 caratteri.", nomeField);
+            valid = false;
         }
 
         if (cognome.isEmpty()) {
@@ -257,6 +264,9 @@ public class RegisterController {
             valid = false;
         } else if (!cognome.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
             showFieldError(cognomeError, "Solo lettere, spazi, trattini e apostrofi.", cognomeField);
+            valid = false;
+        } else if (cognome.length() < 4) {
+            showFieldError(cognomeError, "Deve avere almeno 4 caratteri.", cognomeField);
             valid = false;
         }
 
