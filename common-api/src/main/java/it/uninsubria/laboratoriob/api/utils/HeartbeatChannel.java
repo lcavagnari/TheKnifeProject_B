@@ -23,6 +23,7 @@ public class HeartbeatChannel {
     private volatile boolean running = true;
     private volatile Thread readerThread;
     private volatile Thread pingerThread;
+    private volatile Runnable onDisconnect;
 
     private final BlockingQueue<Integer> pongQueue = new ArrayBlockingQueue<>(1);
 
@@ -32,6 +33,11 @@ public class HeartbeatChannel {
         this.intervalMinutes = intervalMinutes;
         this.in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
         this.out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+    }
+
+    /** Invoked once, on a dead-socket disconnect only (never on a graceful {@link #shutdown()}). */
+    public void setOnDisconnect(Runnable onDisconnect) {
+        this.onDisconnect = onDisconnect;
     }
 
     public void start() {
@@ -62,6 +68,8 @@ public class HeartbeatChannel {
         } catch (IOException e) {
             if (running) {
                 System.err.println("Heartbeat reader stopped: " + e.getMessage());
+                Runnable callback = onDisconnect;
+                if (callback != null) callback.run();
             }
         }
     }
