@@ -54,7 +54,7 @@ public abstract class Menus {
 
     protected void browseRestaurants() {
         try {
-            long total = dataStore.getRestaurantDAO().count();
+            long total = dataStore.getRestaurantDAO().countRemote();
             if (total == 0) {
                 IO.printErrorMessage("Nessun ristorante disponibile al momento.");
                 return;

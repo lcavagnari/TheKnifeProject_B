@@ -1,9 +1,16 @@
 package it.uninsubria.laboratoriob.client;
 
+import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
+import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.ui.IO;
 import it.uninsubria.laboratoriob.client.ui.menus.GuestMenus;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
+
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
 /**
  * Classe principale del client The Knife.
@@ -29,6 +36,8 @@ public class TheKnifeClient {
     }
 
     private static final String serverHost = "localhost";
+    private final int rmiPort = 1099;
+
     private static final int heartbeatPort = 5555;
     private static final long heartbeatIntervalMinutes = 5;
 
@@ -36,16 +45,12 @@ public class TheKnifeClient {
     private final ClientDataStore dataStore;
 
     public TheKnifeClient() {
-        this.dataStore = new ClientDataStore();
         this.tcpHbeatClient = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
+
+        this.dataStore = new ClientDataStore(restaurantService, authService, reviewService, favouriteService);
 
         tcpHbeatClient.start();
         Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
         Runtime.getRuntime().addShutdownHook(new Thread(IO::closeScanner));
-    }
-
-    public void shutdown() {
-        tcpHbeatClient.shutdown();
-        IO.closeScanner();
     }
 }
