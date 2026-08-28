@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private final File storeFile;
+    private File storeFile;
     private final RestaurantServiceInter service;
 
     private final ConcurrentHashMap<UUID, Restaurant> cacheById = new ConcurrentHashMap<>();
@@ -36,6 +36,13 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     public JsonRestaurantDAO(RestaurantServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "restaurants.json");
         this.service = service;
+    }
+
+    public void repointTo(UUID userId) {
+        File userDir = new File(Constants.ROOT, userId.toString());
+        this.storeFile = new File(userDir, storeFile.getName());
+        this.cacheLoaded = false;
+        cacheById.clear();
     }
 
     private void ensureCacheLoaded() {

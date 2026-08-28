@@ -23,7 +23,7 @@ public final class JsonLocationDAO implements DAO<Location> {
     // TOOD: ensure this works only as dependency for user and restaurants
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private final File storeFile;
+    private File storeFile;
 
     private record LocKey(double lat, double lon) {}
     private final ConcurrentHashMap<LocKey, Location> cache = new ConcurrentHashMap<>();
@@ -31,6 +31,13 @@ public final class JsonLocationDAO implements DAO<Location> {
 
     public JsonLocationDAO() {
         this.storeFile = new File(Constants.ROOT, "locations.json");
+    }
+
+    public void repointTo(UUID userId) {
+        File userDir = new File(Constants.ROOT, userId.toString());
+        this.storeFile = new File(userDir, storeFile.getName());
+        this.cacheLoaded = false;
+        cache.clear();
     }
 
     private void ensureCacheLoaded() {

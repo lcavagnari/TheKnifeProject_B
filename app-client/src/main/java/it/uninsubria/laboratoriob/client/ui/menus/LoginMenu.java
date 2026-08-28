@@ -104,6 +104,7 @@ public class LoginMenu {
             if (Validators.validateUser(user))
                 IO.getUserInput("Registrazione completata! Premi un qualsiasi tasto + Invio per tornare al menu principale.");
 
+            dataStore.switchUser(user.getId());
             if (isOwner) dataStore.getOwnerDAO().save((Owner) user);
             else dataStore.getCustomerDAO().save((Customer) user);
 
@@ -144,6 +145,7 @@ public class LoginMenu {
                 else {
                     IO.printSuccessMessage("Login effettuato con successo!");
                     IO.getUserInput("Premi Invio per continuare.");
+                    dataStore.switchUser(user.getId());
                     return user;
                 }
 
