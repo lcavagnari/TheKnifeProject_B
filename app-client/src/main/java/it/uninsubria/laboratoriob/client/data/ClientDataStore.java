@@ -45,8 +45,8 @@ public class ClientDataStore {
         this.favouriteService = favouriteService;
         this.customerDAO = new JsonCustomerDAO(authService,favouriteService);
         this.ownerDAO = new JsonOwnerDAO(authService, restaurantService);
-        this.restaurantDAO = new JsonRestaurantDAO(restaurantService);
         this.locationDAO = new JsonLocationDAO();
+        this.restaurantDAO = new JsonRestaurantDAO(restaurantService, locationDAO);
         this.reviewDAO = new JsonReviewDAO(customerDAO, reviewService);
     }
 

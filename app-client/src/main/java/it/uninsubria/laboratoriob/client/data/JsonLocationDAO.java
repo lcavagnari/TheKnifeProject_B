@@ -20,8 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class JsonLocationDAO implements DAO<Location> {
 
-    // TOOD: ensure this works only as dependency for user and restaurants
-
     private static final ObjectMapper mapper = new ObjectMapper();
     private File storeFile;
 
@@ -84,7 +82,7 @@ public final class JsonLocationDAO implements DAO<Location> {
         return array;
     }
 
-    private Location mapNode(JsonNode node) {
+    Location mapNode(JsonNode node) {
         return new Location(
                 Nation.fromString(node.path("nation").asText()),
                 node.path("city").asText(),
@@ -94,7 +92,7 @@ public final class JsonLocationDAO implements DAO<Location> {
         );
     }
 
-    private ObjectNode toNode(Location loc) {
+    ObjectNode toNode(Location loc) {
         ObjectNode node = mapper.createObjectNode();
         node.put("nation", loc.getNation() != null ? loc.getNation().name() : "");
         node.put("city", loc.getCity());
