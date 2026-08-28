@@ -1,17 +1,23 @@
 package com.example.demo3;
 
+import com.example.demo3.data.Session;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
+import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
+import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.geometry.Insets;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
@@ -32,8 +38,6 @@ public class RestaurantDetailsController {
     private Label priceRangeLabel;
     @FXML
     private Label awardLabel;
-    @FXML
-    private Label greenStarLabel;
     @FXML
     private javafx.scene.layout.HBox greenStarRibbon;
     @FXML
@@ -58,6 +62,10 @@ public class RestaurantDetailsController {
     private Button btnIndietro;
     @FXML
     private VBox root;
+    @FXML
+    private ScrollPane reviewsScrollPane;
+    @FXML
+    private VBox reviewsList;
 
     @FXML
     public void initialize() {
@@ -168,6 +176,40 @@ public class RestaurantDetailsController {
             Review worst = r.getReviews().values().stream().min(Comparator.comparingInt(Review::getValue)).orElseThrow();
             bestReviewLabel.setText(formattaRecensione(best));
             worstReviewLabel.setText(formattaRecensione(worst));
+        }
+
+        // ------------------ LISTA COMPLETA RECENSIONI ------------------
+
+        if (reviewsList != null) reviewsList.getChildren().clear();
+
+        if (r.getReviews() != null && !r.getReviews().isEmpty()) {
+            // Ottieni utente corrente
+            User currentUser = Session.getCurrentUser();
+            final String currentUserId = currentUser != null ? currentUser.getId().toString() : null;
+            final boolean isOwner = currentUser != null
+                    && currentUser.getRole() == UserRole.OWNER
+                    && r.getOwnerId() != null
+                    && currentUser.getId().toString().equals(r.getOwnerId().toString());
+
+
+            // Ordina per data decrescente e crea le card
+            r.getReviews().values().stream()
+                    .sorted(Comparator.comparing(Review::getTimestamp).reversed())
+                    .forEach(review -> {
+                        try {
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("ReviewCard.fxml"));
+                            VBox card = loader.load();
+                            ReviewCardController controller = loader.getController();
+                            controller.setContext(review, currentUserId, isOwner);
+                            reviewsList.getChildren().add(card);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    });
+        } else {
+            Label noReviews = new Label("No reviews yet.");
+            noReviews.setStyle("-fx-text-fill: #757575; -fx-font-size: 13px; -fx-padding: 10;");
+            reviewsList.getChildren().add(noReviews);
         }
     }
 

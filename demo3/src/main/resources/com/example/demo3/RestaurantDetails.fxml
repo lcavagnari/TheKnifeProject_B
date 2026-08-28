@@ -190,73 +190,64 @@
     <VBox spacing="3" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 3);">
         <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
 
-        <HBox alignment="CENTER_LEFT" spacing="4">
-            <children>
-                <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
-                    <image>
-                        <Image url="@images/ic_star.png" />
-                    </image>
-                </ImageView>
-                <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="REVIEWS" />
-            </children>
-        </HBox>
-        <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 2 0 0 0;">
-            <FlowPane fx:id="starsFlow" prefWrapLength="0.0" />
-            <Label fx:id="reviewsCountLabel" styleClass="review-ribbon-text" text="*reviews_count*" />
-        </HBox>
+        <VBox>
+            <HBox alignment="CENTER_LEFT" spacing="4">
+                <children>
+                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                        <image>
+                            <Image url="@images/ic_star.png" />
+                        </image>
+                    </ImageView>
+                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="REVIEWS" />
+                </children>
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="8" style="-fx-padding: 2 0 0 0;">
+                <FlowPane fx:id="starsFlow" prefWrapLength="0.0" />
+                <Label fx:id="reviewsCountLabel" styleClass="review-ribbon-text" text="*reviews_count*" />
+            </HBox>
 
-        <VBox fx:id="bestWorstReviewSeparator" managed="false" spacing="5" style="-fx-padding: 8 0 0 0;" visible="false">
-            <Separator style="-fx-border-width: 3 0 0 0; -fx-border-color: #E0E0E0;" />
+            <VBox fx:id="bestWorstReviewSeparator" managed="false" spacing="5" style="-fx-padding: 8 0 0 0;" visible="false">
+                <Separator style="-fx-border-width: 3 0 0 0; -fx-border-color: #E0E0E0;" />
+            </VBox>
+
+            <!-- Best + Worst Review Row -->
+            <GridPane fx:id="bestWorstReviewRow" hgap="10" managed="false" style="-fx-padding: 3 0 3 0;" vgap="10" visible="false">
+                <columnConstraints>
+                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
+                    <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
+                </columnConstraints>
+
+                <!-- Best review column -->
+                <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="0">
+                    <HBox alignment="CENTER_LEFT" spacing="4">
+                        <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                            <image><Image url="@images/ic_star.png" /></image>
+                        </ImageView>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="BEST REVIEW" />
+                    </HBox>
+                    <Label fx:id="bestReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*best_review*" />
+                </VBox>
+
+                <!-- Worst review column -->
+                <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="1">
+                    <HBox alignment="CENTER_LEFT" spacing="4">
+                        <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
+                            <image><Image url="@images/ic_star.png" /></image>
+                        </ImageView>
+                        <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="WORST REVIEW" />
+                    </HBox>
+                    <Label fx:id="worstReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*worst_review*" />
+                </VBox>
+                <rowConstraints>
+                    <RowConstraints />
+                </rowConstraints>
+            </GridPane>
         </VBox>
 
-        <!-- Best + Worst Review Row -->
-        <GridPane fx:id="bestWorstReviewRow" hgap="10" managed="false" style="-fx-padding: 3 0 3 0;" vgap="10" visible="false">
-            <columnConstraints>
-                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
-                <ColumnConstraints halignment="LEFT" hgrow="ALWAYS" percentWidth="50" />
-            </columnConstraints>
 
-            <!-- Best review column -->
-            <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="0">
-                <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
-                        <image><Image url="@images/ic_star.png" /></image>
-                    </ImageView>
-                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="BEST REVIEW" />
-                </HBox>
-                <Label fx:id="bestReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*best_review*" />
-            </VBox>
+        <padding><Insets bottom="14" left="14" right="14" top="18" /></padding>
 
-            <!-- Worst review column -->
-            <VBox alignment="CENTER_LEFT" spacing="2" GridPane.columnIndex="1">
-                <HBox alignment="CENTER_LEFT" spacing="4">
-                    <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
-                        <image><Image url="@images/ic_star.png" /></image>
-                    </ImageView>
-                    <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="WORST REVIEW" />
-                </HBox>
-                <Label fx:id="worstReviewLabel" style="-fx-text-fill: #424242; -fx-font-size: 13px;" text="*worst_review*" />
-            </VBox>
-            <rowConstraints>
-                <RowConstraints />
-            </rowConstraints>
-        </GridPane>
-
-    </VBox>
-
-    <!-- ALL REVIEWS Section (Scrollable list) -->
-    <VBox spacing="3" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 6, 0.0, 0, 3);">
-        <padding><Insets bottom="14" left="14" right="14" top="14" /></padding>
-
-        <HBox alignment="CENTER_LEFT" spacing="4">
-            <ImageView fitHeight="14" fitWidth="14" preserveRatio="true">
-                <image>
-                    <Image url="@images/ic_star.png" />
-                </image>
-            </ImageView>
-            <Label style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #757575;" text="ALL REVIEWS" />
-        </HBox>
-
+        <!-- ALL REVIEWS Section (Scrollable list) -->
         <ScrollPane fx:id="reviewsScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
                     style="-fx-background-color: transparent; -fx-padding: 0;">
             <VBox fx:id="reviewsList" spacing="8">
