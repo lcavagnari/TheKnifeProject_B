@@ -243,6 +243,14 @@ public class RegisterController {
         String confirmPassword = confirmPasswordField.getText() != null ? confirmPasswordField.getText() : "";
         boolean isGestore = radioGestore != null && radioGestore.isSelected();
 
+        // Validate that a role is selected
+        if (!radioCliente.isSelected() && !radioGestore.isSelected()) {
+            errorLabel.getStyleClass().removeAll("label-success", "label-error");
+            errorLabel.getStyleClass().add("label-error");
+            errorLabel.setText("Seleziona un tipo di utente (Cliente o Gestore).");
+            valid = false;
+        }
+
         boolean valid = true;
 
         if (!username.matches("[a-zA-Z0-9_]+")) {
