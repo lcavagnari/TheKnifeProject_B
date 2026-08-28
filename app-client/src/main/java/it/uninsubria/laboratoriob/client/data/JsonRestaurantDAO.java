@@ -25,6 +25,8 @@ import java.util.stream.Collectors;
 
 public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
+    // TODO: fix Arraylist is not serialisable issue and ensure data is cached appropriately.
+
     private static final ObjectMapper mapper = new ObjectMapper();
     private File storeFile;
     private final RestaurantServiceInter service;
