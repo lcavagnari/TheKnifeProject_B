@@ -8,7 +8,6 @@ import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
-import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
@@ -29,13 +28,15 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     private static final ObjectMapper mapper = new ObjectMapper();
     private File storeFile;
     private final RestaurantServiceInter service;
+    private final JsonLocationDAO locationDAO;
 
     private final ConcurrentHashMap<UUID, Restaurant> cacheById = new ConcurrentHashMap<>();
     private volatile boolean cacheLoaded = false;
 
-    public JsonRestaurantDAO(RestaurantServiceInter service) {
+    public JsonRestaurantDAO(RestaurantServiceInter service, JsonLocationDAO locationDAO) {
         this.storeFile = new File(Constants.ROOT, "restaurants.json");
         this.service = service;
+        this.locationDAO = locationDAO;
     }
 
     public void repointTo(UUID userId) {
@@ -106,13 +107,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         Location loc = null;
         JsonNode locNode = node.path("location");
         if (!locNode.isMissingNode() && !locNode.isNull()) {
-            loc = new Location(
-                    Nation.fromString(locNode.path("nation").asText()),
-                    locNode.path("city").asText(),
-                    locNode.path("latitude").asDouble(),
-                    locNode.path("longitude").asDouble(),
-                    locNode.path("address").asText()
-            );
+            loc = locationDAO.mapNode(locNode);
         }
 
         PriceRange priceRange = PriceRange.MODERATE;
@@ -168,15 +163,8 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         node.put("hasOnlineBooking", restaurant.isHasOnlineBooking());
         node.put("priceRange", restaurant.getPriceRange().name());
 
-        // TODO: extract this method to JsonLocationDao
         if (restaurant.getLocation() != null) {
-            ObjectNode locNode = mapper.createObjectNode();
-            locNode.put("nation", restaurant.getLocation().getNation().name());
-            locNode.put("city", restaurant.getLocation().getCity());
-            locNode.put("latitude", restaurant.getLocation().getLatitude());
-            locNode.put("longitude", restaurant.getLocation().getLongitude());
-            locNode.put("address", restaurant.getLocation().getAddress());
-            node.set("location", locNode);
+            node.set("location", locationDAO.toNode(restaurant.getLocation()));
         }
 
         ArrayNode cuisinesArray = mapper.createArrayNode();
