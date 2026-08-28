@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -27,6 +28,8 @@
                 <Font size="14.0" />
             </font></Button>
         <Label fx:id="nameLabel" styleClass="card-header" text="*restaurant name*" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnModifica" managed="false" onAction="#onModificaClick" text="Modifica" visible="false" />
     </HBox>
 
     <!-- Ribbons: Reviews on top, Awards below -->

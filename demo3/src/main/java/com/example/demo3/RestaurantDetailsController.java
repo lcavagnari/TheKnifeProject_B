@@ -4,11 +4,14 @@ import com.example.demo3.data.Session;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Location;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
@@ -16,6 +19,7 @@ import javafx.geometry.Insets;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
@@ -61,11 +65,15 @@ public class RestaurantDetailsController {
     @FXML
     private Button btnIndietro;
     @FXML
+    private Button btnModifica;
+    @FXML
     private VBox root;
     @FXML
     private ScrollPane reviewsScrollPane;
     @FXML
     private VBox reviewsList;
+
+    private Restaurant restaurant;
 
     @FXML
     public void initialize() {
@@ -78,6 +86,16 @@ public class RestaurantDetailsController {
     }
 
     public void carica(Restaurant r) {
+        this.restaurant = r;
+
+        User currentUser = Session.getCurrentUser();
+        boolean isOwner = currentUser != null
+                && currentUser.getRole() == UserRole.OWNER
+                && r.getOwnerId() != null
+                && currentUser.getId().toString().equals(r.getOwnerId().toString());
+        btnModifica.setVisible(isOwner);
+        btnModifica.setManaged(isOwner);
+
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
         descriptionLabel.setText(valoreO(r.getDescription(), "No description available."));
 
@@ -183,14 +201,7 @@ public class RestaurantDetailsController {
         if (reviewsList != null) reviewsList.getChildren().clear();
 
         if (r.getReviews() != null && !r.getReviews().isEmpty()) {
-            // Ottieni utente corrente
-            User currentUser = Session.getCurrentUser();
             final String currentUserId = currentUser != null ? currentUser.getId().toString() : null;
-            final boolean isOwner = currentUser != null
-                    && currentUser.getRole() == UserRole.OWNER
-                    && r.getOwnerId() != null
-                    && currentUser.getId().toString().equals(r.getOwnerId().toString());
-
 
             // Ordina per data decrescente e crea le card
             r.getReviews().values().stream()
@@ -222,6 +233,44 @@ public class RestaurantDetailsController {
     @FXML
     private void onIndietroClick() {
         Navigation.goBack();
+    }
+
+    @FXML
+    private void onModificaClick() {
+        if (!(Session.getCurrentUser() instanceof Owner owner) || restaurant == null) {
+            return;
+        }
+        try {
+            Stage stage = (Stage) btnModifica.getScene().getWindow();
+            Restaurant target = restaurant;
+
+            Navigation.pushBack(() -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("RestaurantDetails.fxml"));
+                    Parent detailsRoot = loader.load();
+                    RestaurantDetailsController controller = loader.getController();
+                    controller.carica(target);
+                    Scene scene = new Scene(detailsRoot, 650, 550);
+                    stage.setScene(scene);
+                    stage.setTitle(target.getName() != null ? target.getName() : "Dettagli ristorante");
+                    stage.show();
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
+            Parent formRoot = loader.load();
+            AddEditRestaurantController controller = loader.getController();
+            controller.configuraModifica(owner, target);
+
+            Scene scene = new Scene(formRoot, 650, 600);
+            stage.setScene(scene);
+            stage.setTitle("Modifica Ristorante");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private String valoreO(String valore, String fallback) {

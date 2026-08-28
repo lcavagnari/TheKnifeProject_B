@@ -25,6 +25,13 @@
                     </ImageView>
                 </graphic>
             </Button>
+            <Button fx:id="btnMieiRistoranti" managed="false" onAction="#onMieiRistorantiClick" prefWidth="240" styleClass="button-secondary" text="I Miei Ristoranti" visible="false">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <Image url="@images/ic_knifeandfork.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
         </VBox>
         <Button fx:id="btnLogout" onAction="#onLogoutClick" prefWidth="200" styleClass="button-danger" text="Esci">
             <graphic>

@@ -22,12 +22,16 @@ public class HomeController {
     @FXML
     private Button btnTrova;
     @FXML
+    private Button btnMieiRistoranti;
+    @FXML
     private Button btnLogout;
 
     @FXML
     public void initialize() {
         User utente = Session.getCurrentUser();
         boolean isOwner = utente != null && utente.getRole() == UserRole.OWNER;
+        btnMieiRistoranti.setVisible(isOwner);
+        btnMieiRistoranti.setManaged(isOwner);
 
         if (utente == null) {
             welcomeLabel.setText("Benvenuto");
@@ -55,6 +59,28 @@ public class HomeController {
             Scene scene = new Scene(root, 650, 500);
             stage.setScene(scene);
             stage.setTitle("Trova Ristoranti");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void onMieiRistorantiClick() {
+        try {
+            Stage stage = (Stage) btnMieiRistoranti.getScene().getWindow();
+
+            Navigation.pushBack(() -> Navigation.navigateTo(stage, "Home.fxml", "The Knife", 650, 500));
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("MyRestaurants.fxml"));
+            Parent root = loader.load();
+
+            MyRestaurantsController controller = loader.getController();
+            controller.inizializza();
+
+            Scene scene = new Scene(root, 650, 500);
+            stage.setScene(scene);
+            stage.setTitle("I Miei Ristoranti");
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
