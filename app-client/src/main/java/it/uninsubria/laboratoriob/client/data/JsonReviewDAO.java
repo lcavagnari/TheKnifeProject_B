@@ -23,8 +23,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class JsonReviewDAO implements DAO<Review> {
 
-    // TODO: Ensure this one works only in regards to the restaurants.
-
     private static final ObjectMapper mapper = new ObjectMapper();
     private File storeFile;
     private final JsonCustomerDAO customerDAO;
@@ -104,7 +102,13 @@ public final class JsonReviewDAO implements DAO<Review> {
 
         User user = customerDAO.findById(userId).orElse(null);
 
-        return new Review(id, null, user, value, timestamp, text, reply);
+        Review review = new Review(id, null, user, value, timestamp, text, reply);
+
+        String respondedAtStr = node.path("respondedAt").asText(null);
+        if (respondedAtStr != null && !respondedAtStr.isEmpty())
+            review.setRespondedAt(LocalDateTime.parse(respondedAtStr));
+
+        return review;
     }
 
     private ObjectNode toNode(Review review) {
@@ -116,6 +120,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         node.put("text", review.getText() != null ? review.getText() : "");
         node.put("reply", review.getReply());
         node.put("timestamp", review.getTimestamp() != null ? review.getTimestamp().toString() : "");
+        node.put("respondedAt", review.getRespondedAt() != null ? review.getRespondedAt().toString() : "");
         return node;
     }
 
@@ -223,6 +228,27 @@ public final class JsonReviewDAO implements DAO<Review> {
                 System.err.println("RMI sync update review: " + e.getMessage());
             }
         }
+        return true;
+    }
+
+    public boolean replyToReview(Review review, String reply) {
+        if (review == null || reply == null || reply.isBlank()) return false;
+        ensureCacheLoaded();
+
+        boolean synced;
+        try {
+            synced = service != null && service.replyToReview(review.getId(), reply);
+        } catch (RemoteException e) {
+            System.err.println("RMI sync replyToReview: " + e.getMessage());
+            return false;
+        }
+        if (!synced) return false;
+
+        review.setReply(reply);
+        review.setRespondedAt(LocalDateTime.now());
+        cacheById.put(review.getId(), review);
+        persistAtomic(toArrayNode());
+
         return true;
     }
 

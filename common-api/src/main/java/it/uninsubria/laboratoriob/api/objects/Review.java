@@ -55,6 +55,11 @@ public class Review extends Entity {
     private String reply;
 
     /**
+     * Timestamp della risposta del ristorante (opzionale, valorizzato solo insieme a reply).
+     */
+    private LocalDateTime respondedAt;
+
+    /**
      * Costruttore completo con tutti i campi, incluso reply.
      * <p>
      */
@@ -106,6 +111,10 @@ public class Review extends Entity {
         if (reply == null || reply.isBlank())
             return;
         this.reply = reply;
+    }
+
+    public void setRespondedAt(LocalDateTime respondedAt) {
+        this.respondedAt = respondedAt;
     }
 
     @Override

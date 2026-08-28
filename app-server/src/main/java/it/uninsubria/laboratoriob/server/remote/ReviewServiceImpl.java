@@ -6,6 +6,7 @@ import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,5 +52,17 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
     @Override
     public boolean delete(UUID id) throws RemoteException {
         return store.reviews().delete(id);
+    }
+
+    @Override
+    public boolean replyToReview(UUID reviewId, String reply) throws RemoteException {
+        if (reply == null || reply.isBlank()) return false;
+
+        Review review = store.reviews().findById(reviewId);
+        if (review == null) return false;
+
+        review.setReply(reply);
+        review.setRespondedAt(LocalDateTime.now());
+        return store.reviews().update(review);
     }
 }
