@@ -6,9 +6,11 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.data.DAO;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +28,7 @@ public final class JsonReviewDAO implements DAO<Review> {
     private static final ObjectMapper mapper = new ObjectMapper();
     private final File storeFile;
     private final JsonCustomerDAO customerDAO;
-    private final ReviewServiceInter service;
+    private volatile ReviewServiceInter service;
 
     private final ConcurrentHashMap<UUID, Review> cacheById = new ConcurrentHashMap<>();
     private volatile boolean cacheLoaded = false;
@@ -35,6 +37,18 @@ public final class JsonReviewDAO implements DAO<Review> {
         this.storeFile = new File(Constants.ROOT, "reviews.json");
         this.customerDAO = customerDAO;
         this.service = service;
+    }
+
+    void setRemoteReviewService(ReviewServiceInter service) {
+        this.service = service;
+    }
+
+    private ReviewServiceInter ensureService() {
+        ReviewServiceInter current = service;
+        if (current != null) return current;
+        ReviewServiceInter fresh = RmiRepository.lookupReviewService();
+        if (fresh != null) this.service = fresh;
+        return fresh;
     }
 
     private void ensureCacheLoaded() {
@@ -95,7 +109,13 @@ public final class JsonReviewDAO implements DAO<Review> {
 
         User user = customerDAO.findById(userId).orElse(null);
 
-        return new Review(id, null, user, value, timestamp, text, reply);
+        Review review = new Review(id, null, user, value, timestamp, text, reply);
+
+        String respondedAtStr = node.path("respondedAt").asText(null);
+        if (respondedAtStr != null && !respondedAtStr.isEmpty())
+            review.setRespondedAt(LocalDateTime.parse(respondedAtStr));
+
+        return review;
     }
 
     private ObjectNode toNode(Review review) {
@@ -107,6 +127,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         node.put("text", review.getText() != null ? review.getText() : "");
         node.put("reply", review.getReply());
         node.put("timestamp", review.getTimestamp() != null ? review.getTimestamp().toString() : "");
+        node.put("respondedAt", review.getRespondedAt() != null ? review.getRespondedAt().toString() : "");
         return node;
     }
 
@@ -123,14 +144,16 @@ public final class JsonReviewDAO implements DAO<Review> {
         ensureCacheLoaded();
         List<Review> local = new ArrayList<>(cacheById.values());
         if (!local.isEmpty()) return local;
-        if (service != null) {
+        ReviewServiceInter svc = ensureService();
+        if (svc != null) {
             try {
-                List<Review> remote = service.findAll();
+                List<Review> remote = svc.findAll();
                 for (Review r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
                 return new ArrayList<>(cacheById.values());
             } catch (RemoteException e) {
-                System.err.println("RMI fallback findAll review: " + e.getMessage());
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -155,14 +178,16 @@ public final class JsonReviewDAO implements DAO<Review> {
                 .filter(r -> r.getRestaurant() != null && r.getRestaurant().getId().equals(restaurantId))
                 .toList();
         if (!local.isEmpty()) return local;
-        if (service != null) {
+        ReviewServiceInter svc = ensureService();
+        if (svc != null) {
             try {
-                List<Review> remote = service.findByRestaurant(restaurantId);
+                List<Review> remote = svc.findByRestaurant(restaurantId);
                 for (Review r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
                 return remote;
             } catch (RemoteException e) {
-                System.err.println("RMI fallback findByRestaurant review: " + e.getMessage());
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -174,14 +199,16 @@ public final class JsonReviewDAO implements DAO<Review> {
                 .filter(r -> r.getUser() != null && r.getUser().getId().equals(userId))
                 .toList();
         if (!local.isEmpty()) return local;
-        if (service != null) {
+        ReviewServiceInter svc = ensureService();
+        if (svc != null) {
             try {
-                List<Review> remote = service.findByUser(userId);
+                List<Review> remote = svc.findByUser(userId);
                 for (Review r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
                 return remote;
             } catch (RemoteException e) {
-                System.err.println("RMI fallback findByUser review: " + e.getMessage());
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -194,9 +221,11 @@ public final class JsonReviewDAO implements DAO<Review> {
         if (cacheById.containsKey(review.getId())) return false;
         cacheById.put(review.getId(), review);
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.save(review); } catch (RemoteException e) {
-                System.err.println("RMI sync save review: " + e.getMessage());
+        ReviewServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.save(review); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
@@ -209,11 +238,35 @@ public final class JsonReviewDAO implements DAO<Review> {
         if (!cacheById.containsKey(review.getId())) return false;
         cacheById.put(review.getId(), review);
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.update(review); } catch (RemoteException e) {
-                System.err.println("RMI sync update review: " + e.getMessage());
+        ReviewServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.update(review); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
+        return true;
+    }
+
+    public boolean replyToReview(Review review, String reply) {
+        if (review == null || reply == null || reply.isBlank()) return false;
+        ensureCacheLoaded();
+
+        ReviewServiceInter svc = ensureService();
+        boolean synced;
+        try {
+            synced = svc != null && svc.replyToReview(review.getId(), reply);
+        } catch (RemoteException e) {
+            this.service = null;
+            throw new ServiceUnavailableException("Server non disponibile", e);
+        }
+        if (!synced) return false;
+
+        review.setReply(reply);
+        review.setRespondedAt(LocalDateTime.now());
+        cacheById.put(review.getId(), review);
+        persistAtomic(toArrayNode());
+
         return true;
     }
 
@@ -223,9 +276,11 @@ public final class JsonReviewDAO implements DAO<Review> {
         Review removed = cacheById.remove(id);
         if (removed == null) return false;
         persistAtomic(toArrayNode());
-        if (service != null) {
-            try { service.delete(id); } catch (RemoteException e) {
-                System.err.println("RMI sync delete review: " + e.getMessage());
+        ReviewServiceInter svc = ensureService();
+        if (svc != null) {
+            try { svc.delete(id); } catch (RemoteException e) {
+                this.service = null;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;

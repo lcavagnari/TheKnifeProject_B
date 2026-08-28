@@ -43,7 +43,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     protected JsonUserDAO(Class<T> type, UserRole role, AuthServiceInter authService) {
         this.type = type;
         this.role = role;
-        this.storeFile = new File(Constants.ROOT, "users.json");
+        this.storeFile = new File(Constants.ROOT, "user.json");
         this.authService = authService;
     }
 
