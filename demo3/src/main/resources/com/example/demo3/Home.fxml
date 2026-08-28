@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.HomeController">
+    <VBox alignment="CENTER" spacing="30" styleClass="menu-card">
+        <padding>
+            <Insets bottom="30" left="30" right="30" top="30" />
+        </padding>
+        <VBox alignment="CENTER" spacing="6">
+            <Label fx:id="welcomeLabel" styleClass="label-title" text="Benvenuto" />
+            <Label fx:id="roleLabel" styleClass="label-info" text="Cliente" />
+        </VBox>
+        <VBox alignment="CENTER" spacing="10">
+            <Button fx:id="btnTrova" onAction="#onTrovaClick" prefWidth="240" text="Trova Ristoranti">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <Image url="@images/ic_search.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+        </VBox>
+        <Button fx:id="btnLogout" onAction="#onLogoutClick" prefWidth="200" styleClass="button-danger" text="Esci">
+            <graphic>
+                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                    <Image url="@images/ic_exit.png" />
+                </ImageView>
+            </graphic>
+        </Button>
+    </VBox>
+</StackPane>

@@ -9,6 +9,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.util.Optional;
 
@@ -68,6 +69,10 @@ public class LoginController {
         errorLabel.getStyleClass().add("label-success");
         errorLabel.setText("Login riuscito! Benvenuto " + utente.getName() + ".");
         System.out.println("Login riuscito per: " + username + " (" + utente.getRole() + ")");
+
+        Navigation.clearBackstack();
+        Stage stage = (Stage) usernameField.getScene().getWindow();
+        Navigation.navigateTo(stage, "Home.fxml", "The Knife", 650, 500);
     }
 
     @FXML
