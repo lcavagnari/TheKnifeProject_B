@@ -48,9 +48,10 @@ public class HeartbeatClient {
         }
     }
 
-    private void handleDisconnect() {
+    private synchronized void handleDisconnect() {
         if (shuttingDown) return;
         HeartbeatChannel dead = channel;
+        channel = null;
         if (dead != null) dead.shutdown();
         scheduleReconnect();
     }
@@ -78,6 +79,7 @@ public class HeartbeatClient {
     public void shutdown() {
         shuttingDown = true;
         HeartbeatChannel c = channel;
+        channel = null;
         if (c != null) {
             c.shutdown();
         }
