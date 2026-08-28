@@ -6,4 +6,5 @@ target/
 /data/
 
 *.class
+*.code-workspace
 .vscode/
