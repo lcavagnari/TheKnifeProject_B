@@ -43,16 +43,20 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     public void repointTo(UUID userId) {
         File userDir = new File(Constants.ROOT, userId.toString());
+
         this.storeFile = new File(userDir, storeFile.getName());
         this.cacheLoaded = false;
+
         cacheById.clear();
     }
 
     private void ensureCacheLoaded() {
         if (cacheLoaded) return;
+
         synchronized (this) {
             if (cacheLoaded) return;
             loadFromDisk();
+
             cacheLoaded = true;
         }
     }
@@ -60,9 +64,12 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     private void loadFromDisk() {
         cacheById.clear();
         if (!storeFile.exists()) return;
+
         try {
             JsonNode node = mapper.readTree(storeFile);
+
             if (!node.isArray()) return;
+
             for (JsonNode n : (ArrayNode) node) {
                 Restaurant r = mapNode(n);
                 cacheById.put(r.getId(), r);
@@ -86,9 +93,8 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     private ArrayNode toArrayNode() {
         ArrayNode array = mapper.createArrayNode();
-        for (Restaurant r : cacheById.values()) {
-            array.add(toNode(r));
-        }
+        for (Restaurant r : cacheById.values()) array.add(toNode(r));
+
         return array;
     }
 
@@ -134,17 +140,14 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
             for (JsonNode c : cuisinesNode) {
                 try {
                     cuisinesTypes.add(CuisineType.valueOf(c.asText()));
-                } catch (IllegalArgumentException ignored) {
-                }
+                } catch (IllegalArgumentException ignored) {}
             }
         }
 
         Set<String> services = new HashSet<>();
         JsonNode servicesNode = node.path("services");
         if (servicesNode.isArray()) {
-            for (JsonNode s : servicesNode) {
-                services.add(s.asText());
-            }
+            for (JsonNode s : servicesNode) services.add(s.asText());
         }
 
         return new Restaurant(id, name, description, websiteUrl, owner, phone, loc,
@@ -165,9 +168,9 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         node.put("hasOnlineBooking", restaurant.isHasOnlineBooking());
         node.put("priceRange", restaurant.getPriceRange().name());
 
-        if (restaurant.getLocation() != null) {
+        if (restaurant.getLocation() != null)
             node.set("location", locationDAO.toNode(restaurant.getLocation()));
-        }
+
 
         ArrayNode cuisinesArray = mapper.createArrayNode();
         restaurant.getCuisinesTypes().forEach(c -> cuisinesArray.add(c.name()));
@@ -183,8 +186,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     @Override
     public Optional<Restaurant> findById(UUID id) {
         ensureCacheLoaded();
+
         Restaurant cached = cacheById.get(id);
         if (cached != null) return Optional.of(cached);
+
         if (service != null) {
             try {
                 Restaurant remote = service.findById(id);
@@ -203,13 +208,18 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     @Override
     public List<Restaurant> findAll() {
         ensureCacheLoaded();
+
         List<Restaurant> local = new ArrayList<>(cacheById.values());
-        if (!local.isEmpty()) return local;
+
+        // TODO: the fact that cache isnt empty doesnt mean that it is up to date.
+        if (!local.isEmpty() && countLocal() == countRemote()) return local;
         if (service != null) {
             try {
                 List<Restaurant> remote = service.findAll(0, 1000);
+
                 for (Restaurant r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
+
                 return new ArrayList<>(cacheById.values());
             } catch (RemoteException e) {
                 System.err.println("RMI fallback findAll restaurant: " + e.getMessage());
@@ -225,18 +235,28 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return all.subList(offset, Math.min(offset + limit, all.size()));
     }
 
-    @Override
-    public long count() {
-        ensureCacheLoaded();
-        if (!cacheById.isEmpty()) return cacheById.size();
+    public long countRemote() {
         if (service != null) {
             try {
                 return service.count();
             } catch (RemoteException e) {
                 System.err.println("RMI fallback count restaurant: " + e.getMessage());
+                return 0;
             }
-        }
-        return 0;
+        } else return 0;
+    }
+
+    public long countLocal() {
+        ensureCacheLoaded();
+        return (!cacheById.isEmpty()) ? cacheById.size() : 0;
+    }
+
+    @Override
+    public long count() {
+        long local = countLocal();
+        long remote = countRemote();
+
+        return local+remote;
     }
 
     public List<Restaurant> findByOwner(UUID ownerId) {
