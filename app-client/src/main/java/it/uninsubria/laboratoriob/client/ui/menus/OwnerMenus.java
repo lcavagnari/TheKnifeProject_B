@@ -5,6 +5,7 @@ import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -172,6 +173,8 @@ public class OwnerMenus extends Menus {
             } catch (AbortOperationException e) {
                 IO.printErrorMessage("Abort: " + e.getMessage());
                 break;
+            } catch (ServiceUnavailableException e) {
+                IO.printErrorMessage("Server non disponibile. Operazione non completata.");
             }
 
             IO.getUserInput("Premi invio per continuare.");
@@ -264,9 +267,14 @@ public class OwnerMenus extends Menus {
 
             Review selected = allReviews.get(sel - 1);
             String response = IO.getUserInput("Scrivi la tua risposta (max 300 caratteri):");
-            dataStore.getReviewDAO().replyToReview(selected, response);
 
-            IO.printSuccessMessage("Risposta salvata.");
+            try {
+                dataStore.getReviewDAO().replyToReview(selected, response);
+                IO.printSuccessMessage("Risposta salvata.");
+            } catch (ServiceUnavailableException e) {
+                IO.printErrorMessage("Server non disponibile. Operazione non completata.");
+            }
+
             IO.getUserInput("Premi invio per continuare.");
         }
     }

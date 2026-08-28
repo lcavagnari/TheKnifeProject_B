@@ -9,6 +9,7 @@ import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -214,7 +215,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
                 }
             } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI fallback findById restaurant: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return Optional.empty();
@@ -239,7 +240,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
                 return new ArrayList<>(cacheById.values());
             } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI fallback findAll restaurant: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -259,8 +260,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
             return svc.count();
         } catch (RemoteException e) {
             this.service = null;
-            System.err.println("RMI fallback count restaurant: " + e.getMessage());
-            return 0;
+            throw new ServiceUnavailableException("Server non disponibile", e);
         }
     }
 
@@ -292,7 +292,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
                 return remote;
             } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI fallback findByOwner restaurant: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return local;
@@ -309,7 +309,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         if (svc != null) {
             try { svc.save(restaurant); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync save restaurant: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
@@ -318,15 +318,18 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     @Override
     public boolean update(Restaurant restaurant) {
         if (restaurant == null) return false;
+
         ensureCacheLoaded();
         if (!cacheById.containsKey(restaurant.getId())) return false;
+
         cacheById.put(restaurant.getId(), restaurant);
         persistAtomic(toArrayNode());
+
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
             try { svc.update(restaurant); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync update restaurant: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
@@ -342,7 +345,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         if (svc != null) {
             try { svc.delete(id); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync delete restaurant: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
@@ -359,7 +362,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         if (svc != null) {
             try { svc.updateCuisines(restaurantId, cuisines); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync updateCuisines: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;
@@ -376,7 +379,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         if (svc != null) {
             try { svc.updateServices(restaurantId, services); } catch (RemoteException e) {
                 this.service = null;
-                System.err.println("RMI sync updateServices: " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return true;

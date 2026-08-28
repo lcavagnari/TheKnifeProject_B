@@ -8,6 +8,7 @@ import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.data.DAO;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
@@ -210,8 +211,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
             } catch (RemoteException e) {
                 this.authService = null;
-                System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
-                return false;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
 
@@ -252,11 +252,9 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
             } catch (RemoteException e) {
                 this.authService = null;
-                System.err.println("RMI sync save " + getClass().getSimpleName() + ": " + e.getMessage());
-                return false;
-            } finally {
-                if (user == null) return false;
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
+            if (user == null) return false;
         }
 
         ensureCacheLoaded();
@@ -310,7 +308,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
                 }
             } catch (RemoteException e) {
                 this.authService = null;
-                System.err.println("RMI login " + getClass().getSimpleName() + ": " + e.getMessage());
+                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
         return Optional.empty();

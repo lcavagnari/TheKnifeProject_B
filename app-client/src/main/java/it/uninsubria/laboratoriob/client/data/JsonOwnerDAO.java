@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
@@ -72,8 +73,7 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
             svc.saveForOwner(restaurant, ownerId);
         } catch (RemoteException e) {
             this.restaurantService = null;
-            System.err.println("RMI sync addOwnedRestaurant " + getClass().getSimpleName() + ": " + e.getMessage());
-            return false;
+            throw new ServiceUnavailableException("Server non disponibile", e);
         }
 
         return owner.addRestaurant(restaurant);
@@ -93,8 +93,7 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
             svc.deleteOwnedRestaurant(ownerId, restaurantId);
         } catch (RemoteException e) {
             this.restaurantService = null;
-            System.err.println("RMI sync removeOwnedRestaurant " + getClass().getSimpleName() + ": " + e.getMessage());
-            return false;
+            throw new ServiceUnavailableException("Server non disponibile", e);
         }
 
         return owner.removeRestaurant(restaurant);
