@@ -5,19 +5,18 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.HomeController">
-    <VBox alignment="CENTER" spacing="30" styleClass="menu-card">
+<VBox alignment="CENTER" spacing="0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.HomeController">
+    <VBox alignment="CENTER" spacing="10">
+        <Label fx:id="welcomeLabel" styleClass="label-title" text="Benvenuto" />
+        <Label fx:id="roleLabel" styleClass="label-info" text="Cliente" />
+    </VBox>
+    <VBox alignment="CENTER" spacing="50">
         <padding>
-            <Insets bottom="30" left="30" right="30" top="30" />
+            <Insets top="50" />
         </padding>
-        <VBox alignment="CENTER" spacing="6">
-            <Label fx:id="welcomeLabel" styleClass="label-title" text="Benvenuto" />
-            <Label fx:id="roleLabel" styleClass="label-info" text="Cliente" />
-        </VBox>
-        <VBox alignment="CENTER" spacing="10">
+        <VBox alignment="CENTER" spacing="8">
             <Button fx:id="btnTrova" onAction="#onTrovaClick" prefWidth="240" text="Trova Ristoranti">
                 <graphic>
                     <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
@@ -33,12 +32,17 @@
                 </graphic>
             </Button>
         </VBox>
-        <Button fx:id="btnLogout" onAction="#onLogoutClick" prefWidth="200" styleClass="button-danger" text="Esci">
-            <graphic>
-                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                    <Image url="@images/ic_exit.png" />
-                </ImageView>
-            </graphic>
-        </Button>
+        <VBox alignment="CENTER" spacing="8">
+            <Button fx:id="btnDisconnetti" onAction="#onDisconnettiClick" prefWidth="200" styleClass="button-secondary" text="Disconnetti" />
+        </VBox>
+        <VBox alignment="CENTER" spacing="8">
+            <Button fx:id="btnEsci" onAction="#onEsciClick" prefWidth="200" styleClass="button-danger" text="Esci">
+                <graphic>
+                    <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                        <Image url="@images/ic_exit.png" />
+                    </ImageView>
+                </graphic>
+            </Button>
+        </VBox>
     </VBox>
-</StackPane>
+</VBox>

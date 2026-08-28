@@ -1,6 +1,7 @@
 package com.example.demo3;
 
 import com.example.demo3.data.Session;
+import com.example.demo3.data.SessionRepository;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
@@ -13,7 +14,14 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Contenuto "loggato" iniettato nella menu-card di GUI.fxml al posto di
+ * titleBlock/menuButtons, esattamente come Login.fxml e Register.fxml.
+ */
 public class HomeController {
+
+    private final SessionRepository sessionRepository = new SessionRepository();
+    private Runnable onDisconnettiCallback;
 
     @FXML
     private Label welcomeLabel;
@@ -24,10 +32,20 @@ public class HomeController {
     @FXML
     private Button btnMieiRistoranti;
     @FXML
-    private Button btnLogout;
-
+    private Button btnDisconnetti;
     @FXML
-    public void initialize() {
+    private Button btnEsci;
+
+    public void setOnDisconnettiCallback(Runnable callback) {
+        this.onDisconnettiCallback = callback;
+    }
+
+    /**
+     * Da richiamare ogni volta prima di mostrare questo componente: rilegge
+     * l'utente corrente dalla Session, dato che il nodo viene precaricato una
+     * sola volta e riutilizzato per tutta la sessione dell'app.
+     */
+    public void aggiorna() {
         User utente = Session.getCurrentUser();
         boolean isOwner = utente != null && utente.getRole() == UserRole.OWNER;
         btnMieiRistoranti.setVisible(isOwner);
@@ -48,7 +66,7 @@ public class HomeController {
         try {
             Stage stage = (Stage) btnTrova.getScene().getWindow();
 
-            Navigation.pushBack(() -> Navigation.navigateTo(stage, "Home.fxml", "The Knife", 650, 500));
+            Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
             Parent root = loader.load();
@@ -70,7 +88,7 @@ public class HomeController {
         try {
             Stage stage = (Stage) btnMieiRistoranti.getScene().getWindow();
 
-            Navigation.pushBack(() -> Navigation.navigateTo(stage, "Home.fxml", "The Knife", 650, 500));
+            Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("MyRestaurants.fxml"));
             Parent root = loader.load();
@@ -88,11 +106,17 @@ public class HomeController {
     }
 
     @FXML
-    private void onLogoutClick() {
+    private void onDisconnettiClick() {
         Session.logout();
-        Navigation.clearBackstack();
+        sessionRepository.clear();
+        if (onDisconnettiCallback != null) {
+            onDisconnettiCallback.run();
+        }
+    }
 
-        Stage stage = (Stage) btnLogout.getScene().getWindow();
-        Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500);
+    @FXML
+    private void onEsciClick() {
+        Stage stage = (Stage) btnEsci.getScene().getWindow();
+        stage.close();
     }
 }
