@@ -37,6 +37,7 @@ public class TheKnifeClient {
 
     private static final String serverHost = "localhost";
     private final int rmiPort = 1099;
+
     private static final int heartbeatPort = 5555;
     private static final long heartbeatIntervalMinutes = 5;
 
@@ -45,22 +46,6 @@ public class TheKnifeClient {
 
     public TheKnifeClient() {
         this.tcpHbeatClient = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
-
-        RestaurantServiceInter restaurantService = null;
-        AuthServiceInter authService = null;
-        ReviewServiceInter reviewService = null;
-        FavouriteServiceInter favouriteService = null;
-
-        try {
-            Registry registry = LocateRegistry.getRegistry(serverHost, rmiPort);
-            restaurantService = (RestaurantServiceInter) registry.lookup("restaurant");
-            authService = (AuthServiceInter) registry.lookup("auth");
-            reviewService = (ReviewServiceInter) registry.lookup("review");
-            favouriteService = (FavouriteServiceInter) registry.lookup("favourite");
-            IO.printSuccessMessage("RMI connection established.");
-        } catch (Exception e) {
-            System.err.println("WARNING: RMI lookup failed: " + e.getMessage());
-        }
 
         this.dataStore = new ClientDataStore(restaurantService, authService, reviewService, favouriteService);
 
