@@ -2,7 +2,9 @@ package it.uninsubria.laboratoriob.api.utils;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.concurrent.*;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Shared bidirectional TCP heartbeat over an already-connected socket.
@@ -13,6 +15,16 @@ public class HeartbeatChannel {
 
     private static final byte PING = 0;
     private static final byte PONG = 1;
+
+    private static volatile boolean serverReachable = false;
+
+    public static boolean isServerReachable() {
+        return serverReachable;
+    }
+
+    public synchronized static void setServerReachable(boolean value) {
+        serverReachable = value;
+    }
 
     private final Socket socket;
     private final DataInputStream in;
@@ -41,6 +53,8 @@ public class HeartbeatChannel {
     }
 
     public void start() {
+        serverReachable = true;
+
         readerThread = new Thread(this::readLoop, "heartbeat-reader");
         readerThread.setDaemon(true);
         readerThread.start();
@@ -70,6 +84,9 @@ public class HeartbeatChannel {
         } catch (IOException e) {
             if (running) {
                 System.err.println("Heartbeat reader stopped: " + e.getMessage());
+                serverReachable = false;
+                running = false;
+                if (pingerThread != null) pingerThread.interrupt();
                 Runnable callback = onDisconnect;
                 if (callback != null) callback.run();
             }
@@ -88,6 +105,12 @@ public class HeartbeatChannel {
                 System.out.println("[Heartbeat] Sent PING " + counter);
             } catch (IOException e) {
                 System.err.println("Heartbeat ping failed: " + e.getMessage());
+                serverReachable = false;
+                running = false;
+                if (readerThread != null) readerThread.interrupt();
+                Runnable callback = onDisconnect;
+                if (callback != null) callback.run();
+                return;
             }
 
             Integer reply = null;
@@ -117,6 +140,7 @@ public class HeartbeatChannel {
     }
 
     public void shutdown() {
+        serverReachable = false;
         running = false;
         if (pingerThread != null) pingerThread.interrupt();
         if (readerThread != null) readerThread.interrupt();
