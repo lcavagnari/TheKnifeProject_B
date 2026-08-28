@@ -26,7 +26,7 @@ public final class JsonReviewDAO implements DAO<Review> {
     // TODO: Ensure this one works only in regards to the restaurants.
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private final File storeFile;
+    private File storeFile;
     private final JsonCustomerDAO customerDAO;
     private final ReviewServiceInter service;
 
@@ -37,6 +37,13 @@ public final class JsonReviewDAO implements DAO<Review> {
         this.storeFile = new File(Constants.ROOT, "reviews.json");
         this.customerDAO = customerDAO;
         this.service = service;
+    }
+
+    public void repointTo(UUID userId) {
+        File userDir = new File(Constants.ROOT, userId.toString());
+        this.storeFile = new File(userDir, storeFile.getName());
+        this.cacheLoaded = false;
+        cacheById.clear();
     }
 
     private void ensureCacheLoaded() {

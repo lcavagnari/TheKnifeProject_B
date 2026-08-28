@@ -27,7 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
-    protected final File storeFile;
+    protected File storeFile;
     private final Class<T> type;
 
     protected final AuthServiceInter authService;
@@ -48,6 +48,14 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
     protected abstract T mapNode(JsonNode node);
 
     protected abstract ArrayNode toArrayNode();
+
+    public void repointTo(UUID userId) {
+        File userDir = new File(Constants.ROOT, userId.toString());
+        this.storeFile = new File(userDir, storeFile.getName());
+        this.cacheLoaded = false;
+        cacheById.clear();
+        cacheByUsername.clear();
+    }
 
     private void ensureCacheLoaded() {
         if (cacheLoaded) return;

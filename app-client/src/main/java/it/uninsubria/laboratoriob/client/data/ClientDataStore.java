@@ -6,6 +6,8 @@ import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import lombok.Getter;
 
+import java.util.UUID;
+
 /**
  * Facade che orchestra tutti i DAO del client.
  * <p>
@@ -46,5 +48,17 @@ public class ClientDataStore {
         this.restaurantDAO = new JsonRestaurantDAO(restaurantService);
         this.locationDAO = new JsonLocationDAO();
         this.reviewDAO = new JsonReviewDAO(customerDAO, reviewService);
+    }
+
+    /**
+     * Ripunta la cache locale di ogni DAO alla cartella dell'utente autenticato,
+     * cosi' che i dati di sessioni diverse non si mescolino sullo stesso client.
+     */
+    public void switchUser(UUID userId) {
+        customerDAO.repointTo(userId);
+        ownerDAO.repointTo(userId);
+        restaurantDAO.repointTo(userId);
+        reviewDAO.repointTo(userId);
+        locationDAO.repointTo(userId);
     }
 }
