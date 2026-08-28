@@ -9,8 +9,11 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.geometry.Insets;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+import java.time.format.DateTimeFormatter;
+import java.util.Comparator;
 import java.util.Objects;
 
 public class RestaurantDetailsController {
@@ -35,6 +38,14 @@ public class RestaurantDetailsController {
     private javafx.scene.layout.HBox greenStarRibbon;
     @FXML
     private Label reviewsCountLabel;
+    @FXML
+    private VBox bestWorstReviewSeparator;
+    @FXML
+    private GridPane bestWorstReviewRow;
+    @FXML
+    private Label bestReviewLabel;
+    @FXML
+    private Label worstReviewLabel;
     @FXML
     private FlowPane cuisinesFlow;
     @FXML
@@ -145,6 +156,25 @@ public class RestaurantDetailsController {
         starsFlow.getChildren().setAll(starLabel);
 
         reviewsCountLabel.setText(numRecensioni + (numRecensioni == 1 ? " review" : " reviews"));
+
+        // Best + worst review values
+        boolean showBestWorst = numRecensioni > 0;
+        bestWorstReviewSeparator.setVisible(showBestWorst);
+        bestWorstReviewSeparator.setManaged(showBestWorst);
+        bestWorstReviewRow.setVisible(showBestWorst);
+        bestWorstReviewRow.setManaged(showBestWorst);
+        if (showBestWorst) {
+            Review best = r.getReviews().values().stream().max(Comparator.comparingInt(Review::getValue)).orElseThrow();
+            Review worst = r.getReviews().values().stream().min(Comparator.comparingInt(Review::getValue)).orElseThrow();
+            bestReviewLabel.setText(formattaRecensione(best));
+            worstReviewLabel.setText(formattaRecensione(worst));
+        }
+    }
+
+    private static final DateTimeFormatter REVIEW_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    private String formattaRecensione(Review review) {
+        return review.getValue() + " . " + review.getTimestamp().format(REVIEW_TIMESTAMP_FORMAT);
     }
 
     @FXML
