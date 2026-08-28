@@ -8,20 +8,15 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" spacing="25" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.example.demo3.LoginController">
-    <padding>
-        <Insets top="50" right="50" bottom="50" left="50" />
-    </padding>
-    <Label text="🔐 Accedi" styleClass="card-header" />
-    <VBox styleClass="card" spacing="15" maxWidth="360">
-        <TextField fx:id="usernameField" promptText="Username" />
-        <PasswordField fx:id="passwordField" promptText="Password" />
-        <Label fx:id="errorLabel" wrapText="true" />
-        <HBox spacing="15" alignment="CENTER">
-            <Button fx:id="btnLogin" text="Login" onAction="#onLoginClick" />
-            <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-secondary" />
-        </HBox>
-    </VBox>
+    <Label text="Accedi" styleClass="label-title" />
+    <Label text="Inserisci le tue credenziali" styleClass="label-info" />
+    <TextField fx:id="usernameField" promptText="Username" />
+    <PasswordField fx:id="passwordField" promptText="Password" />
+    <Label fx:id="errorLabel" wrapText="true" styleClass="label-error" />
+    <HBox spacing="10" alignment="CENTER">
+        <Button fx:id="btnLogin" text="Login" onAction="#onLoginClick" />
+        <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-danger" />
+    </HBox>
 </VBox>

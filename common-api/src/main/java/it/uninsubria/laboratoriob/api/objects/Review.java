@@ -116,4 +116,8 @@ public class Review extends Entity {
                 "│ Text:             " + (text != null && !text.isBlank() ? "\"" + text + "\"" : "N/A") + "\n" +
                 "│ Reply:            " + (reply != null && !reply.isBlank() ? "\"" + reply + "\"" : "None") + "\n";
     }
+
+    public UUID getAuthorId() {
+        return user.getId();
+    }
 }

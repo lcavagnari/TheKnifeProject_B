@@ -350,4 +350,8 @@ public class Restaurant extends Entity {
         sb.append("└───────────────────────────────────────────────┘");
         return sb.toString();
     }
+
+    public UUID getOwnerId() {
+        return (owner != null) ? owner.getId() : null;
+    }
 }

@@ -21,7 +21,7 @@
       <!-- App icon area -->
       <VBox alignment="CENTER" spacing="10">
          <ImageView fitHeight="480" fitWidth="480" preserveRatio="true">
-            <Image url="@images/app-icon.png"/>
+            <Image url="@images/ic_app.png"/>
          </ImageView>
       </VBox>
    </VBox>
@@ -29,17 +29,17 @@
    <!-- RIGHT BOX – 40% width, fills entire height, elevates the card -->
    <VBox alignment="CENTER" maxHeight="Infinity" maxWidth="Infinity" styleClass="right-box" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="0" GridPane.vgrow="ALWAYS">
       <!-- Menu card – centered inside the right box -->
-      <VBox alignment="CENTER" maxWidth="280" styleClass="menu-card">
+      <VBox fx:id="menuCard" alignment="CENTER" styleClass="menu-card">
          <padding>
             <Insets bottom="20" left="20" right="20" top="20" />
          </padding>
          <!-- Title block -->
-         <VBox alignment="CENTER" spacing="10">
+         <VBox fx:id="titleBlock" alignment="CENTER" spacing="10">
             <Label styleClass="label-title" text="The Knife" />
             <Label styleClass="label-info" text="Il tuo compagno per scoperte culinarie" />
          </VBox>
          <!-- Button clusters -->
-         <VBox alignment="CENTER" spacing="50">
+         <VBox fx:id="menuButtons" alignment="CENTER" spacing="50">
             <padding>
                <Insets top="50" />
             </padding>
@@ -47,30 +47,23 @@
                <Button fx:id="btnLogin" onAction="#onLoginClick" prefWidth="200" text="Accedi">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-login.png"/>
+                        <Image url="@images/ic_login.png"/>
                      </ImageView>
                   </graphic>
                </Button>
                <Button fx:id="btnRegister" onAction="#onRegisterClick" prefWidth="200" styleClass="button-secondary" text="Registrati">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-register.png"/>
+                        <Image url="@images/ic_register.png"/>
                      </ImageView>
                   </graphic>
                </Button>
             </VBox>
             <VBox alignment="CENTER" spacing="8">
-               <Button fx:id="btnCerca" onAction="#onCercaClick" prefWidth="240" text="Cerca Ristorante">
+               <Button fx:id="btnTrova" onAction="#onTrovaClick" prefWidth="240" text="Trova Ristoranti">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-search.png"/>
-                     </ImageView>
-                  </graphic>
-               </Button>
-               <Button fx:id="btnEsplora" onAction="#onEsploraClick" prefWidth="200" styleClass="button-secondary" text="Esplora Ristoranti">
-                  <graphic>
-                     <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-explore.png"/>
+                        <Image url="@images/ic_search.png"/>
                      </ImageView>
                   </graphic>
                </Button>
@@ -79,7 +72,7 @@
                <Button fx:id="btnEsci" onAction="#onEsciClick" prefWidth="200" styleClass="button-danger" text="Esci">
                   <graphic>
                      <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
-                        <Image url="@images/icon-exit.png"/>
+                        <Image url="@images/ic_exit.png"/>
                      </ImageView>
                   </graphic>
                </Button>

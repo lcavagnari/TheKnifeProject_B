@@ -8,27 +8,30 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox spacing="20" stylesheets="@style.css"
-      xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.example.demo3.RestaurantsController">
+<VBox fx:id="root" spacing="24" focusTraversable="true" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.RestaurantsController">
     <padding>
-        <Insets top="25" right="25" bottom="25" left="25" />
+        <Insets bottom="32" left="32" right="32" top="32" />
     </padding>
     <!-- Top bar -->
     <HBox alignment="CENTER_LEFT" spacing="20">
-        <Button fx:id="btnIndietro" text="← Indietro" onAction="#onIndietroClick" styleClass="button-secondary" />
-        <Label fx:id="titleLabel" styleClass="card-header" />
+        <Button fx:id="btnIndietro" onAction="#onIndietroClick" styleClass="button-secondary" text="← Indietro" />
+        <Label fx:id="titleLabel" styleClass="card-header" text="Trova Ristoranti" />
     </HBox>
-    <!-- Main card -->
-    <VBox styleClass="card" spacing="15" VBox.vgrow="ALWAYS">
-        <!-- Search bar (managed by controller) -->
-        <HBox fx:id="searchBar" alignment="CENTER" spacing="10" visible="false" managed="false">
-            <TextField fx:id="searchField" promptText="Cerca nome, città, tipo cucina..." HBox.hgrow="ALWAYS" />
-            <Button text="🔍 Cerca" onAction="#onCercaClick" />
-        </HBox>
-        <!-- Info label -->
-        <Label fx:id="infoLabel" styleClass="label-info" />
-        <!-- List -->
-        <ListView fx:id="restaurantListView" VBox.vgrow="ALWAYS" prefHeight="320" />
+    <!-- Search card -->
+    <HBox fx:id="searchBar" alignment="CENTER" spacing="10" styleClass="search-card">
+        <TextField fx:id="searchField" promptText="Cerca per nome, cucina o città..." HBox.hgrow="ALWAYS" />
+        <Button onAction="#onCercaClick" text="Cerca" />
+    </HBox>
+    <!-- Stats -->
+    <HBox fx:id="statsBar" alignment="CENTER">
+        <Label fx:id="infoLabel" styleClass="stats-label" />
+    </HBox>
+    <!-- Empty state (hidden by default) -->
+    <VBox fx:id="emptyState" managed="false" styleClass="empty-state" visible="false">
+        <Label styleClass="empty-state-icon" text="🍽" />
+        <Label styleClass="empty-state-title" text="Nessun ristorante trovato" />
+        <Label styleClass="empty-state-sub" text="Prova a cercare con parole chiave diverse" />
     </VBox>
+    <!-- List -->
+    <ListView fx:id="restaurantListView" prefHeight="320" VBox.vgrow="ALWAYS" />
 </VBox>

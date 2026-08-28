@@ -6,13 +6,16 @@ import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
+import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.objects.Review;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -124,8 +127,36 @@ public class RestaurantRepository {
             node.get("services").forEach(n -> services.add(n.asText()));
         }
 
-        return new Restaurant(id, name, description, websiteUrl, owner, phone, location, priceRange,
+        Restaurant restaurant = new Restaurant(id, name, description, websiteUrl, owner, phone, location, priceRange,
                 hasDelivery, hasOnlineBooking, award, greenStar, cuisineTypes, services);
+
+        JsonNode reviewsNode = node.get("reviews");
+        if (reviewsNode != null && reviewsNode.isArray()) {
+            reviewsNode.forEach(rn -> restaurant.addReview(reviewFromJson(rn, restaurant)));
+        }
+
+        return restaurant;
+    }
+
+    private Review reviewFromJson(JsonNode node, Restaurant restaurant) {
+        UUID id = node.hasNonNull("id") ? UUID.fromString(node.get("id").asText()) : UUID.randomUUID();
+        int value = node.path("value").asInt(5);
+        String text = node.path("text").asText("Ottima esperienza consigliata a tutti");
+        LocalDateTime timestamp = node.hasNonNull("timestamp")
+                ? LocalDateTime.parse(node.get("timestamp").asText())
+                : LocalDateTime.now();
+        Customer author = stubCustomer(UUID.randomUUID());
+        return new Review(id, restaurant, author, value, timestamp, text, null);
+    }
+
+    /**
+     * Come {@link #stubOwner(UUID)}, ma per l'autore di una recensione: finché le
+     * recensioni arrivano da file JSON locali senza un vero utente Customer
+     * associato, costruiamo un Customer segnaposto.
+     */
+    private Customer stubCustomer(UUID customerId) {
+        return new Customer(customerId, "customer", "", "", "Cliente", "Anonimo",
+                null, LocalDate.now().minusYears(25));
     }
 
     /**
