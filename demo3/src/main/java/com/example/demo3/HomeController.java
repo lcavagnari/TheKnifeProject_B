@@ -32,6 +32,8 @@ public class HomeController {
     @FXML
     private Button btnMieiRistoranti;
     @FXML
+    private Button btnPreferiti;
+    @FXML
     private Button btnDisconnetti;
     @FXML
     private Button btnEsci;
@@ -48,8 +50,11 @@ public class HomeController {
     public void aggiorna() {
         User utente = Session.getCurrentUser();
         boolean isOwner = utente != null && utente.getRole() == UserRole.OWNER;
+        boolean isCliente = utente != null && utente.getRole() == UserRole.CLIENT;
         btnMieiRistoranti.setVisible(isOwner);
         btnMieiRistoranti.setManaged(isOwner);
+        btnPreferiti.setVisible(isCliente);
+        btnPreferiti.setManaged(isCliente);
 
         if (utente == null) {
             welcomeLabel.setText("Benvenuto");
@@ -99,6 +104,28 @@ public class HomeController {
             Scene scene = new Scene(root, 650, 500);
             stage.setScene(scene);
             stage.setTitle("I Miei Ristoranti");
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void onPreferitiClick() {
+        try {
+            Stage stage = (Stage) btnPreferiti.getScene().getWindow();
+
+            Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Favorites.fxml"));
+            Parent root = loader.load();
+
+            FavoritesController controller = loader.getController();
+            controller.inizializza();
+
+            Scene scene = new Scene(root, 650, 500);
+            stage.setScene(scene);
+            stage.setTitle("Preferiti");
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();

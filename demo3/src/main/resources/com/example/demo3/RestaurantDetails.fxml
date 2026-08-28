@@ -29,6 +29,13 @@
             </font></Button>
         <Label fx:id="nameLabel" styleClass="card-header" text="*restaurant name*" />
         <Region HBox.hgrow="ALWAYS" />
+        <Button fx:id="btnPreferito" managed="false" onAction="#onPreferitoClick" styleClass="button-secondary" text="Aggiungi ai Preferiti" visible="false">
+            <graphic>
+                <ImageView fitHeight="16" fitWidth="16" preserveRatio="true">
+                    <Image url="@images/heart-svgrepo-com.png" />
+                </ImageView>
+            </graphic>
+        </Button>
         <Button fx:id="btnModifica" managed="false" onAction="#onModificaClick" text="Modifica" visible="false" />
     </HBox>
 

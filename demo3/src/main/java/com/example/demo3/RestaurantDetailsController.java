@@ -3,6 +3,7 @@ package com.example.demo3;
 import com.example.demo3.data.Session;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -67,6 +68,8 @@ public class RestaurantDetailsController {
     @FXML
     private Button btnModifica;
     @FXML
+    private Button btnPreferito;
+    @FXML
     private VBox root;
     @FXML
     private ScrollPane reviewsScrollPane;
@@ -95,6 +98,13 @@ public class RestaurantDetailsController {
                 && currentUser.getId().toString().equals(r.getOwnerId().toString());
         btnModifica.setVisible(isOwner);
         btnModifica.setManaged(isOwner);
+
+        boolean isCustomer = currentUser instanceof Customer;
+        btnPreferito.setVisible(isCustomer);
+        btnPreferito.setManaged(isCustomer);
+        if (isCustomer) {
+            aggiornaTestoPreferito((Customer) currentUser, r);
+        }
 
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
         descriptionLabel.setText(valoreO(r.getDescription(), "No description available."));
@@ -270,6 +280,28 @@ public class RestaurantDetailsController {
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void onPreferitoClick() {
+        if (!(Session.getCurrentUser() instanceof Customer customer) || restaurant == null) {
+            return;
+        }
+        if (customer.getFavouriteRestourants().contains(restaurant.getId())) {
+            customer.removeFavourite(restaurant);
+        } else {
+            customer.addFavourite(restaurant);
+        }
+        aggiornaTestoPreferito(customer, restaurant);
+    }
+
+    private void aggiornaTestoPreferito(Customer customer, Restaurant r) {
+        boolean isPreferito = customer.getFavouriteRestourants().contains(r.getId());
+        btnPreferito.setText(isPreferito ? "Nei Preferiti" : "Aggiungi ai Preferiti");
+        btnPreferito.getStyleClass().removeAll("button-secondary");
+        if (!isPreferito) {
+            btnPreferito.getStyleClass().add("button-secondary");
         }
     }
 

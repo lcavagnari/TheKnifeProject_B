@@ -32,6 +32,13 @@
                 </ImageView>
             </graphic>
         </Button>
+        <Button fx:id="btnPreferiti" managed="false" onAction="#onPreferitiClick" prefWidth="240" styleClass="button-secondary" text="Preferiti" visible="false">
+            <graphic>
+                <ImageView fitHeight="20" fitWidth="20" preserveRatio="true">
+                    <Image url="@images/heart-svgrepo-com.png" />
+                </ImageView>
+            </graphic>
+        </Button>
     </VBox>
 
     <Region VBox.vgrow="ALWAYS" />
