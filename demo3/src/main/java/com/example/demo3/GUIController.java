@@ -69,6 +69,7 @@ public class GUIController {
             registerForm = registerLoader.load();
             registerController = registerLoader.getController();
             registerController.setOnCancelCallback(this::showMenu);
+            registerController.setOnRegisterSuccessCallback(this::showHome);
 
             FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("Home.fxml"));
             homeForm = homeLoader.load();

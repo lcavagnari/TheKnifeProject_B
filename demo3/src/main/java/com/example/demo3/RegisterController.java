@@ -1,6 +1,8 @@
 package com.example.demo3;
 
 import com.example.demo3.data.PasswordUtil;
+import com.example.demo3.data.Session;
+import com.example.demo3.data.SessionRepository;
 import com.example.demo3.data.UserRepository;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Customer;
@@ -19,7 +21,9 @@ import java.time.LocalDate;
 public class RegisterController {
 
     private final UserRepository userRepository = new UserRepository();
+    private final SessionRepository sessionRepository = new SessionRepository();
     private Runnable onCancelCallback;
+    private Runnable onRegisterSuccessCallback;
 
     @FXML private Label errorLabel;
     @FXML private RadioButton radioGestore;
@@ -127,6 +131,10 @@ public class RegisterController {
 
     public void setOnCancelCallback(Runnable callback) {
         this.onCancelCallback = callback;
+    }
+
+    public void setOnRegisterSuccessCallback(Runnable callback) {
+        this.onRegisterSuccessCallback = callback;
     }
 
     // --- Blur validation ---
@@ -313,9 +321,15 @@ public class RegisterController {
         boolean salvato = userRepository.save(nuovoUtente);
 
         if (salvato) {
+            Session.login(nuovoUtente);
+            sessionRepository.save(nuovoUtente);
             errorLabel.getStyleClass().removeAll("label-error", "label-success");
             errorLabel.getStyleClass().add("label-success");
-            errorLabel.setText("Registrazione completata! File salvato in data/users.");
+            errorLabel.setText("Registrazione completata! Benvenuto " + nuovoUtente.getName() + ".");
+
+            if (onRegisterSuccessCallback != null) {
+                onRegisterSuccessCallback.run();
+            }
         } else {
             errorLabel.getStyleClass().removeAll("label-error", "label-success");
             errorLabel.getStyleClass().add("label-error");
