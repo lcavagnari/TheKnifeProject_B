@@ -1,6 +1,7 @@
 package com.example.demo3;
 
 import com.example.demo3.data.Session;
+import com.example.demo3.data.UserRepository;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Customer;
@@ -33,6 +34,8 @@ import java.util.Comparator;
 import java.util.Objects;
 
 public class RestaurantDetailsController {
+
+    private final UserRepository userRepository = new UserRepository();
 
     @FXML
     private Label nameLabel;
@@ -280,6 +283,7 @@ public class RestaurantDetailsController {
         } else {
             customer.addFavourite(restaurant);
         }
+        userRepository.save(customer);
         aggiornaTestoPreferito(customer, restaurant);
     }
 

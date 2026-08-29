@@ -1,6 +1,9 @@
 package com.example.demo3;
 
 import com.example.demo3.data.RestaurantRepository;
+import com.example.demo3.data.Session;
+import com.example.demo3.data.UserRepository;
+import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
@@ -26,7 +29,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import javafx.scene.control.ContentDisplay;
+import javafx.scene.effect.Blend;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorAdjust;
+import javafx.scene.effect.ColorInput;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -233,14 +239,22 @@ public class RestaurantsController {
         boolean empty = risultati.isEmpty();
         emptyState.setVisible(empty);
         emptyState.setManaged(empty);
-        restaurantListView.setVisible(!empty);
-        restaurantListView.setManaged(!empty);
         statsBar.setVisible(!empty);
         statsBar.setManaged(!empty);
         infoLabel.setText(risultati.size() + " ristorant" + (risultati.size() == 1 ? "e trovato" : "i trovati"));
     }
 
     private static class RestaurantCell extends ListCell<Restaurant> {
+
+        private static final Image HEART_EMPTY = new Image(Objects.requireNonNull(
+                RestaurantCell.class.getResourceAsStream("images/empty-heart-svgrepo-com.png")));
+        private static final Image HEART_FILLED = new Image(Objects.requireNonNull(
+                RestaurantCell.class.getResourceAsStream("images/heart-svgrepo-com.png")));
+        private static final Image HEART_BROKEN = new Image(Objects.requireNonNull(
+                RestaurantCell.class.getResourceAsStream("images/heart-broken-svgrepo-com.png")));
+        private static final Color HEART_HOVER_TINT = Color.web("#e91e63");
+        private static final Color HEART_FAVORITED_TINT = Color.web("#d32f2f");
+        private static final UserRepository USER_REPOSITORY = new UserRepository();
 
         private final HBox card = new HBox();
         private final VBox accent = new VBox();
@@ -251,9 +265,13 @@ public class RestaurantsController {
         private final Label ratingLabel = new Label();
         private final Label metaLabel = new Label();
         private final HBox badges = new HBox();
+        private final Button heartButton = new Button();
+        private final ImageView heartIcon = new ImageView();
         private final Consumer<Restaurant> onNavigate;
         private Restaurant currentRestaurant;
         private Timeline runningAnimation;
+        private boolean isFavorited;
+        private Timeline heartAnimation;
 
         RestaurantCell(Consumer<Restaurant> onNavigate) {
             super();
@@ -275,13 +293,95 @@ public class RestaurantsController {
             topRow.setSpacing(4);
             topRow.getChildren().addAll(nameLabel, awardBox, ratingLabel);
             content.getChildren().addAll(topRow, metaLabel, badges);
-            card.getChildren().addAll(accent, content);
+
+            heartIcon.setFitWidth(28);
+            heartIcon.setFitHeight(28);
+            heartIcon.setPreserveRatio(true);
+            heartIcon.setImage(HEART_EMPTY);
+            heartButton.setGraphic(heartIcon);
+            heartButton.getStyleClass().add("icon-button");
+            heartButton.setOnMouseEntered(e -> repaintHeart());
+            heartButton.setOnMouseExited(e -> repaintHeart());
+            heartButton.setOnAction(e -> onHeartClick());
+
+            card.getChildren().addAll(accent, content, heartButton);
+            card.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
 
             card.setOnMousePressed(e -> {
                 if (currentRestaurant == null) return;
+                if (isWithinHeartButton(e.getTarget())) return;
                 if (runningAnimation != null && runningAnimation.getStatus() == Animation.Status.RUNNING) return;
                 bounceForward();
             });
+        }
+
+        private boolean isWithinHeartButton(javafx.event.EventTarget target) {
+            for (Object walker = target; walker instanceof javafx.scene.Node node; walker = node.getParent()) {
+                if (node == heartButton) return true;
+            }
+            return false;
+        }
+
+        private void applyTint(ImageView iv, Color color) {
+            if (color == null) {
+                iv.setEffect(null);
+                return;
+            }
+            ColorInput colorInput = new ColorInput(0, 0, iv.getFitWidth(), iv.getFitHeight(), color);
+            iv.setEffect(new Blend(BlendMode.SRC_ATOP, null, colorInput));
+        }
+
+        private void repaintHeart() {
+            boolean hovered = heartButton.isHover();
+            if (isFavorited) {
+                heartIcon.setImage(hovered ? HEART_BROKEN : HEART_FILLED);
+                applyTint(heartIcon, HEART_FAVORITED_TINT);
+            } else if (hovered) {
+                heartIcon.setImage(HEART_FILLED);
+                applyTint(heartIcon, HEART_HOVER_TINT);
+            } else {
+                heartIcon.setImage(HEART_EMPTY);
+                applyTint(heartIcon, null);
+            }
+        }
+
+        private void onHeartClick() {
+            if (heartAnimation != null && heartAnimation.getStatus() == Animation.Status.RUNNING) return;
+            if (!(Session.getCurrentUser() instanceof Customer customer) || currentRestaurant == null) return;
+
+            if (!isFavorited) {
+                customer.addFavourite(currentRestaurant);
+                USER_REPOSITORY.save(customer);
+                isFavorited = true;
+                heartIcon.setImage(HEART_FILLED);
+                applyTint(heartIcon, HEART_FAVORITED_TINT);
+                playHeartAnimation(1.3);
+            } else {
+                customer.removeFavourite(currentRestaurant);
+                USER_REPOSITORY.save(customer);
+                isFavorited = false;
+                heartIcon.setImage(HEART_EMPTY);
+                applyTint(heartIcon, null);
+                playHeartAnimation(0.75);
+            }
+        }
+
+        private void playHeartAnimation(double peakScale) {
+            heartButton.setDisable(true);
+            heartAnimation = new Timeline(
+                    new KeyFrame(Duration.millis(140),
+                            new KeyValue(heartButton.scaleXProperty(), peakScale, Interpolator.EASE_OUT),
+                            new KeyValue(heartButton.scaleYProperty(), peakScale, Interpolator.EASE_OUT)),
+                    new KeyFrame(Duration.millis(260),
+                            new KeyValue(heartButton.scaleXProperty(), 1.0, Interpolator.EASE_IN),
+                            new KeyValue(heartButton.scaleYProperty(), 1.0, Interpolator.EASE_IN))
+            );
+            heartAnimation.setOnFinished(e -> {
+                heartAnimation = null;
+                heartButton.setDisable(false);
+                repaintHeart();
+            });
+            heartAnimation.play();
         }
 
         private void bounceForward() {
@@ -306,6 +406,17 @@ public class RestaurantsController {
         @Override
         protected void updateItem(Restaurant r, boolean empty) {
             super.updateItem(r, empty);
+
+            // Cells are recycled while scrolling; a heart animation left running from a
+            // previous restaurant must not finish later and toggle the wrong one's favorite.
+            if (heartAnimation != null) {
+                heartAnimation.stop();
+                heartAnimation = null;
+                heartButton.setDisable(false);
+                heartButton.setScaleX(1.0);
+                heartButton.setScaleY(1.0);
+            }
+
             if (empty || r == null) {
                 setText(null);
                 setGraphic(null);
@@ -313,6 +424,13 @@ public class RestaurantsController {
                 return;
             }
             currentRestaurant = r;
+
+            boolean isCustomer = Session.getCurrentUser() instanceof Customer;
+            isFavorited = isCustomer
+                    && ((Customer) Session.getCurrentUser()).getFavouriteRestourants().contains(r.getId());
+            heartButton.setVisible(isCustomer);
+            heartButton.setManaged(isCustomer);
+            repaintHeart();
 
             nameLabel.setText(r.getName() != null ? r.getName() : "Ristorante");
 

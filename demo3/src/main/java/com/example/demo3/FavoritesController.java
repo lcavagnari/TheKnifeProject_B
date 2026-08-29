@@ -2,6 +2,7 @@ package com.example.demo3;
 
 import com.example.demo3.data.RestaurantRepository;
 import com.example.demo3.data.Session;
+import com.example.demo3.data.UserRepository;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
@@ -28,6 +29,7 @@ import java.util.function.Consumer;
 public class FavoritesController {
 
     private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+    private final UserRepository userRepository = new UserRepository();
     private Customer customer;
 
     @FXML
@@ -69,8 +71,6 @@ public class FavoritesController {
         boolean empty = ristoranti.isEmpty();
         emptyState.setVisible(empty);
         emptyState.setManaged(empty);
-        restaurantListView.setVisible(!empty);
-        restaurantListView.setManaged(!empty);
         infoLabel.setText(ristoranti.size() + " ristorant" + (ristoranti.size() == 1 ? "e preferito" : "i preferiti"));
     }
 
@@ -111,6 +111,7 @@ public class FavoritesController {
     private void rimuoviPreferito(Restaurant r) {
         if (customer != null) {
             customer.removeFavourite(r);
+            userRepository.save(customer);
         }
         caricaEMostra();
     }
