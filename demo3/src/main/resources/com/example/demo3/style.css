@@ -19,6 +19,13 @@
     -fx-alignment: center;
 }
 
+/* ---- ScrollPane: default skin paints its own background/viewport,
+   which ignores the transparent style set on content nodes ---- */
+.scroll-pane,
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
 /* ---- Menu card – 6dp elevation + 20dp padding (already in FXML) ---- */
 .menu-card {
     -fx-background-color: #f5f7fa;

@@ -24,6 +24,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -251,33 +252,19 @@ public class RestaurantDetailsController {
             return;
         }
         try {
-            Stage stage = (Stage) btnModifica.getScene().getWindow();
-            Restaurant target = restaurant;
-
-            Navigation.pushBack(() -> {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("RestaurantDetails.fxml"));
-                    Parent detailsRoot = loader.load();
-                    RestaurantDetailsController controller = loader.getController();
-                    controller.carica(target);
-                    Scene scene = new Scene(detailsRoot, 650, 550);
-                    stage.setScene(scene);
-                    stage.setTitle(target.getName() != null ? target.getName() : "Dettagli ristorante");
-                    stage.show();
-                } catch (IOException ex) {
-                    ex.printStackTrace();
-                }
-            });
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
             Parent formRoot = loader.load();
             AddEditRestaurantController controller = loader.getController();
-            controller.configuraModifica(owner, target);
+            controller.configuraModifica(owner, restaurant);
 
-            Scene scene = new Scene(formRoot, 650, 600);
-            stage.setScene(scene);
-            stage.setTitle("Modifica Ristorante");
-            stage.show();
+            Stage dialog = new Stage();
+            dialog.initOwner(btnModifica.getScene().getWindow());
+            dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setTitle("Modifica Ristorante");
+            dialog.setScene(new Scene(formRoot, 950, 700));
+            dialog.showAndWait();
+
+            carica(restaurant);
         } catch (IOException e) {
             e.printStackTrace();
         }

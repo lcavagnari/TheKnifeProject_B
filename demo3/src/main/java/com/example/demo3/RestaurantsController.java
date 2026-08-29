@@ -21,6 +21,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -202,35 +203,20 @@ public class RestaurantsController {
     @FXML
     private void onNuovoClick() {
         try {
-            Stage stage = (Stage) restaurantListView.getScene().getWindow();
-            Owner ownerCorrente = owner;
-
-            Navigation.pushBack(() -> {
-                try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
-                    Parent root = loader.load();
-                    RestaurantsController controller = loader.getController();
-                    controller.inizializzaProprietario(ownerCorrente);
-                    Scene scene = new Scene(root, 650, 500);
-                    stage.setScene(scene);
-                    stage.setTitle("I Miei Ristoranti");
-                    stage.show();
-                } catch (IOException ex) {
-                    // TODO: MORE ROBUST LOGGING
-                    ex.printStackTrace();
-                }
-            });
-
             FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
-            Parent root = loader.load();
+            Parent formRoot = loader.load();
 
             AddEditRestaurantController controller = loader.getController();
-            controller.configuraNuovo(ownerCorrente);
+            controller.configuraNuovo(owner);
 
-            Scene scene = new Scene(root, 650, 500);
-            stage.setScene(scene);
-            stage.setTitle("Nuovo Ristorante");
-            stage.show();
+            Stage dialog = new Stage();
+            dialog.initOwner(restaurantListView.getScene().getWindow());
+            dialog.initModality(Modality.WINDOW_MODAL);
+            dialog.setTitle("Nuovo Ristorante");
+            dialog.setScene(new Scene(formRoot, 950, 700));
+            dialog.showAndWait();
+
+            caricaEMostra(ristorantiDiProprieta());
         } catch (IOException e) {
             // TODO: MORE ROBUST LOGGING
             e.printStackTrace();
