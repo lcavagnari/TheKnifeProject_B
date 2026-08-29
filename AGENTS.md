@@ -28,9 +28,9 @@ mvn -pl common-api test -Dtest=RestaurantTest  # single test class
 
 - **Lombok in common-api only**: entities use `@Data`, `@Builder`, etc. Getter/setter names may not match field names (e.g., `getWebsiteUrl()`, `isHasDelivery()`, `getCuisinesTypes()`). Always check actual getters before referencing them in demo3.
 - **No module-info.java**: intentionally removed to avoid JPMS + Lombok conflicts.
-- **Jackson NOT used in common-api**: entities have no Jackson annotations. JSON serialization is manual in `demo3/data/` repositories.
+- **Jackson NOT used in common-api**: entities have no Jackson annotations. JSON serialization is manual in `data/` repositories.
 - **demo3's `data/` package** (`com.example.demo3.data`): `UserRepository`, `RestaurantRepository`, `PasswordUtil`, `Session`. Read/write JSON files locally — designed as a replaceable layer for a future network client.
-- **JavaFX FXML files** live in `demo3/src/main/resources/com/example/demo3/`.
+- **JavaFX FXML files** live in `src/main/resources/com/example/demo3/`.
 
 ## Testing
 
