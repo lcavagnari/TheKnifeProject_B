@@ -2,6 +2,7 @@ package com.example.demo3;
 
 import com.example.demo3.data.RestaurantRepository;
 import com.example.demo3.data.Session;
+import com.example.demo3.data.UserRepository;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -11,7 +12,6 @@ import javafx.animation.Interpolator;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,7 +21,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
@@ -240,8 +239,6 @@ public class RestaurantsController {
         boolean empty = risultati.isEmpty();
         emptyState.setVisible(empty);
         emptyState.setManaged(empty);
-        restaurantListView.setVisible(!empty);
-        restaurantListView.setManaged(!empty);
         statsBar.setVisible(!empty);
         statsBar.setManaged(!empty);
         infoLabel.setText(risultati.size() + " ristorant" + (risultati.size() == 1 ? "e trovato" : "i trovati"));
@@ -257,6 +254,7 @@ public class RestaurantsController {
                 RestaurantCell.class.getResourceAsStream("images/heart-broken-svgrepo-com.png")));
         private static final Color HEART_HOVER_TINT = Color.web("#e91e63");
         private static final Color HEART_FAVORITED_TINT = Color.web("#d32f2f");
+        private static final UserRepository USER_REPOSITORY = new UserRepository();
 
         private final HBox card = new HBox();
         private final VBox accent = new VBox();
@@ -302,9 +300,6 @@ public class RestaurantsController {
             heartIcon.setImage(HEART_EMPTY);
             heartButton.setGraphic(heartIcon);
             heartButton.getStyleClass().add("icon-button");
-            // A nested Button fires MOUSE_PRESSED before MOUSE_CLICKED, and the card's
-            // navigate handler listens on MOUSE_PRESSED, so consuming there is what stops it.
-            heartButton.addEventHandler(MouseEvent.MOUSE_PRESSED, Event::consume);
             heartButton.setOnMouseEntered(e -> repaintHeart());
             heartButton.setOnMouseExited(e -> repaintHeart());
             heartButton.setOnAction(e -> onHeartClick());
@@ -314,9 +309,17 @@ public class RestaurantsController {
 
             card.setOnMousePressed(e -> {
                 if (currentRestaurant == null) return;
+                if (isWithinHeartButton(e.getTarget())) return;
                 if (runningAnimation != null && runningAnimation.getStatus() == Animation.Status.RUNNING) return;
                 bounceForward();
             });
+        }
+
+        private boolean isWithinHeartButton(javafx.event.EventTarget target) {
+            for (Object walker = target; walker instanceof javafx.scene.Node node; walker = node.getParent()) {
+                if (node == heartButton) return true;
+            }
+            return false;
         }
 
         private void applyTint(ImageView iv, Color color) {
@@ -348,12 +351,14 @@ public class RestaurantsController {
 
             if (!isFavorited) {
                 customer.addFavourite(currentRestaurant);
+                USER_REPOSITORY.save(customer);
                 isFavorited = true;
                 heartIcon.setImage(HEART_FILLED);
                 applyTint(heartIcon, HEART_FAVORITED_TINT);
                 playHeartAnimation(1.3);
             } else {
                 customer.removeFavourite(currentRestaurant);
+                USER_REPOSITORY.save(customer);
                 isFavorited = false;
                 heartIcon.setImage(HEART_EMPTY);
                 applyTint(heartIcon, null);

@@ -3,6 +3,7 @@ package com.example.demo3.data;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
@@ -14,7 +15,9 @@ import it.uninsubria.laboratoriob.api.objects.User;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -98,6 +101,13 @@ public class UserRepository {
             locNode.put("latitude", loc.getLatitude());
             locNode.put("longitude", loc.getLongitude());
         }
+
+        if (user instanceof Customer customer) {
+            ArrayNode favArray = node.putArray("favouriteRestourants");
+            for (UUID favId : customer.getFavouriteRestourants()) {
+                favArray.add(favId.toString());
+            }
+        }
         return node;
     }
 
@@ -130,6 +140,14 @@ public class UserRepository {
         if (role == UserRole.OWNER) {
             return new Owner(id, username, passwordHash, passwordSalt, name, lastName, location, dateOfBirth);
         }
-        return new Customer(id, username, passwordHash, passwordSalt, name, lastName, location, dateOfBirth);
+
+        Set<UUID> favourites = new HashSet<>();
+        JsonNode favNode = node.get("favouriteRestourants");
+        if (favNode != null && favNode.isArray()) {
+            for (JsonNode favIdNode : favNode) {
+                favourites.add(UUID.fromString(favIdNode.asText()));
+            }
+        }
+        return new Customer(id, username, passwordHash, passwordSalt, name, lastName, location, dateOfBirth, favourites);
     }
 }

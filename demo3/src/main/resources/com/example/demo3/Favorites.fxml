@@ -5,6 +5,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
 <VBox fx:id="root" spacing="24" focusTraversable="true" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.demo3.FavoritesController">
@@ -20,12 +21,13 @@
     <HBox alignment="CENTER">
         <Label fx:id="infoLabel" styleClass="stats-label" />
     </HBox>
-    <!-- Empty state (hidden by default) -->
-    <VBox fx:id="emptyState" managed="false" styleClass="empty-state" visible="false">
-        <Label styleClass="empty-state-icon" text="★" />
-        <Label styleClass="empty-state-title" text="Nessun ristorante preferito" />
-        <Label styleClass="empty-state-sub" text="Apri un ristorante e tocca &quot;Aggiungi ai Preferiti&quot; per trovarlo qui" />
-    </VBox>
-    <!-- List -->
-    <ListView fx:id="restaurantListView" prefHeight="320" VBox.vgrow="ALWAYS" />
+    <!-- List and empty state occupy the same slot -->
+    <StackPane style="-fx-background-radius: 12;" styleClass="left-box" VBox.vgrow="ALWAYS">
+        <ListView fx:id="restaurantListView" prefHeight="320" />
+        <VBox fx:id="emptyState" managed="false" styleClass="empty-state" visible="false">
+            <Label styleClass="empty-state-icon" text="★" />
+            <Label styleClass="empty-state-title" text="Nessun ristorante preferito" />
+            <Label styleClass="empty-state-sub" text="Apri un ristorante e tocca &quot;Aggiungi ai Preferiti&quot; per trovarlo qui" />
+        </VBox>
+    </StackPane>
 </VBox>
