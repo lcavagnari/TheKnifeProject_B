@@ -7,7 +7,7 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox alignment="CENTER" prefHeight="400" spacing="0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.HomeController">
+<VBox alignment="CENTER" prefHeight="400" spacing="0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.controller.HomeController">
     <!-- Top cluster: title + subtitle, pinned to the top -->
     <VBox alignment="CENTER" spacing="10">
         <Label fx:id="welcomeLabel" styleClass="label-title" text="Benvenuto" />

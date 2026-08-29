@@ -1,6 +1,8 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
 
-import it.uninsubria.laboratoriob.client.gui.data.Session;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
@@ -76,7 +78,7 @@ public class FavoritesController {
 
             Navigation.pushBack(() -> {
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Favorites.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Favorites.fxml"));
                     Parent root = loader.load();
                     FavoritesController controller = loader.getController();
                     controller.inizializza();
@@ -89,7 +91,7 @@ public class FavoritesController {
                 }
             });
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("RestaurantDetails.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/RestaurantDetails.fxml"));
             Parent detailsRoot = loader.load();
 
             RestaurantDetailsController controller = loader.getController();
@@ -147,7 +149,7 @@ public class FavoritesController {
             content.getChildren().addAll(topRow, metaLabel);
 
             removeButton.setGraphic(new ImageView(new Image(
-                    getClass().getResourceAsStream("images/heart-broken-svgrepo-com.png"), 18, 18, true, true)));
+                    getClass().getResourceAsStream("/it/uninsubria/laboratoriob/client/gui/images/heart-broken-svgrepo-com.png"), 18, 18, true, true)));
             removeButton.getStyleClass().add("button-link");
             removeButton.setStyle("-fx-padding: 0 12 0 6;");
             // Stop the click from also bubbling up to the card's own navigate-to-details handler.

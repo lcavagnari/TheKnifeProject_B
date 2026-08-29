@@ -1,4 +1,5 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
 
 import it.uninsubria.laboratoriob.api.objects.Review;
 import javafx.animation.PauseTransition;

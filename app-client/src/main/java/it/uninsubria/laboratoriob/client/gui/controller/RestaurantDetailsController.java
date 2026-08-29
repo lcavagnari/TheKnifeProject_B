@@ -1,6 +1,8 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
 
-import it.uninsubria.laboratoriob.client.gui.data.Session;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Customer;
@@ -85,7 +87,7 @@ public class RestaurantDetailsController {
 
     @FXML
     public void initialize() {
-        String css = Objects.requireNonNull(getClass().getResource("style.css")).toExternalForm();
+        String css = Objects.requireNonNull(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/style.css")).toExternalForm();
         root.sceneProperty().addListener((obs, oldScene, newScene) -> {
             if (newScene != null && !newScene.getRoot().getStylesheets().contains(css)) {
                 newScene.getRoot().getStylesheets().add(css);
@@ -147,10 +149,10 @@ public class RestaurantDetailsController {
         // Delivery + Online Booking badges
         deliveryBookingFlow.getChildren().clear();
         if (r.isHasDelivery()) {
-            deliveryBookingFlow.getChildren().add(makeIconBadge("Delivery", "badge-delivery", "images/ic_geomarker.png"));
+            deliveryBookingFlow.getChildren().add(makeIconBadge("Delivery", "badge-delivery", "/it/uninsubria/laboratoriob/client/gui/images/ic_geomarker.png"));
         }
         if (r.isHasOnlineBooking()) {
-            deliveryBookingFlow.getChildren().add(makeIconBadge("Online Booking", "badge-booking", "images/ic_globe.png"));
+            deliveryBookingFlow.getChildren().add(makeIconBadge("Online Booking", "badge-booking", "/it/uninsubria/laboratoriob/client/gui/images/ic_globe.png"));
         }
 
         // Cuisine badges
@@ -219,7 +221,7 @@ public class RestaurantDetailsController {
                     .sorted(Comparator.comparing(Review::getTimestamp).reversed())
                     .forEach(review -> {
                         try {
-                            FXMLLoader loader = new FXMLLoader(getClass().getResource("ReviewCard.fxml"));
+                            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/ReviewCard.fxml"));
                             VBox card = loader.load();
                             ReviewCardController controller = loader.getController();
                             controller.setContext(review, currentUserId, isOwner);
@@ -252,7 +254,7 @@ public class RestaurantDetailsController {
             return;
         }
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/AddEditRestaurant.fxml"));
             Parent formRoot = loader.load();
             AddEditRestaurantController controller = loader.getController();
             controller.configuraModifica(owner, restaurant);

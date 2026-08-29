@@ -1,9 +1,12 @@
 package it.uninsubria.laboratoriob.client;
 
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
-import it.uninsubria.laboratoriob.client.ui.IO;
-import it.uninsubria.laboratoriob.client.ui.menus.GuestMenus;
+import it.uninsubria.laboratoriob.client.cli.IO;
+import it.uninsubria.laboratoriob.client.cli.menus.GuestMenus;
+import it.uninsubria.laboratoriob.client.gui.Launcher;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
+
+import java.util.Arrays;
 
 /**
  * Classe principale del client The Knife.
@@ -19,6 +22,14 @@ import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
 public class TheKnifeClient {
 
     public static void main(String[] args) {
+        if (Arrays.asList(args).contains("--cli")) {
+            runCli();
+        } else {
+            Launcher.main(args);
+        }
+    }
+
+    private static void runCli() {
         IO.printSuccessMessage("Loading The Knife Client...");
 
         TheKnifeClient client = new TheKnifeClient();

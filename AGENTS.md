@@ -2,62 +2,68 @@
 
 ## Quick commands
 
-- **Full build**: `mvn clean install`
-- **CI build**: `mvn -B -ntp package`
-- **Run server**: Execute `TheKnifeServer` main class (module `theknifeserver`)
-- **Run server with dataset update**: Add `--update` or `--update <csv-path>` arg
-- **Run client**: Execute `TheKnifeClient` main class (module `theknifeclient`)
+- **Full build**: `mvn clean install` — ⚠️ currently fails (see Build status)
+- **CI build**: `mvn -B -ntp package` — also red today
+- **Run server**: `TheKnifeServer` main class (module `theknifeserver`)
+- **Run server with dataset update**: add `--update` or `--update <csv-path>` arg
+- **Run client**: `TheKnifeClient` main class (module `theknifeclient`)
 
 ## Prerequisites
 
-- JDK 17+ (CI uses Temurin 17; run configs reference `corretto-17`)
+- JDK 17+ (CI uses Temurin 17; run configs reference `corretto-17`) — but `app-client` needs JDK 25
 - Maven 3.9.9+
-- PostgreSQL 18 running on `localhost:5432/mydb` (user: `testuser`, pass: `test1234`)
-- Start DB: `docker compose up -d`
+- PostgreSQL 18 on `localhost:5432/mydb` (user `testuser` / pass `test1234`), start with `docker compose up -d`
+- app-server integration tests need the DB running (see Testing)
+
+## Build status (verified 2026-08-29) — build is red
+
+The reactor does NOT compile cleanly. Two independent blockers:
+
+- **app-server main won't compile**, killing `mvn package`:
+  - `utils/Loader.java` imports `server.data.{CustomerDAO,OwnerDAO,RestaurantDAO,ReviewDAO}` but those live in `server.data.dao`; calls one-arg `CsvParser.parseFromDataset(path)` (real signature: `(Path, ServerDataStore)`); and `TheKnifeServer` calls `loader.initialise()` which doesn't exist (only `initialiseMaps()`).
+  - `data/remote/{RestaurantServiceImpl,ReviewServiceImpl,FavouriteServiceImpl}.java` are stale legacy copies importing nonexistent `server.data` DAOs. Live RMI impls are in the `server.remote` package — prefer deleting `data/remote/` over fixing it.
+- **app-client**: main targets Java 25 (local JDK 17 cannot compile it) and its tests are stale — single-arg `new JsonCustomerDAO(...)` / `new JsonOwnerDAO(...)` (main ctors are package-private, take 2–3 args) and a `JsonLocationDAO` that no longer exists (replaced by `LocationMapper`).
+
+Don't assume a `mvn clean install` failure is unrelated to your change — these files are the landmines. Focused verification:
+- `mvn test -pl common-api` — passes
+- `mvn test -pl app-server -am` — fails until Loader / `data/remote` are fixed
 
 ## Module structure
 
-| Module | Artifact | Builds fat JAR | Notes |
-|--------|----------|----------------|-------|
-| `common-api` | `theknifeapi` | No | Shared domain model, enums, validators, DAO interface. Has unit tests (JUnit 5). |
-| `app-server` | `theknifeserver` | Yes (shade) | PostgreSQL persistence, HikariCP pool, CSV dataset loader, RMI + heartbeat server. |
-| `app-client` | `theknifeclient` | Yes (shade) | Jackson JSON serialization, CLI menus, local data cache. **Targets Java 25** (different from parent 17). |
+| Module | Artifact | Fat JAR | Notes |
+|--------|----------|---------|-------|
+| `common-api` | `theknifeapi` | No | Shared domain model, enums, validators, DAO interface, RMI service interfaces. Clean build + tests. |
+| `app-server` | `theknifeserver` | Yes (shade) | PostgreSQL persistence, HikariCP, CSV loader, RMI + heartbeat server. Currently doesn't compile. |
+| `app-client` | `theknifeclient` | Yes (shade) | Jackson JSON, CLI menus, local cache. **Targets Java 25** (parent uses 17). Test-compile broken. |
+| `app-client-gui` | `theknifeclientgui` | No | **Standalone POM, not in the parent reactor.** JavaFX 17 scaffold (`HelloApplication`), not wired to app logic. Own Maven wrapper. |
 
-Dependency chain: `app-server` and `app-client` both depend on `common-api`.
+Dependency: `app-server` and `app-client` both depend on `common-api`.
 
 ## Build quirks
 
-- `app-client/pom.xml` sets `maven.compiler.source/target` to **25** while parent uses 17. If building with JDK 17, `app-client` will fail. CI only runs `mvn package` (tests compile but skip shade issues).
-- `maven-shade-plugin` relocates `it.uninsubria.laboratoriob.api` → `it.uninsubria.laboratoriob.libs.theknifeapi` in both fat-JAR modules. If you see `ClassNotFoundException` for API types at runtime, check shade config.
-- Lombok is a compile-time annotation processor (configured in parent pom). IDE must have Lombok plugin installed.
-- `jcenter.bintray.com` repository is referenced in parent and app-server poms (deprecated; may cause warnings).
+- `maven-shade-plugin` relocates `it.uninsubria.laboratoriob.api` → `it.uninsubria.laboratoriob.libs.theknifeapi` (and libphonenumber → `libs.phonenumbers`) in both fat JARs. `ClassNotFoundException` for API types at runtime → check shade config.
+- Lombok is a compile-time annotation processor (configured in parent pom) — IDE needs the Lombok plugin.
+- `jcenter.bintray.com` deprecated repo is referenced in parent and app-server poms (warnings only).
 
 ## Database
 
-- Schema is created programmatically in `Database.initTables()` (DDL in `app-server/.../utils/Database.java`).
-- Reference SQL files in `sql/` directory (`create.sql`, `insert.sql`, etc.) are documentation/manual-use only — the app does NOT read them at runtime.
-- Connection pool: HikariCP, max 10 connections, 30s timeout.
-- Constant tables (price_range, awards, cuisine_type, services) are seeded by `Database.initialiseConstants()` with `ON CONFLICT DO NOTHING`.
-- A system user (`system` / `System Michelin`) is created at startup.
+- Schema is created programmatically in `Database.initTables()` (`app-server` `utils/Database.java`); `sql/` files are documentation only, never read at runtime.
+- Constant tables seeded by `Database.initialiseConstants()` (`ON CONFLICT DO NOTHING`); a `system`/`System Michelin` user is created at startup.
 
-## Server architecture
+## Architecture
 
-- `TheKnifeServer.main()` → creates DB schema → seeds constants → optional `--update` → `Loader.initialise()` (loads all data into Repository caches).
-- RMI registry on port 1099, heartbeat TCP on port 5555.
-- `ServerDataStore` is a thin facade delegating to `RestaurantRepository`, `ReviewRepository`, `UserRepository`.
-- Repositories encapsulate `ConcurrentHashMap` caching + DAO access. RMI service impls read from repositories.
-- DAO classes in `server.data.dao/`: `CustomerDAO`, `LocationDAO`, `OwnerDAO`, `ReviewDAO`, `RestaurantDAO`, `UserDAO`
-- RMI service impls in `server.remote/`: `AuthRemoteImpl`, `RestaurantServiceImpl`, `ReviewServiceImpl`, `FavouriteServiceImpl`
+- Startup: `TheKnifeServer.main()` → schema → constants → optional `--update` (CSV import) → `Loader.initialise()` → RMI registry (port 1099, stubs `auth`/`restaurant`/`review`/`favourite`) + heartbeat TCP (port 5555).
+- `ServerDataStore` facade → `RestaurantRepository`/`ReviewRepository`/`UserRepository` (`ConcurrentHashMap` caches + JDBC DAOs). RMI impls in `server.remote/` delegate to it.
+- Client: `TheKnifeClient` → `ClientDataStore` → Json DAOs (write-through local `data/` JSON cache) + `RmiRepository` (lazy stub acquisition, 500ms cooldown / 2-attempt cap).
+- `common-api` `api/remote/` holds the RMI interfaces both sides compile against.
 
 ## Testing
 
-- `common-api`: unit tests (JUnit 5 + JUnit 3) for entities and enums.
-- `app-client`: unit tests (JUnit 5 + Mockito) for all client DAOs and data flow sync patterns.
-- No server integration tests yet.
-- Run tests: `mvn test -pl common-api` or `mvn test -pl app-client`
+- `common-api`: unit tests (JUnit 5 + legacy JUnit 3) for entities/enums. Green.
+- `app-client`: unit tests (JUnit 5 + Mockito) for JSON DAOs / data-flow sync — currently fail to compile (see Build status).
+- `app-server`: **integration tests against real PostgreSQL** (`RestaurantRepositoryTest`, `ReviewRepositoryTest`, `UserRepositoryTest`, `ServerDataStoreTest` + `testsupport/DbCleanup`). Require the dockerized DB; won't run until the main compile blockers are fixed.
 
 ## CI
 
-- GitHub Actions workflow `.github/workflows/maven.yml` runs on push/PR to `master`.
-- Runs `mvn -B -ntp package` (build + tests).
-- `.github/workflows/maven-publish.yml` publishes to GitHub Packages on release.
+- `.github/workflows/maven.yml`: `mvn -B -ntp package` on push/PR to `master`. Red today (blockers above).
+- `.github/workflows/maven-publish.yml`: publishes to GitHub Packages on release.

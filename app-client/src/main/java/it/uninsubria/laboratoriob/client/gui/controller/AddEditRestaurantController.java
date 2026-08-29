@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
 
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
@@ -7,31 +7,18 @@ import it.uninsubria.laboratoriob.api.enums.PriceRange;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Control;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputControl;
+import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class AddEditRestaurantController {
 
@@ -164,9 +151,8 @@ public class AddEditRestaurantController {
         stellaVerdeCheck.setSelected(restaurant.isGreenStar());
 
         if (restaurant.getCuisinesTypes() != null) {
-            for (CuisineType c : restaurant.getCuisinesTypes()) {
+            for (CuisineType c : restaurant.getCuisinesTypes())
                 cucinaListView.getSelectionModel().select(c);
-            }
         }
 
         if (restaurant.getServices() != null) {

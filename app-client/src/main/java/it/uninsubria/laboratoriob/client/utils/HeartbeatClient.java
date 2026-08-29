@@ -1,7 +1,7 @@
 package it.uninsubria.laboratoriob.client.utils;
 
 import it.uninsubria.laboratoriob.api.utils.HeartbeatChannel;
-import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.cli.IO;
 
 import java.io.IOException;
 import java.net.Socket;

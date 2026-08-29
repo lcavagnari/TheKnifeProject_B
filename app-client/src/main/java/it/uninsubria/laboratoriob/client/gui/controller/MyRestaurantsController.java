@@ -1,6 +1,8 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
 
-import it.uninsubria.laboratoriob.client.gui.data.Session;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
@@ -89,7 +91,7 @@ public class MyRestaurantsController {
 
             Navigation.pushBack(() -> {
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("MyRestaurants.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/MyRestaurants.fxml"));
                     Parent root = loader.load();
                     MyRestaurantsController controller = loader.getController();
                     controller.inizializza();
@@ -102,7 +104,7 @@ public class MyRestaurantsController {
                 }
             });
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("RestaurantDetails.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/RestaurantDetails.fxml"));
             Parent detailsRoot = loader.load();
 
             RestaurantDetailsController controller = loader.getController();
@@ -127,7 +129,7 @@ public class MyRestaurantsController {
 
             Navigation.pushBack(() -> {
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("MyRestaurants.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/MyRestaurants.fxml"));
                     Parent root = loader.load();
                     MyRestaurantsController controller = loader.getController();
                     controller.inizializza();
@@ -140,7 +142,7 @@ public class MyRestaurantsController {
                 }
             });
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/AddEditRestaurant.fxml"));
             Parent formRoot = loader.load();
 
             AddEditRestaurantController controller = loader.getController();

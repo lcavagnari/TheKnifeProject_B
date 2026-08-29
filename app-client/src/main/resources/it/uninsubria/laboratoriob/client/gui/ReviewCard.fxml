@@ -9,7 +9,7 @@
 
 <VBox fx:id="root" spacing="4" style="-fx-background-color: #F5F5F5; -fx-background-radius: 8; -fx-padding: 8;"
       xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.uninsubria.laboratoriob.client.gui.ReviewCardController">
+      fx:controller="it.uninsubria.laboratoriob.client.gui.controller.ReviewCardController">
     <HBox alignment="CENTER_LEFT" spacing="8">
         <Label fx:id="ratingLabel" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #424242;" text="5" />
         <Label fx:id="starsLabel" style="-fx-text-fill: #F4B400; -fx-font-size: 14px;" text="★★★★★" />

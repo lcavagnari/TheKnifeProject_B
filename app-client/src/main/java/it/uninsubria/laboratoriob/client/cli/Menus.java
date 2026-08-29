@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.client.ui;
+package it.uninsubria.laboratoriob.client.cli;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;

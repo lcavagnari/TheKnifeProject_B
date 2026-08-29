@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox alignment="CENTER" spacing="12" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.uninsubria.laboratoriob.client.gui.RegisterController">
+      fx:controller="it.uninsubria.laboratoriob.client.gui.controller.RegisterController">
 
     <Label text="Nuovo account" styleClass="label-title" />
     <Label text="Compila i dati per registrarti" styleClass="label-info" />

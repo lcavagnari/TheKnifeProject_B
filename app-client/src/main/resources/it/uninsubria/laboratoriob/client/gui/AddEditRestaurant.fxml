@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.AddEditRestaurantController">
+<ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.controller.AddEditRestaurantController">
   <VBox spacing="16" styleClass="right-box">
     <padding>
       <Insets bottom="24" left="24" right="24" top="24"/>

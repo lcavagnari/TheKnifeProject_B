@@ -1,6 +1,6 @@
 package it.uninsubria.laboratoriob.client.data;
 
-import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.cli.IO;
 import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 import lombok.Getter;
 

@@ -1,6 +1,7 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
 
-import it.uninsubria.laboratoriob.client.gui.data.Session;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
 import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -52,19 +53,19 @@ public class GUIController {
 
     private void preloadForms() {
         try {
-            FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("Login.fxml"));
+            FXMLLoader loginLoader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Login.fxml"));
             loginForm = loginLoader.load();
             loginController = loginLoader.getController();
             loginController.setOnCancelCallback(this::showMenu);
             loginController.setOnLoginSuccessCallback(this::showHome);
 
-            FXMLLoader registerLoader = new FXMLLoader(getClass().getResource("Register.fxml"));
+            FXMLLoader registerLoader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Register.fxml"));
             registerForm = registerLoader.load();
             registerController = registerLoader.getController();
             registerController.setOnCancelCallback(this::showMenu);
             registerController.setOnRegisterSuccessCallback(this::showHome);
 
-            FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("Home.fxml"));
+            FXMLLoader homeLoader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Home.fxml"));
             homeForm = homeLoader.load();
             homeController = homeLoader.getController();
             homeController.setOnDisconnettiCallback(this::showMenu);
@@ -259,7 +260,7 @@ public class GUIController {
 
             Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Restaurants.fxml"));
             javafx.scene.Parent root = loader.load();
 
             RestaurantsController controller = loader.getController();

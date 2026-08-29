@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="root" spacing="10" style="-fx-alignment: TOP_LEFT;" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.RestaurantDetailsController">
+<VBox fx:id="root" spacing="10" style="-fx-alignment: TOP_LEFT;" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.controller.RestaurantDetailsController">
   <padding>
     <Insets bottom="10" left="10" right="10" top="10"/>
   </padding>

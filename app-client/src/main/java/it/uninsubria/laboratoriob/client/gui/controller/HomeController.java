@@ -1,10 +1,11 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
 
 import it.uninsubria.laboratoriob.api.enums.UserRole;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
-import it.uninsubria.laboratoriob.client.gui.data.Session;
-import it.uninsubria.laboratoriob.client.gui.data.SessionRepository;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
+import it.uninsubria.laboratoriob.client.gui.session.SessionRepository;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -74,7 +75,7 @@ public class HomeController {
 
             Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Restaurants.fxml"));
             Parent root = loader.load();
 
             RestaurantsController controller = loader.getController();
@@ -99,7 +100,7 @@ public class HomeController {
 
             Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Restaurants.fxml"));
             Parent root = loader.load();
 
             RestaurantsController controller = loader.getController();
@@ -121,7 +122,7 @@ public class HomeController {
 
             Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Favorites.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Favorites.fxml"));
             Parent root = loader.load();
 
             FavoritesController controller = loader.getController();

@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.client.gui.data;
+package it.uninsubria.laboratoriob.client.gui.session;
 
 import it.uninsubria.laboratoriob.api.objects.User;
 

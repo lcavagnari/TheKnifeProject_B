@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.VBox?>
 
 <VBox alignment="CENTER" spacing="15" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="it.uninsubria.laboratoriob.client.gui.LoginController">
+      fx:controller="it.uninsubria.laboratoriob.client.gui.controller.LoginController">
     <Label text="Accedi" styleClass="label-title" />
     <Label text="Inserisci le tue credenziali" styleClass="label-info" />
     <TextField fx:id="usernameField" promptText="Username" />

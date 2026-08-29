@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="root" spacing="24" focusTraversable="true" style="-fx-alignment: TOP_LEFT;" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.RestaurantsController">
+<VBox fx:id="root" spacing="24" focusTraversable="true" style="-fx-alignment: TOP_LEFT;" styleClass="right-box" stylesheets="@style.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.controller.RestaurantsController">
     <padding>
         <Insets bottom="32" left="32" right="32" top="32" />
     </padding>

@@ -1,6 +1,8 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client.gui.controller;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
 
-import it.uninsubria.laboratoriob.client.gui.data.Session;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -157,7 +159,7 @@ public class RestaurantsController {
 
             Navigation.pushBack(() -> {
                 try {
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/Restaurants.fxml"));
                     Parent root = loader.load();
                     RestaurantsController controller = loader.getController();
                     Scene scene = new Scene(root, 650, 500);
@@ -176,7 +178,7 @@ public class RestaurantsController {
                 }
             });
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("RestaurantDetails.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/RestaurantDetails.fxml"));
             Parent root = loader.load();
 
             RestaurantDetailsController controller = loader.getController();
@@ -204,7 +206,7 @@ public class RestaurantsController {
     @FXML
     private void onNuovoClick() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/AddEditRestaurant.fxml"));
             Parent formRoot = loader.load();
 
             AddEditRestaurantController controller = loader.getController();
@@ -242,11 +244,11 @@ public class RestaurantsController {
     private static class RestaurantCell extends ListCell<Restaurant> {
 
         private static final Image HEART_EMPTY = new Image(Objects.requireNonNull(
-                RestaurantCell.class.getResourceAsStream("images/empty-heart-svgrepo-com.png")));
+                RestaurantCell.class.getResourceAsStream("/it/uninsubria/laboratoriob/client/gui/images/empty-heart-svgrepo-com.png")));
         private static final Image HEART_FILLED = new Image(Objects.requireNonNull(
-                RestaurantCell.class.getResourceAsStream("images/heart-svgrepo-com.png")));
+                RestaurantCell.class.getResourceAsStream("/it/uninsubria/laboratoriob/client/gui/images/heart-svgrepo-com.png")));
         private static final Image HEART_BROKEN = new Image(Objects.requireNonNull(
-                RestaurantCell.class.getResourceAsStream("images/heart-broken-svgrepo-com.png")));
+                RestaurantCell.class.getResourceAsStream("/it/uninsubria/laboratoriob/client/gui/images/heart-broken-svgrepo-com.png")));
         private static final Color HEART_HOVER_TINT = Color.web("#e91e63");
         private static final Color HEART_FAVORITED_TINT = Color.web("#d32f2f");
 
@@ -476,8 +478,8 @@ public class RestaurantsController {
             for (String c : cuisineBadges) {
                 badges.getChildren().add(makeBadge(c, "badge-cuisine", null));
             }
-            if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery", "images/ic_geomarker.png"));
-            if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking", "images/ic_globe.png"));
+            if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery", "/it/uninsubria/laboratoriob/client/gui/images/ic_geomarker.png"));
+            if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking", "/it/uninsubria/laboratoriob/client/gui/images/ic_globe.png"));
 
             setGraphic(card);
         }
@@ -512,7 +514,7 @@ public class RestaurantsController {
         }
 
         private ImageView makeGreenStarIcon() {
-            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream("images/ic_award.png")));
+            Image img = new Image(Objects.requireNonNull(getClass().getResourceAsStream("/it/uninsubria/laboratoriob/client/gui/images/ic_award.png")));
             ImageView iv = new ImageView(img);
             iv.setFitHeight(20);
             iv.setFitWidth(20);

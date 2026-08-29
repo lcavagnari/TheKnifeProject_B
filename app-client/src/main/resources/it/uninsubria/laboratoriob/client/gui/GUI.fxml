@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-<GridPane stylesheets="@style.css" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.GUIController">
+<GridPane stylesheets="@style.css" GridPane.hgrow="ALWAYS" GridPane.vgrow="ALWAYS" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="it.uninsubria.laboratoriob.client.gui.controller.GUIController">
    <columnConstraints>
       <ColumnConstraints hgrow="ALWAYS" percentWidth="60" />
       <ColumnConstraints hgrow="ALWAYS" percentWidth="40" />
