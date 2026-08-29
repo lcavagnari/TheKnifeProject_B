@@ -3,6 +3,7 @@ package com.example.demo3;
 import com.example.demo3.data.Session;
 import com.example.demo3.data.SessionRepository;
 import it.uninsubria.laboratoriob.api.enums.UserRole;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -90,16 +91,19 @@ public class HomeController {
 
     @FXML
     private void onMieiRistorantiClick() {
+        if (!(Session.getCurrentUser() instanceof Owner owner)) {
+            return;
+        }
         try {
             Stage stage = (Stage) btnMieiRistoranti.getScene().getWindow();
 
             Navigation.pushBack(() -> Navigation.navigateTo(stage, "GUI.fxml", "The Knife Menu", 650, 500));
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("MyRestaurants.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
             Parent root = loader.load();
 
-            MyRestaurantsController controller = loader.getController();
-            controller.inizializza();
+            RestaurantsController controller = loader.getController();
+            controller.inizializzaProprietario(owner);
 
             Scene scene = new Scene(root, 650, 500);
             stage.setScene(scene);

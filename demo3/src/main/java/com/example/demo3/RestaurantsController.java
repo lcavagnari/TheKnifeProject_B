@@ -1,6 +1,7 @@
 package com.example.demo3;
 
 import com.example.demo3.data.RestaurantRepository;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import javafx.animation.Animation;
@@ -29,15 +30,21 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class RestaurantsController {
 
     private final RestaurantRepository restaurantRepository = new RestaurantRepository();
+    private Owner owner;
 
     @FXML
     private Label titleLabel;
@@ -54,36 +61,111 @@ public class RestaurantsController {
     @FXML
     private Button btnIndietro;
     @FXML
+    private Button btnNuovo;
+    @FXML
     private VBox emptyState;
+    @FXML
+    private Label emptyStateTitle;
+    @FXML
+    private Label emptyStateSub;
 
     @FXML
     private VBox root;
 
     public void inizializza() {
+        this.owner = null;
         restaurantListView.getStyleClass().add("restaurant-list");
         restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli));
 
+        titleLabel.setText("Trova Ristoranti");
         searchBar.setVisible(true);
         searchBar.setManaged(true);
+        btnNuovo.setVisible(false);
+        btnNuovo.setManaged(false);
+        emptyStateTitle.setText("Nessun ristorante trovato");
+        emptyStateSub.setText("Prova a cercare con parole chiave diverse");
 
         root.setOnMousePressed(e -> root.requestFocus());
 
         caricaEMostra(restaurantRepository.caricaTutti());
     }
 
+    public void inizializzaProprietario(Owner owner) {
+        this.owner = owner;
+        restaurantListView.getStyleClass().add("restaurant-list");
+        restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli));
+
+        titleLabel.setText("I Miei Ristoranti");
+        searchBar.setVisible(true);
+        searchBar.setManaged(true);
+        btnNuovo.setVisible(true);
+        btnNuovo.setManaged(true);
+        emptyStateTitle.setText("Non hai ancora nessun ristorante");
+        emptyStateSub.setText("Usa \"+ Nuovo Ristorante\" per aggiungere il primo");
+
+        root.setOnMousePressed(e -> root.requestFocus());
+
+        caricaEMostra(ristorantiDiProprieta());
+    }
+
+    private List<Restaurant> ristorantiDiProprieta() {
+        Map<UUID, Restaurant> uniti = new LinkedHashMap<>();
+        if (owner == null) {
+            return List.of();
+        }
+
+        for (Restaurant r : owner.getRestaurantsById().values()) {
+            uniti.put(r.getId(), r);
+        }
+        for (Restaurant r : restaurantRepository.caricaTutti()) {
+            if (r.getOwnerId() != null && r.getOwnerId().equals(owner.getId())) {
+                uniti.putIfAbsent(r.getId(), r);
+            }
+        }
+        return List.copyOf(uniti.values());
+    }
+
+    private List<Restaurant> filtraPerParolaChiave(String keyword) {
+        List<Restaurant> ristoranti = ristorantiDiProprieta();
+        if (keyword == null || keyword.isBlank()) {
+            return ristoranti;
+        }
+
+        String kw = keyword.trim().toLowerCase(Locale.ROOT);
+        List<Restaurant> risultato = new ArrayList<>();
+        for (Restaurant r : ristoranti) {
+            boolean matchNome = r.getName() != null && r.getName().toLowerCase(Locale.ROOT).contains(kw);
+            boolean matchCitta = r.getLocation() != null && r.getLocation().getCity() != null
+                    && r.getLocation().getCity().toLowerCase(Locale.ROOT).contains(kw);
+            boolean matchCucina = r.getCuisinesTypes() != null && r.getCuisinesTypes().stream()
+                    .anyMatch(c -> c != null && c.toString().toLowerCase(Locale.ROOT).contains(kw));
+
+            if (matchNome || matchCitta || matchCucina) {
+                risultato.add(r);
+            }
+        }
+        return risultato;
+    }
+
     private void apriDettagli(Restaurant r) {
         try {
             Stage stage = (Stage) restaurantListView.getScene().getWindow();
+            Owner ownerCorrente = owner;
 
             Navigation.pushBack(() -> {
                 try {
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
                     Parent root = loader.load();
                     RestaurantsController controller = loader.getController();
-                    controller.inizializza();
                     Scene scene = new Scene(root, 650, 500);
                     stage.setScene(scene);
-                    stage.setTitle("Trova Ristoranti");
+                    if (ownerCorrente != null) {
+                        controller.inizializzaProprietario(ownerCorrente);
+                        stage.setTitle("I Miei Ristoranti");
+                    } else {
+                        controller.inizializza();
+                        stage.setTitle("Trova Ristoranti");
+                    }
                     stage.show();
                 } catch (IOException ex) {
                     // TODO: MORE ROBUST LOGGING
@@ -110,7 +192,49 @@ public class RestaurantsController {
     @FXML
     private void onCercaClick() {
         String keyword = searchField.getText();
-        caricaEMostra(restaurantRepository.cerca(keyword));
+        if (owner != null) {
+            caricaEMostra(filtraPerParolaChiave(keyword));
+        } else {
+            caricaEMostra(restaurantRepository.cerca(keyword));
+        }
+    }
+
+    @FXML
+    private void onNuovoClick() {
+        try {
+            Stage stage = (Stage) restaurantListView.getScene().getWindow();
+            Owner ownerCorrente = owner;
+
+            Navigation.pushBack(() -> {
+                try {
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("Restaurants.fxml"));
+                    Parent root = loader.load();
+                    RestaurantsController controller = loader.getController();
+                    controller.inizializzaProprietario(ownerCorrente);
+                    Scene scene = new Scene(root, 650, 500);
+                    stage.setScene(scene);
+                    stage.setTitle("I Miei Ristoranti");
+                    stage.show();
+                } catch (IOException ex) {
+                    // TODO: MORE ROBUST LOGGING
+                    ex.printStackTrace();
+                }
+            });
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("AddEditRestaurant.fxml"));
+            Parent root = loader.load();
+
+            AddEditRestaurantController controller = loader.getController();
+            controller.configuraNuovo(ownerCorrente);
+
+            Scene scene = new Scene(root, 650, 500);
+            stage.setScene(scene);
+            stage.setTitle("Nuovo Ristorante");
+            stage.show();
+        } catch (IOException e) {
+            // TODO: MORE ROBUST LOGGING
+            e.printStackTrace();
+        }
     }
 
     @FXML
@@ -123,6 +247,8 @@ public class RestaurantsController {
         boolean empty = risultati.isEmpty();
         emptyState.setVisible(empty);
         emptyState.setManaged(empty);
+        restaurantListView.setVisible(!empty);
+        restaurantListView.setManaged(!empty);
         statsBar.setVisible(!empty);
         statsBar.setManaged(!empty);
         infoLabel.setText(risultati.size() + " ristorant" + (risultati.size() == 1 ? "e trovato" : "i trovati"));
