@@ -25,6 +25,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputControl;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.Stage;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -259,7 +260,7 @@ public class AddEditRestaurantController {
             aggiornaRistorante(location, nome, descrizione, sitoWeb, telefono, prezzo, premio, cucineSelezionate);
         }
 
-        Navigation.goBack();
+        chiudiFinestra();
     }
 
     private void aggiornaRistorante(Location location, String nome, String descrizione, String sitoWeb,
@@ -299,12 +300,17 @@ public class AddEditRestaurantController {
 
     @FXML
     private void onAnnullaClick() {
-        Navigation.goBack();
+        chiudiFinestra();
     }
 
     @FXML
     private void onIndietroClick() {
-        Navigation.goBack();
+        chiudiFinestra();
+    }
+
+    private void chiudiFinestra() {
+        Stage stage = (Stage) btnAnnulla.getScene().getWindow();
+        stage.close();
     }
 
     private String formattaCucina(CuisineType c) {
