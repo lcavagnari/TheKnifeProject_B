@@ -33,6 +33,8 @@ public class ClientDataStore {
         this.restaurantDAO = new JsonRestaurantDAO(null);
         this.ownerDAO = new JsonOwnerDAO(null, null, restaurantDAO);
         this.reviewDAO = new JsonReviewDAO(customerDAO, null);
+
+        acquireRemoteServices();
     }
 
     /**
