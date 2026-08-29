@@ -111,6 +111,16 @@
     -fx-effect: none;
 }
 
+.icon-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 4 0 8;
+    -fx-cursor: hand;
+}
+.icon-button:hover, .icon-button:pressed {
+    -fx-background-color: transparent;
+    -fx-effect: none;
+}
+
 /* ---- Inputs (shared across all screens) ---- */
 .text-field, .password-field, .date-picker, .combo-box {
     -fx-background-color: #fafafa;
