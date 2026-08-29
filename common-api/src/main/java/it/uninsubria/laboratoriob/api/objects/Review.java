@@ -117,6 +117,11 @@ public class Review extends Entity {
         this.respondedAt = respondedAt;
     }
 
+    public void clearReply() {
+        this.reply = null;
+        this.respondedAt = null;
+    }
+
     @Override
     public String toString() {
         return "│ ID:               " + id + "\n" +
