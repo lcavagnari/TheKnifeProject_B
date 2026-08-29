@@ -2,6 +2,7 @@ package com.example.demo3.data;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.Nation;
@@ -62,6 +63,93 @@ public class RestaurantRepository {
         }
 
         return risultato;
+    }
+
+    public void salva(Restaurant restaurant) {
+        File dir = new File(RESTAURANTS_DIR);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+
+        File file = trovaFilePerId(restaurant.getId());
+        if (file == null) {
+            file = new File(dir, restaurant.getId() + ".json");
+        }
+
+        try {
+            MAPPER.writeValue(file, toJson(restaurant));
+        } catch (IOException e) {
+            System.err.println("Errore salvando il ristorante " + restaurant.getName() + ": " + e.getMessage());
+        }
+    }
+
+    private File trovaFilePerId(UUID id) {
+        File dir = new File(RESTAURANTS_DIR);
+        File[] files = dir.listFiles((d, name) -> name.toLowerCase(Locale.ROOT).endsWith(".json"));
+        if (files == null) {
+            return null;
+        }
+        for (File file : files) {
+            try {
+                JsonNode node = MAPPER.readTree(file);
+                if (node.hasNonNull("id") && id.equals(UUID.fromString(node.get("id").asText()))) {
+                    return file;
+                }
+            } catch (IOException ignored) {
+            }
+        }
+        return null;
+    }
+
+    private ObjectNode toJson(Restaurant r) {
+        ObjectNode node = MAPPER.createObjectNode();
+        node.put("id", r.getId().toString());
+        node.put("name", r.getName());
+        node.put("description", r.getDescription());
+        node.put("websiteUrl", r.getWebsiteUrl());
+        node.put("phone", r.getPhone());
+
+        Location loc = r.getLocation();
+        if (loc != null) {
+            ObjectNode locNode = node.putObject("location");
+            locNode.put("nation", loc.getNation() != null ? loc.getNation().name() : null);
+            locNode.put("city", loc.getCity());
+            locNode.put("latitude", loc.getLatitude());
+            locNode.put("longitude", loc.getLongitude());
+            locNode.put("address", loc.getAddress());
+        }
+
+        node.put("priceRange", r.getPriceRange() != null ? r.getPriceRange().name() : null);
+        node.put("hasDelivery", r.isHasDelivery());
+        node.put("hasOnlineBooking", r.isHasOnlineBooking());
+        node.put("award", r.getAward() != null ? r.getAward().name() : null);
+        node.put("greenStar", r.isGreenStar());
+
+        var cuisineTypesNode = node.putArray("cuisineTypes");
+        if (r.getCuisinesTypes() != null) {
+            r.getCuisinesTypes().forEach(c -> cuisineTypesNode.add(c.name()));
+        }
+
+        var servicesNode = node.putArray("services");
+        if (r.getServices() != null) {
+            r.getServices().forEach(servicesNode::add);
+        }
+
+        node.put("ownerId", r.getOwnerId() != null ? r.getOwnerId().toString() : null);
+
+        var reviewsNode = node.putArray("reviews");
+        if (r.getReviews() != null) {
+            r.getReviews().values().forEach(rev -> {
+                ObjectNode revNode = reviewsNode.addObject();
+                revNode.put("id", rev.getId().toString());
+                revNode.put("value", rev.getValue());
+                revNode.put("timestamp", rev.getTimestamp().toString());
+                revNode.put("text", rev.getComment());
+                revNode.put("reply", rev.getReply());
+            });
+        }
+
+        return node;
     }
 
     public List<Restaurant> cerca(String keyword) {
@@ -147,8 +235,16 @@ public class RestaurantRepository {
         LocalDateTime timestamp = node.hasNonNull("timestamp")
                 ? LocalDateTime.parse(node.get("timestamp").asText())
                 : LocalDateTime.now();
+        String reply = node.path("reply").asText(null);
         Customer author = stubCustomer(UUID.randomUUID());
-        return new Review(id, restaurant, author, value, timestamp, text, null);
+        try {
+            return new Review(id, restaurant, author, value, timestamp, text, reply);
+        } catch (IllegalArgumentException e) {
+            // La risposta salvata non passa più la validazione (es. caratteri non ammessi):
+            // non far sparire l'intero ristorante per questo, la si scarta soltanto.
+            System.err.println("Risposta non valida per la recensione " + id + ", ignorata: " + e.getMessage());
+            return new Review(id, restaurant, author, value, timestamp, text, null);
+        }
     }
 
     /**

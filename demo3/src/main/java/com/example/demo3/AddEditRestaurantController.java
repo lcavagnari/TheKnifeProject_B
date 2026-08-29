@@ -1,5 +1,6 @@
 package com.example.demo3;
 
+import com.example.demo3.data.RestaurantRepository;
 import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.Nation;
@@ -35,6 +36,7 @@ import java.util.Set;
 
 public class AddEditRestaurantController {
 
+    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
     private Owner owner;
     private Restaurant restaurantInModifica;
     private final Set<String> servizi = new LinkedHashSet<>();
@@ -256,8 +258,10 @@ public class AddEditRestaurantController {
                     consegnaCheck.isSelected(), prenotazioneCheck.isSelected(), premio, stellaVerdeCheck.isSelected(),
                     cucineSelezionate, new HashSet<>(servizi), new HashMap<>());
             owner.addRestaurant(nuovo);
+            restaurantRepository.salva(nuovo);
         } else {
             aggiornaRistorante(location, nome, descrizione, sitoWeb, telefono, prezzo, premio, cucineSelezionate);
+            restaurantRepository.salva(restaurantInModifica);
         }
 
         chiudiFinestra();

@@ -1,5 +1,6 @@
 package com.example.demo3;
 
+import com.example.demo3.data.RestaurantRepository;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
@@ -12,6 +13,8 @@ import javafx.util.Duration;
 import java.time.format.DateTimeFormatter;
 
 public class ReviewCardController {
+
+    private final RestaurantRepository restaurantRepository = new RestaurantRepository();
 
     @FXML
     private Label ratingLabel;
@@ -159,6 +162,7 @@ public class ReviewCardController {
     @FXML
     private void onReplySubmit() {
         review.setReply(replyField.getText());
+        restaurantRepository.salva(review.getRestaurant());
         aggiornaRispostaVisibile();
         onReplyCancel();
     }
@@ -170,6 +174,7 @@ public class ReviewCardController {
 
     private void confermaCancellazioneRisposta() {
         review.clearReply();
+        restaurantRepository.salva(review.getRestaurant());
 
         double larghezzaAttuale = replyButton.getWidth();
         replyButton.setMinWidth(larghezzaAttuale);
