@@ -63,7 +63,10 @@ public class ServerDataStore {
             if (restaurant.getOwner() != null) {
                 User u = users.findById(restaurant.getOwner().getId());
 
-                if (u instanceof Owner owner) restaurant.setOwner(owner);
+                if (u instanceof Owner owner) {
+                    restaurant.setOwner(owner);
+                    owner.addRestaurant(restaurant);
+                }
             }
         }
     }

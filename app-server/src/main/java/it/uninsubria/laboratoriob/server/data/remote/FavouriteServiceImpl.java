@@ -70,8 +70,8 @@ public class FavouriteServiceImpl extends UnicastRemoteObject implements Favouri
         CompletableFuture<Set<UUID>> db = CompletableFuture
                 .supplyAsync(() -> cDAO.findFavourites(userID))
                 .exceptionally(ex -> Set.of());
-        merged.addAll(db.join());
 
+        merged.addAll(db.join());
         return merged;
     }
 }

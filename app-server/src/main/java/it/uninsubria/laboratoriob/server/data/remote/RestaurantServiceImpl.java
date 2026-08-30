@@ -8,14 +8,9 @@ import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import it.uninsubria.laboratoriob.server.data.dao.RestaurantDAO;
 
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class RestaurantServiceImpl extends UnicastRemoteObject implements RestaurantServiceInter {
@@ -90,7 +85,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .supplyAsync(() -> rDAO.save(restaurant))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -103,7 +98,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .supplyAsync(() -> rDAO.update(restaurant))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -116,7 +111,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .supplyAsync(() -> rDAO.delete(id))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -131,7 +126,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .supplyAsync(() -> rDAO.save(restaurant))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -146,7 +141,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .supplyAsync(() -> rDAO.delete(restaurantId))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -159,7 +154,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .supplyAsync(() -> rDAO.updateCuisines(restaurantId, cuisines))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -172,7 +167,7 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .supplyAsync(() -> rDAO.updateServices(restaurantId, services))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 }

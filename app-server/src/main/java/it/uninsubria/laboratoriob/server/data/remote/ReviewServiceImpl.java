@@ -93,7 +93,7 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
                 .supplyAsync(() -> rDAO.update(review))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -106,7 +106,7 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
                 .supplyAsync(() -> rDAO.delete(id))
                 .exceptionally(ex -> false);
 
-        if (cacheOk && dbOk.join()) return true;
+        if (cacheOk & dbOk.join()) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
