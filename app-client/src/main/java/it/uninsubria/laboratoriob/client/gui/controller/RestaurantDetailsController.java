@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.UUID;
 
 public class RestaurantDetailsController {
 
@@ -97,19 +98,39 @@ public class RestaurantDetailsController {
         writeReviewBoxController.setOnCancel(() -> carica(restaurant));
     }
 
+    private Review findReviewByUser(Restaurant r, UUID userId) {
+        for (Review review : r.getReviews().values()) {
+            if (review.getUser() != null && review.getUser().getId().equals(userId)) return review;
+        }
+        return null;
+    }
+
     private void onWriteReviewSubmit(ReviewInputBoxController.Result result) {
         if (!(Session.getCurrentUser() instanceof Customer customer) || restaurant == null) return;
-        if (result.rating() < 1 || result.rating() > 5 || result.text() == null || result.text().isBlank()) return;
 
-        Review existing = restaurant.getReviews().get(customer.getId());
-        if (existing != null) {
-            existing.setValue(result.rating());
-            existing.setText(result.text());
-            GuiContext.getDataStore().getReviewDAO().update(existing);
-        } else {
-            Review review = new Review(restaurant, customer, result.rating(), result.text());
-            restaurant.addReview(review);
-            GuiContext.getDataStore().getReviewDAO().save(review);
+        if (result.rating() < 1 || result.rating() > 5) {
+            writeReviewBoxController.showError("Seleziona una valutazione da 1 a 5 stelle.");
+            return;
+        }
+        if (result.text() == null || result.text().isBlank()) {
+            writeReviewBoxController.showError("Il testo della recensione non può essere vuoto.");
+            return;
+        }
+
+        try {
+            Review existing = findReviewByUser(restaurant, customer.getId());
+            if (existing != null) {
+                existing.setValue(result.rating());
+                existing.setText(result.text());
+                GuiContext.getDataStore().getReviewDAO().update(existing);
+            } else {
+                Review review = new Review(restaurant, customer, result.rating(), result.text());
+                restaurant.addReview(review);
+                GuiContext.getDataStore().getReviewDAO().save(review);
+            }
+        } catch (IllegalArgumentException e) {
+            writeReviewBoxController.showError(e.getMessage());
+            return;
         }
 
         carica(restaurant);
@@ -132,16 +153,11 @@ public class RestaurantDetailsController {
         if (isCustomer)
             aggiornaTestoPreferito((Customer) currentUser, r);
 
-        writeReviewSection.setVisible(isCustomer);
-        writeReviewSection.setManaged(isCustomer);
-        if (isCustomer) {
-            Review ownReview = r.getReviews().get(currentUser.getId());
-            if (ownReview != null) {
-                writeReviewBoxController.setRating(ownReview.getValue());
-                writeReviewBoxController.setText(ownReview.getText());
-            } else {
-                writeReviewBoxController.clear();
-            }
+        boolean canWriteReview = isCustomer && findReviewByUser(r, currentUser.getId()) == null;
+        writeReviewSection.setVisible(canWriteReview);
+        writeReviewSection.setManaged(canWriteReview);
+        if (canWriteReview) {
+            writeReviewBoxController.clear();
         }
 
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
