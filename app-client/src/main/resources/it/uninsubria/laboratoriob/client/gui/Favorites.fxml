@@ -28,4 +28,8 @@
                    text="Apri un ristorante e tocca &quot;Aggiungi ai Preferiti&quot; per trovarlo qui"/>
         </VBox>
     </StackPane>
+    <!-- Load more -->
+    <HBox fx:id="loadMoreBar" alignment="CENTER" managed="false" visible="false">
+        <Button fx:id="btnCaricaAltri" onAction="#onCaricaAltriClick" styleClass="button-secondary" text="Carica altri"/>
+    </HBox>
 </VBox>

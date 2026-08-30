@@ -34,7 +34,11 @@ import java.util.stream.Collectors;
 
 public class RestaurantsController {
 
+    private static final int PAGE_SIZE = 20;
+
     private Owner owner;
+    private List<Restaurant> risultatiCompleti = List.of();
+    private int visibleCount = PAGE_SIZE;
 
     @FXML
     private Label titleLabel;
@@ -58,6 +62,10 @@ public class RestaurantsController {
     private Label emptyStateTitle;
     @FXML
     private Label emptyStateSub;
+    @FXML
+    private HBox loadMoreBar;
+    @FXML
+    private Button btnCaricaAltri;
 
     @FXML
     private VBox root;
@@ -210,13 +218,31 @@ public class RestaurantsController {
     }
 
     private void caricaEMostra(List<Restaurant> risultati) {
-        restaurantListView.getItems().setAll(risultati);
-        boolean empty = risultati.isEmpty();
+        this.risultatiCompleti = risultati;
+        this.visibleCount = PAGE_SIZE;
+        aggiornaListaVisibile();
+    }
+
+    private void aggiornaListaVisibile() {
+        List<Restaurant> visibili = risultatiCompleti.subList(0, Math.min(visibleCount, risultatiCompleti.size()));
+        restaurantListView.getItems().setAll(visibili);
+
+        boolean empty = risultatiCompleti.isEmpty();
         emptyState.setVisible(empty);
         emptyState.setManaged(empty);
         statsBar.setVisible(!empty);
         statsBar.setManaged(!empty);
-        infoLabel.setText(risultati.size() + " ristorant" + (risultati.size() == 1 ? "e trovato" : "i trovati"));
+        infoLabel.setText(risultatiCompleti.size() + " ristorant" + (risultatiCompleti.size() == 1 ? "e trovato" : "i trovati"));
+
+        boolean hasMore = visibleCount < risultatiCompleti.size();
+        loadMoreBar.setVisible(hasMore);
+        loadMoreBar.setManaged(hasMore);
+    }
+
+    @FXML
+    private void onCaricaAltriClick() {
+        visibleCount += PAGE_SIZE;
+        aggiornaListaVisibile();
     }
 
     private static class RestaurantCell extends ListCell<Restaurant> {

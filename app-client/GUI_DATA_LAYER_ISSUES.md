@@ -50,23 +50,28 @@ so that specific path is verified by code review against the existing `switchUse
 `LoginController` already uses), not by a live restore test. Flagging this explicitly rather than claiming more than
 was checked.
 
-## 3. No pagination in the GUI lists
+## 3. No pagination in the GUI lists — FIXED (2026-08-30)
 
-**Problem (confirmed):** `RestaurantsController` (both browse and owner mode), and `FavoritesController` all call bare
-`findAll()` and dump everything into a
-`ListView`. Only the CLI's `browseRestaurants()` pages.
+**Problem (confirmed):** `RestaurantsController` (both browse and owner mode), and `FavoritesController` all called
+bare `findAll()` and dumped everything into a `ListView`. Only the CLI's `browseRestaurants()` paged.
 
-**Decisions already made:**
+**Fix applied, matching the decisions already made:**
 
-- UI approach: a "Load More" button at the end of the list, not CLI-style page (P/N) navigation.
-- Scope: `RestaurantsController`'s browse mode, `RestaurantsController.inizializzaProprietario()`
-  (the real, reachable "I Miei Ristoranti" — not `MyRestaurantsController`, which is not used/called anywhere in the
-  code; is that intentional or not?), and `FavoritesController`.
-- Technical correction: no DAO in this codebase does real paged fetching —
-  `JsonRestaurantDAO.findAll(offset, limit)` fetches everything and slices in memory. So all three screens implement
-  "Load More" the same simple way, no special-casing between them needed.
+- Added a "Load More" button (`btnCaricaAltri` / `loadMoreBar`) below the list in `Restaurants.fxml` and
+  `Favorites.fxml`, hidden/unmanaged when there's nothing more to show.
+- Scope: `RestaurantsController`'s browse mode, `RestaurantsController.inizializzaProprietario()` (the real,
+  reachable "I Miei Ristoranti" - `MyRestaurantsController`, not used/called anywhere in the code, was not touched),
+  and `FavoritesController`.
+- Both controllers now keep the full result list in memory (`risultatiCompleti`) and a `visibleCount` cursor starting
+  at `PAGE_SIZE`; the `ListView` only ever shows `risultatiCompleti.subList(0, visibleCount)`. Clicking "Load More"
+  bumps `visibleCount` by `PAGE_SIZE` and re-renders. No DAO does real paged fetching, so this is client-side slicing
+  of an already-fully-fetched list, same as the rest of the codebase.
+- Page size: went with `PAGE_SIZE = 20`, matching the CLI's `browseRestaurants()` default, since no other value was
+  specified. Open to changing it.
 
-**Still open:** exact page size. CLI's `browseRestaurants()` uses 20; not confirmed as the value to reuse here.
+**Verification:** clean compile, plus a standalone `FXMLLoader.load()` smoke test (JavaFX `Application`, no full app
+launch needed) confirmed both `Restaurants.fxml` and `Favorites.fxml` parse and bind to the updated controllers
+without error - not just "it compiled."
 
 ---
 

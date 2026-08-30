@@ -28,7 +28,11 @@ import java.util.function.Consumer;
 
 public class FavoritesController {
 
+    private static final int PAGE_SIZE = 20;
+
     private Customer customer;
+    private List<Restaurant> risultatiCompleti = List.of();
+    private int visibleCount = PAGE_SIZE;
 
     @FXML
     private Label infoLabel;
@@ -38,6 +42,10 @@ public class FavoritesController {
     private ListView<Restaurant> restaurantListView;
     @FXML
     private VBox emptyState;
+    @FXML
+    private HBox loadMoreBar;
+    @FXML
+    private Button btnCaricaAltri;
     @FXML
     private VBox root;
 
@@ -62,13 +70,29 @@ public class FavoritesController {
     }
 
     private void caricaEMostra() {
-        List<Restaurant> ristoranti = ristorantiPreferiti();
-        restaurantListView.getItems().setAll(ristoranti);
+        this.risultatiCompleti = ristorantiPreferiti();
+        this.visibleCount = PAGE_SIZE;
+        aggiornaListaVisibile();
+    }
 
-        boolean empty = ristoranti.isEmpty();
+    private void aggiornaListaVisibile() {
+        List<Restaurant> visibili = risultatiCompleti.subList(0, Math.min(visibleCount, risultatiCompleti.size()));
+        restaurantListView.getItems().setAll(visibili);
+
+        boolean empty = risultatiCompleti.isEmpty();
         emptyState.setVisible(empty);
         emptyState.setManaged(empty);
-        infoLabel.setText(ristoranti.size() + " ristorant" + (ristoranti.size() == 1 ? "e preferito" : "i preferiti"));
+        infoLabel.setText(risultatiCompleti.size() + " ristorant" + (risultatiCompleti.size() == 1 ? "e preferito" : "i preferiti"));
+
+        boolean hasMore = visibleCount < risultatiCompleti.size();
+        loadMoreBar.setVisible(hasMore);
+        loadMoreBar.setManaged(hasMore);
+    }
+
+    @FXML
+    private void onCaricaAltriClick() {
+        visibleCount += PAGE_SIZE;
+        aggiornaListaVisibile();
     }
 
     private void apriDettagli(Restaurant r) {
