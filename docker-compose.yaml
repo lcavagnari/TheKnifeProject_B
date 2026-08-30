@@ -3,14 +3,44 @@ services:
     image: postgres:18
     container_name: postgressql
     restart: unless-stopped
+    network_mode: host
     environment:
       POSTGRES_DB: mydb
       POSTGRES_USER: testuser
       POSTGRES_PASSWORD: test1234
-    ports:
-      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U testuser -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    container_name: theknifeserver
+    restart: unless-stopped
+    network_mode: host
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  client:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+    container_name: theknifeclient
+    network_mode: host
+    stdin_open: true
+    tty: true
+    depends_on:
+      server:
+        condition: service_started
+    volumes:
+      - client_data:/app/data
 
 volumes:
   postgres_data:
+  client_data:

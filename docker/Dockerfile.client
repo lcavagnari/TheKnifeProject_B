@@ -1,0 +1,9 @@
+FROM maven:3.9-eclipse-temurin-25 AS build
+WORKDIR /workspace
+COPY . .
+RUN mvn -B -ntp -DskipTests -Dmaven.test.skip=true -pl app-client -am package
+
+FROM eclipse-temurin:25-jre
+WORKDIR /app
+COPY --from=build /workspace/app-client/target/theknifeclient-1.0-SNAPSHOT.jar .
+ENTRYPOINT ["java", "-cp", "theknifeclient-1.0-SNAPSHOT.jar", "it.uninsubria.laboratoriob.client.TheKnifeClient", "--cli"]
