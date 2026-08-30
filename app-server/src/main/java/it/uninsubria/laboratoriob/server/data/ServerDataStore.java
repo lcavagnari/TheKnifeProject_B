@@ -9,20 +9,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Facade che incapsula i tre repository del server: ristoranti, recensioni e utenti.
+ * <p>
+ * Fornisce accesso diretto ai repository e un metodo {@link #initialise()} per il caricamento
+ * bulk in memoria al startup. Tutte le operazioni RMI delegano a questa classe.
+ */
 public class ServerDataStore {
 
     private final RestaurantRepository restaurants;
     private final ReviewRepository reviews;
     private final UserRepository users;
 
+    /**
+     * Costruisce il data store, istanziando i tre repository.
+     */
     public ServerDataStore() {
         this.restaurants = new RestaurantRepository();
         this.reviews = new ReviewRepository(restaurants);
         this.users = new UserRepository();
     }
 
+    /**
+     * Restituisce il repository dei ristoranti.
+     *
+     * @return repository dei ristoranti
+     */
     public RestaurantRepository restaurants() { return restaurants; }
+
+    /**
+     * Restituisce il repository delle recensioni.
+     *
+     * @return repository delle recensioni
+     */
     public ReviewRepository reviews() { return reviews; }
+
+    /**
+     * Restituisce il repository degli utenti.
+     *
+     * @return repository degli utenti
+     */
     public UserRepository users() { return users; }
 
     /**

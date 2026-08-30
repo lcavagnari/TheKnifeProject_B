@@ -60,6 +60,7 @@ public class ReviewDAO implements DAO<Review> {
         return review;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Review> findById(UUID id) {
         String query = """
@@ -81,6 +82,7 @@ public class ReviewDAO implements DAO<Review> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Review> findAll() {
         List<Review> reviews = new ArrayList<>();
@@ -100,6 +102,7 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    /** {@inheritDoc} */
     @Override
     public long count() {
         try (Connection conn = Database.getConnection();
@@ -112,6 +115,12 @@ public class ReviewDAO implements DAO<Review> {
         return 0;
     }
 
+    /**
+     * Trova tutte le recensioni associate a un determinato ristorante.
+     *
+     * @param restaurantId l'UUID del ristorante
+     * @return una lista di recensioni per il ristorante specificato
+     */
     public List<Review> findByRestaurant(UUID restaurantId) {
         List<Review> reviews = new ArrayList<>();
         String query = """
@@ -133,6 +142,12 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    /**
+     * Trova tutte le recensioni scritte da un determinato utente.
+     *
+     * @param userId l'UUID dell'utente
+     * @return una lista di recensioni scritte dall'utente specificato
+     */
     public List<Review> findByUser(UUID userId) {
         List<Review> reviews = new ArrayList<>();
         String query = """
@@ -154,6 +169,7 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Review> findAll(int offset, int limit) {
         List<Review> reviews = new ArrayList<>();
@@ -177,6 +193,7 @@ public class ReviewDAO implements DAO<Review> {
         return reviews;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean save(Review review) {
         String query = """
@@ -202,6 +219,7 @@ public class ReviewDAO implements DAO<Review> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean update(Review review) {
         String query = """
@@ -228,6 +246,13 @@ public class ReviewDAO implements DAO<Review> {
         }
     }
 
+    /**
+     * Salva una risposta del proprietario a una recensione esistente.
+     *
+     * @param id l'UUID della recensione da aggiornare
+     * @param replyToRwview il testo della risposta
+     * @return {@code true} se l'aggiornamento ha avuto successo
+     */
     public final boolean saveReply(UUID id, String replyToRwview) {
         final String query = """
                 UPDATE review
@@ -246,6 +271,7 @@ public class ReviewDAO implements DAO<Review> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean delete(UUID id) {
         String query = """

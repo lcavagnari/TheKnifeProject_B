@@ -20,11 +20,20 @@ public class HeartbeatServer {
     private final CopyOnWriteArrayList<HeartbeatChannel> channels = new CopyOnWriteArrayList<>();
     private volatile boolean shuttingDown = false;
 
+    /**
+     * Crea un nuovo server di heartbeat.
+     *
+     * @param port            porta TCP su cui ascoltare
+     * @param intervalMinutes intervallo di heartbeat in minuti
+     */
     public HeartbeatServer(int port, long intervalMinutes) {
         this.port = port;
         this.intervalMinutes = intervalMinutes;
     }
 
+    /**
+     * Avvia il server di heartbeat su un thread daemon.
+     */
     public void start() {
         Thread setupThread = new Thread(this::acceptLoop, "heartbeat-setup");
         setupThread.setDaemon(true);
@@ -57,12 +66,18 @@ public class HeartbeatServer {
         }
     }
 
+    /**
+     * Invia un segnale di risveglio a tutti i canali di heartbeat attivi.
+     */
     public void wakeUp() {
         for (HeartbeatChannel c : channels) {
             c.wakeUp();
         }
     }
 
+    /**
+     * Chiude tutti i canali di heartbeat e il server socket.
+     */
     public void shutdown() {
         shuttingDown = true;
         for (HeartbeatChannel c : channels) {

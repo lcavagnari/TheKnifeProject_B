@@ -26,6 +26,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Parser del dataset CSV Michelin e utilità per l'importazione.
+ * <p>
+ * Legge il file CSV (delimitatore {@code ;}), converte le righe in oggetti
+ * di dominio ({@link Restaurant}, {@link Location}, ecc.) e li persiste
+ * nel database e nella cache in memoria tramite {@link ServerDataStore}.
+ *
+ * @author Luca Cavagnari
+ */
 @UtilityClass
 public class CsvParser {
 
@@ -188,6 +197,14 @@ public class CsvParser {
         return cuisineTypes;
     }
 
+    /**
+     * Restituisce il proprietario di sistema "Michelin" creandolo se non esiste.
+     * <p>
+     * L'UUID è deterministico ({@code nameUUIDFromBytes("theknife-system-owner")})
+     * per garantire l'idempotenza.
+     *
+     * @return il proprietario di sistema
+     */
     public static Owner getOrCreateSystemOwner() {
         try (java.sql.Connection conn = Database.getConnection();
              java.sql.PreparedStatement check = conn.prepareStatement(
@@ -247,6 +264,16 @@ public class CsvParser {
                 services);
     }
 
+    /**
+     * Legge il dataset CSV e importa i ristoranti nel database e nella cache.
+     * <p>
+     * La persistenza e il caricamento in cache avvengono concorrenemente
+     * tramite {@link CompletableFuture}. Il proprietario di sistema viene
+     * assegnato a tutti i ristoranti importati.
+     *
+     * @param path  percorso del file CSV
+     * @param store data store del server
+     */
     public static void parseFromDataset(Path path, ServerDataStore store) {
         if (path == null)
             return;
@@ -291,6 +318,16 @@ public class CsvParser {
         }
     }
 
+    /**
+     * Aggiorna il dataset Michelin dal percorso specificato (o predefinito).
+     * <p>
+     * Valida l'esistenza del file e delega l'effettiva importazione a
+     * {@link #parseFromDataset(Path, ServerDataStore)}.
+     *
+     * @param path  percorso del file CSV ({@code null} o vuoto per il default)
+     * @param store data store del server
+     * @throws IOException se il percorso non è valido o il file non esiste
+     */
     public static void updateMichelinDataset(String path, ServerDataStore store) throws IOException {
         path = (path != null && !path.isBlank()) ? path : "michelin_my_maps.csv";
         Path inputPath = Paths.get(path).normalize().toRealPath();

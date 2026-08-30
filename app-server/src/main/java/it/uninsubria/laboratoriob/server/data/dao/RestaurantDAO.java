@@ -75,6 +75,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
     }
 
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Restaurant> findById(UUID id) {
         String query = """
@@ -98,6 +99,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Restaurant> findAll() {
         List<Restaurant> restaurants = new ArrayList<>();
@@ -120,6 +122,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return restaurants;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Restaurant> findAll(int offset, int limit) {
         List<Restaurant> restaurants = new ArrayList<>();
@@ -143,6 +146,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return restaurants;
     }
 
+    /** {@inheritDoc} */
     @Override
     public long count() {
         String query = "SELECT COUNT(*) FROM restaurant";
@@ -156,6 +160,13 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return 0;
     }
 
+    /**
+     * Cerca tutti i ristoranti associati a un determinato proprietario.
+     *
+     * @param ownerId l'UUID del proprietario di cui cercare i ristoranti
+     * @return una lista di ristoranti posseduti dal proprietario specificato,
+     *         o una lista vuota se non ne esistono
+     */
     public List<Restaurant> findByOwner(UUID ownerId) {
         List<Restaurant> restaurants = new ArrayList<>();
         String query = """
@@ -179,6 +190,13 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return restaurants;
     }
 
+    /**
+     * Restituisce i tipi di cucina associati a un ristorante.
+     *
+     * @param restaurantId l'UUID del ristorante di cui recuperare le cucine
+     * @return un insieme di {@link CuisineType} associati al ristorante,
+     *         o un insieme vuoto se non ne esistono
+     */
     public Set<CuisineType> findCuisines(UUID restaurantId) {
         Set<CuisineType> cuisines = new HashSet<>();
         String query = """
@@ -204,6 +222,13 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return cuisines;
     }
 
+    /**
+     * Restituisce i servizi associati a un ristorante.
+     *
+     * @param restaurantId l'UUID del ristorante di cui recuperare i servizi
+     * @return un insieme di descrizioni dei servizi associati al ristorante,
+     *         o un insieme vuoto se non ne esistono
+     */
     public Set<String> findServices(UUID restaurantId) {
         Set<String> services = new HashSet<>();
         String query = """
@@ -226,6 +251,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         return services;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean save(Restaurant restaurant) {
         String query = """
@@ -265,6 +291,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean update(Restaurant restaurant) {
         String query = """
@@ -305,6 +332,7 @@ public class RestaurantDAO implements DAO<Restaurant> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean delete(UUID id) {
         String query = "DELETE FROM restaurant WHERE id = ?";
@@ -319,6 +347,18 @@ public class RestaurantDAO implements DAO<Restaurant> {
         }
     }
 
+    /**
+     * Aggiorna i tipi di cucina associati a un ristorante, sostituendo quelli esistenti.
+     * <p>
+     * La operazione avviene in una singola transazione: eliminazione delle associazioni
+     * precedenti, inserimento di quelle nuove. Se un tipo di cucina non esiste nella
+     * tabella {@code cuisine_type}, viene creato automaticamente.
+     * </p>
+     *
+     * @param restaurantId l'UUID del ristorante da aggiornare
+     * @param cuisines     l'insieme dei nuovi {@link CuisineType} da associare
+     * @return {@code true} se l'operazione ha avuto successo, {@code false} in caso di errore
+     */
     public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) {
         String deleteQuery = "DELETE FROM restaurant_cuisine WHERE restaurant_id = ?";
         String insertQuery = "INSERT INTO restaurant_cuisine (restaurant_id, type) VALUES (?, ?)";
@@ -377,6 +417,18 @@ public class RestaurantDAO implements DAO<Restaurant> {
         }
     }
 
+    /**
+     * Aggiorna i servizi associati a un ristorante, sostituendo quelli esistenti.
+     * <p>
+     * La operazione avviene in una singola transazione: eliminazione delle associazioni
+     * precedenti, inserimento di quelle nuove. Se un servizio non esiste nella tabella
+     * {@code services_and_facilities}, viene creato automaticamente.
+     * </p>
+     *
+     * @param restaurantId l'UUID del ristorante da aggiornare
+     * @param services     l'insieme delle nuove descrizioni di servizi da associare
+     * @return {@code true} se l'operazione ha avuto successo, {@code false} in caso di errore
+     */
     public boolean updateServices(UUID restaurantId, Set<String> services) {
         String deleteQuery = "DELETE FROM restaurant_services WHERE restaurant_id = ?";
         String insertQuery = "INSERT INTO restaurant_services (restaurant_id, service) VALUES (?, ?)";

@@ -13,6 +13,15 @@ import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+/**
+ * Entry point del server The Knife.
+ * <p>
+ * Inizializza il database (schema + costanti), avvia il server di heartbeat TCP,
+ * carica opazionalmente il dataset Michelin, e registra i servizi RMI
+ * ({@code restaurant}, {@code auth}, {@code review}, {@code favourite}) sulla porta 1099.
+ *
+ * @author Luca Cavagnari
+ */
 public class TheKnifeServer {
 
     private final int rmiPort = 1099;
@@ -22,6 +31,10 @@ public class TheKnifeServer {
     private final HeartbeatServer tcpHbeatServer;
     private final ServerDataStore dataStore;
 
+    /**
+     * Costruisce il server, inizializzando data store, heartbeat, hook di shutdown
+     * e lo schema del database.
+     */
     public TheKnifeServer() {
         this.dataStore = new ServerDataStore();
         this.tcpHbeatServer = new HeartbeatServer(heartbeatPort, heartbeatIntervalMinutes);
@@ -37,6 +50,13 @@ public class TheKnifeServer {
             System.err.println("ERROR while initialising database constants");
     }
 
+    /**
+     * Avvia il server: importa il dataset CSV se richiesto, carica i dati
+     * nel data store e registra i servizi RMI.
+     *
+     * @param args argomenti della riga di comando;
+     *             {@code --update [path]} per importare il dataset Michelin
+     */
     private void start(String[] args) {
         try {
             if (args.length > 1 && args[0].equals("--update")) {
@@ -64,11 +84,19 @@ public class TheKnifeServer {
         }
     }
 
+    /**
+     * Arresta il server di heartbeat e chiude il connection pool del database.
+     */
     private void shutdown() {
         tcpHbeatServer.shutdown();
         Database.shutdown();
     }
 
+    /**
+     * Metodo principale. Istanzia e avvia il server.
+     *
+     * @param args argomenti della riga di comando
+     */
     public static void main(String[] args) {
         System.out.println("Loading The Knife Server...");
 

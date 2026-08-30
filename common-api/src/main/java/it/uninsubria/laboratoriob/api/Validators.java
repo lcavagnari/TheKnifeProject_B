@@ -9,6 +9,13 @@ import lombok.experimental.UtilityClass;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+/**
+ * Utility class per la validazione degli oggetti di dominio.
+ * <p>
+ * Fornisce metodi statici per verificare la correttezza di stringhe,
+ * location, date, UUID e oggetti di dominio (Review, User, Restaurant).
+ * Tutti i metodi lanciano {@link IllegalArgumentException} in caso di validazione fallita.
+ */
 @UtilityClass
 public class Validators {
     /**

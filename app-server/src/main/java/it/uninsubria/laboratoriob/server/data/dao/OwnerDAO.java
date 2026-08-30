@@ -35,6 +35,13 @@ import java.util.stream.Collectors;
  */
 public class OwnerDAO extends UserDAO<Owner> {
 
+    /**
+     * Costruttore predefinito.
+     * <p>
+     * Inizializza il DAO impostando il flag {@code isOwner} a {@code true},
+     * indicando che questo DAO gestisce utenti di tipo proprietario.
+     * </p>
+     */
     public OwnerDAO() {
         super(true);
     }
@@ -102,14 +109,37 @@ public class OwnerDAO extends UserDAO<Owner> {
         return succeded;
     }
 
+    /**
+     * Aggiunge un'associazione tra un proprietario e un ristorante.
+     *
+     * @param ownerId      l'UUID del proprietario
+     * @param restaurantId l'UUID del ristorante da associare
+     * @return {@code true} se l'associazione è stata creata con successo,
+     *         {@code false} in caso di errore o se l'associazione esiste già
+     */
     public boolean addRestaurant(UUID ownerId, UUID restaurantId) {
         return super.addSpecial(ownerId, restaurantId);
     }
 
+    /**
+     * Rimuove l'associazione tra un proprietario e un ristorante.
+     *
+     * @param ownerId      l'UUID del proprietario
+     * @param restaurantId l'UUID del ristorante da dissociare
+     * @return {@code true} se l'associazione è stata rimossa con successo,
+     *         {@code false} in caso di errore o se l'associazione non esiste
+     */
     public boolean removeRestaurant(UUID ownerId, UUID restaurantId) {
         return super.removeSpecial(ownerId, restaurantId);
     }
 
+    /**
+     * Trova tutti gli UUID dei ristoranti associati a un proprietario.
+     *
+     * @param ownerId l'UUID del proprietario
+     * @return un {@link Set} contenente gli UUID dei ristoranti associati,
+     *         vuoto se il proprietario non possiede ristoranti
+     */
     public Set<UUID> findRestaurants(UUID ownerId) {
         return super.findSpecial(ownerId);
     }

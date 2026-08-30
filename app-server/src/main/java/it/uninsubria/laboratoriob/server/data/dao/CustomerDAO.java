@@ -34,6 +34,13 @@ import java.util.UUID;
  */
 public final class CustomerDAO extends UserDAO<Customer> {
 
+    /**
+     * Costruttore predefinito.
+     * <p>
+     * Inizializza il DAO impostando il flag {@code isOwner} a {@code false},
+     * indicando che questo DAO gestisce utenti di tipo cliente.
+     * </p>
+     */
     public CustomerDAO() {
         super(false);
     }
@@ -95,14 +102,37 @@ public final class CustomerDAO extends UserDAO<Customer> {
         return succeded;
     }
 
+    /**
+     * Aggiunge un ristorante alla lista dei preferiti di un cliente.
+     *
+     * @param ownerId      l'UUID del cliente
+     * @param restaurantId l'UUID del ristorante da aggiungere ai preferiti
+     * @return {@code true} se l'operazione è stata completata con successo,
+     *         {@code false} in caso di errore o se il preferito esiste già
+     */
     public boolean addFavourites(UUID ownerId, UUID restaurantId) {
         return super.addSpecial(ownerId, restaurantId);
     }
 
+    /**
+     * Rimuove un ristorante dalla lista dei preferiti di un cliente.
+     *
+     * @param ownerId      l'UUID del cliente
+     * @param restaurantId l'UUID del ristorante da rimuovere dai preferiti
+     * @return {@code true} se l'operazione è stata completata con successo,
+     *         {@code false} in caso di errore o se il preferito non esiste
+     */
     public boolean removeFavourites(UUID ownerId, UUID restaurantId) {
         return super.removeSpecial(ownerId, restaurantId);
     }
 
+    /**
+     * Trova tutti gli UUID dei ristoranti preferiti da un cliente.
+     *
+     * @param ownerId l'UUID del cliente
+     * @return un {@link Set} contenente gli UUID dei ristoranti preferiti,
+     *         vuoto se il cliente non ha preferiti
+     */
     public Set<UUID> findFavourites(UUID ownerId) {
         return super.findSpecial(ownerId);
     }

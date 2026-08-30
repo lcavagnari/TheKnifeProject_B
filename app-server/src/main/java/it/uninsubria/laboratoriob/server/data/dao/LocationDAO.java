@@ -34,17 +34,27 @@ import java.util.UUID;
 public final class LocationDAO implements DAO<Location> {
 
     // Location has no ID attribute
+    /** {@inheritDoc} */
     @Override
     public Optional<Location> findById(UUID id) {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean delete(UUID id) {
         return false;
     }
 
 
+    /**
+     * Cerca una location tramite le sue coordinate geografiche.
+     *
+     * @param lat    la latitudine della posizione
+     * @param longit la longitudine della posizione
+     * @return un {@link Optional} contenente la {@link Location} trovata,
+     *         oppure vuoto se nessuna location corrisponde alle coordinate
+     */
     public Optional<Location> findByCoordinates(double lat, double longit) {
         final String query = "SELECT * FROM location WHERE latitude=? AND longitude=?";
 
@@ -72,6 +82,7 @@ public final class LocationDAO implements DAO<Location> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Location> findAll() {
         String query = "SELECT * FROM location";
@@ -121,6 +132,7 @@ public final class LocationDAO implements DAO<Location> {
         return locations;
     }
 
+    /** {@inheritDoc} */
     @Override
     public long count() {
         try (Connection conn = Database.getConnection();
@@ -133,6 +145,7 @@ public final class LocationDAO implements DAO<Location> {
         return 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean save(Location location) {
         String query = "INSERT INTO location (latitude, longitude, city, country, address) VALUES (?,?,?,?,?) ON CONFLICT (latitude, longitude) DO NOTHING";
@@ -153,6 +166,15 @@ public final class LocationDAO implements DAO<Location> {
     }
 
 
+    /**
+     * Aggiorna una location identificata dalle sue coordinate geografiche.
+     *
+     * @param lat    la latitudine della posizione da aggiornare
+     * @param longit la longitudine della posizione da aggiornare
+     * @param newLoc la nuova {@link Location} con i dati aggiornati
+     * @return {@code true} se la location è stata aggiornata con successo,
+     *         {@code false} in caso di errore o se la location non esiste
+     */
     public boolean update(double lat, double longit, Location newLoc) {
         String query = "UPDATE location SET country = ?, city = ?, latitude = ?, longitude = ?, address = ? WHERE latitude = ? AND longitude = ?";
 
@@ -173,12 +195,21 @@ public final class LocationDAO implements DAO<Location> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean update(Location entity) {
         return update(entity.getLatitude(), entity.getLongitude(), entity);
     }
 
 
+    /**
+     * Elimina una location identificata dalle sue coordinate geografiche.
+     *
+     * @param lat    la latitudine della posizione da eliminare
+     * @param longit la longitudine della posizione da eliminare
+     * @return {@code true} se la location è stata eliminata con successo,
+     *         {@code false} in caso di errore o se la location non esiste
+     */
     public boolean delete(double lat, double longit) {
         // DELETE FROM location WHERE id = ?
         String query = "DELETE FROM location WHERE latitude = ? AND longitude = ?";

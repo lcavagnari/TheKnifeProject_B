@@ -37,6 +37,11 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     protected final RestaurantDAO restaurantDAO;
     private final boolean isOwner;
 
+    /**
+     * Costruttore della classe astratta.
+     *
+     * @param isOwner flag che indica se questo DAO gestisce owner ({@code true}) o customer ({@code false})
+     */
     public UserDAO(boolean isOwner) {
         this.locationDAO = new LocationDAO();
         this.restaurantDAO = new RestaurantDAO();
@@ -44,8 +49,16 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         this.isOwner = isOwner;
     }
 
+    /**
+     * Mappa una riga del ResultSet in un oggetto del sottotipo concreto.
+     *
+     * @param rs il ResultSet posizionato sulla riga da mappare
+     * @return l'oggetto {@link User} mappato
+     * @throws SQLException se si verifica un errore di accesso al database
+     */
     protected abstract T mapRow(ResultSet rs) throws SQLException;
 
+    /** {@inheritDoc} */
     public Optional<T> findById(UUID uId) {
         final String query = "SELECT id, username, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date, is_system FROM \"user\" where id=? AND is_owner = " + isOwner;
 
@@ -64,6 +77,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     public Optional<T> findByUsername(String username) {
         final String query = "SELECT id, psw_hash, psw_salt, first_name, last_name, latitude, longitude, birth_date, is_system FROM \"user\" where username=? AND is_owner = " + isOwner;
 
@@ -82,6 +96,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     public List<T> findAll() {
         List<T> users = new ArrayList<>();
 
@@ -103,6 +118,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return users;
     }
 
+    /** {@inheritDoc} */
     public List<T> findAll(int offset, int limit) {
         List<T> users = new ArrayList<>();
 
@@ -127,6 +143,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return users;
     }
 
+    /** {@inheritDoc} */
     public long count() {
         final String query = "SELECT COUNT(*) FROM \"user\" where is_owner = " + isOwner;
 
@@ -142,6 +159,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return 0;
     }
 
+    /** {@inheritDoc} */
     public boolean save(T user) {
         Location loc = user.getLocation();
 
@@ -178,6 +196,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return false;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean update(T user) {
         final String query = "UPDATE \"user\" SET username=?, psw_hash=?, psw_salt=?, first_name=?, last_name=?, birth_date=?, latitude=?, longitude=?, is_system=? WHERE id=? AND is_owner=" + isOwner;
@@ -211,6 +230,7 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         }
     }
 
+    /** {@inheritDoc} */
     public boolean delete(UUID id) {
         String query = "DELETE FROM \"user\" WHERE id=? AND is_owner=" + isOwner;
 
@@ -227,6 +247,12 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     }
 
 
+    /**
+     * Trova gli UUID dei ristoranti associati all'utente (preferiti o ristoranti posseduti).
+     *
+     * @param userId l'UUID dell'utente
+     * @return un set di UUID dei ristoranti associati
+     */
     protected Set<UUID> findSpecial(UUID userId) {
         String query = "SELECT restaurant_id FROM " + ((isOwner) ? "user_restaurants" : "user_favorites") + " WHERE user_id=?";
 
@@ -248,6 +274,13 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
         return favourites;
     }
 
+    /**
+     * Aggiunge un'associazione tra un utente e un ristorante.
+     *
+     * @param userId l'UUID dell'utente
+     * @param restaurantId l'UUID del ristorante
+     * @return {@code true} se l'inserimento ha avuto successo
+     */
     protected boolean addSpecial(UUID userId, UUID restaurantId) {
         String query = "INSERT INTO " + ((isOwner) ? "user_restaurants" : "user_favorites") + " (user_id, restaurant_id) VALUES (?,?)";
 
@@ -265,6 +298,13 @@ public abstract class UserDAO<T extends User> implements DAO<T> {
     }
 
 
+    /**
+     * Rimuove l'associazione tra un utente e un ristorante.
+     *
+     * @param customerId l'UUID dell'utente
+     * @param restaurantId l'UUID del ristorante
+     * @return {@code true} se la rimozione ha avuto successo
+     */
     protected boolean removeSpecial(UUID customerId, UUID restaurantId) {
         String query = "DELETE FROM " + ((isOwner) ? "user_restaurants" : "user_favorites") + " WHERE restaurant_id=? AND user_id=?";
 
