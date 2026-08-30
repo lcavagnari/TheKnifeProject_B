@@ -3,7 +3,6 @@ package it.uninsubria.laboratoriob.client;
 import it.uninsubria.laboratoriob.client.cli.IO;
 import it.uninsubria.laboratoriob.client.cli.menus.GuestMenus;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
-import it.uninsubria.laboratoriob.client.gui.Launcher;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
 
 import java.util.Arrays;
@@ -25,7 +24,7 @@ public class TheKnifeClient {
         if (Arrays.asList(args).contains("--cli"))
             runCli();
         else
-            Launcher.main(args);
+            HelloApplication.main(args);
     }
 
     private static void runCli() {

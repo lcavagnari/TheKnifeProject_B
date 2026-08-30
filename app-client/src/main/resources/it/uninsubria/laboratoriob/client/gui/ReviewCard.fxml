@@ -33,11 +33,5 @@
     </HBox>
 
     <!-- Casella di risposta, nascosta finché non si preme Reply -->
-    <VBox fx:id="replyInputBox" spacing="6" managed="false" visible="false" style="-fx-padding: 6 0 0 0;">
-        <TextArea fx:id="replyField" promptText="Scrivi una risposta..." prefRowCount="2" wrapText="true"/>
-        <HBox alignment="CENTER_RIGHT" spacing="8">
-            <Button onAction="#onReplyCancel" styleClass="button-link" text="Annulla"/>
-            <Button onAction="#onReplySubmit" styleClass="button-secondary" text="Invia"/>
-        </HBox>
-    </VBox>
+    <fx:include fx:id="replyInputBox" source="ReviewInputBox.fxml" managed="false" visible="false"/>
 </VBox>

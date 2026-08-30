@@ -62,7 +62,7 @@
                         <!-- Default configuration for running with: mvn -pl app-client javafx:run -->
                         <id>default-cli</id>
                         <configuration>
-                            <mainClass>it.uninsubria.laboratoriob.client.gui.HelloApplication</mainClass>
+                            <mainClass>it.uninsubria.laboratoriob.client.HelloApplication</mainClass>
                             <launcher>app</launcher>
                             <jlinkZipName>app</jlinkZipName>
                             <jlinkImageName>app</jlinkImageName>

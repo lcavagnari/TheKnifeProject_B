@@ -1,5 +1,6 @@
 package it.uninsubria.laboratoriob.client.gui;
 
+import it.uninsubria.laboratoriob.client.HelloApplication;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 
 /**

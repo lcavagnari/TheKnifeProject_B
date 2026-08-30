@@ -1,6 +1,7 @@
-package it.uninsubria.laboratoriob.client.gui;
+package it.uninsubria.laboratoriob.client;
 
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
 import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 import javafx.application.Application;
@@ -11,6 +12,10 @@ import javafx.stage.Stage;
 import java.io.IOException;
 
 public class HelloApplication extends Application {
+
+    public static void main(String[] args) {
+        Application.launch(HelloApplication.class, args);
+    }
 
     private static final String SERVER_HOST = "localhost";
     private static final int RMI_PORT = 1099;

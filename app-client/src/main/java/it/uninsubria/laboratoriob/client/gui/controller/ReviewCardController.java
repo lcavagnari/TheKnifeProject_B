@@ -6,7 +6,6 @@ import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
@@ -36,7 +35,7 @@ public class ReviewCardController {
     @FXML
     private VBox replyInputBox;
     @FXML
-    private TextArea replyField;
+    private ReviewInputBoxController replyInputBoxController;
 
     private enum StatoBottoneRisposta {NESSUNA_RISPOSTA, RISPOSTA_PRESENTE, CONFERMA_CANCELLAZIONE}
 
@@ -48,6 +47,17 @@ public class ReviewCardController {
 
 
     private static final DateTimeFormatter REVIEW_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+    @FXML
+    private void initialize() {
+        replyInputBoxController.setReplyMode();
+        replyInputBoxController.setOnSubmit(result -> {
+            GuiContext.getDataStore().getReviewDAO().replyToReview(review, result.text());
+            aggiornaRispostaVisibile();
+            chiudiCasellaRisposta();
+        });
+        replyInputBoxController.setOnCancel(this::chiudiCasellaRisposta);
+    }
 
     public void setReview(Review review) {
         this.review = review;
@@ -140,26 +150,18 @@ public class ReviewCardController {
     }
 
     private void apriCasellaRisposta() {
-        replyField.setText(review.getReply() != null ? review.getReply() : "");
+        replyInputBoxController.setText(review.getReply() != null ? review.getReply() : "");
         replyButton.setVisible(false);
         replyButton.setManaged(false);
         replyInputBox.setVisible(true);
         replyInputBox.setManaged(true);
     }
 
-    @FXML
-    private void onReplyCancel() {
+    private void chiudiCasellaRisposta() {
         replyInputBox.setVisible(false);
         replyInputBox.setManaged(false);
         replyButton.setVisible(true);
         replyButton.setManaged(true);
-    }
-
-    @FXML
-    private void onReplySubmit() {
-        GuiContext.getDataStore().getReviewDAO().replyToReview(review, replyField.getText());
-        aggiornaRispostaVisibile();
-        onReplyCancel();
     }
 
     @FXML

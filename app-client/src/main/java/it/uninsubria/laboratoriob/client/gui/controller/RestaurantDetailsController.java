@@ -77,6 +77,10 @@ public class RestaurantDetailsController {
     private ScrollPane reviewsScrollPane;
     @FXML
     private VBox reviewsList;
+    @FXML
+    private VBox writeReviewSection;
+    @FXML
+    private ReviewInputBoxController writeReviewBoxController;
 
     private Restaurant restaurant;
 
@@ -87,6 +91,28 @@ public class RestaurantDetailsController {
             if (newScene != null && !newScene.getRoot().getStylesheets().contains(css))
                 newScene.getRoot().getStylesheets().add(css);
         });
+
+        writeReviewBoxController.setReviewMode();
+        writeReviewBoxController.setOnSubmit(this::onWriteReviewSubmit);
+        writeReviewBoxController.setOnCancel(() -> carica(restaurant));
+    }
+
+    private void onWriteReviewSubmit(ReviewInputBoxController.Result result) {
+        if (!(Session.getCurrentUser() instanceof Customer customer) || restaurant == null) return;
+        if (result.rating() < 1 || result.rating() > 5 || result.text() == null || result.text().isBlank()) return;
+
+        Review existing = restaurant.getReviews().get(customer.getId());
+        if (existing != null) {
+            existing.setValue(result.rating());
+            existing.setText(result.text());
+            GuiContext.getDataStore().getReviewDAO().update(existing);
+        } else {
+            Review review = new Review(restaurant, customer, result.rating(), result.text());
+            restaurant.addReview(review);
+            GuiContext.getDataStore().getReviewDAO().save(review);
+        }
+
+        carica(restaurant);
     }
 
     public void carica(Restaurant r) {
@@ -105,6 +131,18 @@ public class RestaurantDetailsController {
         btnPreferito.setManaged(isCustomer);
         if (isCustomer)
             aggiornaTestoPreferito((Customer) currentUser, r);
+
+        writeReviewSection.setVisible(isCustomer);
+        writeReviewSection.setManaged(isCustomer);
+        if (isCustomer) {
+            Review ownReview = r.getReviews().get(currentUser.getId());
+            if (ownReview != null) {
+                writeReviewBoxController.setRating(ownReview.getValue());
+                writeReviewBoxController.setText(ownReview.getText());
+            } else {
+                writeReviewBoxController.clear();
+            }
+        }
 
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
         descriptionLabel.setText(valoreO(r.getDescription(), "No description available."));

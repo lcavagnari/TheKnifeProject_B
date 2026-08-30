@@ -260,6 +260,13 @@
         <padding>
             <Insets bottom="14" left="14" right="14" top="18"/>
         </padding>
+        <!-- Scrivi una recensione (solo per i clienti loggati) -->
+        <VBox fx:id="writeReviewSection" spacing="6" managed="false" visible="false"
+              style="-fx-padding: 8 0 12 0;">
+            <Label style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #424242;"
+                   text="La tua recensione"/>
+            <fx:include fx:id="writeReviewBox" source="ReviewInputBox.fxml"/>
+        </VBox>
         <!-- ALL REVIEWS Section (Scrollable list) -->
         <ScrollPane fx:id="reviewsScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED"
                     style="-fx-background-color: transparent; -fx-padding: 0;">
