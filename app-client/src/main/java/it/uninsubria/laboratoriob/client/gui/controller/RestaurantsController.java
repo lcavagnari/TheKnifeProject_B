@@ -68,10 +68,6 @@ public class RestaurantsController {
     private Label emptyStateTitle;
     @FXML
     private Label emptyStateSub;
-    @FXML
-    private HBox loadMoreBar;
-    @FXML
-    private Button btnCaricaAltri;
 
     @FXML
     private VBox root;
@@ -82,7 +78,7 @@ public class RestaurantsController {
     public void inizializza() {
         this.owner = null;
         restaurantListView.getStyleClass().add("restaurant-list");
-        restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli));
+        restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli, this::caricaAltri));
 
         titleLabel.setText("Trova Ristoranti");
         searchBar.setVisible(true);
@@ -106,7 +102,7 @@ public class RestaurantsController {
     public void inizializzaProprietario(Owner owner) {
         this.owner = owner;
         restaurantListView.getStyleClass().add("restaurant-list");
-        restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli));
+        restaurantListView.setCellFactory(lv -> new RestaurantCell(this::apriDettagli, this::caricaAltri));
 
         titleLabel.setText("I Miei Ristoranti");
         searchBar.setVisible(true);
@@ -240,22 +236,27 @@ public class RestaurantsController {
 
     private void aggiornaListaVisibile() {
         List<Restaurant> visibili = risultatiCompleti.subList(0, Math.min(visibleCount, risultatiCompleti.size()));
-        restaurantListView.getItems().setAll(visibili);
+        boolean hasMore = visibleCount < risultatiCompleti.size();
+
+        // "Carica altri" e' l'ultima riga della lista stessa (item null = riga
+        // segnaposto), cosi' scorre insieme ai ristoranti invece di stare fissa
+        // sotto la ListView.
+        List<Restaurant> itemsConFooter = new ArrayList<>(visibili);
+        if (hasMore) itemsConFooter.add(null);
+        restaurantListView.getItems().setAll(itemsConFooter);
 
         boolean empty = risultatiCompleti.isEmpty();
         emptyState.setVisible(empty);
         emptyState.setManaged(empty);
         statsBar.setVisible(!empty);
         statsBar.setManaged(!empty);
-        infoLabel.setText(risultatiCompleti.size() + " ristorant" + (risultatiCompleti.size() == 1 ? "e trovato" : "i trovati"));
 
-        boolean hasMore = visibleCount < risultatiCompleti.size();
-        loadMoreBar.setVisible(hasMore);
-        loadMoreBar.setManaged(hasMore);
+        int totale = risultatiCompleti.size();
+        String suffisso = "ristorant" + (totale == 1 ? "e trovato" : "i trovati");
+        infoLabel.setText(hasMore ? (visibili.size() + " di " + totale + " " + suffisso) : (totale + " " + suffisso));
     }
 
-    @FXML
-    private void onCaricaAltriClick() {
+    private void caricaAltri() {
         visibleCount += PAGE_SIZE;
         aggiornaListaVisibile();
     }
@@ -283,14 +284,29 @@ public class RestaurantsController {
         private final Button heartButton = new Button();
         private final ImageView heartIcon = new ImageView();
         private final Consumer<Restaurant> onNavigate;
+        private final Runnable onLoadMore;
+        private final VBox loadMoreRow = new VBox();
         private Restaurant currentRestaurant;
         private Timeline runningAnimation;
         private boolean isFavorited;
         private Timeline heartAnimation;
 
-        RestaurantCell(Consumer<Restaurant> onNavigate) {
+        RestaurantCell(Consumer<Restaurant> onNavigate, Runnable onLoadMore) {
             super();
             this.onNavigate = onNavigate;
+            this.onLoadMore = onLoadMore;
+
+            javafx.scene.layout.Region spacer = new javafx.scene.layout.Region();
+            spacer.setPrefHeight(16);
+            Button loadMoreButton = new Button("Carica altri");
+            loadMoreButton.getStyleClass().add("button-secondary");
+            loadMoreButton.setOnAction(e -> {
+                if (this.onLoadMore != null) this.onLoadMore.run();
+            });
+            HBox loadMoreWrap = new HBox(loadMoreButton);
+            loadMoreWrap.setAlignment(javafx.geometry.Pos.CENTER);
+            loadMoreRow.getChildren().addAll(spacer, loadMoreWrap);
+            loadMoreRow.setAlignment(javafx.geometry.Pos.CENTER);
 
             card.getStyleClass().add("restaurant-card");
             card.setSpacing(0);
@@ -429,10 +445,17 @@ public class RestaurantsController {
                 heartButton.setScaleY(1.0);
             }
 
-            if (empty || r == null) {
+            if (empty) {
                 setText(null);
                 setGraphic(null);
                 currentRestaurant = null;
+                return;
+            }
+            if (r == null) {
+                // Riga segnaposto: spazio vuoto + pulsante "Carica altri", ultima della lista.
+                currentRestaurant = null;
+                setText(null);
+                setGraphic(loadMoreRow);
                 return;
             }
             currentRestaurant = r;
