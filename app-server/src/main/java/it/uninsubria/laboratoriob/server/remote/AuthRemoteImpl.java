@@ -48,18 +48,20 @@ public class AuthRemoteImpl extends UnicastRemoteObject implements AuthServiceIn
         UUID id = UUID.randomUUID();
 
         User newUser;
+        boolean saved;
         if (isOwner) {
             newUser = new Owner(id, username, hash, salt, firstName, lastName,
                     location, birthDate, new HashSet<>(), false);
 
-            store.users().saveOwner((Owner) newUser);
+            saved = store.users().saveOwner((Owner) newUser);
         } else {
             newUser = new Customer(id, username, hash, salt, firstName, lastName,
                     location, birthDate, new HashSet<>(), false);
 
-            store.users().saveCustomer((Customer) newUser);
+            saved = store.users().saveCustomer((Customer) newUser);
         }
 
-        return newUser;
+        if (saved) return newUser;
+        else throw new RemoteException("Error occured while saving changes");
     }
 }

@@ -170,7 +170,7 @@ class DataFlowSyncTest {
     @Test
     @DisplayName("Restaurant findAll: cache empty → RMI → cache + JSON")
     void testRestaurantFindAllCacheMiss() throws RemoteException {
-        when(mockRestaurantService.findAll(0, 1000)).thenReturn(java.util.List.of(testRestaurant));
+        when(mockRestaurantService.findAll(0, 1000)).thenReturn(java.util.Set.of(testRestaurant));
 
         var result = restaurantDAO.findAll();
         assertFalse(result.isEmpty());

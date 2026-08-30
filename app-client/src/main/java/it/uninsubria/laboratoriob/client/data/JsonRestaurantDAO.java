@@ -73,7 +73,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
             if (!node.isArray()) return;
 
-            for (JsonNode n : (ArrayNode) node) {
+            for (JsonNode n : node) {
                 Restaurant r = mapNode(n);
                 cacheById.put(r.getId(), r);
             }
@@ -217,7 +217,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
             try {
-                List<Restaurant> remote = svc.findAll(0, 1000);
+                Set<Restaurant> remote = svc.findAll(0, 1000);
 
                 for (Restaurant r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
@@ -271,10 +271,10 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
             try {
-                List<Restaurant> remote = svc.findByOwner(ownerId);
+                Set<Restaurant> remote = svc.findByOwner(ownerId);
                 for (Restaurant r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());
-                return remote;
+                return new ArrayList<>(remote);
             } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);

@@ -203,7 +203,7 @@ class JsonRestaurantDAOTest {
     @Test
     @DisplayName("findAll() falls back to RMI when cache empty")
     void testFindAllRMIFallback() throws RemoteException {
-        when(mockService.findAll(0, 1000)).thenReturn(List.of(testRestaurant));
+        when(mockService.findAll(0, 1000)).thenReturn(Set.of(testRestaurant));
 
         List<Restaurant> result = dao.findAll();
         assertFalse(result.isEmpty());
@@ -213,7 +213,7 @@ class JsonRestaurantDAOTest {
     @Test
     @DisplayName("findByOwner() falls back to RMI when no local match")
     void testFindByOwnerRMIFallback() throws RemoteException {
-        when(mockService.findByOwner(testOwner.getId())).thenReturn(List.of(testRestaurant));
+        when(mockService.findByOwner(testOwner.getId())).thenReturn(Set.of(testRestaurant));
 
         List<Restaurant> result = dao.findByOwner(testOwner.getId());
         assertEquals(1, result.size());
