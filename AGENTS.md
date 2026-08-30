@@ -30,12 +30,12 @@ Don't assume a `mvn clean install` failure is unrelated to your change — these
 
 ## Module structure
 
-| Module | Artifact | Fat JAR | Notes |
-|--------|----------|---------|-------|
-| `common-api` | `theknifeapi` | No | Shared domain model, enums, validators, DAO interface, RMI service interfaces. Clean build + tests. |
-| `app-server` | `theknifeserver` | Yes (shade) | PostgreSQL persistence, HikariCP, CSV loader, RMI + heartbeat server. Currently doesn't compile. |
-| `app-client` | `theknifeclient` | Yes (shade) | Jackson JSON, CLI menus, local cache. **Targets Java 25** (parent uses 17). Test-compile broken. |
-| `app-client-gui` | `theknifeclientgui` | No | **Standalone POM, not in the parent reactor.** JavaFX 17 scaffold (`HelloApplication`), not wired to app logic. Own Maven wrapper. |
+| Module | Artifact | Fat JAR | Notes                                                                                                                            |
+|--------|----------|---------|----------------------------------------------------------------------------------------------------------------------------------|
+| `common-api` | `theknifeapi` | No | Shared domain model, enums, validators, DAO interface, RMI service interfaces. Clean build + tests.                              |
+| `app-server` | `theknifeserver` | Yes (shade) | PostgreSQL persistence, HikariCP, CSV loader, RMI + heartbeat server. Currently doesn't compile.                                 |
+| `app-client` | `theknifeclient` | Yes (shade) | Jackson JSON, CLI menus, local cache. **Targets Java 25** (parent uses 17). Test-compile broken.                                 |
+| `app-client-gui` | `theknifeclientgui` | No | **Standalone POM, not in the parent reactor.** JavaFX 17 scaffold (`TheKnifeClient`), not wired to app logic. Own Maven wrapper. |
 
 Dependency: `app-server` and `app-client` both depend on `common-api`.
 
