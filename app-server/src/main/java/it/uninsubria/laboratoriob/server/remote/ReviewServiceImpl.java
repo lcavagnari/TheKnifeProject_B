@@ -42,28 +42,36 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
 
     @Override
     public boolean save(Review review) throws RemoteException {
-        return store.reviews().save(review);
+        if (review == null) return false;
+        if (store.reviews().save(review)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean update(Review review) throws RemoteException {
-        return store.reviews().update(review);
+        if (review == null) return false;
+        if (store.reviews().update(review)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        return store.reviews().delete(id);
+        if (id == null) return false;
+        if (store.reviews().delete(id)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean replyToReview(UUID reviewId, String reply) throws RemoteException {
-        if (reply == null || reply.isBlank()) return false;
+        if (reviewId == null || reply == null || reply.isBlank()) return false;
 
         Review review = store.reviews().findById(reviewId);
         if (review == null) return false;
 
         review.setReply(reply);
         review.setRespondedAt(LocalDateTime.now());
-        return store.reviews().update(review);
+
+        if (store.reviews().update(review)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 }

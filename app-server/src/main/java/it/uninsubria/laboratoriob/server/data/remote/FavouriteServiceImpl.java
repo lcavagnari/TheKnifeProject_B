@@ -9,6 +9,7 @@ import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class FavouriteServiceImpl extends UnicastRemoteObject implements FavouriteServiceInter {
 
@@ -21,25 +22,39 @@ public class FavouriteServiceImpl extends UnicastRemoteObject implements Favouri
 
     @Override
     public boolean addFavourites(UUID userID, UUID restaurantId) throws RemoteException {
-        boolean ok = cDAO.addFavourites(userID, restaurantId);
+        if (userID == null || restaurantId == null) return false;
 
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> cDAO.addFavourites(userID, restaurantId))
+                .exceptionally(ex -> false);
+
+        boolean ok = dbOk.join();
         if (ok) {
             User u = store.users().findById(userID);
-            if (u instanceof Customer)
-                ((Customer) u).getFavouriteRestourants().add(restaurantId);
-        }
+            if (u instanceof Customer c) c.getFavouriteRestourants().add(restaurantId);
+            else throw new RemoteException("Unsupported operation");
+
+        } else throw new RemoteException("Error occured while saving changes");
+
         return ok;
     }
 
     @Override
     public boolean removeFavourites(UUID userID, UUID restaurantId) throws RemoteException {
-        boolean ok = cDAO.removeFavourites(userID, restaurantId);
+        if (userID == null || restaurantId == null) return false;
 
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> cDAO.removeFavourites(userID, restaurantId))
+                .exceptionally(ex -> false);
+
+        boolean ok = dbOk.join();
         if (ok) {
             User u = store.users().findById(userID);
-            if (u instanceof Customer)
-                ((Customer) u).getFavouriteRestourants().remove(restaurantId);
-        }
+            if (u instanceof Customer c) c.getFavouriteRestourants().remove(restaurantId);
+            else throw new RemoteException("Unsupported operation");
+
+        } else throw new RemoteException("Error occured while saving changes");
+
         return ok;
     }
 

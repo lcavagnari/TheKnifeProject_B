@@ -43,39 +43,54 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
 
     @Override
     public boolean save(Restaurant restaurant) throws RemoteException {
-        return store.restaurants().save(restaurant);
+        if (restaurant == null) return false;
+        if (store.restaurants().save(restaurant)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean update(Restaurant restaurant) throws RemoteException {
-        return store.restaurants().update(restaurant);
+        if (restaurant == null) return false;
+        if (store.restaurants().update(restaurant)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        return store.restaurants().delete(id);
+        if (id == null) return false;
+        if (store.restaurants().delete(id)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) throws RemoteException {
-        return store.restaurants().updateCuisines(restaurantId, cuisines);
+        if (restaurantId == null || cuisines == null) return false;
+        if (store.restaurants().updateCuisines(restaurantId, cuisines)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean updateServices(UUID restaurantId, Set<String> services) throws RemoteException {
-        return store.restaurants().updateServices(restaurantId, services);
+        if (restaurantId == null || services == null) return false;
+        if (store.restaurants().updateServices(restaurantId, services)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean registerOwner(Restaurant restaurant, UUID ownerId) throws RemoteException {
-        boolean saved = store.restaurants().save(restaurant);
-        if (saved) store.users().addOwnedRestaurant(ownerId, restaurant);
-        return saved;
+        if (restaurant == null || ownerId == null) return false;
+
+        boolean saved = store.restaurants().save(restaurant) && store.users().addOwnedRestaurant(ownerId, restaurant);
+        if (saved) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean unregisterOwner(UUID ownerId, UUID restaurantId) throws RemoteException {
-        store.users().removeOwnedRestaurant(ownerId, restaurantId);
-        return store.restaurants().delete(restaurantId);
+        if (ownerId == null || restaurantId == null) return false;
+
+        boolean ok = store.users().removeOwnedRestaurant(ownerId, restaurantId) && store.restaurants().delete(restaurantId);
+        if (ok) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 }

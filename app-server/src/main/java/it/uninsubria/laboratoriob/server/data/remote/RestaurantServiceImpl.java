@@ -56,29 +56,41 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
 
     @Override
     public boolean save(Restaurant restaurant) throws RemoteException {
-        boolean ok = rDAO.save(restaurant);
+        if (restaurant == null) return false;
 
-        if (ok) store.restaurants().save(restaurant);
+        boolean cacheOk = store.restaurants().save(restaurant);
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> rDAO.save(restaurant))
+                .exceptionally(ex -> false);
 
-        return ok;
+        if (cacheOk && dbOk.join()) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean update(Restaurant restaurant) throws RemoteException {
-        boolean ok = rDAO.update(restaurant);
+        if (restaurant == null) return false;
 
-        if (ok) store.restaurants().update(restaurant);
+        boolean cacheOk = store.restaurants().update(restaurant);
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> rDAO.update(restaurant))
+                .exceptionally(ex -> false);
 
-        return ok;
+        if (cacheOk && dbOk.join()) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        boolean ok = rDAO.delete(id);
+        if (id == null) return false;
 
-        if (ok) store.restaurants().delete(id);
+        boolean cacheOk = store.restaurants().delete(id);
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> rDAO.delete(id))
+                .exceptionally(ex -> false);
 
-        return ok;
+        if (cacheOk && dbOk.join()) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override

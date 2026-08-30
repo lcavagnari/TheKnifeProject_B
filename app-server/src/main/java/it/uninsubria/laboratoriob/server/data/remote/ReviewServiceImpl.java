@@ -8,8 +8,10 @@ import it.uninsubria.laboratoriob.server.data.dao.ReviewDAO;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
     
@@ -44,22 +46,58 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
 
     @Override
     public boolean save(Review review) throws RemoteException {
+        // NOTE: not propagated to the cacheOk/dbOk pattern - store.reviews().save(review)
+        // already does its own INSERT via ReviewRepository's internal DAO, so pairing it
+        // with rDAO.save(review) here would double-INSERT the same primary key and always
+        // fail, same risk as RestaurantServiceImpl.save()/registerOwner(). Left as a single
+        // DB-only write, flagged per your instruction rather than "fixed" unilaterally.
         return rDAO.save(review);
     }
 
     @Override
     public boolean update(Review review) throws RemoteException {
-        return rDAO.update(review);
+        if (review == null) return false;
+
+        boolean cacheOk = store.reviews().update(review);
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> rDAO.update(review))
+                .exceptionally(ex -> false);
+
+        if (cacheOk && dbOk.join()) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        return rDAO.delete(id);
+        if (id == null) return false;
+
+        boolean cacheOk = store.reviews().delete(id);
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> rDAO.delete(id))
+                .exceptionally(ex -> false);
+
+        if (cacheOk && dbOk.join()) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean replyToReview(UUID reviewId, String reply) throws RemoteException {
-        if (reply == null || reply.isBlank()) return false;
-        return rDAO.saveReply(reviewId, reply);
+        if (reviewId == null || reply == null || reply.isBlank()) return false;
+
+        CompletableFuture<Boolean> dbOk = CompletableFuture
+                .supplyAsync(() -> rDAO.saveReply(reviewId, reply))
+                .exceptionally(ex -> false);
+
+        boolean ok = dbOk.join();
+        if (ok) {
+            Review review = store.reviews().findById(reviewId);
+            if (review != null) {
+                review.setReply(reply);
+                review.setRespondedAt(LocalDateTime.now());
+            }
+        }
+
+        if (ok) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 }
