@@ -3,12 +3,11 @@ package it.uninsubria.laboratoriob.api.enums;
 /**
  * Enum che rappresenta le possibili cucine servite da un ristorante.
  * Ogni valore identifica uno stile culinario regionale, nazionale o tematico.
- * <p>
+ *
  * I nomi dei valori sono scritti in maiuscolo e separati da underscore (`_`), e vengono resi
  * in minuscolo tramite il metodo {@link #toString()} per l'esportazione o la visualizzazione.
- * <p>
+ *
  * Nota: i valori di questo enum vengono utilizzati per la serializzazione/deserializzazione e il filtraggio.
- * <p>
  *
  * @author Luca Cavagnari
  * @version 1.0

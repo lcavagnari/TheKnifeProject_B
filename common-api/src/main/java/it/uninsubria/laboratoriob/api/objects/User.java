@@ -12,15 +12,14 @@ import java.util.UUID;
 
 /**
  * Classe astratta che rappresenta un utente del sistema.
- * <p>
+ *
  * Contiene i dati base dell'utente quali username, nome, cognome, data di
  * nascita e posizione.
- * <p>
+ *
  * Gestisce la sicurezza della password tramite hashing e salting.
- * <p>
+ *
  * Estende {@link Entity}. Persistenza gestita dai relativi it.uninsubria.laboratoriob.api.data.DAO
  * ({@code ClientDAO}, {@code OwnerDAO}).
- * <p>
  *
  * @author Luca Cavagnari
  * @version 2.0
@@ -42,11 +41,34 @@ public abstract class User extends Entity {
 
     private boolean system;
 
+    /**
+     * Costruttore senza ID pre-esistente e senza flag system.
+     *
+     * @param username nome utente
+     * @param passwordHash hash della password
+     * @param salt salt per l'hashing
+     * @param name nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     */
     public User(String username, String passwordHash, String salt, String name, String lastName, Location location,
                 LocalDate dateOfBirth) {
         this(username, passwordHash, salt, name, lastName, location, dateOfBirth, false);
     }
 
+    /**
+     * Costruttore senza ID pre-esistente, con flag system.
+     *
+     * @param username nome utente
+     * @param passwordHash hash della password
+     * @param salt salt per l'hashing
+     * @param name nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     * @param system true se utente di sistema
+     */
     public User(String username, String passwordHash, String salt, String name, String lastName, Location location,
                 LocalDate dateOfBirth, boolean system) {
         super();
@@ -62,6 +84,18 @@ public abstract class User extends Entity {
 
     }
 
+    /**
+     * Costruttore con ID pre-esistente e senza flag system.
+     *
+     * @param id identificatore univoco
+     * @param username nome utente
+     * @param passwordHash hash della password
+     * @param salt salt per l'hashing
+     * @param name nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     */
     public User(UUID id, String username, String passwordHash, String salt, String name, String lastName, Location location,
                 LocalDate dateOfBirth) {
         this(id, username, passwordHash, salt, name, lastName, location, dateOfBirth, false);
@@ -110,7 +144,11 @@ public abstract class User extends Entity {
                 ", dateOfBirth=" + dateOfBirth;
     }
 
-    /** Restituisce il ruolo dell'utente (proprietario o cliente). */
+    /**
+     * Restituisce il ruolo dell'utente (proprietario o cliente).
+     *
+     * @return ruolo dell'utente
+     */
     public abstract UserRole getRole();
 
 }

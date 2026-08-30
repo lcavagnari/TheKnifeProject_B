@@ -10,15 +10,14 @@ import java.util.UUID;
 
 /**
  * Classe che rappresenta un utente di tipo Cliente.
- * <p>
+ *
  * Mantiene un insieme di ristoranti preferiti identificati da UUID.
- * <p>
+ *
  * Fornisce metodi per aggiungere e rimuovere ristoranti preferiti.
- * <p>
+ *
  * Estende la classe {@link User}. Persistenza gestita da {@code ClientDAO},
  * inclusa
  * la tabella di join per i preferiti.
- * <p>
  *
  * @author Luca Cavagnari
  * @version 2.0
@@ -35,7 +34,6 @@ public class Customer extends User {
 
     /**
      * Costruttore con password hashata e salt (UUID esistente, es. da database).
-     * <p>
      *
      * @param id          identificativo
      * @param username    nome utente
@@ -53,7 +51,6 @@ public class Customer extends User {
 
     /**
      * Costruttore con password hashata, salt e insieme di ristoranti preferiti.
-     * <p>
      *
      * @param id                   identificativo
      * @param username             nome utente
@@ -108,9 +105,7 @@ public class Customer extends User {
 
     /**
      * Aggiunge un ristorante ai preferiti del cliente.
-     * <p>
      * Restituisce false se il ristorante è nullo o già presente.
-     * <p>
      *
      * @param r ristorante da aggiungere
      * @return true se aggiunto correttamente, false altrimenti
@@ -121,9 +116,7 @@ public class Customer extends User {
 
     /**
      * Rimuove un ristorante dai preferiti del cliente.
-     * <p>
      * Restituisce false se il ristorante è nullo o non presente.
-     * <p>
      *
      * @param r ristorante da rimuovere
      * @return true se rimosso correttamente, false altrimenti
@@ -135,7 +128,6 @@ public class Customer extends User {
     /**
      * Restituisce la rappresentazione testuale dell'istanza, includendo i
      * preferiti.
-     * <p>
      *
      * @return stringa descrittiva dell'oggetto Client
      */

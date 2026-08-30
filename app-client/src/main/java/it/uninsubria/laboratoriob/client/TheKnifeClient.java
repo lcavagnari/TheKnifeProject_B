@@ -34,6 +34,7 @@ public class TheKnifeClient extends Application {
     static final int HEARTBEAT_PORT = 5555;
     static final long HEARTBEAT_INTERVAL_MINUTES = 5;
 
+    /** Punto di ingresso dell'applicazione client. */
     public static void main(String[] args) {
         IO.printSuccessMessage("Loading The Knife Client...");
 

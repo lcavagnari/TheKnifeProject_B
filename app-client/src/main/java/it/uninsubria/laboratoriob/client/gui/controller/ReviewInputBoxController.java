@@ -13,6 +13,7 @@ import java.util.function.Consumer;
  */
 public class ReviewInputBoxController {
 
+    /** Risultato dell'inserimento di una recensione: valutazione numerica e testo. */
     public record Result(int rating, String text) {
     }
 

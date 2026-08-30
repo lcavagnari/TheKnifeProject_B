@@ -7,9 +7,9 @@ import java.io.File;
 import java.text.SimpleDateFormat;
 
 /**
- * Classe di utilità contenente costanti condivise nel progetto.<p>
- * Include il percorso radice per il salvataggio dati e il formato standard per i timestamp.<p>
- * <p>
+ * Classe di utilità contenente costanti condivise nel progetto.
+ * Include il percorso radice per il salvataggio dati e il formato standard per i timestamp.
+ *
  * Annota con {@link UtilityClass} per impedire istanziazione.
  */
 @Getter

@@ -15,9 +15,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/** Implementazione RMI del servizio ristoranti (cache + DB). */
 public class RestaurantServiceImpl extends UnicastRemoteObject implements RestaurantServiceInter {
     private final ServerDataStore store;
 
+    /**
+     * Costruisce l'implementazione remota del servizio ristoranti.
+     *
+     * @param store facade dei dati server
+     * @throws RemoteException se l'esportazione RMI fallisce
+     */
     public RestaurantServiceImpl(ServerDataStore store) throws RemoteException {
         this.store = store;
     }

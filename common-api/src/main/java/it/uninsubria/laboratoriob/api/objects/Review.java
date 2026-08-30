@@ -10,12 +10,9 @@ import java.util.UUID;
 /**
  * Rappresenta una recensione lasciata da un {@link User} su un
  * {@link Restaurant}.
- * <p>
  * Contiene valutazione numerica, testo, risposta del ristorante e timestamp.
- * <p>
  * Estende {@link Entity}; persistita nella tabella recensioni con FK verso
  * ristorante e utente.
- * <p>
  *
  * @author Luke
  * @version 2.0
@@ -61,7 +58,14 @@ public class Review extends Entity {
 
     /**
      * Costruttore completo con tutti i campi, incluso reply.
-     * <p>
+     *
+     * @param id identificatore univoco
+     * @param restaurant ristorante recensito
+     * @param user autore della recensione
+     * @param value valutazione numerica (1-5)
+     * @param timestamp data e ora della recensione
+     * @param text testo della recensione
+     * @param reply risposta del ristorante (opzionale)
      */
     public Review(UUID id, Restaurant restaurant, User user, int value, LocalDateTime timestamp, String text,
                   String reply) {
@@ -75,48 +79,97 @@ public class Review extends Entity {
         Validators.validateReview(this);
     }
 
+    /**
+     * Costruttore senza ID pre-esistente, con reply.
+     *
+     * @param restaurant ristorante recensito
+     * @param user autore della recensione
+     * @param value valutazione numerica (1-5)
+     * @param timestamp data e ora della recensione
+     * @param text testo della recensione
+     * @param reply risposta del ristorante (opzionale)
+     */
     public Review(Restaurant restaurant, User user, int value, LocalDateTime timestamp, String text, String reply) {
         this(UUID.randomUUID(), restaurant, user, value, timestamp, text, reply);
     }
 
+    /**
+     * Costruttore per nuova recensione senza ID pre-esistente.
+     *
+     * @param restaurant ristorante recensito
+     * @param value valutazione numerica (1-5)
+     * @param user autore della recensione
+     * @param text testo della recensione
+     */
     public Review(Restaurant restaurant, int value, User user, String text) {
         this(UUID.randomUUID(), restaurant, user, value, LocalDateTime.now(), text, null);
     }
 
+    /**
+     * Costruttore per nuova recensione senza ID pre-esistente, con ordine parametri alternativo.
+     *
+     * @param restaurant ristorante recensito
+     * @param user autore della recensione
+     * @param value valutazione numerica (1-5)
+     * @param text testo della recensione
+     */
     public Review(Restaurant restaurant, User user, int value, String text) {
         this(UUID.randomUUID(), restaurant, user, value, LocalDateTime.now(), text, null);
     }
 
+    /** Restituisce la valutazione numerica (1-5). */
     public int getRating() {
         return value;
     }
 
+    /** Restituisce il testo della recensione. */
     public String getComment() {
         return text;
     }
 
+    /**
+     * Imposta la valutazione numerica (ignorata se fuori intervallo 1-5).
+     *
+     * @param value nuova valutazione
+     */
     public void setValue(int value) {
         if (value < 1 || value > 5)
             return;
         this.value = value;
     }
 
+    /**
+     * Imposta il testo della recensione (ignorato se nullo o vuoto).
+     *
+     * @param text nuovo testo
+     */
     public void setText(String text) {
         if (text == null || text.isBlank())
             return;
         this.text = text;
     }
 
+    /**
+     * Imposta la risposta del ristorante (ignorata se nulla o vuota).
+     *
+     * @param reply testo della risposta
+     */
     public void setReply(String reply) {
         if (reply == null || reply.isBlank())
             return;
         this.reply = reply;
     }
 
+    /**
+     * Imposta il timestamp della risposta del ristorante.
+     *
+     * @param respondedAt data e ora della risposta
+     */
     public void setRespondedAt(LocalDateTime respondedAt) {
         this.respondedAt = respondedAt;
     }
 
+    /** Rimuove la risposta del ristorante e il timestamp associato. */
     public void clearReply() {
         this.reply = null;
         this.respondedAt = null;

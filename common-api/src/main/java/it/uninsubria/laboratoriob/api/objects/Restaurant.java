@@ -14,15 +14,11 @@ import java.util.*;
 /**
  * Rappresenta un ristorante con proprietà multiple come nome, descrizione,
  * servizi, e recensioni.
- * <p>
  * Estende {@link Entity}. Persistenza gestita da {@code RestaurantDAO}; questa
  * classe
  * è un modello dati puro senza logica di serializzazione.
- * <p>
  * Contiene insiemi di tipi di cucina, servizi, e recensioni.
- * <p>
  * Associa un {@link Owner} come proprietario e una {@link Location} geografica.
- * <p>
  *
  * @author Luke
  * @version 2.0
@@ -106,9 +102,7 @@ public class Restaurant extends Entity {
     /**
      * Costruttore per ricostruire un ristorante esistente (UUID noto, es. da
      * database).
-     * <p>
      * Gestisce valori null o vuoti con default.
-     * <p>
      *
      * @param id               UUID esistente
      * @param name             nome del ristorante
@@ -154,7 +148,6 @@ public class Restaurant extends Entity {
 
     /**
      * Costruttore per un nuovo ristorante (UUID generato automaticamente).
-     * <p>
      *
      * @param name             nome del ristorante
      * @param description      descrizione
@@ -185,7 +178,6 @@ public class Restaurant extends Entity {
     /**
      * Costruttore per ricostruire un ristorante esistente senza recensioni
      * precaricate.
-     * <p>
      * Le recensioni possono essere popolate successivamente tramite
      * {@code ReviewDAO}.
      *
@@ -215,7 +207,6 @@ public class Restaurant extends Entity {
 
     /**
      * Aggiunge una recensione al ristorante se non è già presente.
-     * <p>
      *
      * @param r recensione da aggiungere
      */
@@ -228,7 +219,6 @@ public class Restaurant extends Entity {
 
     /**
      * Rimuove una recensione dal ristorante se presente.
-     * <p>
      *
      * @param r recensione da rimuovere
      */
@@ -240,10 +230,8 @@ public class Restaurant extends Entity {
 
     /**
      * Aggiunge un servizio alla collezione dei servizi offerti dal ristorante.
-     * <p>
      * Il servizio viene validato tramite {@link Validators#validateString(String)} prima
      * dell'inserimento.
-     * <p>
      *
      * @param service il servizio da aggiungere (es. "WiFi", "Parking")
      * @return true se il servizio è stato aggiunto con successo, false se
@@ -258,10 +246,8 @@ public class Restaurant extends Entity {
 
     /**
      * Rimuove un servizio dalla collezione dei servizi offerti dal ristorante.
-     * <p>
      * Il servizio viene validato tramite {@link Validators#validateString(String)} prima
      * della rimozione.
-     * <p>
      *
      * @param service il servizio da rimuovere
      * @return true se il servizio è stato rimosso con successo, false se
@@ -277,7 +263,6 @@ public class Restaurant extends Entity {
     /**
      * Aggiunge un tipo di cucina alla collezione delle cucine servite dal
      * ristorante.
-     * <p>
      *
      * @param c il tipo di cucina da aggiungere
      * @return true se il tipo di cucina è stato aggiunto con successo, false se
@@ -293,7 +278,6 @@ public class Restaurant extends Entity {
     /**
      * Rimuove un tipo di cucina dalla collezione delle cucine servite dal
      * ristorante.
-     * <p>
      *
      * @param c il tipo di cucina da rimuovere
      * @return true se il tipo di cucina è stato rimosso con successo, false se
@@ -309,7 +293,6 @@ public class Restaurant extends Entity {
     /**
      * Restituisce una rappresentazione stringa dettagliata del ristorante con tutti
      * i campi.
-     * <p>
      *
      * @return stringa descrittiva
      */

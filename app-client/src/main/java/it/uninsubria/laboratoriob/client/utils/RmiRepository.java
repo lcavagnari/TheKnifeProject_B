@@ -156,6 +156,8 @@ public class RmiRepository {
      * Explicit, forced reconnect attempt: bypasses the cooldown and the give-up cap
      * (unlike {@link #lookup}), and resets the failure counters so opportunistic
      * per-call lookups get fresh attempts again afterward.
+     *
+     * @return insieme dei nomi dei servizi acquisiti con successo
      */
     @SuppressWarnings("unchecked")
     public Set<String> acquireAll() {

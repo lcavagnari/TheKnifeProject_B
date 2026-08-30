@@ -11,11 +11,18 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+/** Implementazione RMI del servizio recensioni (cache + DB, fallback). */
 public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
     
     private final ReviewDAO rDAO = new ReviewDAO();
     private final ServerDataStore store;
     
+    /**
+     * Costruisce l'implementazione remota del servizio recensioni.
+     *
+     * @param store facade dei dati server
+     * @throws RemoteException se l'esportazione RMI fallisce
+     */
     public ReviewServiceImpl(ServerDataStore store) throws RemoteException {
         this.store = store;
     }

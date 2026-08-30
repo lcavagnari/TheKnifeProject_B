@@ -17,7 +17,11 @@ public final class DbCleanup {
 
     private DbCleanup() {}
 
-    /** Elimina un ristorante e le tabelle figlie (review, cuisine, services, restaurants, favorites). */
+    /**
+     * Elimina un ristorante e le tabelle figlie (review, cuisine, services, restaurants, favorites).
+     *
+     * @param restaurantId UUID del ristorante da eliminare
+     */
     public static void deleteRestaurant(UUID restaurantId) {
         exec("DELETE FROM review WHERE restaurant_id=?", restaurantId);
         exec("DELETE FROM restaurant_cuisine WHERE restaurant_id=?", restaurantId);
@@ -27,7 +31,11 @@ public final class DbCleanup {
         exec("DELETE FROM restaurant WHERE id=?", restaurantId);
     }
 
-    /** Elimina un utente e le tabelle figlie (favorites, restaurants, review). */
+    /**
+     * Elimina un utente e le tabelle figlie (favorites, restaurants, review).
+     *
+     * @param userId UUID dell'utente da eliminare
+     */
     public static void deleteUser(UUID userId) {
         exec("DELETE FROM user_favorites WHERE user_id=?", userId);
         exec("DELETE FROM user_restaurants WHERE user_id=?", userId);
@@ -35,12 +43,21 @@ public final class DbCleanup {
         exec("DELETE FROM \"user\" WHERE id=?", userId);
     }
 
-    /** Elimina una recensione per ID. */
+    /**
+     * Elimina una recensione per ID.
+     *
+     * @param reviewId UUID della recensione da eliminare
+     */
     public static void deleteReview(UUID reviewId) {
         exec("DELETE FROM review WHERE id=?", reviewId);
     }
 
-    /** Elimina una posizione per coordinate geografiche. */
+    /**
+     * Elimina una posizione per coordinate geografiche.
+     *
+     * @param lat latitudine
+     * @param lon longitudine
+     */
     public static void deleteLocation(double lat, double lon) {
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(

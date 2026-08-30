@@ -13,18 +13,13 @@ import java.util.UUID;
 
 /**
  * Classe che rappresenta un utente di tipo Proprietario (Owner).
- * <p>
  * Mantiene un insieme di ristoranti di cui è proprietario.
- * <p>
  * Fornisce metodi per aggiungere, rimuovere e modificare ristoranti.
- * <p>
  * Estende la classe {@link User}. Persistenza gestita da {@code OwnerDAO}; le
  * modifiche
  * ai ristoranti mutano solo lo stato in memoria — la persistenza va richiamata
  * esplicitamente
  * tramite {@code RestaurantDAO} da chi possiede la transazione.
- * <p>
- * <p>
  * Autore: Luke
  *
  * @version 2.0
@@ -36,14 +31,12 @@ public class Owner extends User {
 
     /**
      * Mappa dei ristoranti indicizzati per ID UUID.
-     * <p>
      */
     @Getter
     private final Map<UUID, Restaurant> restaurantsById = new HashMap<>();
 
     /**
      * Mappa dei ristoranti indicizzati per nome.
-     * <p>
      */
     @Getter
     private final Map<String, Restaurant> restaurantsByName = new HashMap<>();
@@ -51,7 +44,6 @@ public class Owner extends User {
     /**
      * Costruttore completo con set di ristoranti esistenti (UUID esistente, es. da
      * database).
-     * <p>
      *
      * @param id          identificatore univoco dell'owner
      * @param username    nome utente per il login
@@ -96,7 +88,6 @@ public class Owner extends User {
 
     /**
      * Costruttore con credenziali complete ma senza ristoranti (UUID esistente).
-     * <p>
      *
      * @param id          identificatore univoco dell'owner
      * @param username    nome utente per il login
@@ -164,7 +155,6 @@ public class Owner extends User {
 
     /**
      * Aggiunge un ristorante alle collezioni dell'owner.
-     * <p>
      *
      * @param r il ristorante da aggiungere
      * @return true se il ristorante è stato aggiunto con successo, false se nullo o
@@ -180,7 +170,6 @@ public class Owner extends User {
 
     /**
      * Rimuove un ristorante dalle collezioni dell'owner.
-     * <p>
      *
      * @param r il ristorante da rimuovere
      * @return true se il ristorante è stato rimosso con successo, false se nullo o
@@ -196,7 +185,6 @@ public class Owner extends User {
 
     /**
      * Rinomina un ristorante esistente.
-     * <p>
      * Il nuovo nome deve rispettare il pattern: 4-30 caratteri alfanumerici, spazi,
      * trattini e apostrofi.
      *
@@ -224,7 +212,6 @@ public class Owner extends User {
 
     /**
      * Modifica la descrizione di un ristorante.
-     * <p>
      *
      * @param r              il ristorante da modificare
      * @param newDescription nuova descrizione
@@ -242,7 +229,6 @@ public class Owner extends User {
 
     /**
      * Modifica l'URL del sito web di un ristorante.
-     * <p>
      *
      * @param r             il ristorante da modificare
      * @param newWebsiteUrl nuovo URL del sito web
@@ -260,7 +246,6 @@ public class Owner extends User {
 
     /**
      * Modifica il numero di telefono di un ristorante.
-     * <p>
      *
      * @param r        il ristorante da modificare
      * @param newPhone nuovo numero di telefono
@@ -278,7 +263,6 @@ public class Owner extends User {
 
     /**
      * Modifica la posizione geografica di un ristorante.
-     * <p>
      *
      * @param r           il ristorante da modificare
      * @param newLocation nuova posizione geografica
@@ -296,7 +280,6 @@ public class Owner extends User {
 
     /**
      * Modifica la fascia di prezzo di un ristorante.
-     * <p>
      *
      * @param r             il ristorante da modificare
      * @param newPriceRange nuova fascia di prezzo
@@ -314,7 +297,6 @@ public class Owner extends User {
 
     /**
      * Modifica il premio assegnato a un ristorante.
-     * <p>
      *
      * @param r        il ristorante da modificare
      * @param newAward nuovo premio da assegnare
@@ -332,7 +314,6 @@ public class Owner extends User {
 
     /**
      * Modifica lo stato della Stella Verde Michelin per un ristorante.
-     * <p>
      *
      * @param r         il ristorante da modificare
      * @param greenStar true se il ristorante ha la Stella Verde, false altrimenti
@@ -350,7 +331,6 @@ public class Owner extends User {
 
     /**
      * Modifica la disponibilità del servizio di consegna a domicilio.
-     * <p>
      *
      * @param r           il ristorante da modificare
      * @param hasDelivery true se il ristorante offre consegna, false altrimenti
@@ -367,7 +347,6 @@ public class Owner extends User {
 
     /**
      * Modifica la disponibilità del servizio di prenotazione online.
-     * <p>
      *
      * @param r          il ristorante da modificare
      * @param hasBooking true se il ristorante offre prenotazioni online, false
@@ -386,7 +365,6 @@ public class Owner extends User {
 
     /**
      * Restituisce i dettagli completi di un ristorante in formato stringa.
-     * <p>
      *
      * @param r il ristorante di cui mostrare i dettagli
      * @return rappresentazione testuale del ristorante, null se ristorante nullo o
@@ -400,7 +378,6 @@ public class Owner extends User {
 
     /**
      * Restituisce il ruolo dell'utente.
-     * <p>
      *
      * @return {@link UserRole#OWNER}
      */

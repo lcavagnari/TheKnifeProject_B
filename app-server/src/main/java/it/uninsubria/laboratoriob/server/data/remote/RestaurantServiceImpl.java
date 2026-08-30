@@ -13,11 +13,18 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
+/** Implementazione RMI del servizio ristoranti (cache + DB, fallback). */
 public class RestaurantServiceImpl extends UnicastRemoteObject implements RestaurantServiceInter {
     
     private final RestaurantDAO rDAO = new RestaurantDAO();
     private final ServerDataStore store;
 
+    /**
+     * Costruisce l'implementazione remota del servizio ristoranti.
+     *
+     * @param store facade dei dati server
+     * @throws RemoteException se l'esportazione RMI fallisce
+     */
     public RestaurantServiceImpl(ServerDataStore store) throws RemoteException {
         this.store = store;
     }

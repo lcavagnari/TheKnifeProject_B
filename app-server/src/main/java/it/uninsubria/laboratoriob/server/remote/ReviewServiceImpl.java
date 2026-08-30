@@ -12,9 +12,16 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+/** Implementazione RMI del servizio recensioni (cache). */
 public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
     private final ServerDataStore store;
 
+    /**
+     * Costruisce l'implementazione remota del servizio recensioni.
+     *
+     * @param store facade dei dati server
+     * @throws RemoteException se l'esportazione RMI fallisce
+     */
     public ReviewServiceImpl(ServerDataStore store) throws RemoteException {
         this.store = store;
     }

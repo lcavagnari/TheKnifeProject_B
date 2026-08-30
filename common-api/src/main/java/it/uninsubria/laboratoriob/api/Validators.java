@@ -36,6 +36,9 @@ public class Validators {
 
     /**
      * Variante di {@link #validateString(String, String)} con regex predefinita.
+     *
+     * @param value valore da controllare
+     * @return true se valido
      */
     public static boolean validateString(String value) throws IllegalArgumentException {
         return validateString("^[\\p{L}0-9 \\-']{4,200}$", value);
@@ -65,6 +68,11 @@ public class Validators {
 
     /**
      * Verifica che la data sia compresa in un intervallo.
+     *
+     * @param min data inferiore
+     * @param max data superiore
+     * @param date data da verificare
+     * @return true se valida e nell'intervallo
      */
     public static boolean validateDates(LocalDateTime min, LocalDateTime max, LocalDateTime date) throws IllegalArgumentException {
         if (date == null)
@@ -76,6 +84,9 @@ public class Validators {
 
     /**
      * Variante senza intervallo (qualsiasi data valida).
+     *
+     * @param date data da verificare
+     * @return true se valida
      */
     public static boolean validateDates(LocalDateTime date) throws IllegalArgumentException {
         return validateDates(LocalDateTime.MIN, LocalDateTime.MAX, date);

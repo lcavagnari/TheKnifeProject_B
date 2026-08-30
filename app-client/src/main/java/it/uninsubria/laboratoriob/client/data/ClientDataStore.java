@@ -42,6 +42,8 @@ public class ClientDataStore {
      * Acquires all RMI stubs (via {@link RmiRepository}, which must already be
      * {@code configure()}d) and pushes the ones that succeeded onto the DAOs.
      * Safe to call again later (e.g. after a manual reconnect).
+     *
+     * @return true se almeno un servizio RMI e' stato acquisito
      */
     public boolean acquireRemoteServices() {
         Set<String> acquired = RmiRepository.acquireAll();

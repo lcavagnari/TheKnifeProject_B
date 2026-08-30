@@ -8,10 +8,21 @@ package it.uninsubria.laboratoriob.api.exceptions;
  */
 public class ServiceUnavailableException extends RuntimeException {
 
+    /**
+     * Costruttore con messaggio.
+     *
+     * @param message descrizione dell'errore
+     */
     public ServiceUnavailableException(String message) {
         super(message);
     }
 
+    /**
+     * Costruttore con messaggio e causa.
+     *
+     * @param message descrizione dell'errore
+     * @param cause eccezione originale
+     */
     public ServiceUnavailableException(String message, Throwable cause) {
         super(message, cause);
     }

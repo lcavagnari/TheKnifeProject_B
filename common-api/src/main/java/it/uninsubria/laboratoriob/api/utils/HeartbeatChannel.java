@@ -18,12 +18,20 @@ public class HeartbeatChannel {
 
     private static volatile boolean serverReachable = false;
 
-    /** Restituisce true se il server e' raggiungibile. */
+    /**
+     * Restituisce true se il server e' raggiungibile.
+     *
+     * @return true se il server e' raggiungibile
+     */
     public static boolean isServerReachable() {
         return serverReachable;
     }
 
-    /** Imposta lo stato di raggiungibilita' del server. */
+    /**
+     * Imposta lo stato di raggiungibilita' del server.
+     *
+     * @param value true se il server e' raggiungibile
+     */
     public synchronized static void setServerReachable(boolean value) {
         serverReachable = value;
     }

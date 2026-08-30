@@ -11,11 +11,10 @@ import java.util.UUID;
 /**
  * Classe che rappresenta una posizione geografica con nazione, città, indirizzo
  * e coordinate.
- * <p>
+ *
  * Estende {@link Entity}. Persistita nella propria tabella, referenziata
  * tramite FK
  * da {@code Restaurant} e {@code User}.
- * <p>
  *
  * @author Luca Cavagnari
  * @version 2.0
@@ -53,7 +52,6 @@ public class Location extends Entity {
 
     /**
      * Costruttore per una nuova Location (UUID generato automaticamente).
-     * <p>
      *
      * @param nation    nazione di appartenenza
      * @param city      nome della città
@@ -73,7 +71,6 @@ public class Location extends Entity {
     /**
      * Costruttore per ricostruire una Location esistente (UUID noto, es. da
      * database).
-     * <p>
      *
      * @param id        UUID esistente
      * @param nation    nazione di appartenenza
@@ -93,7 +90,6 @@ public class Location extends Entity {
 
     /**
      * Restituisce la rappresentazione testuale dettagliata dell'oggetto Location.
-     * <p>
      *
      * @return stringa contenente tutti i campi
      */
