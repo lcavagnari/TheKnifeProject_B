@@ -1003,6 +1003,7 @@ public enum CuisineType {
      */
     YUNNANESE,
 
+    /** Cucina Zhou cinese */
     ZHOU,
     /**
      * Cucina Zhejiang cinese

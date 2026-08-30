@@ -15,14 +15,23 @@ import java.util.List;
  */
 public abstract class Menus {
 
+    /** Utente attualmente autenticato. */
     protected final User user;
+    /** Facade dei dati client. */
     protected final ClientDataStore dataStore;
 
+    /**
+     * Costruisce il menu base con utente e facade dati.
+     *
+     * @param user utente autenticato
+     * @param dataStore facade dei dati client
+     */
     public Menus(User user, ClientDataStore dataStore) {
         this.user = user;
         this.dataStore = dataStore;
     }
 
+    /** Cerca un ristorante per nome e mostra i dettagli. */
     protected void searchRestaurant() {
         IO.clearScreen();
 
@@ -57,6 +66,7 @@ public abstract class Menus {
         viewRestaurantDetails(r);
     }
 
+    /** Mostra la lista paginata di tutti i ristoranti disponibili. */
     protected void browseRestaurants() {
         try {
             long total = dataStore.getRestaurantDAO().countRemote();
@@ -115,6 +125,7 @@ public abstract class Menus {
         }
     }
 
+    /** Chiude l'applicazione con un messaggio di saluto. */
     protected void exit() {
         IO.clearScreen();
         System.out.println("Goodbye!");

@@ -155,7 +155,7 @@ public final class LocationDAO implements DAO<Location> {
             stmt.setDouble(1, location.getLatitude());
             stmt.setDouble(2, location.getLongitude());
             stmt.setString(3, location.getCity() != null && location.getCity().isBlank() ? null : location.getCity());
-            stmt.setString(4, location.getNation().getIsoCode());
+            stmt.setString(4, location.getNation() != null ? location.getNation().getIsoCode() : null);
             stmt.setString(5, location.getAddress() != null && location.getAddress().isBlank() ? null : location.getAddress());
 
             return stmt.executeUpdate() >= 0;
@@ -180,7 +180,7 @@ public final class LocationDAO implements DAO<Location> {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
-            stmt.setString(1, newLoc.getNation().name());
+            stmt.setString(1, newLoc.getNation() != null ? newLoc.getNation().getIsoCode() : null);
             stmt.setString(2, newLoc.getCity());
             stmt.setDouble(3, newLoc.getLatitude());
             stmt.setDouble(4, newLoc.getLongitude());

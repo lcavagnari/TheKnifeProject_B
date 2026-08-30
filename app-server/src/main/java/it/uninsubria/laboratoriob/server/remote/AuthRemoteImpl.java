@@ -14,9 +14,16 @@ import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.UUID;
 
+/** Implementazione RMI del servizio di autenticazione. */
 public class AuthRemoteImpl extends UnicastRemoteObject implements AuthServiceInter {
     private final ServerDataStore store;
 
+    /**
+     * Costruisce l'implementazione remota del servizio auth.
+     *
+     * @param store facade dei dati server
+     * @throws RemoteException se l'esportazione RMI fallisce
+     */
     public AuthRemoteImpl(ServerDataStore store) throws RemoteException {
         this.store = store;
     }

@@ -12,11 +12,18 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
+/** Implementazione RMI del servizio preferiti (cache + DB). */
 public class FavouriteServiceImpl extends UnicastRemoteObject implements FavouriteServiceInter {
 
     private final CustomerDAO cDAO = new CustomerDAO();
     private final ServerDataStore store;
 
+    /**
+     * Costruisce l'implementazione remota del servizio preferiti.
+     *
+     * @param store facade dei dati server
+     * @throws RemoteException se l'esportazione RMI fallisce
+     */
     public FavouriteServiceImpl(ServerDataStore store) throws RemoteException {
         this.store = store;
     }

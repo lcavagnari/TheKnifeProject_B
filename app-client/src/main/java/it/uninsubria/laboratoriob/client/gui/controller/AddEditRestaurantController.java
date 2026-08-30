@@ -260,9 +260,13 @@ public class AddEditRestaurantController {
                     consegnaCheck.isSelected(), prenotazioneCheck.isSelected(), premio, stellaVerdeCheck.isSelected(),
                     cucineSelezionate, new HashSet<>(servizi), new HashMap<>());
             GuiContext.getDataStore().getOwnerDAO().addOwnedRestaurant(owner.getId(), nuovo);
+            GuiContext.getDataStore().getRestaurantDAO().updateCuisines(nuovo.getId(), cucineSelezionate);
+            GuiContext.getDataStore().getRestaurantDAO().updateServices(nuovo.getId(), servizi);
         } else {
             aggiornaRistorante(location, nome, descrizione, sitoWeb, telefono, prezzo, premio, cucineSelezionate);
             GuiContext.getDataStore().getRestaurantDAO().update(restaurantInModifica);
+            GuiContext.getDataStore().getRestaurantDAO().updateCuisines(restaurantInModifica.getId(), cucineSelezionate);
+            GuiContext.getDataStore().getRestaurantDAO().updateServices(restaurantInModifica.getId(), servizi);
         }
 
         chiudiFinestra();

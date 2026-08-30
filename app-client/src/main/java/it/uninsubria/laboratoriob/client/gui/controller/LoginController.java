@@ -111,11 +111,27 @@ public class LoginController {
 
         if (onLoginSuccessCallback != null)
             onLoginSuccessCallback.run();
+        clearFields();
     }
 
     @FXML
     private void onAnnullaClick() {
+        clearFields();
         if (onCancelCallback != null)
             onCancelCallback.run();
+    }
+
+    /**
+     * Riporta il form allo stato iniziale: svuota username, password ed
+     * eventuale messaggio di errore. Va richiamato ogni volta che il form
+     * viene abbandonato (annulla o login riuscito), dato che l'istanza del
+     * controller/form viene riutilizzata per tutta la sessione (si veda
+     * {@code GUIController.preloadForms()}).
+     */
+    private void clearFields() {
+        usernameField.clear();
+        passwordField.clear();
+        errorLabel.setText("");
+        errorLabel.getStyleClass().removeAll("label-success", "label-error");
     }
 }

@@ -18,10 +18,12 @@ public class HeartbeatChannel {
 
     private static volatile boolean serverReachable = false;
 
+    /** Restituisce true se il server e' raggiungibile. */
     public static boolean isServerReachable() {
         return serverReachable;
     }
 
+    /** Imposta lo stato di raggiungibilita' del server. */
     public synchronized static void setServerReachable(boolean value) {
         serverReachable = value;
     }
@@ -39,7 +41,13 @@ public class HeartbeatChannel {
 
     private final BlockingQueue<Integer> pongQueue = new ArrayBlockingQueue<>(1);
 
-    /** socket must already be connected. */
+    /**
+     * Crea un canale di heartbeat su un socket gia' connesso.
+     *
+     * @param socket socket TCP gia' connesso
+     * @param intervalMinutes intervallo in minuti tra un ping e l'altro
+     * @throws IOException se la lettura/scrittura dello stream fallisce
+     */
     public HeartbeatChannel(Socket socket, long intervalMinutes) throws IOException {
         this.socket = socket;
         this.intervalMinutes = intervalMinutes;
@@ -47,11 +55,16 @@ public class HeartbeatChannel {
         this.out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
     }
 
-    /** Invoked once, on a dead-socket disconnect only (never on a graceful {@link #shutdown()}). */
+    /**
+     * Imposta il callback invocato alla disconnessione del socket (non su shutdown graceful).
+     *
+     * @param onDisconnect runnable da eseguire alla disconnessione
+     */
     public void setOnDisconnect(Runnable onDisconnect) {
         this.onDisconnect = onDisconnect;
     }
 
+    /** Avvia i thread di lettura e ping. */
     public void start() {
         serverReachable = true;
 
@@ -136,6 +149,7 @@ public class HeartbeatChannel {
         }
     }
 
+    /** Chiude il canale di heartbeat e ferma i thread. */
     public void shutdown() {
         serverReachable = false;
         running = false;

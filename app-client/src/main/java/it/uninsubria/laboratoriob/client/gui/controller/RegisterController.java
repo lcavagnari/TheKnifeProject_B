@@ -413,10 +413,12 @@ public class RegisterController {
 
         if (onRegisterSuccessCallback != null)
             onRegisterSuccessCallback.run();
+        clearFields();
     }
 
     @FXML
     private void onAnnullaClick() {
+        clearFields();
         if (onCancelCallback != null)
             onCancelCallback.run();
     }
@@ -445,6 +447,36 @@ public class RegisterController {
             errors[i].setManaged(false);
             fields[i].getStyleClass().remove("error");
         }
+    }
+
+    /**
+     * Riporta il form allo stato iniziale: svuota tutti i campi di testo,
+     * la data di nascita, la password (e la relativa conferma), il ruolo
+     * selezionato e ogni errore visibile. Va richiamato ogni volta che il
+     * form viene abbandonato (annulla o registrazione completata), dato che
+     * l'istanza del controller/form viene riutilizzata per tutta la sessione
+     * (si veda {@code GUIController.preloadForms()}).
+     */
+    private void clearFields() {
+        usernameField.clear();
+        nomeField.clear();
+        cognomeField.clear();
+        indirizzoField.clear();
+        cittaField.clear();
+        nazioneField.clear();
+        passwordField.clear();
+        confirmPasswordField.clear();
+        dataNascitaPicker.setValue(null);
+
+        confirmPasswordWrapper.setVisible(false);
+        confirmPasswordWrapper.setManaged(false);
+
+        selectRole(true);
+
+        errorLabel.setText("");
+        errorLabel.getStyleClass().removeAll("label-success", "label-error");
+
+        clearAllErrors();
     }
 
     private void shakeField(Control field) {

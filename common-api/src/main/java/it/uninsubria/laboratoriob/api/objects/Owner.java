@@ -68,6 +68,20 @@ public class Owner extends User {
         this(id, username, password, salt, name, lastName, location, dateOfBirth, restaurants, false);
     }
 
+    /**
+     * Costruttore completo con flag system e ristoranti.
+     *
+     * @param id identificatore univoco
+     * @param username nome utente
+     * @param password password hashata
+     * @param salt salt per l'hashing
+     * @param name nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     * @param restaurants ristoranti associati
+     * @param system true se utente di sistema
+     */
     public Owner(UUID id, String username, String password, String salt, String name, String lastName,
                  Location location, LocalDate dateOfBirth, Set<Restaurant> restaurants, boolean system) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth, system);
@@ -98,15 +112,51 @@ public class Owner extends User {
         this(id, username, password, salt, name, lastName, location, dateOfBirth, false);
     }
 
+    /**
+     * Costruttore con credenziali complete, flag system, senza ristoranti.
+     *
+     * @param id identificatore univoco
+     * @param username nome utente
+     * @param password password hashata
+     * @param salt salt per l'hashing
+     * @param name nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     * @param system true se utente di sistema
+     */
     public Owner(UUID id, String username, String password, String salt, String name, String lastName,
                  Location location, LocalDate dateOfBirth, boolean system) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth, system);
     }
 
+    /**
+     * Costruttore per registrazione senza ID pre-esistente, senza flag system.
+     *
+     * @param username nome utente
+     * @param passwordHash hash della password
+     * @param passwordSalt salt della password
+     * @param firstName nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     */
     public Owner(String username, String passwordHash, String passwordSalt, String firstName, String lastName, Location location, LocalDate dateOfBirth) {
         this(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth, false);
     }
 
+    /**
+     * Costruttore per registrazione senza ID pre-esistente, con flag system.
+     *
+     * @param username nome utente
+     * @param passwordHash hash della password
+     * @param passwordSalt salt della password
+     * @param firstName nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     * @param system true se utente di sistema
+     */
     public Owner(String username, String passwordHash, String passwordSalt, String firstName, String lastName, Location location, LocalDate dateOfBirth, boolean system) {
         super(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth, system);
     }

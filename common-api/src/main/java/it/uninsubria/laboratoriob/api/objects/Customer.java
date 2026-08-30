@@ -70,12 +70,37 @@ public class Customer extends User {
         this(id, username, password, salt, name, lastName, location, dateOfBirth, favouriteRestourants, false);
     }
 
+    /**
+     * Costruttore completo con flag system.
+     *
+     * @param id identificatore univoco
+     * @param username nome utente
+     * @param password password hashata
+     * @param salt salt per l'hashing
+     * @param name nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     * @param favouriteRestourants ristoranti preferiti
+     * @param system true se utente di sistema
+     */
     public Customer(UUID id, String username, String password, String salt, String name, String lastName,
                     Location location, LocalDate dateOfBirth, Set<UUID> favouriteRestourants, boolean system) {
         super(id, username, password, salt, name, lastName, location, dateOfBirth, system);
         this.favouriteRestourants = (favouriteRestourants != null) ? favouriteRestourants : new HashSet<>();
     }
 
+    /**
+     * Costruttore per registrazione senza ID pre-esistente.
+     *
+     * @param username nome utente
+     * @param passwordHash hash della password
+     * @param passwordSalt salt della password
+     * @param firstName nome
+     * @param lastName cognome
+     * @param location posizione
+     * @param dateOfBirth data di nascita
+     */
     public Customer(String username, String passwordHash, String passwordSalt, String firstName, String lastName, Location location, LocalDate dateOfBirth) {
         super(username, passwordHash, passwordSalt, firstName, lastName, location, dateOfBirth);
         this.favouriteRestourants = new HashSet<>();

@@ -110,6 +110,7 @@ public abstract class User extends Entity {
                 ", dateOfBirth=" + dateOfBirth;
     }
 
+    /** Restituisce il ruolo dell'utente (proprietario o cliente). */
     public abstract UserRole getRole();
 
 }

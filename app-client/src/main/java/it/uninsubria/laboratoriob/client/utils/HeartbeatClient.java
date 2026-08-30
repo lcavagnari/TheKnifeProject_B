@@ -86,6 +86,7 @@ public class HeartbeatClient {
         retryThread.start();
     }
 
+    /** Invia un segnale di risveglio al thread ping per un controllo immediato. */
     public void wakeUp() {
         HeartbeatChannel c = channel;
         if (c != null)

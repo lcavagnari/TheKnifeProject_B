@@ -1,7 +1,7 @@
 [licenseImg]: https://img.shields.io/badge/License-MIT-important
-[license]: https://github.com/lcavagnari/CommandBlocker/blob/master/LICENSE
+[license]: https://github.com/lcavagnari/TheKnifeProject_B/blob/master/LICENSE
 [releaseImg]: https://img.shields.io/badge/Version-1.0-blue
-[release]: https://github.com/lcavagnari/TheKnifeProject/releases/latest
+[release]: https://github.com/lcavagnari/TheKnifeProject_B/releases/latest
 
 # 🔪 The Knife
 ---
@@ -17,213 +17,149 @@
 # Indice
 1. 📝 [Descrizione](#-descrizione)
 2. ⚙️ [Caratteristiche Principali](#-caratteristiche-principali)
-3. 🖥️ [Requisiti di sistema](#-requisiti-di-sistema)
-4. 📦 [Installazione](#-installazione)
-5. 📚 [Documentazione](#-documentazione)
-6. 🧭 [Come Usare](#-come-usare-guida-per-lutente)
-    - 🔐 [Login](#-login)
-    - 🆕 [Registrazione](#-registrazione)
-    - 🔎 [Ricerca Ristorante](#-esplora-ristoranti)
+3. 🏗️ [Architettura](#-architettura)
+4. 🖥️ [Requisiti di sistema](#-requisiti-di-sistema)
+5. 📦 [Installazione ed Esecuzione](#-installazione-ed-esecuzione)
+6. 📚 [Documentazione](#-documentazione)
+7. 🧭 [Come Usare](#-come-usare-guida-per-lutente)
     - 👻 [Guest](#-guest-utenti-anonimi)
-    - 🍽️ [Cliente](#-customer-cliente)
-    - 🧑‍🍳 [Proprietario](#-owner-proprietario)
-    - 🚪 [Esci](#-esci)
-    - 🛑 [Errori Comuni](#-errori-comuni-nessun-problema)
-7. 🤝 [Contribuire](#-contribuire)
-8. 📝 [Licenza](#-licenza)
-9. 📬 [Contatti](#-contatti)
-10. 📌 [Note Finali](#-note-finali)
+    - 🍽️ [Cliente](#-cliente)
+    - 🧑‍🍳 [Gestore](#-gestore-proprietario)
+8. 🛑 [Limiti noti](#-limiti-noti)
+9. 🤝 [Contribuire](#-contribuire)
+10. 📝 [Licenza](#-licenza)
+11. 📬 [Contatti](#-contatti)
 
 
 ---
 ## 📝 Descrizione
 
-The Knife è un sistema software per la gestione e la consultazione di ristoranti, recensioni e utenti. Il progetto supporta la serializzazione JSON delle entità, la gestione di diversi tipi di cucina, premi, fasce di prezzo e altre caratteristiche rilevanti per ristoranti.
+The Knife è un sistema client/server per la scoperta, la gestione e la recensione di ristoranti in stile Michelin. Un server centrale conserva in modo persistente ristoranti, utenti e recensioni su un database PostgreSQL; il client è un'applicazione desktop con interfaccia grafica (JavaFX) che comunica con il server via Java RMI, con una cache locale su file JSON per un'esperienza più reattiva.
 
-L'applicazione prevede un'interfaccia a linea di comando (CLI) per l'interazione dell'utente, con funzionalità di login, registrazione, ricerca e visualizzazione dettagliata dei ristoranti.
-  
----  
+Il progetto nasce da un dataset reale di oltre mille ristoranti Michelin ed è pensato per due tipi di utenti registrati — **Cliente** (cerca, recensisce, salva i preferiti) e **Gestore** (inserisce e amministra i propri ristoranti) — oltre alla semplice consultazione da parte di visitatori non registrati.
+
+---
 
 ## ⚙️ Caratteristiche Principali
 
-- Gestione di entità principali: `Restaurant`, `Review`, `Location`, `User` e `Owner`.
-- Enumerazioni per cucine (`CuisineType`), premi (`Award`), fasce di prezzo (`PriceRange`), e nazionalità (`Nation`).
-- Serializzazione e deserializzazione JSON tramite Jackson.
-- Input utente tramite CLI con validazioni e messaggi localizzati in italiano.
-- Supporto per aggiungere recensioni e gestire servizi offerti dai ristoranti.
-- Architettura modulare con classi di utilità e gestione file.
+- Architettura **client/server**: il server è l'unica fonte di verità sui dati, il client mantiene una cache locale JSON per le operazioni più frequenti.
+- Comunicazione applicativa tramite **Java RMI** (autenticazione, ristoranti, recensioni, preferiti) e monitoraggio della connessione tramite un canale di **heartbeat TCP** indipendente.
+- Interfaccia utente **grafica in JavaFX**, con un'interfaccia testuale (CLI) alternativa raggiungibile con il flag `--cli`.
+- Persistenza su **PostgreSQL** lato server (via HikariCP), fornito pronto all'uso tramite Docker Compose.
+- Gestione di ristoranti, recensioni, utenti (Cliente/Gestore), cucine, premi, fasce di prezzo e servizi offerti.
+- Import automatico di un dataset reale di oltre 1000 ristoranti in stile Michelin.
+- Password protette con hashing PBKDF2 + salt.
 
----  
+---
+
+## 🏗️ Architettura
+
+Il progetto è organizzato in tre moduli Maven:
+
+| Modulo | Ruolo |
+|--------|-------|
+| `common-api` | Modello di dominio condiviso, interfacce DAO e interfacce di servizio RMI usate sia dal client sia dal server. |
+| `app-server` | Persistenza su PostgreSQL, import del dataset, implementazioni RMI, server di heartbeat. |
+| `app-client` | Interfaccia grafica JavaFX (e CLI), cache locale JSON, client RMI e di heartbeat. |
+
+Per i dettagli tecnici completi — diagrammi UML/ER, scelte architetturali, strutture dati e pattern utilizzati — si veda il [Manuale Tecnico](docs/manuale%20tecnico.md).
+
+---
 
 ## 🖥️ Requisiti di sistema
 
-| Nome  | Versione | Preferibilmente      |
-|-------|----------|----------------------|
-| Jdk   | 17+      | `Amazon-corretto 19` |
-| Maven | 3.9.9+   | 3.9.9+               |
-
----  
-
-## 📦 Installazione
-
-
-### 💿 Metodo automatico
-
-1. Ottenere il jar dai [Releases](https://github.com/lcavagnari/TheKnifeProject/releases/latest)
-<br>
-<br>
-2. Eseguire l'applicazione:
-
-```bash  
-java -jar TheKnifeProject-1.0.jar  
-```  
+| Componente | Versione | Note |
+|------------|----------|------|
+| JDK | 17+ | Consigliata la distribuzione gratuita "Amazon Corretto 17". |
+| Maven | 3.9.9+ | Necessario solo per compilare dai sorgenti. |
+| Docker / Docker Compose | recente | Per avviare PostgreSQL senza installazione manuale. |
 
 ---
 
-### 🖥️ Metodo Manuale
+## 📦 Installazione ed Esecuzione
 
-1. Clonare la repository:
+1. **Avviare il database** (dalla cartella principale del progetto):
+   ```bash
+   docker compose up -d postgres
+   ```
 
-```bash  
-git clone https://github.com/lcavagnari/TheKnifeProject.git
-cd TheKnifeProject  
-````  
+2. **Compilare il progetto**:
+   ```bash
+   mvn package -Dmaven.test.skip=true
+   ```
+   Vengono generati `app-server/target/theknifeserver-1.0-SNAPSHOT.jar` e `app-client/target/theknifeclient-1.0-SNAPSHOT.jar`.
 
-2. Compilare con Maven:
+3. **Avviare il server** (da lasciare sempre in esecuzione):
+   ```bash
+   java -cp app-server/target/theknifeserver-1.0-SNAPSHOT.jar it.uninsubria.laboratoriob.server.TheKnifeServer --update
+   ```
+   Il flag `--update` importa, alla prima esecuzione, il dataset Michelin di esempio (`michelin_my_maps.csv`).
 
-```bash  
-mvn clean install  
-```  
+4. **Avviare il client**:
+   ```bash
+   mvn -pl app-client javafx:run
+   ```
+   In alternativa, con i JAR già pronti: `java -jar app-client/target/theknifeclient-1.0-SNAPSHOT.jar`.
 
-3. Eseguire l'applicazione:
+Per una guida passo passo pensata per chi non ha esperienza di programmazione, si veda il [Manuale Utente](docs/manuale%20utente.md).
 
-```bash  
-java -jar TheKnifeProject-1.0.jar  
-```  
-  
----  
+---
 
 ## 📚 Documentazione
 
-Visibile attraverso la [Javadoc](https://javacode-docsvault.vercel.app/projects/theknifeproject/index.html)
-
-  
----  
-
-## 🧭 Come Usare (Guida per l’Utente)
-
-Una volta lanciata l’applicazione (`TheKnifeProject-1.0.jar`), verrà mostrato il **Menu Principale**, da cui puoi accedere a tutte le funzionalità.
-
-### ✅ Registrazione
-
-Se sei un nuovo utente, scegli `Registrazione` e segui le istruzioni.
-Puoi scegliere tra:
-
-* **Cliente**: potrai cercare ristoranti, recensirli e salvare i tuoi preferiti.
-* **Proprietario**: potrai aggiungere e gestire i tuoi ristoranti.
-
-Verranno richieste alcune informazioni base:
-
-* Nome, Cognome
-* Nome utente (almeno 4 caratteri)
-* Password (almeno 8 caratteri)
-* Città, Nazione, Indirizzo
-* Data di nascita
-
-Tutti gli input sono **guidati**: se sbagli, potrai reinserirli.
+- [Manuale Utente](docs/manuale%20utente.md) — guida completa all'uso dell'applicazione, con screenshot.
+- [Manuale Tecnico](docs/manuale%20tecnico.md) — architettura, diagrammi UML/ER, strutture dati e scelte progettuali.
+- [JavaDoc](https://javacode-docsvault.vercel.app/projects/theknifeproject_b/index.html) — documentazione generata dal codice sorgente.
 
 ---
 
-### 🔐 Login
+## 🧭 Come Usare (Guida per l'Utente)
 
-Se hai già un account, scegli `LoginMenu`. Inserisci il tuo **nome utente** e **password**.
-Se l’autenticazione fallisce, potrai riprovare o tornare al menu principale.
+Avviato il client, viene mostrata una schermata iniziale da cui accedere, registrarsi, oppure esplorare i ristoranti come ospite.
 
----
+<p align="center">
+  <img src="docs/screenshots/02_home_ospite.png" alt="Schermata iniziale" width="45%">
+  <img src="docs/screenshots/05_ricerca_ristoranti.png" alt="Ricerca ristoranti" width="45%">
+</p>
 
-### 🔎 Esplora Ristoranti
+### 👻 Guest (utenti anonimi)
 
-Dopo l’accesso, potrai:
+Chi non è registrato può comunque:
 
-* **Cercare ristoranti** per:
+- 🔍 Cercare ed esplorare il catalogo ristoranti (per nome, cucina o città)
+- 📖 Consultare le schede dettagliate dei ristoranti, incluse le recensioni
+- 🔐 Accedere in ogni momento a login e registrazione per sbloccare le funzionalità complete
 
-    * Nome
-    * Tipo di cucina (es. ITALIAN, JAPANESE, etc.)
-    * Nazione
-    * Servizi (es. Delivery, Booking)
-    * Fascia di prezzo (€ → €€€€)
-    * Premi (es. MICHELIN, GREEN\_STAR)
+### 🍽️ Cliente
 
-* **Visualizzare dettagli** completi di ogni ristorante:
+Dopo la registrazione/login come Cliente:
 
-    * Descrizione, premi, location, cucina, prezzo, recensioni
-    * Proprietario (visibile solo per owner)
+- 📌 Aggiungere o rimuovere un ristorante dai **Preferiti**
+- 📄 Leggere tutte le recensioni di un ristorante
+- ✏️ Scrivere una recensione, con voto da 1 a 5 stelle e testo libero
 
----
+### 🧑‍🍳 Gestore (Proprietario)
 
-### 👻 Guest (Utenti anonimi)
+Dopo la registrazione/login come Gestore:
 
-Gli utenti *non registrati* (Guest) possono:
+- ➕ Aggiungere un nuovo ristorante (nome, descrizione, indirizzo, cucina, prezzo, servizi)
+- 📝 Modificare i dati di un proprio ristorante
+- 🔍 Consultare le recensioni ricevute dai propri ristoranti
 
-- 🔍 Esplorare il catalogo ristoranti in sola lettura
-- 📖 Visualizzare informazioni dettagliate sui ristoranti:  
-  nome, tipo di cucina, servizi offerti, fascia di prezzo, premi ricevuti, posizione e recensioni
-- 🧭 Navigare liberamente tra i risultati, ma **non** possono lasciare recensioni o modificare dati
-- 🔐 Accedere in qualsiasi momento alle funzionalità complete effettuando il Login o la Registrazione
+<p align="center">
+  <img src="docs/screenshots/08_miei_ristoranti.png" alt="I miei ristoranti" width="45%">
+  <img src="docs/screenshots/09_nuovo_ristorante.png" alt="Nuovo ristorante" width="45%">
+</p>
 
----
-
-### 🍽️ Client (Cliente)
-
-Dopo il login come Cliente, potrai:
-
-* 📌 **Aggiungere ai preferiti** un ristorante
-* 📄 **Leggere tutte le recensioni** di un ristorante
-* ✏️ **Scrivere una recensione** per un ristorante (se non ne hai già scritta una)
-* 🛠️ **Modificare la tua recensione** (voto e testo)
-* ❌ **Cancellare la tua recensione**
-* 🧾 **Visualizzare i tuoi ristoranti preferiti**
-
-Tutte le azioni sono accessibili da un **menu contestuale** dopo aver selezionato un ristorante.
+Per la descrizione completa di ogni funzionalità, con tutti gli screenshot, si veda il [Manuale Utente](docs/manuale%20utente.md).
 
 ---
 
-### 🧑‍🍳 Owner (Proprietario)
+## 🛑 Limiti noti
 
-Dopo il login come Proprietario, potrai:
-
-* ➕ **Aggiungere un nuovo ristorante**
-
-    * Nome, descrizione, cucina, premi, servizi, location, prezzo
-
-* 📝 **Modificare i dati di un tuo ristorante**
-
-    * Cambiare qualsiasi campo: nome, tipo cucina, indirizzo, premi, etc.
-
-* ❌ **Eliminare uno dei tuoi ristoranti**
-
-* 🔍 **Visualizzare tutte le recensioni ricevute** per ogni tuo ristorante
-
-Ogni azione è gestita tramite menu interattivi con conferme e messaggi chiari.
+The Knife è un progetto universitario in sviluppo attivo. I limiti attualmente noti (campo "Nazione" da compilare in italiano, alcune etichette non ancora tradotte, eliminazione di una recensione non ancora funzionante, tra gli altri) sono documentati in dettaglio nella sezione "Limiti della soluzione sviluppata" del [Manuale Utente](docs/manuale%20utente.md#limiti-della-soluzione-sviluppata) e del [Manuale Tecnico](docs/manuale%20tecnico.md#7-limiti-della-soluzione-sviluppata).
 
 ---
-
-### 🚪 Esci
-
-Scegli questa opzione per chiudere l’applicazione in sicurezza.
-
----
-
-### 🛑 Errori Comuni? Nessun problema:
-
-* Ogni campo ha **limiti** (es. minimo caratteri per username o password)
-* Il programma **ti guida** se sbagli un input
-* Inserisci sempre valori coerenti (es. scegli cucine esistenti o premi validi)
-
----
-  
----  
-
 
 ## 🤝 Contribuire
 
@@ -235,27 +171,21 @@ Per contribuire al progetto:
 4. Push sul branch: `git push origin nome-feature`
 5. Creare una Pull Request descrivendo le modifiche effettuate
 
-
-  
----  
+---
 ## 📄 Licenza
 
 Questo progetto è rilasciato sotto licenza MIT. Consultare il file [`LICENSE`](LICENSE) per i dettagli.
-  
----  
+
+---
 
 ## 📬 Contatti
 
-Autore: Luca Cavagnari  
-\# Matricola: 761291
-Email:  lcavagnari@studenti.uninsubria.it
-  
----  
+| Nome | Ruolo | Matricola |
+|------|-------|-----------|
+| Luca Cavagnari | Lead / System Architect / Backend | 761291 |
+| Francesco Semenzato | Backend | 753593 |
+| Matteo Landini | Frontend | 760120 |
 
-## 🧩 Note Finali
+Progetto realizzato per il Laboratorio Interdisciplinare B, Università degli Studi dell'Insubria.
 
-Questo progetto è una dimostrazione di architettura software modulare con particolare attenzione alla serializzazione dati, validazione input utente e gestione di enumerazioni complesse. Ulteriori funzionalità sono pianificate per espandere il sistema.
-
-Progetto creato per il laboratorio A della Università Degli Studi Dell'Insubria.
-
-*(Creatori di TheFork, perfavore, non denunciatemi. ~~Mi hanno costretto~~)*
+*(Creatori di TheFork, perfavore, non denunciateci. ~~Ci hanno costretto~~)*

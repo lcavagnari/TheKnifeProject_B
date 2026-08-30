@@ -35,14 +35,19 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
+    /** ObjectMapper condiviso per la serializzazione JSON. */
     protected static final ObjectMapper mapper = new ObjectMapper();
+    /** File locale di persistenza dei dati. */
     protected File storeFile;
     private final Class<T> type;
 
+    /** Servizio di autenticazione RMI remoto, nullable. */
     protected volatile AuthServiceInter authService;
     private final UserRole role;
 
+    /** Cache per ID UUID. */
     protected final ConcurrentHashMap<UUID, T> cacheById = new ConcurrentHashMap<>();
+    /** Cache per username. */
     protected final ConcurrentHashMap<String, T> cacheByUsername = new ConcurrentHashMap<>();
 
     private volatile boolean cacheLoaded = false;
@@ -228,7 +233,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
         if (user.getLocation() != null) {
             ObjectNode locNode = mapper.createObjectNode();
-            locNode.put("nation", user.getLocation().getNation().name());
+            locNode.put("nation", user.getLocation().getNation() != null ? user.getLocation().getNation().name() : "");
             locNode.put("city", user.getLocation().getCity());
             locNode.put("latitude", user.getLocation().getLatitude());
             locNode.put("longitude", user.getLocation().getLongitude());
@@ -307,6 +312,9 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
      * {@code authService.register()}. Usato quando l'utente e' gia' stato
      * registrato lato server (che genera id, salt e hash reali - il client
      * non ha accesso a {@code PasswordHasher}) e va solo memorizzato in cache.
+     *
+     * @param user utente da inserire in cache
+     * @return true se inserito correttamente
      */
     public boolean cacheOnly(T user) {
         if (user == null) return false;
@@ -321,6 +329,18 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         return true;
     }
 
+    /**
+     * Registra un nuovo utente tramite RMI e lo aggiunge alla cache locale.
+     *
+     * @param username nome utente
+     * @param rawPassword password in chiaro
+     * @param firstName nome
+     * @param lastName cognome
+     * @param birthDate data di nascita
+     * @param location posizione geografica
+     * @param isOwner true se il ruolo e' proprietario
+     * @return true se la registrazione e' riuscita
+     */
     public boolean save(String username, String rawPassword, String firstName,
                         String lastName, LocalDate birthDate, Location location,
                         boolean isOwner) {
@@ -374,6 +394,13 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         return true;
     }
 
+    /**
+     * Effettua il login dell'utente, cercando prima nella cache locale e poi tramite RMI.
+     *
+     * @param username nome utente
+     * @param password password in chiaro
+     * @return Optional contenente l'utente se trovato e autenticato
+     */
     @SuppressWarnings("unchecked")
     public Optional<T> login(String username, String password) {
         ensureCacheLoaded();

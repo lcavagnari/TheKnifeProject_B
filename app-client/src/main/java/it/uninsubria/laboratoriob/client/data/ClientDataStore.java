@@ -28,6 +28,7 @@ public class ClientDataStore {
     private final JsonRestaurantDAO restaurantDAO;
     private final JsonReviewDAO reviewDAO;
 
+    /** Costruisce il facade dei dati client, inizializzando i DAO locali e tentando la connessione RMI. */
     public ClientDataStore() {
         this.customerDAO = new JsonCustomerDAO(null, null);
         this.restaurantDAO = new JsonRestaurantDAO(null);
@@ -66,6 +67,8 @@ public class ClientDataStore {
      * Ripunta la cache locale dei DAO utente (profilo, ristoranti posseduti, preferiti)
      * alla cartella dell'utente autenticato. Ristoranti e recensioni restano globali:
      * sono dati di consultazione condivisi, non legati a un singolo utente.
+     *
+     * @param userId UUID dell'utente autenticato
      */
     public void switchUser(UUID userId) {
         customerDAO.repointTo(userId);

@@ -41,6 +41,7 @@ public class CsvParser {
     private final static SecureRandom rd = new SecureRandom();
     private final static LocationDAO LOCATION_DAO = new LocationDAO();
 
+    /** UUID del proprietario di sistema usato per i ristoranti importati dal dataset CSV. */
     public static final UUID SYSTEM_OWNER_ID = UUID.nameUUIDFromBytes("theknife-system-owner".getBytes());
     private static final String SYSTEM_OWNER_USERNAME = "system";
     private static final String SYSTEM_OWNER_SALT = PasswordHasher.generateSalt();

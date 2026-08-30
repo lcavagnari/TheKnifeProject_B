@@ -26,6 +26,7 @@ public enum Award {
      */
     TWO_STARS(2),
 
+    /** 3 stelle Michelin */
     THREE_STARS(3),
     /**
      * 4 stelle Michelin

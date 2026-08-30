@@ -78,8 +78,12 @@ public final class JsonReviewDAO implements DAO<Review> {
             JsonNode node = mapper.readTree(storeFile);
             if (!node.isArray()) return;
             for (JsonNode n : (ArrayNode) node) {
-                Review review = mapNode(n);
-                cacheById.put(review.getId(), review);
+                try {
+                    Review review = mapNode(n);
+                    cacheById.put(review.getId(), review);
+                } catch (IllegalArgumentException e) {
+                    System.err.println("Voce recensione corrotta ignorata in " + storeFile.getName() + ": " + e.getMessage());
+                }
             }
         } catch (IOException e) {
             System.err.println("Errore loadFromDisk in JsonReviewDAO: " + e.getMessage());

@@ -2,7 +2,10 @@ package it.uninsubria.laboratoriob.api.exceptions;
 
 import lombok.Getter;
 
-
+/**
+ * Eccezione lanciata quando l'utente inserisce il comando speciale di annullamento
+ * durante un'operazione interattiva.
+ */
 public class AbortOperationException extends RuntimeException {
 
     /**

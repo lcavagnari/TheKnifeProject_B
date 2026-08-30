@@ -572,7 +572,17 @@ public enum Nation {
         if (identifier == null) return null;
 
         String s = identifier.toLowerCase().trim();
-        return ALIAS_MAP.getOrDefault(s, null);
+        Nation byAlias = ALIAS_MAP.getOrDefault(s, null);
+        if (byAlias != null) return byAlias;
+
+        // Fallback: confronta col nome dell'enum stesso (es. "united kingdom",
+        // "united-kingdom" o "united_kingdom" per UNITED_KINGDOM), cosi ogni
+        // nazione resta riconoscibile anche quando non e' presente in ALIAS_MAP.
+        String normalized = s.replace(' ', '_').replace('-', '_');
+        for (Nation n : values())
+            if (n.name().equalsIgnoreCase(normalized)) return n;
+
+        return null;
     }
 
     /**

@@ -8,9 +8,16 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.Set;
 import java.util.UUID;
 
+/** Implementazione RMI del servizio preferiti (solo cache, delega al store). */
 public class FavouriteServiceImpl extends UnicastRemoteObject implements FavouriteServiceInter {
     private final ServerDataStore store;
 
+    /**
+     * Costruisce l'implementazione remota del servizio preferiti.
+     *
+     * @param store facade dei dati server
+     * @throws RemoteException se l'esportazione RMI fallisce
+     */
     public FavouriteServiceImpl(ServerDataStore store) throws RemoteException {
         this.store = store;
     }

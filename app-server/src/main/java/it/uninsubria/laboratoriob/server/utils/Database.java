@@ -60,6 +60,7 @@ public final class Database {
         ds = new HikariDataSource(config);
     }
 
+    /** Crea le tabelle del database se non esistono gia'. */
     public static boolean initTables() {
         // blocking
         try (Connection conn = Database.getConnection();
@@ -249,6 +250,7 @@ public final class Database {
         }
     }
 
+    /** Inserisce le tabelle costanti (price_range, cuisine_type, nation, award, user_role) con ON CONFLICT DO NOTHING. */
     public static boolean initialiseConstants() {
         // blocking
         try (Connection conn = Database.getConnection();

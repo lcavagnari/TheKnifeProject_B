@@ -187,6 +187,7 @@ public class OwnerMenus extends Menus {
         }
     }
 
+    /** Mostra le recensioni piu' recenti dei ristoranti dell'owner (ultimi 7 giorni). */
     protected void viewOwnerLatestReviews() {
         Map<UUID, Restaurant> restaurants = owner.getRestaurantsById();
 
