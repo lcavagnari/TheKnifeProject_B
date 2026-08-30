@@ -7,6 +7,7 @@ import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import it.uninsubria.laboratoriob.server.data.dao.CustomerDAO;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -60,11 +61,17 @@ public class FavouriteServiceImpl extends UnicastRemoteObject implements Favouri
 
     @Override
     public Set<UUID> findFavourites(UUID userID) throws RemoteException {
+        if (userID == null) return Set.of();
+
+        Set<UUID> merged = new HashSet<>();
         User u = store.users().findById(userID);
+        if (u instanceof Customer c) merged.addAll(c.getFavouriteRestourants());
 
-        if (u instanceof Customer)
-            return Set.copyOf(((Customer) u).getFavouriteRestourants());
+        CompletableFuture<Set<UUID>> db = CompletableFuture
+                .supplyAsync(() -> cDAO.findFavourites(userID))
+                .exceptionally(ex -> Set.of());
+        merged.addAll(db.join());
 
-        return cDAO.findFavourites(userID);
+        return merged;
     }
 }

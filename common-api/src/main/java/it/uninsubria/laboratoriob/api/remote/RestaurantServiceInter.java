@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public interface RestaurantServiceInter extends Remote {
-    List<Restaurant> findAll(int offset, int limit) throws RemoteException;
+    Set<Restaurant> findAll(int offset, int limit) throws RemoteException;
     long count() throws RemoteException;
     Restaurant findById(UUID id) throws RemoteException;
     List<Restaurant> findByOwner(UUID id) throws  RemoteException;

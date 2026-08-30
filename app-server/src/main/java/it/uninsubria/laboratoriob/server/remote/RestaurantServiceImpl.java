@@ -1,13 +1,16 @@
 package it.uninsubria.laboratoriob.server.remote;
 
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -20,10 +23,10 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     }
 
     @Override
-    public List<Restaurant> findAll(int offset, int limit) throws RemoteException {
+    public Set<Restaurant> findAll(int offset, int limit) throws RemoteException {
         List<Restaurant> all = new ArrayList<>(store.restaurants().findAll());
-        if (offset >= all.size()) return List.of();
-        return new ArrayList<>(all.subList(offset, Math.min(offset + limit, all.size())));
+        if (offset >= all.size()) return Set.of();
+        return new HashSet<>(all.subList(offset, Math.min(offset + limit, all.size())));
     }
 
     @Override

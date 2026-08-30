@@ -199,7 +199,7 @@ class JsonRestaurantDAOTest {
     @Test
     @DisplayName("findAll() falls back to RMI when cache empty")
     void testFindAllRMIFallback() throws RemoteException {
-        when(mockService.findAll(0, 1000)).thenReturn(List.of(testRestaurant));
+        when(mockService.findAll(0, 1000)).thenReturn(Set.of(testRestaurant));
 
         List<Restaurant> result = dao.findAll();
         assertFalse(result.isEmpty());

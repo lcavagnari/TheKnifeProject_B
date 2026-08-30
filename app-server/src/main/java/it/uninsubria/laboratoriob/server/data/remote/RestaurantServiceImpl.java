@@ -1,7 +1,9 @@
 package it.uninsubria.laboratoriob.server.data.remote;
 
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
+import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
+import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import it.uninsubria.laboratoriob.server.data.dao.RestaurantDAO;
@@ -10,6 +12,7 @@ import it.uninsubria.laboratoriob.server.data.dao.RestaurantDAO;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -25,33 +28,57 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     }
 
     @Override
-    public List<Restaurant> findAll(int offset, int limit) throws RemoteException {
-        List<Restaurant> all = new ArrayList<>(store.restaurants().findAll());
+    public Set<Restaurant> findAll(int offset, int limit) throws RemoteException {
+        List<Restaurant> allCache = new ArrayList<>(store.restaurants().findAll());
+        List<Restaurant> cachePage = offset >= allCache.size()
+                ? List.of()
+                : allCache.subList(offset, Math.min(offset + limit, allCache.size()));
 
-        if (offset >= all.size()) return List.of();
+        Set<Restaurant> merged = new HashSet<>(cachePage);
 
-        return all.subList(offset, Math.min(offset + limit, all.size()));
+        CompletableFuture<List<Restaurant>> db = CompletableFuture
+                .supplyAsync(() -> rDAO.findAll(offset, limit))
+                .exceptionally(ex -> List.of());
+        merged.addAll(db.join());
+
+        return merged;
     }
 
     @Override
     public long count() throws RemoteException {
         long cache = store.restaurants().count();
         CompletableFuture<Long> db = CompletableFuture.supplyAsync(rDAO::count);
-        
+
         // Using cache as base and assuming edge-case in which # in cache != # in DB
         return cache + (db.join() - cache);
     }
 
     @Override
     public Restaurant findById(UUID id) throws RemoteException {
-        return store.restaurants().findById(id);
+        if (id == null) return null;
+
+        Restaurant cache = store.restaurants().findById(id);
+        CompletableFuture<Restaurant> db = CompletableFuture
+                .supplyAsync(() -> rDAO.findById(id).orElse(null))
+                .exceptionally(ex -> null);
+
+        return cache != null ? cache : db.join();
     }
 
     @Override
     public List<Restaurant> findByOwner(UUID id) throws RemoteException {
-        return store.restaurants().findAll().stream()
-                .filter(r -> r.getOwner() != null && r.getOwner().getId().equals(id))
-                .toList();
+        if (id == null) return List.of();
+
+        Set<Restaurant> merged = new HashSet<>();
+        User owner = store.users().findById(id);
+        if (owner instanceof Owner o) merged.addAll(o.getRestaurantsById().values());
+
+        CompletableFuture<List<Restaurant>> db = CompletableFuture
+                .supplyAsync(() -> rDAO.findByOwner(id))
+                .exceptionally(ex -> List.of());
+        merged.addAll(db.join());
+
+        return new ArrayList<>(merged);
     }
 
     @Override

@@ -217,7 +217,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
             try {
-                List<Restaurant> remote = svc.findAll(0, 1000);
+                Set<Restaurant> remote = svc.findAll(0, 1000);
 
                 for (Restaurant r : remote) cacheById.put(r.getId(), r);
                 persistAtomic(toArrayNode());

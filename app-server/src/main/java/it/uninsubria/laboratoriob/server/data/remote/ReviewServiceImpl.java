@@ -5,12 +5,10 @@ import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import it.uninsubria.laboratoriob.server.data.dao.ReviewDAO;
 
-
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
@@ -24,33 +22,65 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
 
     @Override
     public List<Review> findByRestaurant(UUID restaurantId) throws RemoteException {
-        return store.reviews().findByRestaurant(restaurantId);
+        if (restaurantId == null) return List.of();
+
+        Set<Review> merged = new HashSet<>(store.reviews().findByRestaurant(restaurantId));
+
+        CompletableFuture<List<Review>> db = CompletableFuture
+                .supplyAsync(() -> rDAO.findByRestaurant(restaurantId))
+                .exceptionally(ex -> List.of());
+        merged.addAll(db.join());
+
+        return new ArrayList<>(merged);
     }
 
     @Override
     public List<Review> findByUser(UUID userId) throws RemoteException {
-        return store.reviews().findByUser(userId);
+        if (userId == null) return List.of();
+
+        Set<Review> merged = new HashSet<>(store.reviews().findByUser(userId));
+
+        CompletableFuture<List<Review>> db = CompletableFuture
+                .supplyAsync(() -> rDAO.findByUser(userId))
+                .exceptionally(ex -> List.of());
+        merged.addAll(db.join());
+
+        return new ArrayList<>(merged);
     }
 
     @Override
     public List<Review> findAll() throws RemoteException {
-        return store.reviews().findAll();
+        Set<Review> merged = new HashSet<>(store.reviews().findAll());
+
+        CompletableFuture<List<Review>> db = CompletableFuture
+                .supplyAsync(rDAO::findAll)
+                .exceptionally(ex -> List.of());
+        merged.addAll(db.join());
+
+        return new ArrayList<>(merged);
     }
 
     @Override
-    public List<Review> findAll(int offset, int limit) throws RemoteException {
-        List<Review> all = store.reviews().findAll();
-        if (offset >= all.size()) return List.of();
-        return all.subList(offset, Math.min(offset + limit, all.size()));
+    public Set<Review> findAll(int offset, int limit) throws RemoteException {
+        List<Review> allCache = store.reviews().findAll();
+        List<Review> cachePage = offset >= allCache.size()
+                ? List.of()
+                : allCache.subList(offset, Math.min(offset + limit, allCache.size()));
+
+        Set<Review> merged = new HashSet<>(cachePage);
+
+        CompletableFuture<List<Review>> db = CompletableFuture
+                .supplyAsync(() -> rDAO.findAll(offset, limit))
+                .exceptionally(ex -> List.of());
+        merged.addAll(db.join());
+
+        return merged;
     }
 
+    // NOTE: not propagated to the cacheOk/dbOk pattern since store.reviews().save(review)
+    // already does its own INSERT via ReviewRepository's internal DAO, risk of duplication
     @Override
     public boolean save(Review review) throws RemoteException {
-        // NOTE: not propagated to the cacheOk/dbOk pattern - store.reviews().save(review)
-        // already does its own INSERT via ReviewRepository's internal DAO, so pairing it
-        // with rDAO.save(review) here would double-INSERT the same primary key and always
-        // fail, same risk as RestaurantServiceImpl.save()/registerOwner(). Left as a single
-        // DB-only write, flagged per your instruction rather than "fixed" unilaterally.
         return rDAO.save(review);
     }
 
