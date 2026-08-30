@@ -2,8 +2,9 @@ package it.uninsubria.laboratoriob.server.data.remote;
 
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
+import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import it.uninsubria.laboratoriob.server.data.dao.ReviewDAO;
-import it.uninsubria.laboratoriob.server.utils.Loader;
+
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -11,29 +12,32 @@ import java.util.List;
 import java.util.UUID;
 
 public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
+    
     private final ReviewDAO rDAO = new ReviewDAO();
-
-    public ReviewServiceImpl() throws RemoteException {
+    private final ServerDataStore store;
+    
+    public ReviewServiceImpl(ServerDataStore store) throws RemoteException {
+        this.store = store;
     }
 
     @Override
     public List<Review> findByRestaurant(UUID restaurantId) throws RemoteException {
-        return Loader.findReviewsByRestaurant(restaurantId);
+        return store.reviews().findByRestaurant(restaurantId);
     }
 
     @Override
     public List<Review> findByUser(UUID userId) throws RemoteException {
-        return Loader.findReviewsByUser(userId);
+        return store.reviews().findByUser(userId);
     }
 
     @Override
     public List<Review> findAll() throws RemoteException {
-        return Loader.findAllReviews();
+        return store.reviews().findAll();
     }
 
     @Override
     public List<Review> findAll(int offset, int limit) throws RemoteException {
-        List<Review> all = Loader.findAllReviews();
+        List<Review> all = store.reviews().findAll();
         if (offset >= all.size()) return List.of();
         return all.subList(offset, Math.min(offset + limit, all.size()));
     }
