@@ -1,8 +1,12 @@
 package it.uninsubria.laboratoriob.client.gui.controller;
 
+import it.uninsubria.laboratoriob.api.objects.User;
+import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
 import it.uninsubria.laboratoriob.client.gui.Navigation;
 
 import it.uninsubria.laboratoriob.client.gui.session.Session;
+import it.uninsubria.laboratoriob.client.gui.session.SessionRepository;
 import javafx.animation.ParallelTransition;
 import javafx.animation.PauseTransition;
 import javafx.animation.TranslateTransition;
@@ -22,6 +26,8 @@ public class GUIController {
     private static final Duration SLIDE_DURATION = Duration.millis(250);
     private static final Duration PAUSE_DURATION = Duration.millis(100);
     private static final double BLUR_RADIUS = 6;
+
+    private final SessionRepository sessionRepository = new SessionRepository();
 
     @FXML
     private VBox menuCard;
@@ -54,8 +60,32 @@ public class GUIController {
         });
         preloadForms();
 
+        restoreSession();
+
         if (Session.isLoggedIn())
             mostraHomeSenzaAnimazione();
+    }
+
+    /**
+     * Ripristina la sessione salvata (se presente) prima che la scena sia
+     * visibile, ripuntando i DAO utente all'id salvato e ricaricando
+     * l'utente da cache/JSON locale.
+     */
+    private void restoreSession() {
+        if (Session.isLoggedIn()) return;
+
+        sessionRepository.loadUserId().ifPresent(userId -> {
+            ClientDataStore dataStore = GuiContext.getDataStore();
+            dataStore.switchUser(userId);
+
+            User restored = dataStore.getCustomerDAO().findById(userId)
+                    .map(u -> (User) u)
+                    .or(() -> dataStore.getOwnerDAO().findById(userId).map(u -> (User) u))
+                    .orElse(null);
+
+            if (restored != null)
+                Session.login(restored);
+        });
     }
 
     private void preloadForms() {

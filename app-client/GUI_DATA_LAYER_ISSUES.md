@@ -24,31 +24,31 @@ never-overwrite pattern at lines ~260-266 of the pre-fix file. It's not used/cal
 paths (GUI goes through `authService.register()` + `cacheOnly()` directly) — is that method still needed, and if so,
 should it get the same fix?
 
-## 2. Session persistence is write-only
+## 2. Session persistence is write-only — FIXED (2026-08-30)
 
-**Problem (confirmed):** `SessionRepository.save(user)` writes to `data/session.txt`
-on every login/register. `loadUsername()` exists to read it back but has no caller anywhere in the codebase. Result: the
-GUI always starts logged out, regardless of a prior session. `GUIController.initialize()`'s
-`if (Session.isLoggedIn())` restore check never runs as a consequence, since `Session` is never populated before it —
-is that intentional or not?
+**Problem (confirmed):** `SessionRepository.save(user)` wrote to `data/session.txt`
+on every login/register. `loadUsername()` existed to read it back but had no caller anywhere in the codebase. Result:
+the GUI always started logged out, regardless of a prior session. `GUIController.initialize()`'s
+`if (Session.isLoggedIn())` restore check never ran as a consequence, since `Session` was never populated before it.
 
-**Decisions already made:**
+**Fix applied, matching the decisions already made:**
 
-- Session file becomes `data/session.ini`, format:
+- Session file is now `data/session.ini`:
   ```
   [session]
   userId=<uuid>
   ```
-  Storing the user's ID, not username — the real storage is keyed by user ID (`data/<userId>/user.json`), not `user_*`
-  files (that was the old demo3 scheme).
-- `loadUsername()` is replaced by `loadUserId()` returning `Optional<UUID>`.
-- Restore logic lands in `GUIController.initialize()`, before the existing
-  `if (Session.isLoggedIn())` check: if nobody's logged in yet,
-  `loadUserId()` → `dataStore.switchUser(id)` → try `customerDAO.findById(id)`, then `ownerDAO.findById(id)` → whichever
-  hits → `Session.login(user)`.
+  Storing the user's ID, not username — matches real storage keyed by user ID (`data/<userId>/user.json`).
+- `loadUsername()` replaced by `loadUserId()` returning `Optional<UUID>`.
+- `GUIController.initialize()` calls a new `restoreSession()` before the existing `if (Session.isLoggedIn())` check:
+  if nobody's logged in yet, `loadUserId()` → `dataStore.switchUser(id)` → try `customerDAO.findById(id)`, then
+  `ownerDAO.findById(id)` → whichever hits → `Session.login(user)`.
 
-Depends loosely on #1 — the restore path calls `findById`, not the broken
-`cacheOnly`, so it isn't hard-blocked, but both live in the same subsystem.
+**Verification level:** clean compile + a real headless launch under `Xvfb` (no exceptions, no crash). No local
+`data/session.ini` + cached user existed on this machine to exercise the actual restore-and-log-in path end to end,
+so that specific path is verified by code review against the existing `switchUser`/`findById` pattern (same one
+`LoginController` already uses), not by a live restore test. Flagging this explicitly rather than claiming more than
+was checked.
 
 ## 3. No pagination in the GUI lists
 
