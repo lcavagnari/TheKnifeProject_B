@@ -1,8 +1,8 @@
 package it.uninsubria.laboratoriob.client;
 
-import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.cli.IO;
 import it.uninsubria.laboratoriob.client.cli.menus.GuestMenus;
+import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.gui.Launcher;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
 

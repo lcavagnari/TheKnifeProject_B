@@ -139,7 +139,8 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
             for (JsonNode c : cuisinesNode) {
                 try {
                     cuisinesTypes.add(CuisineType.valueOf(c.asText()));
-                } catch (IllegalArgumentException ignored) {}
+                } catch (IllegalArgumentException ignored) {
+                }
             }
         }
 
@@ -258,7 +259,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         long local = countLocal();
         long remote = countRemote();
 
-        return local+remote;
+        return local + remote;
     }
 
     public List<Restaurant> findByOwner(UUID ownerId) {
@@ -291,7 +292,9 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         persistAtomic(toArrayNode());
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.save(restaurant); } catch (RemoteException e) {
+            try {
+                svc.save(restaurant);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }
@@ -311,7 +314,9 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.update(restaurant); } catch (RemoteException e) {
+            try {
+                svc.update(restaurant);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }
@@ -327,7 +332,9 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         persistAtomic(toArrayNode());
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.delete(id); } catch (RemoteException e) {
+            try {
+                svc.delete(id);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }
@@ -344,7 +351,9 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         persistAtomic(toArrayNode());
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.updateCuisines(restaurantId, cuisines); } catch (RemoteException e) {
+            try {
+                svc.updateCuisines(restaurantId, cuisines);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }
@@ -361,7 +370,9 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         persistAtomic(toArrayNode());
         RestaurantServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.updateServices(restaurantId, services); } catch (RemoteException e) {
+            try {
+                svc.updateServices(restaurantId, services);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }

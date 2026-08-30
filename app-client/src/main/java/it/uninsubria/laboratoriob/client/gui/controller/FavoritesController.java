@@ -1,18 +1,18 @@
 package it.uninsubria.laboratoriob.client.gui.controller;
-import it.uninsubria.laboratoriob.client.gui.GuiContext;
-import it.uninsubria.laboratoriob.client.gui.Navigation;
 
-import it.uninsubria.laboratoriob.client.gui.session.Session;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.objects.User;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;

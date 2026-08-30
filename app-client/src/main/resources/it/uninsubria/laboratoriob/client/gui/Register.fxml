@@ -5,73 +5,76 @@
 <VBox alignment="CENTER" spacing="12" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="it.uninsubria.laboratoriob.client.gui.controller.RegisterController">
 
-    <Label text="Nuovo account" styleClass="label-title" />
-    <Label text="Compila i dati per registrarti" styleClass="label-info" />
+    <Label text="Nuovo account" styleClass="label-title"/>
+    <Label text="Compila i dati per registrarti" styleClass="label-info"/>
 
     <!-- Role selection – visual cards -->
     <HBox spacing="10" alignment="CENTER" styleClass="role-selector">
         <VBox fx:id="roleClienteCard" styleClass="role-card role-card-selected" alignment="CENTER" spacing="4">
-            <Label text="Cliente" styleClass="role-card-title" />
-            <Label text="Trova e recensisci" styleClass="role-card-sub" />
+            <Label text="Cliente" styleClass="role-card-title"/>
+            <Label text="Trova e recensisci" styleClass="role-card-sub"/>
         </VBox>
         <VBox fx:id="roleGestoreCard" styleClass="role-card" alignment="CENTER" spacing="4">
-            <Label text="Gestore" styleClass="role-card-title" />
-            <Label text="Gestisci il ristorante" styleClass="role-card-sub" />
+            <Label text="Gestore" styleClass="role-card-title"/>
+            <Label text="Gestisci il ristorante" styleClass="role-card-sub"/>
         </VBox>
         <!-- Hidden radios for ToggleGroup binding -->
         <RadioButton fx:id="radioCliente" text="Cliente" selected="true" visible="false" managed="false">
-            <toggleGroup><ToggleGroup fx:id="tipoUtenteGroup" /></toggleGroup>
+            <toggleGroup>
+                <ToggleGroup fx:id="tipoUtenteGroup"/>
+            </toggleGroup>
         </RadioButton>
-        <RadioButton fx:id="radioGestore" text="Gestore" toggleGroup="$tipoUtenteGroup" visible="false" managed="false" />
+        <RadioButton fx:id="radioGestore" text="Gestore" toggleGroup="$tipoUtenteGroup" visible="false"
+                     managed="false"/>
     </HBox>
 
     <!-- Account -->
-    <Label text="Account" styleClass="section-header" />
+    <Label text="Account" styleClass="section-header"/>
     <VBox spacing="2">
-        <Label fx:id="usernameError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-        <TextField fx:id="usernameField" promptText="Username *" />
+        <Label fx:id="usernameError" styleClass="field-error" visible="false" managed="false" wrapText="true"/>
+        <TextField fx:id="usernameField" promptText="Username *"/>
     </VBox>
     <VBox spacing="2">
-        <Label fx:id="passwordError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-        <PasswordField fx:id="passwordField" promptText="Password *" />
+        <Label fx:id="passwordError" styleClass="field-error" visible="false" managed="false" wrapText="true"/>
+        <PasswordField fx:id="passwordField" promptText="Password *"/>
     </VBox>
     <VBox fx:id="confirmPasswordWrapper" spacing="2" visible="false" managed="false">
-        <Label fx:id="confirmPasswordError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-        <PasswordField fx:id="confirmPasswordField" promptText="Conferma password *" />
+        <Label fx:id="confirmPasswordError" styleClass="field-error" visible="false" managed="false" wrapText="true"/>
+        <PasswordField fx:id="confirmPasswordField" promptText="Conferma password *"/>
     </VBox>
 
     <!-- Profilo -->
-    <Label text="Profilo" styleClass="section-header" />
+    <Label text="Profilo" styleClass="section-header"/>
     <HBox spacing="10">
         <VBox spacing="2" HBox.hgrow="ALWAYS">
-            <Label fx:id="nomeError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-            <TextField fx:id="nomeField" promptText="Nome *" HBox.hgrow="ALWAYS" />
+            <Label fx:id="nomeError" styleClass="field-error" visible="false" managed="false" wrapText="true"/>
+            <TextField fx:id="nomeField" promptText="Nome *" HBox.hgrow="ALWAYS"/>
         </VBox>
         <VBox spacing="2" HBox.hgrow="ALWAYS">
-            <Label fx:id="cognomeError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-            <TextField fx:id="cognomeField" promptText="Cognome *" HBox.hgrow="ALWAYS" />
+            <Label fx:id="cognomeError" styleClass="field-error" visible="false" managed="false" wrapText="true"/>
+            <TextField fx:id="cognomeField" promptText="Cognome *" HBox.hgrow="ALWAYS"/>
         </VBox>
     </HBox>
     <VBox spacing="2" alignment="CENTER">
-        <Label fx:id="dataNascitaError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-        <DatePicker fx:id="dataNascitaPicker" promptText="Data di nascita *" styleClass="date-picker-wide" />
+        <Label fx:id="dataNascitaError" styleClass="field-error" visible="false" managed="false" wrapText="true"/>
+        <DatePicker fx:id="dataNascitaPicker" promptText="Data di nascita *" styleClass="date-picker-wide"/>
     </VBox>
 
     <!-- Indirizzo -->
-    <Label text="Indirizzo" styleClass="section-header" />
-    <TextField fx:id="indirizzoField" promptText="Via e numero civico" />
+    <Label text="Indirizzo" styleClass="section-header"/>
+    <TextField fx:id="indirizzoField" promptText="Via e numero civico"/>
     <HBox spacing="10">
-        <TextField fx:id="cittaField" promptText="Città" HBox.hgrow="ALWAYS" />
+        <TextField fx:id="cittaField" promptText="Città" HBox.hgrow="ALWAYS"/>
         <VBox spacing="2" HBox.hgrow="ALWAYS">
-            <Label fx:id="nazioneError" styleClass="field-error" visible="false" managed="false" wrapText="true" />
-            <TextField fx:id="nazioneField" promptText="Nazione (es. Italy)" HBox.hgrow="ALWAYS" />
+            <Label fx:id="nazioneError" styleClass="field-error" visible="false" managed="false" wrapText="true"/>
+            <TextField fx:id="nazioneField" promptText="Nazione (es. Italy)" HBox.hgrow="ALWAYS"/>
         </VBox>
     </HBox>
 
-    <Label fx:id="errorLabel" wrapText="true" styleClass="label-success" />
+    <Label fx:id="errorLabel" wrapText="true" styleClass="label-success"/>
 
     <HBox spacing="20" alignment="CENTER">
-        <Button fx:id="btnRegistrati" text="Registrati" onAction="#onRegistratiClick" />
-        <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-link" />
+        <Button fx:id="btnRegistrati" text="Registrati" onAction="#onRegistratiClick"/>
+        <Button fx:id="btnAnnulla" text="Annulla" onAction="#onAnnullaClick" styleClass="button-link"/>
     </HBox>
 </VBox>

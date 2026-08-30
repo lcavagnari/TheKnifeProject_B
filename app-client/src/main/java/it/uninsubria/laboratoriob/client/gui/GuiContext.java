@@ -10,7 +10,8 @@ public final class GuiContext {
 
     private static ClientDataStore dataStore;
 
-    private GuiContext() {}
+    private GuiContext() {
+    }
 
     public static void init(ClientDataStore store) {
         dataStore = store;

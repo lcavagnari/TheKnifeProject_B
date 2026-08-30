@@ -250,8 +250,8 @@ public class AddEditRestaurantController {
     }
 
     private void aggiornaRistorante(Location location, String nome, String descrizione, String sitoWeb,
-                                     String telefono, PriceRange prezzo, Award premio,
-                                     Set<CuisineType> cucineSelezionate) {
+                                    String telefono, PriceRange prezzo, Award premio,
+                                    Set<CuisineType> cucineSelezionate) {
         Restaurant r = restaurantInModifica;
 
         if (!nome.equals(r.getName()))

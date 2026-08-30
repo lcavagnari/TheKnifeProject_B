@@ -13,7 +13,8 @@ public final class Navigation {
 
     private static final Deque<Runnable> backstack = new ArrayDeque<>();
 
-    private Navigation() {}
+    private Navigation() {
+    }
 
     public static void pushBack(Runnable goBack) {
         backstack.push(goBack);

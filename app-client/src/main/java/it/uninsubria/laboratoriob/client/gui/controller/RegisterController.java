@@ -1,5 +1,4 @@
 package it.uninsubria.laboratoriob.client.gui.controller;
-import it.uninsubria.laboratoriob.client.gui.GuiContext;
 
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Customer;
@@ -8,14 +7,15 @@ import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
 import it.uninsubria.laboratoriob.client.gui.session.Session;
 import it.uninsubria.laboratoriob.client.gui.session.SessionRepository;
 import it.uninsubria.laboratoriob.client.utils.RmiRepository;
+import javafx.animation.PauseTransition;
+import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
-import javafx.animation.PauseTransition;
-import javafx.animation.TranslateTransition;
 import javafx.util.Duration;
 
 import java.rmi.RemoteException;
@@ -27,34 +27,59 @@ public class RegisterController {
     private Runnable onCancelCallback;
     private Runnable onRegisterSuccessCallback;
 
-    @FXML private Label errorLabel;
-    @FXML private RadioButton radioGestore;
-    @FXML private RadioButton radioCliente;
-    @FXML private ToggleGroup tipoUtenteGroup;
-    @FXML private VBox roleClienteCard;
-    @FXML private VBox roleGestoreCard;
-    @FXML private VBox confirmPasswordWrapper;
+    @FXML
+    private Label errorLabel;
+    @FXML
+    private RadioButton radioGestore;
+    @FXML
+    private RadioButton radioCliente;
+    @FXML
+    private ToggleGroup tipoUtenteGroup;
+    @FXML
+    private VBox roleClienteCard;
+    @FXML
+    private VBox roleGestoreCard;
+    @FXML
+    private VBox confirmPasswordWrapper;
 
-    @FXML private TextField usernameField;
-    @FXML private TextField nomeField;
-    @FXML private TextField cognomeField;
-    @FXML private TextField indirizzoField;
-    @FXML private TextField cittaField;
-    @FXML private TextField nazioneField;
-    @FXML private DatePicker dataNascitaPicker;
-    @FXML private PasswordField passwordField;
-    @FXML private PasswordField confirmPasswordField;
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private TextField nomeField;
+    @FXML
+    private TextField cognomeField;
+    @FXML
+    private TextField indirizzoField;
+    @FXML
+    private TextField cittaField;
+    @FXML
+    private TextField nazioneField;
+    @FXML
+    private DatePicker dataNascitaPicker;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private PasswordField confirmPasswordField;
 
-    @FXML private Label usernameError;
-    @FXML private Label passwordError;
-    @FXML private Label confirmPasswordError;
-    @FXML private Label nomeError;
-    @FXML private Label cognomeError;
-    @FXML private Label dataNascitaError;
-    @FXML private Label nazioneError;
+    @FXML
+    private Label usernameError;
+    @FXML
+    private Label passwordError;
+    @FXML
+    private Label confirmPasswordError;
+    @FXML
+    private Label nomeError;
+    @FXML
+    private Label cognomeError;
+    @FXML
+    private Label dataNascitaError;
+    @FXML
+    private Label nazioneError;
 
-    @FXML private Button btnRegistrati;
-    @FXML private Button btnAnnulla;
+    @FXML
+    private Button btnRegistrati;
+    @FXML
+    private Button btnAnnulla;
 
     @FXML
     public void initialize() {
@@ -110,13 +135,27 @@ public class RegisterController {
         });
 
         // Clear errors on typing
-        usernameField.textProperty().addListener((obs, old, n) -> { if (usernameError.isVisible()) clearFieldError(usernameError, usernameField); });
-        nomeField.textProperty().addListener((obs, old, n) -> { if (nomeError.isVisible()) clearFieldError(nomeError, nomeField); });
-        cognomeField.textProperty().addListener((obs, old, n) -> { if (cognomeError.isVisible()) clearFieldError(cognomeError, cognomeField); });
-        passwordField.textProperty().addListener((obs, old, n) -> { if (passwordError.isVisible()) clearFieldError(passwordError, passwordField); });
-        confirmPasswordField.textProperty().addListener((obs, old, n) -> { if (confirmPasswordError.isVisible()) clearFieldError(confirmPasswordError, confirmPasswordField); });
-        nazioneField.textProperty().addListener((obs, old, n) -> { if (nazioneError.isVisible()) clearFieldError(nazioneError, nazioneField); });
-        dataNascitaPicker.valueProperty().addListener((obs, old, n) -> { if (dataNascitaError.isVisible()) clearFieldError(dataNascitaError, dataNascitaPicker); });
+        usernameField.textProperty().addListener((obs, old, n) -> {
+            if (usernameError.isVisible()) clearFieldError(usernameError, usernameField);
+        });
+        nomeField.textProperty().addListener((obs, old, n) -> {
+            if (nomeError.isVisible()) clearFieldError(nomeError, nomeField);
+        });
+        cognomeField.textProperty().addListener((obs, old, n) -> {
+            if (cognomeError.isVisible()) clearFieldError(cognomeError, cognomeField);
+        });
+        passwordField.textProperty().addListener((obs, old, n) -> {
+            if (passwordError.isVisible()) clearFieldError(passwordError, passwordField);
+        });
+        confirmPasswordField.textProperty().addListener((obs, old, n) -> {
+            if (confirmPasswordError.isVisible()) clearFieldError(confirmPasswordError, confirmPasswordField);
+        });
+        nazioneField.textProperty().addListener((obs, old, n) -> {
+            if (nazioneError.isVisible()) clearFieldError(nazioneError, nazioneField);
+        });
+        dataNascitaPicker.valueProperty().addListener((obs, old, n) -> {
+            if (dataNascitaError.isVisible()) clearFieldError(dataNascitaError, dataNascitaPicker);
+        });
     }
 
     private void selectRole(boolean cliente) {

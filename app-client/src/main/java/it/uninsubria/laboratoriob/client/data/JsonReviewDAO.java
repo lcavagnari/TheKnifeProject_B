@@ -222,7 +222,9 @@ public final class JsonReviewDAO implements DAO<Review> {
         persistAtomic(toArrayNode());
         ReviewServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.save(review); } catch (RemoteException e) {
+            try {
+                svc.save(review);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }
@@ -239,7 +241,9 @@ public final class JsonReviewDAO implements DAO<Review> {
         persistAtomic(toArrayNode());
         ReviewServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.update(review); } catch (RemoteException e) {
+            try {
+                svc.update(review);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }
@@ -277,7 +281,9 @@ public final class JsonReviewDAO implements DAO<Review> {
         persistAtomic(toArrayNode());
         ReviewServiceInter svc = ensureService();
         if (svc != null) {
-            try { svc.delete(id); } catch (RemoteException e) {
+            try {
+                svc.delete(id);
+            } catch (RemoteException e) {
                 this.service = null;
                 throw new ServiceUnavailableException("Server non disponibile", e);
             }

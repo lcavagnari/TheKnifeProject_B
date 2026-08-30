@@ -1,50 +1,34 @@
 package it.uninsubria.laboratoriob.client.gui.controller;
-import it.uninsubria.laboratoriob.client.gui.GuiContext;
-import it.uninsubria.laboratoriob.client.gui.Navigation;
 
-import it.uninsubria.laboratoriob.client.gui.session.Session;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
+import it.uninsubria.laboratoriob.client.gui.Navigation;
+import it.uninsubria.laboratoriob.client.gui.session.Session;
+import javafx.animation.*;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.util.Duration;
-
-import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.*;
 import javafx.scene.effect.Blend;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.effect.ColorInput;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -442,8 +426,6 @@ public class RestaurantsController {
             ratingLabel.setManaged(isPresent);
 
 
-
-
             // Meta: city + price range
             String city = (r.getLocation() != null && r.getLocation().getCity() != null)
                     ? r.getLocation().getCity() : "";
@@ -470,8 +452,10 @@ public class RestaurantsController {
                     : Set.of();
             for (String c : cuisineBadges)
                 badges.getChildren().add(makeBadge(c, "badge-cuisine", null));
-            if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery", "/it/uninsubria/laboratoriob/client/gui/images/ic_geomarker.png"));
-            if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking", "/it/uninsubria/laboratoriob/client/gui/images/ic_globe.png"));
+            if (r.isHasDelivery())
+                badges.getChildren().add(makeBadge("Delivery", "badge-delivery", "/it/uninsubria/laboratoriob/client/gui/images/ic_geomarker.png"));
+            if (r.isHasOnlineBooking())
+                badges.getChildren().add(makeBadge("Booking", "badge-booking", "/it/uninsubria/laboratoriob/client/gui/images/ic_globe.png"));
 
             setGraphic(card);
         }
@@ -494,7 +478,8 @@ public class RestaurantsController {
                     l.setGraphic(iv);
                     l.setContentDisplay(ContentDisplay.LEFT);
                     l.setGraphicTextGap(4);
-                } catch (Exception ignored) {}
+                } catch (Exception ignored) {
+                }
             }
             return l;
         }

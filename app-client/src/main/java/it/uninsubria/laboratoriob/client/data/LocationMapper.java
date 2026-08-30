@@ -14,7 +14,8 @@ import it.uninsubria.laboratoriob.api.objects.Location;
  */
 final class LocationMapper {
 
-    private LocationMapper() {}
+    private LocationMapper() {
+    }
 
     static Location fromNode(JsonNode node) {
         if (node == null || node.isMissingNode() || node.isNull()) return null;

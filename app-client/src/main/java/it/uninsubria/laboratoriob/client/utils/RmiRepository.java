@@ -104,7 +104,8 @@ public class RmiRepository {
         int p = port;
         if (h == null) return Set.of();
 
-        record Slot(AtomicReference<?> ref, AtomicLong lastAttempt, AtomicInteger failedAttempts) {}
+        record Slot(AtomicReference<?> ref, AtomicLong lastAttempt, AtomicInteger failedAttempts) {
+        }
 
         Map<String, Slot> services = Map.of(
                 "restaurant", new Slot(restaurantService, restaurantLastAttempt, restaurantFailedAttempts),

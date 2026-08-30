@@ -38,7 +38,7 @@ public abstract class Menus {
                         .orElse(null);
 
                 if (r == null)
-                    throw new IllegalArgumentException("Nessun ristorante trovato con nome "+name+", riprovare");
+                    throw new IllegalArgumentException("Nessun ristorante trovato con nome " + name + ", riprovare");
 
             } catch (IllegalArgumentException ex) {
                 IO.printErrorMessage(ex.getMessage());

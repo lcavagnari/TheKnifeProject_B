@@ -1,4 +1,5 @@
 package it.uninsubria.laboratoriob.client.gui.controller;
+
 import it.uninsubria.laboratoriob.client.gui.Navigation;
 
 import it.uninsubria.laboratoriob.client.gui.session.Session;
@@ -22,13 +23,20 @@ public class GUIController {
     private static final Duration PAUSE_DURATION = Duration.millis(100);
     private static final double BLUR_RADIUS = 6;
 
-    @FXML private VBox menuCard;
-    @FXML private VBox titleBlock;
-    @FXML private VBox menuButtons;
-    @FXML private Button btnLogin;
-    @FXML private Button btnRegister;
-    @FXML private Button btnTrova;
-    @FXML private Button btnEsci;
+    @FXML
+    private VBox menuCard;
+    @FXML
+    private VBox titleBlock;
+    @FXML
+    private VBox menuButtons;
+    @FXML
+    private Button btnLogin;
+    @FXML
+    private Button btnRegister;
+    @FXML
+    private Button btnTrova;
+    @FXML
+    private Button btnEsci;
 
     private Node loginForm;
     private Node registerForm;

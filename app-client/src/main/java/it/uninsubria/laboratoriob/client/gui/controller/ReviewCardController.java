@@ -1,7 +1,7 @@
 package it.uninsubria.laboratoriob.client.gui.controller;
-import it.uninsubria.laboratoriob.client.gui.GuiContext;
 
 import it.uninsubria.laboratoriob.api.objects.Review;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
 import javafx.animation.PauseTransition;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -10,6 +10,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.util.Duration;
+
 import java.time.format.DateTimeFormatter;
 
 public class ReviewCardController {
@@ -37,14 +38,13 @@ public class ReviewCardController {
     @FXML
     private TextArea replyField;
 
-    private enum StatoBottoneRisposta { NESSUNA_RISPOSTA, RISPOSTA_PRESENTE, CONFERMA_CANCELLAZIONE }
+    private enum StatoBottoneRisposta {NESSUNA_RISPOSTA, RISPOSTA_PRESENTE, CONFERMA_CANCELLAZIONE}
 
     private StatoBottoneRisposta statoBottoneRisposta = StatoBottoneRisposta.NESSUNA_RISPOSTA;
 
     private Review review;
     private String currentUserId;
     private boolean isOwner;
-
 
 
     private static final DateTimeFormatter REVIEW_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");

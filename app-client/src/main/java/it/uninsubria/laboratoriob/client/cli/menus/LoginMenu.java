@@ -7,8 +7,8 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
-import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.cli.IO;
+import it.uninsubria.laboratoriob.client.data.ClientDataStore;
 import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 import lombok.experimental.UtilityClass;
 
@@ -156,7 +156,7 @@ public class LoginMenu {
                         user = authService.login(username, password);
                     } catch (RemoteException ex) {
                         throw new AbortOperationException(
-                                (ex.getMessage().isEmpty()) ? "Server non raggiungibile." : "Errore: "+ex.getMessage()
+                                (ex.getMessage().isEmpty()) ? "Server non raggiungibile." : "Errore: " + ex.getMessage()
                         );
                     }
                 } else {
