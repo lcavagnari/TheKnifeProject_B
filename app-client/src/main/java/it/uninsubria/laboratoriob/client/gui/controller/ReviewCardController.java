@@ -49,6 +49,7 @@ public class ReviewCardController {
     private Review review;
     private String currentUserId;
     private boolean isOwner;
+    private Runnable onDeleted;
 
 
     private static final DateTimeFormatter REVIEW_TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
@@ -213,9 +214,19 @@ public class ReviewCardController {
         pausa.play();
     }
 
+    /**
+     * Imposta il callback invocato dopo che la recensione e' stata eliminata con
+     * successo, cosi' che lo schermo che ospita la card possa aggiornarsi.
+     *
+     * @param onDeleted azione da eseguire dopo la cancellazione
+     */
+    public void setOnDeleted(Runnable onDeleted) {
+        this.onDeleted = onDeleted;
+    }
+
     @FXML
     private void onDeleteAction() {
-        System.out.println("Elimina la recensione " + review.getId());
-        // Aggiungi qui la logica per eliminare la recensione (es. API call)
+        GuiContext.getDataStore().getReviewDAO().delete(review.getId());
+        if (onDeleted != null) onDeleted.run();
     }
 }

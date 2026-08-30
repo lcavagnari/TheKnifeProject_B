@@ -27,6 +27,7 @@ import javafx.stage.Stage;
 import java.io.IOException;
 import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -76,6 +77,8 @@ public class RestaurantDetailsController {
     private Button btnIndietro;
     @FXML
     private Button btnModifica;
+    @FXML
+    private Button btnElimina;
     @FXML
     private Button btnPreferito;
     @FXML
@@ -152,6 +155,15 @@ public class RestaurantDetailsController {
     public void carica(Restaurant r) {
         this.restaurant = r;
 
+        // Le recensioni sono dati condivisi tra utenti/sessioni diverse: l'oggetto
+        // Restaurant passato a questo metodo potrebbe provenire da una cache locale
+        // non aggiornata (es. l'elenco "I Miei Ristoranti" del Gestore), quindi si
+        // ricaricano sempre dal server prima di mostrarle.
+        List<Review> recensioniAggiornate = GuiContext.getDataStore().getReviewDAO().findByRestaurant(r.getId());
+        r.getReviews().clear();
+        for (Review rev : recensioniAggiornate)
+            r.getReviews().put(rev.getId(), rev);
+
         User currentUser = Session.getCurrentUser();
         boolean isOwner = currentUser != null
                 && currentUser.getRole() == UserRole.OWNER
@@ -159,6 +171,8 @@ public class RestaurantDetailsController {
                 && currentUser.getId().toString().equals(r.getOwner().getId().toString());
         btnModifica.setVisible(isOwner);
         btnModifica.setManaged(isOwner);
+        btnElimina.setVisible(isOwner);
+        btnElimina.setManaged(isOwner);
 
         boolean isCustomer = currentUser instanceof Customer;
         btnPreferito.setVisible(isCustomer);
@@ -281,6 +295,7 @@ public class RestaurantDetailsController {
                             VBox card = loader.load();
                             ReviewCardController controller = loader.getController();
                             controller.setContext(review, currentUserId, isOwner);
+                            controller.setOnDeleted(() -> carica(restaurant));
                             reviewsList.getChildren().add(card);
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -325,6 +340,25 @@ public class RestaurantDetailsController {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @FXML
+    private void onEliminaClick() {
+        if (!(Session.getCurrentUser() instanceof Owner owner) || restaurant == null)
+            return;
+
+        javafx.scene.control.Alert conferma = new javafx.scene.control.Alert(
+                javafx.scene.control.Alert.AlertType.CONFIRMATION,
+                "Eliminare definitivamente \"" + restaurant.getName() + "\"? L'operazione non e' reversibile.",
+                javafx.scene.control.ButtonType.YES, javafx.scene.control.ButtonType.CANCEL);
+        conferma.setTitle("Elimina Ristorante");
+        conferma.setHeaderText(null);
+        conferma.initOwner(btnElimina.getScene().getWindow());
+
+        conferma.showAndWait().filter(button -> button == javafx.scene.control.ButtonType.YES).ifPresent(button -> {
+            GuiContext.getDataStore().getOwnerDAO().removeOwnedRestaurant(owner.getId(), restaurant.getId());
+            Navigation.goBack();
+        });
     }
 
     @FXML

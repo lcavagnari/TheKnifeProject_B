@@ -200,10 +200,10 @@ public final class JsonReviewDAO implements DAO<Review> {
      */
     public List<Review> findByRestaurant(UUID restaurantId) {
         ensureCacheLoaded();
-        List<Review> local = cacheById.values().stream()
-                .filter(r -> r.getRestaurant() != null && r.getRestaurant().getId().equals(restaurantId))
-                .toList();
-        if (!local.isEmpty()) return local;
+        // A differenza delle altre query di questo DAO, qui si preferisce sempre
+        // interrogare il server quando disponibile: le recensioni di un ristorante
+        // sono dati condivisi tra piu' utenti/sessioni, quindi una cache locale
+        // "vince" solo se il server non e' raggiungibile.
         ReviewServiceInter svc = ensureService();
         if (svc != null) {
             try {
@@ -213,10 +213,11 @@ public final class JsonReviewDAO implements DAO<Review> {
                 return remote;
             } catch (RemoteException e) {
                 this.service = null;
-                throw new ServiceUnavailableException("Server non disponibile", e);
             }
         }
-        return local;
+        return cacheById.values().stream()
+                .filter(r -> r.getRestaurant() != null && r.getRestaurant().getId().equals(restaurantId))
+                .toList();
     }
 
     /**

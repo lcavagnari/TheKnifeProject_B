@@ -31,6 +31,8 @@
         </Button>
         <Button fx:id="btnModifica" managed="false" styleClass="button-secondary" onAction="#onModificaClick"
                 text="Modifica" visible="false"/>
+        <Button fx:id="btnElimina" managed="false" styleClass="button-danger" onAction="#onEliminaClick"
+                text="Elimina" visible="false"/>
     </HBox>
     <!-- Ribbons: Reviews on top, Awards below -->
     <VBox alignment="CENTER_LEFT" spacing="0">
