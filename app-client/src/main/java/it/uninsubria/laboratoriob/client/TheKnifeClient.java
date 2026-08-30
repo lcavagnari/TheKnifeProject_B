@@ -22,11 +22,10 @@ import java.util.Arrays;
 public class TheKnifeClient {
 
     public static void main(String[] args) {
-        if (Arrays.asList(args).contains("--cli")) {
+        if (Arrays.asList(args).contains("--cli"))
             runCli();
-        } else {
+        else
             Launcher.main(args);
-        }
     }
 
     private static void runCli() {

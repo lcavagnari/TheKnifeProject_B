@@ -46,9 +46,8 @@ public class GUIController {
         });
         preloadForms();
 
-        if (Session.isLoggedIn()) {
+        if (Session.isLoggedIn())
             mostraHomeSenzaAnimazione();
-        }
     }
 
     private void preloadForms() {
@@ -87,9 +86,8 @@ public class GUIController {
         menuButtons.setVisible(false);
         menuButtons.setManaged(false);
 
-        if (!menuCard.getChildren().contains(homeForm)) {
+        if (!menuCard.getChildren().contains(homeForm))
             menuCard.getChildren().add(homeForm);
-        }
         homeForm.setVisible(true);
         homeForm.setManaged(true);
     }

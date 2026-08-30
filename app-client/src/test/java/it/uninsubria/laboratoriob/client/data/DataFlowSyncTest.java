@@ -75,9 +75,8 @@ class DataFlowSyncTest {
         if (restaurantsFile.exists()) restaurantsFile.delete();
         if (reviewsFile.exists()) reviewsFile.delete();
         File dataDir = new File("data");
-        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0) {
+        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0)
             dataDir.delete();
-        }
     }
 
     // --- User Flow: login → cache → JSON → RMI ---

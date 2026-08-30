@@ -20,9 +20,8 @@ public final class Navigation {
     }
 
     public static void goBack() {
-        if (!backstack.isEmpty()) {
+        if (!backstack.isEmpty())
             backstack.pop().run();
-        }
     }
 
     public static void clearBackstack() {

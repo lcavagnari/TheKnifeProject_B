@@ -168,9 +168,8 @@ public class RmiRepository {
         } catch (Exception e) {
             int failures = failedAttempts.incrementAndGet();
             System.err.println("RMI lookup failed for '" + name + "': " + e.getMessage());
-            if (failures >= MAX_FAILED_ATTEMPTS) {
+            if (failures >= MAX_FAILED_ATTEMPTS)
                 System.err.println("RMI lookup for '" + name + "' failed " + failures + " times in a row, giving up until reconnect.");
-            }
             return null;
         }
     }

@@ -116,25 +116,20 @@ public class RestaurantsController {
 
     private List<Restaurant> ristorantiDiProprieta() {
         Map<UUID, Restaurant> uniti = new LinkedHashMap<>();
-        if (owner == null) {
+        if (owner == null)
             return List.of();
-        }
 
-        for (Restaurant r : owner.getRestaurantsById().values()) {
+        for (Restaurant r : owner.getRestaurantsById().values())
             uniti.put(r.getId(), r);
-        }
-        for (Restaurant r : GuiContext.getDataStore().getRestaurantDAO().findAll()) {
-            if (r.getOwner() != null && r.getOwner().getId().equals(owner.getId())) {
+        for (Restaurant r : GuiContext.getDataStore().getRestaurantDAO().findAll())
+            if (r.getOwner() != null && r.getOwner().getId().equals(owner.getId()))
                 uniti.putIfAbsent(r.getId(), r);
-            }
-        }
         return List.copyOf(uniti.values());
     }
 
     private List<Restaurant> filtraPerParolaChiave(List<Restaurant> ristoranti, String keyword) {
-        if (keyword == null || keyword.isBlank()) {
+        if (keyword == null || keyword.isBlank())
             return ristoranti;
-        }
 
         String kw = keyword.trim().toLowerCase(Locale.ROOT);
         List<Restaurant> risultato = new ArrayList<>();
@@ -145,9 +140,8 @@ public class RestaurantsController {
             boolean matchCucina = r.getCuisinesTypes() != null && r.getCuisinesTypes().stream()
                     .anyMatch(c -> c != null && c.toString().toLowerCase(Locale.ROOT).contains(kw));
 
-            if (matchNome || matchCitta || matchCucina) {
+            if (matchNome || matchCitta || matchCucina)
                 risultato.add(r);
-            }
         }
         return risultato;
     }
@@ -312,9 +306,8 @@ public class RestaurantsController {
         }
 
         private boolean isWithinHeartButton(javafx.event.EventTarget target) {
-            for (Object walker = target; walker instanceof javafx.scene.Node node; walker = node.getParent()) {
+            for (Object walker = target; walker instanceof javafx.scene.Node node; walker = node.getParent())
                 if (node == heartButton) return true;
-            }
             return false;
         }
 
@@ -475,9 +468,8 @@ public class RestaurantsController {
             Set<String> cuisineBadges = (r.getCuisinesTypes() != null)
                     ? r.getCuisinesTypes().stream().limit(3).map(c -> c.toString()).collect(Collectors.toSet())
                     : Set.of();
-            for (String c : cuisineBadges) {
+            for (String c : cuisineBadges)
                 badges.getChildren().add(makeBadge(c, "badge-cuisine", null));
-            }
             if (r.isHasDelivery()) badges.getChildren().add(makeBadge("Delivery", "badge-delivery", "/it/uninsubria/laboratoriob/client/gui/images/ic_geomarker.png"));
             if (r.isHasOnlineBooking()) badges.getChildren().add(makeBadge("Booking", "badge-booking", "/it/uninsubria/laboratoriob/client/gui/images/ic_globe.png"));
 

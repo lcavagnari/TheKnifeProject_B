@@ -18,9 +18,8 @@ public class SessionRepository {
     public void save(User user) {
         try {
             File dir = SESSION_FILE.getParentFile();
-            if (dir != null && !dir.exists()) {
+            if (dir != null && !dir.exists())
                 dir.mkdirs();
-            }
             Files.writeString(SESSION_FILE.toPath(), user.getUsername(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             System.err.println("Errore salvando la sessione: " + e.getMessage());
@@ -28,9 +27,8 @@ public class SessionRepository {
     }
 
     public Optional<String> loadUsername() {
-        if (!SESSION_FILE.exists()) {
+        if (!SESSION_FILE.exists())
             return Optional.empty();
-        }
         try {
             String username = Files.readString(SESSION_FILE.toPath(), StandardCharsets.UTF_8).trim();
             return username.isBlank() ? Optional.empty() : Optional.of(username);
@@ -41,8 +39,7 @@ public class SessionRepository {
     }
 
     public void clear() {
-        if (SESSION_FILE.exists()) {
+        if (SESSION_FILE.exists())
             SESSION_FILE.delete();
-        }
     }
 }

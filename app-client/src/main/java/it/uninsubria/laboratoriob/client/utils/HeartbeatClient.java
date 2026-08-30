@@ -77,17 +77,15 @@ public class HeartbeatClient {
 
     public void wakeUp() {
         HeartbeatChannel c = channel;
-        if (c != null) {
+        if (c != null)
             c.wakeUp();
-        }
     }
 
     public void shutdown() {
         shuttingDown = true;
         HeartbeatChannel c = channel;
         channel = null;
-        if (c != null) {
+        if (c != null)
             c.shutdown();
-        }
     }
 }

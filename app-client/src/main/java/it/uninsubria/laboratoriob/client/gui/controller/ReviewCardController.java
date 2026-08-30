@@ -54,17 +54,15 @@ public class ReviewCardController {
         ratingLabel.setText(String.valueOf(review.getValue()));
 
         StringBuilder stars = new StringBuilder();
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 5; i++)
             stars.append(i <= review.getValue() ? "★" : "☆");
-        }
         starsLabel.setText(stars.toString());
         timeLabel.setText(review.getTimestamp().format(REVIEW_TIMESTAMP_FORMAT));
 
-        if (review.getComment() != null && !review.getComment().isBlank()) {
+        if (review.getComment() != null && !review.getComment().isBlank())
             commentLabel.setText(review.getComment());
-        } else {
+        else
             commentLabel.setText("No review text provided.");
-        }
 
         aggiornaRispostaVisibile();
     }
@@ -73,9 +71,8 @@ public class ReviewCardController {
         boolean hasReply = review.getReply() != null && !review.getReply().isBlank();
         replyDisplay.setVisible(hasReply);
         replyDisplay.setManaged(hasReply);
-        if (hasReply) {
+        if (hasReply)
             replyTextLabel.setText(review.getReply());
-        }
         impostaStatoBottoneRisposta(hasReply ? StatoBottoneRisposta.RISPOSTA_PRESENTE : StatoBottoneRisposta.NESSUNA_RISPOSTA);
     }
 

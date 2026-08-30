@@ -89,9 +89,8 @@ public final class JsonReviewDAO implements DAO<Review> {
 
     private ArrayNode toArrayNode() {
         ArrayNode array = mapper.createArrayNode();
-        for (Review review : cacheById.values()) {
+        for (Review review : cacheById.values())
             array.add(toNode(review));
-        }
         return array;
     }
 

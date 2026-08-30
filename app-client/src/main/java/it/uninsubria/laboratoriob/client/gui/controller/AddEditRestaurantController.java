@@ -164,9 +164,8 @@ public class AddEditRestaurantController {
     @FXML
     private void onAggiungiServizioClick() {
         String s = servizioField.getText() != null ? servizioField.getText().trim() : "";
-        if (!s.isEmpty() && servizi.add(s)) {
+        if (!s.isEmpty() && servizi.add(s))
             renderServizi();
-        }
         servizioField.clear();
     }
 
@@ -255,9 +254,8 @@ public class AddEditRestaurantController {
                                      Set<CuisineType> cucineSelezionate) {
         Restaurant r = restaurantInModifica;
 
-        if (!nome.equals(r.getName())) {
+        if (!nome.equals(r.getName()))
             owner.renameRestaurant(r.getId(), nome);
-        }
         owner.modifyRestaurantDescription(r, descrizione);
         owner.modifyRestaurantWebsite(r, sitoWeb);
         owner.modifyRestaurantPhone(r, telefono);
@@ -269,20 +267,16 @@ public class AddEditRestaurantController {
         owner.modifyRestaurantHasBooking(r, prenotazioneCheck.isSelected());
 
         Set<CuisineType> cucineAttuali = new HashSet<>(r.getCuisinesTypes());
-        for (CuisineType c : cucineAttuali) {
+        for (CuisineType c : cucineAttuali)
             if (!cucineSelezionate.contains(c)) r.removeCuisineType(c);
-        }
-        for (CuisineType c : cucineSelezionate) {
+        for (CuisineType c : cucineSelezionate)
             if (!cucineAttuali.contains(c)) r.addCuisineType(c);
-        }
 
         Set<String> serviziAttuali = new HashSet<>(r.getServices());
-        for (String s : serviziAttuali) {
+        for (String s : serviziAttuali)
             if (!servizi.contains(s)) r.removeService(s);
-        }
-        for (String s : servizi) {
+        for (String s : servizi)
             if (!serviziAttuali.contains(s)) r.addService(s);
-        }
     }
 
     @FXML
@@ -344,9 +338,8 @@ public class AddEditRestaurantController {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
         errorLabel.setManaged(true);
-        if (!field.getStyleClass().contains("error")) {
+        if (!field.getStyleClass().contains("error"))
             field.getStyleClass().add("error");
-        }
     }
 
     private void clearFieldError(Label errorLabel, Control field) {
@@ -359,8 +352,7 @@ public class AddEditRestaurantController {
         errorLabel.setText("");
         Label[] errors = {nomeError, nazioneError, prezzoError};
         Control[] fields = {nomeField, nazioneField, prezzoCombo};
-        for (int i = 0; i < errors.length; i++) {
+        for (int i = 0; i < errors.length; i++)
             clearFieldError(errors[i], fields[i]);
-        }
     }
 }

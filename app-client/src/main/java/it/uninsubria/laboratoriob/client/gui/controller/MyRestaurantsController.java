@@ -58,18 +58,14 @@ public class MyRestaurantsController {
 
     private List<Restaurant> ristorantiDiProprieta() {
         Map<UUID, Restaurant> uniti = new LinkedHashMap<>();
-        if (owner == null) {
+        if (owner == null)
             return List.of();
-        }
 
-        for (Restaurant r : owner.getRestaurantsById().values()) {
+        for (Restaurant r : owner.getRestaurantsById().values())
             uniti.put(r.getId(), r);
-        }
-        for (Restaurant r : GuiContext.getDataStore().getRestaurantDAO().findAll()) {
-            if (r.getOwner() != null && r.getOwner().getId().equals(owner.getId())) {
+        for (Restaurant r : GuiContext.getDataStore().getRestaurantDAO().findAll())
+            if (r.getOwner() != null && r.getOwner().getId().equals(owner.getId()))
                 uniti.putIfAbsent(r.getId(), r);
-            }
-        }
         return List.copyOf(uniti.values());
     }
 
@@ -121,9 +117,8 @@ public class MyRestaurantsController {
 
     @FXML
     private void onNuovoClick() {
-        if (owner == null) {
+        if (owner == null)
             return;
-        }
         try {
             Stage stage = (Stage) btnNuovo.getScene().getWindow();
 

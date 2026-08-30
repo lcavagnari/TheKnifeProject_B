@@ -49,9 +49,8 @@ class JsonOwnerDAOTest {
     void tearDown() {
         if (usersFile.exists()) usersFile.delete();
         File dataDir = new File("data");
-        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0) {
+        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0)
             dataDir.delete();
-        }
     }
 
     // --- L0: ConcurrentHashMap cache ---

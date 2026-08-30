@@ -90,18 +90,17 @@ public abstract class Menus {
                 String input = IO.getUserInput("Seleziona un'opzione:");
                 if (input.equalsIgnoreCase("0")) return;
 
-                if (hasPrev && input.equalsIgnoreCase("P")) {
+                if (hasPrev && input.equalsIgnoreCase("P"))
                     offset = Math.max(0, offset - pageSize);
-                } else if (hasNext && input.equalsIgnoreCase("N")) {
+                else if (hasNext && input.equalsIgnoreCase("N"))
                     offset += pageSize;
-                } else {
+                else {
                     try {
                         int choice = Integer.parseInt(input);
-                        if (choice >= 1 && choice <= page.size()) {
+                        if (choice >= 1 && choice <= page.size())
                             viewRestaurantDetails(page.get(choice - 1));
-                        } else {
+                        else
                             IO.printErrorMessage("Opzione non valida");
-                        }
                     } catch (NumberFormatException e) {
                         IO.printErrorMessage("Opzione non valida");
                     }

@@ -145,9 +145,8 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
         Set<String> services = new HashSet<>();
         JsonNode servicesNode = node.path("services");
-        if (servicesNode.isArray()) {
+        if (servicesNode.isArray())
             for (JsonNode s : servicesNode) services.add(s.asText());
-        }
 
         return new Restaurant(id, name, description, websiteUrl, owner, phone, loc,
                 priceRange, hasDelivery, hasOnlineBooking, award, greenStar, cuisinesTypes, services);

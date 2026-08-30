@@ -46,11 +46,10 @@ public class ClientDataStore {
         Set<String> acquired = RmiRepository.acquireAll();
         propagateServices();
 
-        if (acquired.isEmpty()) {
+        if (acquired.isEmpty())
             System.err.println("WARNING: RMI connection unavailable, running in local-only mode.");
-        } else {
+        else
             IO.printSuccessMessage("RMI connection established.");
-        }
         return !acquired.isEmpty();
     }
 

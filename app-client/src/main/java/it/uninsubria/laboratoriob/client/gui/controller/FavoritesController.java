@@ -54,9 +54,8 @@ public class FavoritesController {
     }
 
     private List<Restaurant> ristorantiPreferiti() {
-        if (customer == null || customer.getFavouriteRestourants() == null || customer.getFavouriteRestourants().isEmpty()) {
+        if (customer == null || customer.getFavouriteRestourants() == null || customer.getFavouriteRestourants().isEmpty())
             return List.of();
-        }
         return GuiContext.getDataStore().getRestaurantDAO().findAll().stream()
                 .filter(r -> customer.getFavouriteRestourants().contains(r.getId()))
                 .toList();
@@ -107,9 +106,8 @@ public class FavoritesController {
     }
 
     private void rimuoviPreferito(Restaurant r) {
-        if (customer != null) {
+        if (customer != null)
             GuiContext.getDataStore().getCustomerDAO().removeFavourite(customer.getId(), r.getId());
-        }
         caricaEMostra();
     }
 

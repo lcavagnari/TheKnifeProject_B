@@ -92,9 +92,8 @@ public class HomeController {
 
     @FXML
     private void onMieiRistorantiClick() {
-        if (!(Session.getCurrentUser() instanceof Owner owner)) {
+        if (!(Session.getCurrentUser() instanceof Owner owner))
             return;
-        }
         try {
             Stage stage = (Stage) btnMieiRistoranti.getScene().getWindow();
 
@@ -141,9 +140,8 @@ public class HomeController {
     private void onDisconnettiClick() {
         Session.logout();
         sessionRepository.clear();
-        if (onDisconnettiCallback != null) {
+        if (onDisconnettiCallback != null)
             onDisconnettiCallback.run();
-        }
     }
 
     @FXML

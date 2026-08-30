@@ -144,72 +144,66 @@ public class RegisterController {
     private void validateUsername() {
         String val = usernameField.getText() != null ? usernameField.getText().trim() : "";
         if (val.isEmpty()) return;
-        if (!val.matches("[a-zA-Z0-9_]+")) {
+        if (!val.matches("[a-zA-Z0-9_]+"))
             showFieldError(usernameError, "Solo lettere, numeri e underscore.", usernameField);
-        } else if (val.length() < 4 || val.length() > 16) {
+        else if (val.length() < 4 || val.length() > 16)
             showFieldError(usernameError, "Deve avere tra 4 e 16 caratteri.", usernameField);
-        } else {
+        else
             clearFieldError(usernameError, usernameField);
-        }
     }
 
     private void validateNome() {
         String val = nomeField.getText() != null ? nomeField.getText().trim() : "";
-        if (val.isEmpty()) {
+        if (val.isEmpty())
             showFieldError(nomeError, "Il nome è obbligatorio.", nomeField);
-        } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
+        else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+"))
             showFieldError(nomeError, "Solo lettere, spazi, trattini e apostrofi.", nomeField);
-        } else if (val.length() < 4) {
+        else if (val.length() < 4)
             showFieldError(nomeError, "Deve avere almeno 4 caratteri.", nomeField);
-        } else {
+        else
             clearFieldError(nomeError, nomeField);
-        }
     }
 
     private void validateCognome() {
         String val = cognomeField.getText() != null ? cognomeField.getText().trim() : "";
-        if (val.isEmpty()) {
+        if (val.isEmpty())
             showFieldError(cognomeError, "Il cognome è obbligatorio.", cognomeField);
-        } else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+")) {
+        else if (!val.matches("[a-zA-ZÀ-ÿ'\\s-]+"))
             showFieldError(cognomeError, "Solo lettere, spazi, trattini e apostrofi.", cognomeField);
-        } else if (val.length() < 4) {
+        else if (val.length() < 4)
             showFieldError(cognomeError, "Deve avere almeno 4 caratteri.", cognomeField);
-        } else {
+        else
             clearFieldError(cognomeError, cognomeField);
-        }
     }
 
     private void validatePassword() {
         String val = passwordField.getText() != null ? passwordField.getText() : "";
         if (val.isEmpty()) return;
-        if (val.length() < 4) {
+        if (val.length() < 4)
             showFieldError(passwordError, "Minimo 4 caratteri.", passwordField);
-        } else {
+        else
             clearFieldError(passwordError, passwordField);
-        }
     }
 
     private void validateConfirmPassword() {
         String pw = passwordField.getText() != null ? passwordField.getText() : "";
         String confirm = confirmPasswordField.getText() != null ? confirmPasswordField.getText() : "";
         if (confirm.isEmpty()) return;
-        if (!pw.equals(confirm)) {
+        if (!pw.equals(confirm))
             showFieldError(confirmPasswordError, "Le password non corrispondono.", confirmPasswordField);
-        } else {
+        else
             clearFieldError(confirmPasswordError, confirmPasswordField);
-        }
     }
 
     private void validateDataNascita() {
         LocalDate val = dataNascitaPicker.getValue();
         if (val == null) return;
-        if (val.isAfter(LocalDate.now())) {
+        if (val.isAfter(LocalDate.now()))
             showFieldError(dataNascitaError, "La data non può essere nel futuro.", dataNascitaPicker);
-        } else if (val.isAfter(LocalDate.now().minusYears(13))) {
+        else if (val.isAfter(LocalDate.now().minusYears(13)))
             showFieldError(dataNascitaError, "Devi avere almeno 13 anni.", dataNascitaPicker);
-        } else {
+        else
             clearFieldError(dataNascitaError, dataNascitaPicker);
-        }
     }
 
     private void validateNazione() {
@@ -218,11 +212,10 @@ public class RegisterController {
             clearFieldError(nazioneError, nazioneField);
             return;
         }
-        if (Nation.fromString(val) == null) {
+        if (Nation.fromString(val) == null)
             showFieldError(nazioneError, "Nazione non riconosciuta.", nazioneField);
-        } else {
+        else
             clearFieldError(nazioneError, nazioneField);
-        }
     }
 
     // --- Submit ---
@@ -363,16 +356,14 @@ public class RegisterController {
         errorLabel.getStyleClass().add("label-success");
         errorLabel.setText("Registrazione completata! Benvenuto " + nuovoUtente.getName() + ".");
 
-        if (onRegisterSuccessCallback != null) {
+        if (onRegisterSuccessCallback != null)
             onRegisterSuccessCallback.run();
-        }
     }
 
     @FXML
     private void onAnnullaClick() {
-        if (onCancelCallback != null) {
+        if (onCancelCallback != null)
             onCancelCallback.run();
-        }
     }
 
     // --- Error helpers ---
@@ -381,9 +372,8 @@ public class RegisterController {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
         errorLabel.setManaged(true);
-        if (!field.getStyleClass().contains("error")) {
+        if (!field.getStyleClass().contains("error"))
             field.getStyleClass().add("error");
-        }
     }
 
     private void clearFieldError(Label errorLabel, Control field) {

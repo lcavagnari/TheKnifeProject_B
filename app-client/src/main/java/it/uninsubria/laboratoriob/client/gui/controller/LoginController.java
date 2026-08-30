@@ -82,11 +82,10 @@ public class LoginController {
 
         ClientDataStore dataStore = GuiContext.getDataStore();
         dataStore.switchUser(utente.getId());
-        if (utente instanceof Owner owner) {
+        if (utente instanceof Owner owner)
             dataStore.getOwnerDAO().cacheOnly(owner);
-        } else if (utente instanceof Customer customer) {
+        else if (utente instanceof Customer customer)
             dataStore.getCustomerDAO().cacheOnly(customer);
-        }
 
         Session.login(utente);
         sessionRepository.save(utente);
@@ -95,15 +94,13 @@ public class LoginController {
         errorLabel.setText("Login riuscito! Benvenuto " + utente.getName() + ".");
         System.out.println("Login riuscito per: " + username + " (" + utente.getRole() + ")");
 
-        if (onLoginSuccessCallback != null) {
+        if (onLoginSuccessCallback != null)
             onLoginSuccessCallback.run();
-        }
     }
 
     @FXML
     private void onAnnullaClick() {
-        if (onCancelCallback != null) {
+        if (onCancelCallback != null)
             onCancelCallback.run();
-        }
     }
 }

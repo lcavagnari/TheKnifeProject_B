@@ -95,9 +95,8 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
                 readBoolean(node, "system", false)
         );
 
-        for (UUID restaurantId : loadOwnedRestaurantIds()) {
+        for (UUID restaurantId : loadOwnedRestaurantIds())
             restaurantDAO.findById(restaurantId).ifPresent(owner::addRestaurant);
-        }
 
         return owner;
     }

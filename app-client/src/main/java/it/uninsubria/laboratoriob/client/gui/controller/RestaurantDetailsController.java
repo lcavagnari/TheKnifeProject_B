@@ -89,9 +89,8 @@ public class RestaurantDetailsController {
     public void initialize() {
         String css = Objects.requireNonNull(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/style.css")).toExternalForm();
         root.sceneProperty().addListener((obs, oldScene, newScene) -> {
-            if (newScene != null && !newScene.getRoot().getStylesheets().contains(css)) {
+            if (newScene != null && !newScene.getRoot().getStylesheets().contains(css))
                 newScene.getRoot().getStylesheets().add(css);
-            }
         });
     }
 
@@ -109,20 +108,18 @@ public class RestaurantDetailsController {
         boolean isCustomer = currentUser instanceof Customer;
         btnPreferito.setVisible(isCustomer);
         btnPreferito.setManaged(isCustomer);
-        if (isCustomer) {
+        if (isCustomer)
             aggiornaTestoPreferito((Customer) currentUser, r);
-        }
 
         nameLabel.setText(valoreO(r.getName(), "Senza nome"));
         descriptionLabel.setText(valoreO(r.getDescription(), "No description available."));
 
         // Website
         String website = r.getWebsiteUrl();
-        if (website != null && !website.isBlank()) {
+        if (website != null && !website.isBlank())
             websiteLabel.setText(website);
-        } else {
+        else
             websiteLabel.setText("N/A");
-        }
 
         // Phone
         phoneLabel.setText(valoreO(r.getPhone(), "N/A"));
@@ -148,12 +145,10 @@ public class RestaurantDetailsController {
 
         // Delivery + Online Booking badges
         deliveryBookingFlow.getChildren().clear();
-        if (r.isHasDelivery()) {
+        if (r.isHasDelivery())
             deliveryBookingFlow.getChildren().add(makeIconBadge("Delivery", "badge-delivery", "/it/uninsubria/laboratoriob/client/gui/images/ic_geomarker.png"));
-        }
-        if (r.isHasOnlineBooking()) {
+        if (r.isHasOnlineBooking())
             deliveryBookingFlow.getChildren().add(makeIconBadge("Online Booking", "badge-booking", "/it/uninsubria/laboratoriob/client/gui/images/ic_globe.png"));
-        }
 
         // Cuisine badges
         cuisinesFlow.getChildren().clear();
@@ -186,9 +181,8 @@ public class RestaurantDetailsController {
         }
         int filledStars = (int) Math.round(avg);
         StringBuilder sb = new StringBuilder();
-        for (int i = 1; i <= 5; i++) {
+        for (int i = 1; i <= 5; i++)
             sb.append(i <= filledStars ? "★" : "☆");
-        }
         Label starLabel = new Label(sb.toString());
         starLabel.getStyleClass().add("reviews-stars");
         starLabel.setPadding(Insets.EMPTY);
@@ -250,9 +244,8 @@ public class RestaurantDetailsController {
 
     @FXML
     private void onModificaClick() {
-        if (!(Session.getCurrentUser() instanceof Owner owner) || restaurant == null) {
+        if (!(Session.getCurrentUser() instanceof Owner owner) || restaurant == null)
             return;
-        }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/AddEditRestaurant.fxml"));
             Parent formRoot = loader.load();
@@ -274,15 +267,13 @@ public class RestaurantDetailsController {
 
     @FXML
     private void onPreferitoClick() {
-        if (!(Session.getCurrentUser() instanceof Customer customer) || restaurant == null) {
+        if (!(Session.getCurrentUser() instanceof Customer customer) || restaurant == null)
             return;
-        }
         var customerDAO = GuiContext.getDataStore().getCustomerDAO();
-        if (customer.getFavouriteRestourants().contains(restaurant.getId())) {
+        if (customer.getFavouriteRestourants().contains(restaurant.getId()))
             customerDAO.removeFavourite(customer.getId(), restaurant.getId());
-        } else {
+        else
             customerDAO.addFavourite(customer.getId(), restaurant.getId());
-        }
         aggiornaTestoPreferito(customer, restaurant);
     }
 
@@ -290,9 +281,8 @@ public class RestaurantDetailsController {
         boolean isPreferito = customer.getFavouriteRestourants().contains(r.getId());
         btnPreferito.setText(isPreferito ? "Nei Preferiti" : "Aggiungi ai Preferiti");
         btnPreferito.getStyleClass().removeAll("button-secondary");
-        if (!isPreferito) {
+        if (!isPreferito)
             btnPreferito.getStyleClass().add("button-secondary");
-        }
     }
 
     private String valoreO(String valore, String fallback) {
