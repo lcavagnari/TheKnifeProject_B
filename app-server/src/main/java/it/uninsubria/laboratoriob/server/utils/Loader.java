@@ -2,10 +2,10 @@ package it.uninsubria.laboratoriob.server.utils;
 
 
 import it.uninsubria.laboratoriob.api.objects.*;
-import it.uninsubria.laboratoriob.server.data.CustomerDAO;
-import it.uninsubria.laboratoriob.server.data.OwnerDAO;
-import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
-import it.uninsubria.laboratoriob.server.data.ReviewDAO;
+import it.uninsubria.laboratoriob.server.data.dao.CustomerDAO;
+import it.uninsubria.laboratoriob.server.data.dao.OwnerDAO;
+import it.uninsubria.laboratoriob.server.data.dao.RestaurantDAO;
+import it.uninsubria.laboratoriob.server.data.dao.ReviewDAO;
 import lombok.experimental.UtilityClass;
 
 import java.io.File;

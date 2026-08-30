@@ -3,7 +3,7 @@ package it.uninsubria.laboratoriob.server.data.remote;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.User;
 import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
-import it.uninsubria.laboratoriob.server.data.CustomerDAO;
+import it.uninsubria.laboratoriob.server.data.dao.CustomerDAO;
 import it.uninsubria.laboratoriob.server.utils.Loader;
 
 import java.rmi.RemoteException;

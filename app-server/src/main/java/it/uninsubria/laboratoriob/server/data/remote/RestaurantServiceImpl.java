@@ -3,7 +3,7 @@ package it.uninsubria.laboratoriob.server.data.remote;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
-import it.uninsubria.laboratoriob.server.data.RestaurantDAO;
+import it.uninsubria.laboratoriob.server.data.dao.RestaurantDAO;
 import it.uninsubria.laboratoriob.server.utils.Loader;
 
 import java.rmi.RemoteException;
