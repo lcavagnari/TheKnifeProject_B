@@ -61,8 +61,8 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     }
 
     @Override
-    public List<Restaurant> findByOwner(UUID id) throws RemoteException {
-        if (id == null) return List.of();
+    public Set<Restaurant> findByOwner(UUID id) throws RemoteException {
+        if (id == null) return Set.of();
 
         Set<Restaurant> merged = new HashSet<>();
         User owner = store.users().findById(id);
@@ -73,19 +73,16 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
                 .exceptionally(ex -> List.of());
         merged.addAll(db.join());
 
-        return new ArrayList<>(merged);
+        return merged;
     }
 
     @Override
     public boolean save(Restaurant restaurant) throws RemoteException {
         if (restaurant == null) return false;
 
-        boolean cacheOk = store.restaurants().save(restaurant);
-        CompletableFuture<Boolean> dbOk = CompletableFuture
-                .supplyAsync(() -> rDAO.save(restaurant))
-                .exceptionally(ex -> false);
-
-        if (cacheOk & dbOk.join()) return true;
+        // store.restaurants().save() already persists via RestaurantRepository's own DAO -
+        // no separate rDAO.save() here, that would double-INSERT the same primary key.
+        if (store.restaurants().save(restaurant)) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 
@@ -119,14 +116,12 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     public boolean registerOwner(Restaurant restaurant, UUID ownerId) throws RemoteException {
         if (restaurant == null || ownerId == null) return false;
 
-        boolean cacheOk = store.restaurants().save(restaurant)
-                && store.users().addOwnedRestaurant(ownerId, restaurant);
+        // Same reasoning as save(): store.restaurants().save() already persists to DB,
+        // no separate rDAO.save() here.
+        boolean ok = store.restaurants().save(restaurant)
+                & store.users().addOwnedRestaurant(ownerId, restaurant);
 
-        CompletableFuture<Boolean> dbOk = CompletableFuture
-                .supplyAsync(() -> rDAO.save(restaurant))
-                .exceptionally(ex -> false);
-
-        if (cacheOk & dbOk.join()) return true;
+        if (ok) return true;
         else throw new RemoteException("Error occured while saving changes");
     }
 

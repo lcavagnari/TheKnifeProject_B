@@ -40,8 +40,13 @@ public class RestaurantServiceImpl extends UnicastRemoteObject implements Restau
     }
 
     @Override
-    public List<Restaurant> findByOwner(UUID id) throws RemoteException {
-        return store.restaurants().findByOwner(id);
+    public Set<Restaurant> findByOwner(UUID id) throws RemoteException {
+        if (id == null) return Set.of();
+
+        User owner = store.users().findById(id);
+        if (owner instanceof Owner o) return new HashSet<>(o.getRestaurantsById().values());
+
+        return Set.of();
     }
 
     @Override

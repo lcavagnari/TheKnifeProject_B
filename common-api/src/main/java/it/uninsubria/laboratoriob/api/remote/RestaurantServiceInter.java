@@ -5,7 +5,6 @@ import it.uninsubria.laboratoriob.api.objects.Restaurant;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,7 +12,7 @@ public interface RestaurantServiceInter extends Remote {
     Set<Restaurant> findAll(int offset, int limit) throws RemoteException;
     long count() throws RemoteException;
     Restaurant findById(UUID id) throws RemoteException;
-    List<Restaurant> findByOwner(UUID id) throws  RemoteException;
+    Set<Restaurant> findByOwner(UUID id) throws  RemoteException;
     boolean save(Restaurant restaurant) throws RemoteException;
     boolean update(Restaurant restaurant) throws RemoteException;
     boolean delete(UUID id) throws RemoteException;

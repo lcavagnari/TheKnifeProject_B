@@ -9,14 +9,19 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.rmi.RemoteException;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -209,7 +214,7 @@ class JsonRestaurantDAOTest {
     @Test
     @DisplayName("findByOwner() falls back to RMI when no local match")
     void testFindByOwnerRMIFallback() throws RemoteException {
-        when(mockService.findByOwner(testOwner.getId())).thenReturn(List.of(testRestaurant));
+        when(mockService.findByOwner(testOwner.getId())).thenReturn(Set.of(testRestaurant));
 
         List<Restaurant> result = dao.findByOwner(testOwner.getId());
         assertEquals(1, result.size());
