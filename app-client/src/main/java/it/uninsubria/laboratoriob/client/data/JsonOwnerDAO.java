@@ -95,9 +95,8 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
                 readBoolean(node, "system", false)
         );
 
-        for (UUID restaurantId : loadOwnedRestaurantIds()) {
+        for (UUID restaurantId : loadOwnedRestaurantIds())
             restaurantDAO.findById(restaurantId).ifPresent(owner::addRestaurant);
-        }
 
         return owner;
     }
@@ -121,7 +120,7 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         if (svc == null) return false;
 
         try {
-            svc.saveForOwner(restaurant, ownerId);
+            svc.registerOwner(restaurant, ownerId);
         } catch (RemoteException e) {
             this.restaurantService = null;
             throw new ServiceUnavailableException("Server non disponibile", e);
@@ -143,7 +142,7 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         if (svc == null) return false;
 
         try {
-            svc.deleteOwnedRestaurant(ownerId, restaurantId);
+            svc.unregisterOwner(ownerId, restaurantId);
         } catch (RemoteException e) {
             this.restaurantService = null;
             throw new ServiceUnavailableException("Server non disponibile", e);

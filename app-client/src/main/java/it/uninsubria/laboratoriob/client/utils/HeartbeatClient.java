@@ -1,7 +1,7 @@
 package it.uninsubria.laboratoriob.client.utils;
 
 import it.uninsubria.laboratoriob.api.utils.HeartbeatChannel;
-import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.cli.IO;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -77,17 +77,15 @@ public class HeartbeatClient {
 
     public void wakeUp() {
         HeartbeatChannel c = channel;
-        if (c != null) {
+        if (c != null)
             c.wakeUp();
-        }
     }
 
     public void shutdown() {
         shuttingDown = true;
         HeartbeatChannel c = channel;
         channel = null;
-        if (c != null) {
+        if (c != null)
             c.shutdown();
-        }
     }
 }

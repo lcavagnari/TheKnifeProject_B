@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.client.ui;
+package it.uninsubria.laboratoriob.client.cli;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
@@ -38,7 +38,7 @@ public abstract class Menus {
                         .orElse(null);
 
                 if (r == null)
-                    throw new IllegalArgumentException("Nessun ristorante trovato con nome "+name+", riprovare");
+                    throw new IllegalArgumentException("Nessun ristorante trovato con nome " + name + ", riprovare");
 
             } catch (IllegalArgumentException ex) {
                 IO.printErrorMessage(ex.getMessage());
@@ -90,18 +90,17 @@ public abstract class Menus {
                 String input = IO.getUserInput("Seleziona un'opzione:");
                 if (input.equalsIgnoreCase("0")) return;
 
-                if (hasPrev && input.equalsIgnoreCase("P")) {
+                if (hasPrev && input.equalsIgnoreCase("P"))
                     offset = Math.max(0, offset - pageSize);
-                } else if (hasNext && input.equalsIgnoreCase("N")) {
+                else if (hasNext && input.equalsIgnoreCase("N"))
                     offset += pageSize;
-                } else {
+                else {
                     try {
                         int choice = Integer.parseInt(input);
-                        if (choice >= 1 && choice <= page.size()) {
+                        if (choice >= 1 && choice <= page.size())
                             viewRestaurantDetails(page.get(choice - 1));
-                        } else {
+                        else
                             IO.printErrorMessage("Opzione non valida");
-                        }
                     } catch (NumberFormatException e) {
                         IO.printErrorMessage("Opzione non valida");
                     }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fx:id="root" spacing="6" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.uninsubria.laboratoriob.client.gui.controller.ReviewInputBoxController">
+    <!-- Selettore stelle, nascosto in modalità risposta -->
+    <VBox fx:id="starsSection" spacing="4">
+        <HBox spacing="4" alignment="CENTER_LEFT">
+            <Label fx:id="star1" text="☆" style="-fx-text-fill: #F4B400; -fx-font-size: 20px; -fx-cursor: hand;"
+                   onMouseClicked="#onStar1Clicked"/>
+            <Label fx:id="star2" text="☆" style="-fx-text-fill: #F4B400; -fx-font-size: 20px; -fx-cursor: hand;"
+                   onMouseClicked="#onStar2Clicked"/>
+            <Label fx:id="star3" text="☆" style="-fx-text-fill: #F4B400; -fx-font-size: 20px; -fx-cursor: hand;"
+                   onMouseClicked="#onStar3Clicked"/>
+            <Label fx:id="star4" text="☆" style="-fx-text-fill: #F4B400; -fx-font-size: 20px; -fx-cursor: hand;"
+                   onMouseClicked="#onStar4Clicked"/>
+            <Label fx:id="star5" text="☆" style="-fx-text-fill: #F4B400; -fx-font-size: 20px; -fx-cursor: hand;"
+                   onMouseClicked="#onStar5Clicked"/>
+        </HBox>
+    </VBox>
+    <TextArea fx:id="textField" promptText="Scrivi..." prefRowCount="2" wrapText="true"/>
+    <Label fx:id="errorLabel" styleClass="label-error" wrapText="true" managed="false" visible="false"/>
+    <HBox alignment="CENTER_RIGHT" spacing="8">
+        <Button onAction="#onCancelAction" styleClass="button-link" text="Annulla"/>
+        <Button onAction="#onSubmitAction" styleClass="button-secondary" text="Invia"/>
+    </HBox>
+</VBox>

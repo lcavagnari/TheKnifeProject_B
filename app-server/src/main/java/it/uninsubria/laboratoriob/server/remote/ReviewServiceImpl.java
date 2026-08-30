@@ -7,8 +7,9 @@ import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServiceInter {
@@ -34,36 +35,44 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
     }
 
     @Override
-    public List<Review> findAll(int offset, int limit) throws RemoteException {
+    public Set<Review> findAll(int offset, int limit) throws RemoteException {
         List<Review> all = store.reviews().findAll();
-        if (offset >= all.size()) return List.of();
-        return new ArrayList<>(all.subList(offset, Math.min(offset + limit, all.size())));
+        if (offset >= all.size()) return Set.of();
+        return new HashSet<>(all.subList(offset, Math.min(offset + limit, all.size())));
     }
 
     @Override
     public boolean save(Review review) throws RemoteException {
-        return store.reviews().save(review);
+        if (review == null) return false;
+        if (store.reviews().save(review)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean update(Review review) throws RemoteException {
-        return store.reviews().update(review);
+        if (review == null) return false;
+        if (store.reviews().update(review)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean delete(UUID id) throws RemoteException {
-        return store.reviews().delete(id);
+        if (id == null) return false;
+        if (store.reviews().delete(id)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean replyToReview(UUID reviewId, String reply) throws RemoteException {
-        if (reply == null || reply.isBlank()) return false;
+        if (reviewId == null || reply == null || reply.isBlank()) return false;
 
         Review review = store.reviews().findById(reviewId);
         if (review == null) return false;
 
         review.setReply(reply);
         review.setRespondedAt(LocalDateTime.now());
-        return store.reviews().update(review);
+
+        if (store.reviews().update(review)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 }

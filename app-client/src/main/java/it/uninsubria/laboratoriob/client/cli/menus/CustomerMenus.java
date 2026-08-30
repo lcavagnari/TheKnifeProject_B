@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.client.ui.menus;
+package it.uninsubria.laboratoriob.client.cli.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.exceptions.AbortOperationException;
@@ -6,9 +6,9 @@ import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
+import it.uninsubria.laboratoriob.client.cli.IO;
+import it.uninsubria.laboratoriob.client.cli.Menus;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
-import it.uninsubria.laboratoriob.client.ui.IO;
-import it.uninsubria.laboratoriob.client.ui.Menus;
 
 import java.util.*;
 

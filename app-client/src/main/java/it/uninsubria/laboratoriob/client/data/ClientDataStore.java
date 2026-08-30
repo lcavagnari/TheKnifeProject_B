@@ -1,6 +1,6 @@
 package it.uninsubria.laboratoriob.client.data;
 
-import it.uninsubria.laboratoriob.client.ui.IO;
+import it.uninsubria.laboratoriob.client.cli.IO;
 import it.uninsubria.laboratoriob.client.utils.RmiRepository;
 import lombok.Getter;
 
@@ -33,6 +33,8 @@ public class ClientDataStore {
         this.restaurantDAO = new JsonRestaurantDAO(null);
         this.ownerDAO = new JsonOwnerDAO(null, null, restaurantDAO);
         this.reviewDAO = new JsonReviewDAO(customerDAO, null);
+
+        acquireRemoteServices();
     }
 
     /**
@@ -44,11 +46,10 @@ public class ClientDataStore {
         Set<String> acquired = RmiRepository.acquireAll();
         propagateServices();
 
-        if (acquired.isEmpty()) {
+        if (acquired.isEmpty())
             System.err.println("WARNING: RMI connection unavailable, running in local-only mode.");
-        } else {
+        else
             IO.printSuccessMessage("RMI connection established.");
-        }
         return !acquired.isEmpty();
     }
 

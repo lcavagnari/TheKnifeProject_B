@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fx:id="root" spacing="24" focusTraversable="true" styleClass="right-box" stylesheets="@style.css"
+      xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="it.uninsubria.laboratoriob.client.gui.controller.MyRestaurantsController">
+    <padding>
+        <Insets bottom="32" left="32" right="32" top="32"/>
+    </padding>
+    <!-- Top bar -->
+    <HBox alignment="CENTER_LEFT" spacing="20">
+        <Button fx:id="btnIndietro" onAction="#onIndietroClick" styleClass="button-secondary" text="← Indietro"/>
+        <Label styleClass="card-header" text="I Miei Ristoranti"/>
+        <Region HBox.hgrow="ALWAYS"/>
+        <Button fx:id="btnNuovo" onAction="#onNuovoClick" text="+ Nuovo Ristorante"/>
+    </HBox>
+    <!-- Stats -->
+    <HBox alignment="CENTER">
+        <Label fx:id="infoLabel" styleClass="stats-label"/>
+    </HBox>
+    <!-- Empty state (hidden by default) -->
+    <VBox fx:id="emptyState" managed="false" styleClass="empty-state" visible="false">
+        <Label styleClass="empty-state-icon" text="🍽"/>
+        <Label styleClass="empty-state-title" text="Non hai ancora nessun ristorante"/>
+        <Label styleClass="empty-state-sub" text="Usa &quot;+ Nuovo Ristorante&quot; per aggiungere il primo"/>
+    </VBox>
+    <!-- List -->
+    <ListView fx:id="restaurantListView" prefHeight="320" VBox.vgrow="ALWAYS"/>
+</VBox>

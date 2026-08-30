@@ -4,9 +4,12 @@ import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
-import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
-import org.junit.jupiter.api.*;
+import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.rmi.RemoteException;
@@ -75,9 +78,8 @@ class DataFlowSyncTest {
         if (restaurantsFile.exists()) restaurantsFile.delete();
         if (reviewsFile.exists()) reviewsFile.delete();
         File dataDir = new File("data");
-        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0) {
+        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0)
             dataDir.delete();
-        }
     }
 
     // --- User Flow: login → cache → JSON → RMI ---
@@ -168,7 +170,7 @@ class DataFlowSyncTest {
     @Test
     @DisplayName("Restaurant findAll: cache empty → RMI → cache + JSON")
     void testRestaurantFindAllCacheMiss() throws RemoteException {
-        when(mockRestaurantService.findAll(0, 1000)).thenReturn(java.util.List.of(testRestaurant));
+        when(mockRestaurantService.findAll(0, 1000)).thenReturn(java.util.Set.of(testRestaurant));
 
         var result = restaurantDAO.findAll();
         assertFalse(result.isEmpty());

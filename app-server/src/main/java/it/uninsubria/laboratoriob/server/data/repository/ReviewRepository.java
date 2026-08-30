@@ -7,6 +7,7 @@ import it.uninsubria.laboratoriob.server.data.dao.ReviewDAO;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 public class ReviewRepository {
 
@@ -85,7 +86,15 @@ public class ReviewRepository {
 
     // ── DAO access (for Loader bulk load) ──
 
-    public List<Review> loadForRestaurant(UUID restaurantId) {
-        return dao.findByRestaurant(restaurantId);
+    public CompletableFuture<List<Review>> loadForRestaurant(UUID restaurantId) {
+        return CompletableFuture
+                .supplyAsync(() -> dao.findByRestaurant(restaurantId))
+                .exceptionally(ex -> {
+                    System.err.println(
+                            "Errore caricamento review for restaurant #"
+                                    + restaurantId + ": " + ex.getMessage()
+                    );
+                    return new ArrayList<>();
+                });
     }
 }

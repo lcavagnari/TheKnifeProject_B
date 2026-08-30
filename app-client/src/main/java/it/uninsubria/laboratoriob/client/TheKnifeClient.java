@@ -1,9 +1,18 @@
 package it.uninsubria.laboratoriob.client;
 
+import it.uninsubria.laboratoriob.client.cli.IO;
+import it.uninsubria.laboratoriob.client.cli.menus.GuestMenus;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
-import it.uninsubria.laboratoriob.client.ui.IO;
-import it.uninsubria.laboratoriob.client.ui.menus.GuestMenus;
+import it.uninsubria.laboratoriob.client.gui.GuiContext;
 import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
+import it.uninsubria.laboratoriob.client.utils.RmiRepository;
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+import java.io.IOException;
+import java.util.Arrays;
 
 /**
  * Classe principale del client The Knife.
@@ -16,34 +25,48 @@ import it.uninsubria.laboratoriob.client.utils.HeartbeatClient;
  * per sincronizzare i dati con il server.
  * </p>
  */
-public class TheKnifeClient {
+public class TheKnifeClient extends Application {
+
+    private static ClientDataStore clientDataStore;
+
+    static final String SERVER_HOST = "localhost";
+    static final int RMI_PORT = 1099;
+    static final int HEARTBEAT_PORT = 5555;
+    static final long HEARTBEAT_INTERVAL_MINUTES = 5;
 
     public static void main(String[] args) {
         IO.printSuccessMessage("Loading The Knife Client...");
 
-        TheKnifeClient client = new TheKnifeClient();
+        initClient();
 
         IO.printSuccessMessage("Client initialized. Data store ready.");
 
-        new GuestMenus(client.dataStore).openMenu();
+        if (Arrays.asList(args).contains("--cli")) new GuestMenus(clientDataStore).openMenu();
+        else Application.launch(TheKnifeClient.class, args);
     }
 
-    private static final String serverHost = "localhost";
-    private final int rmiPort = 1099;
+    private static void initClient() {
+        RmiRepository.configure(SERVER_HOST, RMI_PORT);
+        clientDataStore = new ClientDataStore();
 
-    private static final int heartbeatPort = 5555;
-    private static final long heartbeatIntervalMinutes = 5;
+        HeartbeatClient heartbeat = new HeartbeatClient(SERVER_HOST, HEARTBEAT_PORT, HEARTBEAT_INTERVAL_MINUTES);
+        heartbeat.start();
 
-    private final HeartbeatClient tcpHbeatClient;
-    private final ClientDataStore dataStore;
-
-    public TheKnifeClient() {
-        this.tcpHbeatClient = new HeartbeatClient(serverHost, heartbeatPort, heartbeatIntervalMinutes);
-
-        this.dataStore = new ClientDataStore();
-
-        tcpHbeatClient.start();
-        Runtime.getRuntime().addShutdownHook(new Thread(tcpHbeatClient::shutdown));
+        Runtime.getRuntime().addShutdownHook(new Thread(heartbeat::shutdown));
         Runtime.getRuntime().addShutdownHook(new Thread(IO::closeScanner));
+    }
+
+    @Override
+    public void start(Stage stage) throws IOException {
+        GuiContext.init(clientDataStore);
+
+        FXMLLoader fxmlLoader = new FXMLLoader(TheKnifeClient.class.getResource("gui/GUI.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+        stage.setTitle("The Knife");
+        stage.setScene(scene);
+
+        stage.setMaximized(true);
+        stage.toFront();
+        stage.show();
     }
 }

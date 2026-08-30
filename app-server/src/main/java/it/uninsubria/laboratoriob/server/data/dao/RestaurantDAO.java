@@ -395,9 +395,8 @@ public class RestaurantDAO implements DAO<Restaurant> {
                 try (PreparedStatement findStmt = conn.prepareStatement(findServiceQuery)) {
                     findStmt.setString(1, service);
                     try (ResultSet rs = findStmt.executeQuery()) {
-                        if (rs.next()) {
+                        if (rs.next())
                             serviceId = rs.getInt("id");
-                        }
                     }
                 }
 

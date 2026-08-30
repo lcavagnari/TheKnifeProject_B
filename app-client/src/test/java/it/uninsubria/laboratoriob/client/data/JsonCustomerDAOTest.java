@@ -5,7 +5,10 @@ import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.File;
@@ -44,9 +47,8 @@ class JsonCustomerDAOTest {
     void tearDown() {
         if (usersFile.exists()) usersFile.delete();
         File dataDir = new File("data");
-        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0) {
+        if (dataDir.exists() && dataDir.list() != null && dataDir.list().length == 0)
             dataDir.delete();
-        }
     }
 
     @Test

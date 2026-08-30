@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.client.ui;
+package it.uninsubria.laboratoriob.client.cli;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.enums.Nation;
@@ -227,9 +227,9 @@ public class IO {
 
     public static void clearScreen() {
         try {
-            if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+            if (System.getProperty("os.name").toLowerCase().contains("windows"))
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
-            } else {
+            else {
                 System.out.print("\033[H\033[2J");
                 System.out.flush();
             }

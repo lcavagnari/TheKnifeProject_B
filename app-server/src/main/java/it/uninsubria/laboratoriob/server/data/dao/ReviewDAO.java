@@ -228,6 +228,24 @@ public class ReviewDAO implements DAO<Review> {
         }
     }
 
+    public final boolean saveReply(UUID id, String replyToRwview) {
+        final String query = """
+                UPDATE review
+                SET response = ?, responded_at = ?
+                WHERE id = ?
+                """;
+
+        try (Connection conn = Database.getConnection(); PreparedStatement stmt = conn.prepareStatement(query)) {
+            stmt.setString(1, replyToRwview);
+            stmt.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
+            stmt.setObject(3, id, Types.OTHER);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.err.println("Errore saveReply in ReviewDAO: " + e.getMessage());
+            return false;
+        }
+    }
+
     @Override
     public boolean delete(UUID id) {
         String query = """

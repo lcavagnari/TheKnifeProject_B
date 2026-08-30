@@ -14,9 +14,11 @@ import it.uninsubria.laboratoriob.server.data.ServerDataStore;
 import it.uninsubria.laboratoriob.server.data.dao.LocationDAO;
 import lombok.experimental.UtilityClass;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.time.LocalDate;
 import java.util.*;
@@ -287,5 +289,25 @@ public class CsvParser {
         } catch (IOException | SecurityException e) {
             System.err.println("❌ Error while parsing csv database: " + e.getMessage());
         }
+    }
+
+    public static void updateMichelinDataset(String path, ServerDataStore store) throws IOException {
+        path = (path != null && !path.isBlank()) ? path : "michelin_my_maps.csv";
+        Path inputPath = Paths.get(path).normalize().toRealPath();
+
+        File dataset = inputPath.toFile();
+
+        if (!dataset.exists() || !dataset.isFile() || !dataset.getName().endsWith(".csv")) {
+            System.err.println("File or path " + path
+                    + " does not exist or it is not supported by the program, please check and try again.");
+            return;
+        }
+
+        System.err.println("Updating michelin data from file...");
+
+        long timestamp = System.currentTimeMillis();
+        parseFromDataset(inputPath, store);
+
+        System.out.println("Update completed in " + ((System.currentTimeMillis() - timestamp) + "ms"));
     }
 }

@@ -228,7 +228,8 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         if (user == null) return false;
 
         ensureCacheLoaded();
-        if (cacheById.containsKey(user.getId())) return false;
+        T old = cacheById.get(user.getId());
+        if (old != null) cacheByUsername.remove(old.getUsername());
         cacheById.put(user.getId(), user);
         cacheByUsername.put(user.getUsername(), user);
         persistAtomic(toArrayNode());

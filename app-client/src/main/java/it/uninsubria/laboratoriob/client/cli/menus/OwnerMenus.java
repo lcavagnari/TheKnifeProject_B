@@ -1,4 +1,4 @@
-package it.uninsubria.laboratoriob.client.ui.menus;
+package it.uninsubria.laboratoriob.client.cli.menus;
 
 import it.uninsubria.laboratoriob.api.Validators;
 import it.uninsubria.laboratoriob.api.enums.Award;
@@ -10,9 +10,9 @@ import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.api.objects.Review;
+import it.uninsubria.laboratoriob.client.cli.IO;
+import it.uninsubria.laboratoriob.client.cli.Menus;
 import it.uninsubria.laboratoriob.client.data.ClientDataStore;
-import it.uninsubria.laboratoriob.client.ui.IO;
-import it.uninsubria.laboratoriob.client.ui.Menus;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -65,9 +65,9 @@ public class OwnerMenus extends Menus {
             IO.clearScreen();
 
             Collection<Review> reviews = restaurant.getReviews().values();
-            if (reviews.isEmpty()) {
+            if (reviews.isEmpty())
                 System.out.println("No reviews available for this restaurant.\n");
-            } else {
+            else {
                 Review best = reviews.stream().max(Comparator.comparingInt(Review::getValue)).orElse(null);
                 Review worst = reviews.stream().min(Comparator.comparingInt(Review::getValue)).orElse(null);
 
@@ -157,9 +157,8 @@ public class OwnerMenus extends Menus {
                     case 13 -> {
                         dataStore.getRestaurantDAO().update(restaurant);
 
-                        if (!originalName.equals(restaurant.getName())) {
+                        if (!originalName.equals(restaurant.getName()))
                             owner.getRestaurantsByName().remove(originalName);
-                        }
                         owner.getRestaurantsByName().put(restaurant.getName(), restaurant);
 
                         IO.printSuccessMessage("Modifiche salvate.");
@@ -251,9 +250,8 @@ public class OwnerMenus extends Menus {
                 Review r = allReviews.get(i);
                 System.out.printf("[%d] Da: %s | Voto: %d\n", i + 1, r.getUser().getUsername(), r.getValue());
                 System.out.println(r.getText());
-                if (r.getReply() != null) {
+                if (r.getReply() != null)
                     System.out.println("✎ Risposta attuale: " + r.getReply());
-                }
                 System.out.println("─".repeat(50));
             }
             System.out.println("[0] Torna indietro");

@@ -5,13 +5,14 @@ import it.uninsubria.laboratoriob.api.objects.Review;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface ReviewServiceInter extends Remote {
     public List<Review> findByRestaurant(UUID restaurantId) throws RemoteException;
     public List<Review> findByUser(UUID userId) throws RemoteException;
     public List<Review> findAll() throws RemoteException;
-    public List<Review> findAll(int offset, int limit) throws RemoteException;
+    public Set<Review> findAll(int offset, int limit) throws RemoteException;
     public boolean save(Review review) throws RemoteException;
     public boolean update(Review review) throws RemoteException;
     public boolean delete(UUID id) throws RemoteException;

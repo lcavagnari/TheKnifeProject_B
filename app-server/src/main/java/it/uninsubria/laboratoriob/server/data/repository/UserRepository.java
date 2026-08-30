@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class UserRepository {
@@ -127,7 +128,21 @@ public class UserRepository {
 
     // ── DAO access (for Loader bulk load) ──
 
-    public List<Owner> loadAllOwnersFromDb() { return ownerDAO.findAll(); }
+    public CompletableFuture<List<Owner>> loadAllOwnersFromDb() {
+        return CompletableFuture
+                .supplyAsync(ownerDAO::findAll)
+                .exceptionally(ex -> {
+                    System.err.println("Error occured while loading owners: " + ex.getMessage());
+                    return null;
+                });
+    }
 
-    public List<Customer> loadAllCustomersFromDb() { return customerDAO.findAll(); }
+    public CompletableFuture<List<Customer>> loadAllCustomersFromDb() {
+        return CompletableFuture
+                .supplyAsync(customerDAO::findAll)
+                .exceptionally(ex -> {
+                    System.err.println("Errore caricamento proprietari: " + ex.getMessage());
+                    return null;
+                });
+    }
 }

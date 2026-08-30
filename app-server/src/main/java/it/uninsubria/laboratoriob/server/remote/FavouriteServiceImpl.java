@@ -17,12 +17,16 @@ public class FavouriteServiceImpl extends UnicastRemoteObject implements Favouri
 
     @Override
     public boolean addFavourites(UUID userID, UUID restaurantId) throws RemoteException {
-        return store.users().addFavourite(userID, restaurantId);
+        if (userID == null || restaurantId == null) return false;
+        if (store.users().addFavourite(userID, restaurantId)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
     public boolean removeFavourites(UUID userID, UUID restaurantId) throws RemoteException {
-        return store.users().removeFavourite(userID, restaurantId);
+        if (userID == null || restaurantId == null) return false;
+        if (store.users().removeFavourite(userID, restaurantId)) return true;
+        else throw new RemoteException("Error occured while saving changes");
     }
 
     @Override
