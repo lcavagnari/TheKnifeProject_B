@@ -20,11 +20,22 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * DAO per la gestione degli utenti di tipo {@link Customer}.
+ * Estende {@link JsonUserDAO} gestendo la persistenza locale della lista dei
+ * ristoranti preferiti e delegando le operazioni RMI al server.
+ */
 public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
 
     private volatile FavouriteServiceInter favService;
     private File favouritesFile;
 
+    /**
+     * Costruisce un nuovo DAO per i clienti.
+     *
+     * @param authService servizio di autenticazione RMI
+     * @param favService  servizio dei preferiti RMI
+     */
     JsonCustomerDAO(AuthServiceInter authService, FavouriteServiceInter favService) {
         super(Customer.class, UserRole.CLIENT, authService);
 
@@ -32,6 +43,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         this.favouritesFile = new File(Constants.ROOT, "favourites.json");
     }
 
+    /** {@inheritDoc} */
     @Override
     public void repointTo(UUID userId) {
         super.repointTo(userId);
@@ -79,6 +91,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         return fresh;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Customer mapNode(JsonNode node) {
         Set<UUID> favourites = loadFavouritesFromDisk();
@@ -97,6 +110,7 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         );
     }
 
+    /** {@inheritDoc} */
     @Override
     protected ArrayNode toArrayNode() {
         ArrayNode array = mapper.createArrayNode();
@@ -110,6 +124,15 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         return array;
     }
 
+    /**
+     * Aggiunge un ristorante alla lista dei preferiti del cliente.
+     * Registra l'associazione sia localmente che tramite il servizio RMI.
+     *
+     * @param customerId   ID del cliente
+     * @param restaurantId ID del ristorante da aggiungere ai preferiti
+     * @return {@code true} se il ristorante è stato aggiunto con successo
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public boolean addFavourite(UUID customerId, UUID restaurantId) {
         Customer customer = cacheById.get(customerId);
         if (customer == null) return false;
@@ -129,6 +152,15 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         return true;
     }
 
+    /**
+     * Rimuove un ristorante dalla lista dei preferiti del cliente.
+     * Elimina l'associazione sia localmente che tramite il servizio RMI.
+     *
+     * @param customerId   ID del cliente
+     * @param restaurantId ID del ristorante da rimuovere dai preferiti
+     * @return {@code true} se il ristorante è stato rimosso con successo
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public boolean removeFavourite(UUID customerId, UUID restaurantId) {
         Customer customer = cacheById.get(customerId);
         if (customer == null) return false;
@@ -148,6 +180,12 @@ public final class JsonCustomerDAO extends JsonUserDAO<Customer> {
         return true;
     }
 
+    /**
+     * Restituisce l'insieme degli ID dei ristoranti preferiti dal cliente.
+     *
+     * @param customerId ID del cliente
+     * @return insieme immutabile di ID dei ristoranti preferiti, o un insieme vuoto se il cliente non esiste
+     */
     public Set<UUID> findFavourites(UUID customerId) {
         Customer customer = cacheById.get(customerId);
         return customer != null ? Set.copyOf(customer.getFavouriteRestourants()) : Set.of();

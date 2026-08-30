@@ -21,6 +21,12 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 
+/**
+ * Controller principale della menu-card della GUI.
+ * Gestisce la navigazione animata tra il menu iniziale (titleBlock + menuButtons),
+ * il form di login, il form di registrazione e la schermata home dell'utente loggato.
+ * Gestisce inoltre il ripristino della sessione salvata all'avvio dell'applicazione.
+ */
 public class GUIController {
 
     private static final Duration SLIDE_DURATION = Duration.millis(250);
@@ -52,6 +58,7 @@ public class GUIController {
     private HomeController homeController;
     private boolean animating = false;
 
+    /** {@inheritDoc} */
     @FXML
     public void initialize() {
         menuCard.layoutBoundsProperty().addListener((obs, oldBounds, newBounds) -> {

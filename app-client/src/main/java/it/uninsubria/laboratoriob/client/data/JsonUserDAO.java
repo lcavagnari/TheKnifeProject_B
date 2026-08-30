@@ -26,6 +26,13 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * DAO astratto per la gestione degli utenti con persistenza JSON lato client.
+ * Fornisce una cache in memoria ({@code ConcurrentHashMap}) sincronizzata con il file JSON locale,
+ * e delega le operazioni di registrazione e login al servizio RMI remoto.
+ *
+ * @param <T> il tipo di utente gestito (es. {@code Customer}, {@code Owner})
+ */
 public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
     protected static final ObjectMapper mapper = new ObjectMapper();
@@ -40,6 +47,13 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
 
     private volatile boolean cacheLoaded = false;
 
+    /**
+     * Crea un nuovo DAO utente per il tipo e il ruolo specificati.
+     *
+     * @param type la classe dell'entita utente da gestire
+     * @param role il ruolo utente associato a questo DAO
+     * @param authService il servizio di autenticazione RMI remoto
+     */
     protected JsonUserDAO(Class<T> type, UserRole role, AuthServiceInter authService) {
         this.type = type;
         this.role = role;
@@ -59,10 +73,27 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         return fresh;
     }
 
+    /**
+     * Mappa un nodo JSON nell'entita utente corrispondente.
+     *
+     * @param node il nodo JSON da convertire
+     * @return l'entita utente estratta dal nodo
+     */
     protected abstract T mapNode(JsonNode node);
 
+    /**
+     * Converte tutti gli utenti in cache in un array JSON.
+     *
+     * @return un {@link ArrayNode} contenente la rappresentazione JSON di tutti gli utenti
+     */
     protected abstract ArrayNode toArrayNode();
 
+    /**
+     * Ripunta il file di persistenza alla cartella dell'utente specificato,
+     * svuotando la cache corrente e ricaricandola al prossimo accesso.
+     *
+     * @param userId l'identificativo dell'utente verso cui ripuntare
+     */
     public void repointTo(UUID userId) {
         File userDir = new File(Constants.ROOT, userId.toString());
         this.storeFile = new File(userDir, storeFile.getName());
@@ -99,6 +130,12 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         }
     }
 
+    /**
+     * Scrive l'array JSON su disco in modo atomico, usando un file temporaneo
+     * e una mossa atomica per evitare corruzione in caso di interruzione.
+     *
+     * @param array l'array JSON da persistere
+     */
     protected void persistAtomic(ArrayNode array) {
         try {
             if (!storeFile.getParentFile().exists()) storeFile.getParentFile().mkdirs();
@@ -111,22 +148,55 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         }
     }
 
+    /**
+     * Legge l'identificativo UUID dal nodo JSON.
+     *
+     * @param node il nodo JSON contenente il campo "id"
+     * @return l'UUID estratto
+     */
     protected UUID readId(JsonNode node) {
         return UUID.fromString(node.path("id").asText());
     }
 
+    /**
+     * Legge un valore stringa dal nodo JSON al campo specificato.
+     *
+     * @param node il nodo JSON sorgente
+     * @param field il nome del campo da leggere
+     * @return il valore stringa del campo
+     */
     protected String readString(JsonNode node, String field) {
         return node.path(field).asText();
     }
 
+    /**
+     * Legge la data di nascita dal campo "dateOfBirth" del nodo JSON.
+     *
+     * @param node il nodo JSON contenente la data di nascita
+     * @return la {@link LocalDate} estratta
+     */
     protected LocalDate readDate(JsonNode node) {
         return LocalDate.parse(node.path("dateOfBirth").asText());
     }
 
+    /**
+     * Legge un valore booleano dal nodo JSON, con un valore predefinito di fallback.
+     *
+     * @param node il nodo JSON sorgente
+     * @param field il nome del campo da leggere
+     * @param defaultValue il valore da restituire se il campo non esiste
+     * @return il valore booleano letto, oppure {@code defaultValue}
+     */
     protected boolean readBoolean(JsonNode node, String field, boolean defaultValue) {
         return node.path(field).asBoolean(defaultValue);
     }
 
+    /**
+     * Legge l'oggetto {@link Location} dal nodo JSON annidato nel campo "location".
+     *
+     * @param node il nodo JSON contenente il sotto-nodo "location"
+     * @return la localita estratta, oppure {@code null} se assente o nulla
+     */
     protected Location readLocation(JsonNode node) {
         JsonNode locNode = node.path("location");
         if (locNode.isMissingNode() || locNode.isNull()) return null;
@@ -139,6 +209,12 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         );
     }
 
+    /**
+     * Scrive tutti i campi comuni dell'utente nel nodo JSON specificato.
+     *
+     * @param node il nodo JSON di destinazione
+     * @param user l'utente i cui campi vanno scritti
+     */
     protected void writeUserFields(ObjectNode node, User user) {
         node.put("id", user.getId().toString());
         node.put("role", user.getRole().name());
@@ -161,6 +237,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<T> findById(UUID id) {
         ensureCacheLoaded();
@@ -169,6 +246,12 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         return Optional.empty();
     }
 
+    /**
+     * Cerca un utente per nome utente nella cache locale.
+     *
+     * @param username il nome utente da ricercare
+     * @return un {@link Optional} contenente l'utente trovato, oppure vuoto
+     */
     public Optional<T> findByUsername(String username) {
         ensureCacheLoaded();
         T cached = cacheByUsername.get(username);
@@ -176,6 +259,7 @@ public abstract class JsonUserDAO<T extends User> implements DAO<T> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<T> findAll() {
         ensureCacheLoaded();

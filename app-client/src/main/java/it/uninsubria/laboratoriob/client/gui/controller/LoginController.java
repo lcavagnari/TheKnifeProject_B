@@ -17,6 +17,11 @@ import javafx.scene.control.TextField;
 
 import java.rmi.RemoteException;
 
+/**
+ * Controller del form di login.
+ * Gestisce l'autenticazione dell'utente tramite RMI, il salvataggio della sessione
+ * e la transizione alla schermata home in caso di login riuscito.
+ */
 public class LoginController {
 
     private final SessionRepository sessionRepository = new SessionRepository();
@@ -38,10 +43,20 @@ public class LoginController {
     @FXML
     private Button btnAnnulla;
 
+    /**
+     * Imposta il callback invocato quando l'utente annulla il login.
+     *
+     * @param callbackRunnable da eseguire per tornare al menu iniziale
+     */
     public void setOnCancelCallback(Runnable callback) {
         this.onCancelCallback = callback;
     }
 
+    /**
+     * Imposta il callback invocato dopo un login riuscito.
+     *
+     * @param callbackRunnable da eseguire per passare alla schermata home
+     */
     public void setOnLoginSuccessCallback(Runnable callback) {
         this.onLoginSuccessCallback = callback;
     }

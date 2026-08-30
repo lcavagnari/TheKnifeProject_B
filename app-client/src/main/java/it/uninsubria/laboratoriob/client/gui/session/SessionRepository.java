@@ -18,6 +18,11 @@ public class SessionRepository {
     private static final File SESSION_FILE = new File("data", "session.ini");
     private static final String USER_ID_KEY = "userId=";
 
+    /**
+     * Salva l'id dell'utente loggato nel file di sessione locale.
+     *
+     * @param user l'utente di cui persistere l'id
+     */
     public void save(User user) {
         try {
             File dir = SESSION_FILE.getParentFile();
@@ -30,6 +35,11 @@ public class SessionRepository {
         }
     }
 
+    /**
+     * Carica l'id dell'utente dalla sessione persistita nel file locale.
+     *
+     * @return un {@link Optional} contenente l'id dell'utente, oppure vuoto se la sessione non esiste
+     */
     public Optional<UUID> loadUserId() {
         if (!SESSION_FILE.exists())
             return Optional.empty();
@@ -46,6 +56,9 @@ public class SessionRepository {
         }
     }
 
+    /**
+     * Rimuove il file di sessione locale, terminando la sessione salvata.
+     */
     public void clear() {
         if (SESSION_FILE.exists())
             SESSION_FILE.delete();

@@ -25,6 +25,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * DAO per la gestione dei ristoranti con persistenza su file JSON locale.
+ * Implementa la cache in memoria con {@link ConcurrentHashMap} e sincronizza
+ * le modifiche tramite il servizio RMI {@link RestaurantServiceInter}.
+ */
 public final class JsonRestaurantDAO implements DAO<Restaurant> {
 
     // TODO: fix Arraylist is not serialisable issue and ensure data is cached appropriately.
@@ -36,6 +41,11 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
     private final ConcurrentHashMap<UUID, Restaurant> cacheById = new ConcurrentHashMap<>();
     private volatile boolean cacheLoaded = false;
 
+    /**
+     * Costruisce un nuovo DAO per i ristoranti.
+     *
+     * @param service servizio RMI per la gestione dei ristoranti
+     */
     public JsonRestaurantDAO(RestaurantServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "restaurants.json");
         this.service = service;
@@ -182,6 +192,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return node;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Restaurant> findById(UUID id) {
         ensureCacheLoaded();
@@ -206,6 +217,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Restaurant> findAll() {
         ensureCacheLoaded();
@@ -231,6 +243,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return local;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Restaurant> findAll(int offset, int limit) {
         List<Restaurant> all = findAll();
@@ -238,6 +251,12 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return all.subList(offset, Math.min(offset + limit, all.size()));
     }
 
+    /**
+     * Restituisce il numero di ristoranti memorizzati sul server remoto.
+     *
+     * @return numero di ristoranti remoti, o 0 se il servizio non è disponibile
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public long countRemote() {
         RestaurantServiceInter svc = ensureService();
         if (svc == null) return 0;
@@ -249,11 +268,17 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         }
     }
 
+    /**
+     * Restituisce il numero di ristoranti memorizzati nella cache locale.
+     *
+     * @return numero di ristoranti in cache
+     */
     public long countLocal() {
         ensureCacheLoaded();
         return (!cacheById.isEmpty()) ? cacheById.size() : 0;
     }
 
+    /** {@inheritDoc} */
     @Override
     public long count() {
         long local = countLocal();
@@ -262,6 +287,14 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return local + remote;
     }
 
+    /**
+     * Cerca tutti i ristoranti di proprietà di un determinato owner.
+     * Prima verifica nella cache locale, poi interroga il server se necessario.
+     *
+     * @param ownerId ID del proprietario
+     * @return lista dei ristoranti dell'owner
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public List<Restaurant> findByOwner(UUID ownerId) {
         ensureCacheLoaded();
         List<Restaurant> local = cacheById.values().stream()
@@ -283,6 +316,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return local;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean save(Restaurant restaurant) {
         if (restaurant == null) return false;
@@ -302,6 +336,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean update(Restaurant restaurant) {
         if (restaurant == null) return false;
@@ -324,6 +359,7 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean delete(UUID id) {
         ensureCacheLoaded();
@@ -342,6 +378,15 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return true;
     }
 
+    /**
+     * Aggiorna i tipi di cucina di un ristorante.
+     * Sostituisce l'intero insieme con quello fornito.
+     *
+     * @param restaurantId ID del ristorante da aggiornare
+     * @param cuisines     nuovo insieme di tipi di cucina
+     * @return {@code true} se l'aggiornamento è riuscito
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public boolean updateCuisines(UUID restaurantId, Set<CuisineType> cuisines) {
         ensureCacheLoaded();
         Restaurant r = cacheById.get(restaurantId);
@@ -361,6 +406,15 @@ public final class JsonRestaurantDAO implements DAO<Restaurant> {
         return true;
     }
 
+    /**
+     * Aggiorna i servizi offerti da un ristorante.
+     * Sostituisce l'intero insieme con quello fornito.
+     *
+     * @param restaurantId ID del ristorante da aggiornare
+     * @param services     nuovo insieme di servizi
+     * @return {@code true} se l'aggiornamento è riuscito
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public boolean updateServices(UUID restaurantId, Set<String> services) {
         ensureCacheLoaded();
         Restaurant r = cacheById.get(restaurantId);

@@ -122,7 +122,15 @@ public abstract class Menus {
         System.exit(0);
     }
 
+    /**
+     * Apre il menu principale del ruolo corrente, gestendo l'interazione utente in un ciclo continuo.
+     */
     public abstract void openMenu();
 
+    /**
+     * Mostra i dettagli e le recensioni del ristorante selezionato.
+     *
+     * @param restaurant il ristorante da visualizzare
+     */
     protected abstract void viewRestaurantDetails(Restaurant restaurant);
 }

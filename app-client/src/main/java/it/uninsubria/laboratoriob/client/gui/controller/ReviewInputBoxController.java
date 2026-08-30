@@ -38,49 +38,90 @@ public class ReviewInputBoxController {
     private Consumer<Result> onSubmit;
     private Runnable onCancel;
 
+    /** {@inheritDoc} */
     @FXML
     private void initialize() {
         stars = new Label[]{star1, star2, star3, star4, star5};
     }
 
+    /**
+     * Configura la casella in modalità risposta: nasconde la sezione stelle,
+     * lasciando solo il campo di testo.
+     */
     public void setReplyMode() {
         starsSection.setVisible(false);
         starsSection.setManaged(false);
     }
 
+    /**
+     * Configura la casella in modalità recensione: mostra la sezione stelle
+     * per la selezione del voto.
+     */
     public void setReviewMode() {
         starsSection.setVisible(true);
         starsSection.setManaged(true);
     }
 
+    /**
+     * Imposta il testo pre-compilato nella casella di testo.
+     *
+     * @param text il testo da inserire; se {@code null} viene inserita una stringa vuota
+     */
     public void setText(String text) {
         textField.setText(text != null ? text : "");
     }
 
+    /**
+     * Imposta il voto pre-selezionato (da 0 a 5 stelle).
+     *
+     * @param rating il numero di stelle selezionate
+     */
     public void setRating(int rating) {
         selectRating(rating);
     }
 
+    /**
+     * Imposta il callback invocato quando l'utente conferma l'invio.
+     *
+     * @param handler il consumer che riceve il risultato (voto + testo)
+     */
     public void setOnSubmit(Consumer<Result> handler) {
         this.onSubmit = handler;
     }
 
+    /**
+     * Imposta il callback invocato quando l'utente annulla l'operazione.
+     *
+     * @param handler il runnable da eseguire per annullare
+     */
     public void setOnCancel(Runnable handler) {
         this.onCancel = handler;
     }
 
+    /**
+     * Resetta la casella: cancella il testo, deseleziona le stelle e nasconde
+     * eventuali messaggi di errore.
+     */
     public void clear() {
         textField.clear();
         selectRating(0);
         clearError();
     }
 
+    /**
+     * Mostra un messaggio di errore sotto la casella di testo.
+     *
+     * @param message il messaggio di errore da visualizzare
+     */
     public void showError(String message) {
         errorLabel.setText(message);
         errorLabel.setVisible(true);
         errorLabel.setManaged(true);
     }
 
+    /**
+     * Nasconde il messaggio di errore attualmente visualizzato.
+     */
     public void clearError() {
         errorLabel.setText("");
         errorLabel.setVisible(false);

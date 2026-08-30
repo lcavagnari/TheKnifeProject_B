@@ -21,6 +21,11 @@ import javafx.util.Duration;
 import java.rmi.RemoteException;
 import java.time.LocalDate;
 
+/**
+ * Controller del form di registrazione.
+ * Gestisce la creazione di un nuovo utente (cliente o gestore) con validazione
+ * dei campi, animazioni di conferma e autenticazione automatica al termine.
+ */
 public class RegisterController {
 
     private final SessionRepository sessionRepository = new SessionRepository();
@@ -81,6 +86,7 @@ public class RegisterController {
     @FXML
     private Button btnAnnulla;
 
+    /** {@inheritDoc} */
     @FXML
     public void initialize() {
         roleClienteCard.setOnMouseClicked(e -> selectRole(true));
@@ -170,10 +176,20 @@ public class RegisterController {
         }
     }
 
+    /**
+     * Imposta il callback invocato quando l'utente annulla la registrazione.
+     *
+     * @param callbackRunnable da eseguire per tornare al menu iniziale
+     */
     public void setOnCancelCallback(Runnable callback) {
         this.onCancelCallback = callback;
     }
 
+    /**
+     * Imposta il callback invocato dopo una registrazione riuscita.
+     *
+     * @param callbackRunnable da eseguire per passare alla schermata home
+     */
     public void setOnRegisterSuccessCallback(Runnable callback) {
         this.onRegisterSuccessCallback = callback;
     }

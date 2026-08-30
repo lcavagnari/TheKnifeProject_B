@@ -32,6 +32,12 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+/**
+ * Controller della schermata di elenco ristoranti.
+ * Supporta due modalità:browse pubblico (tutti i ristoranti) e gestione proprietario
+ * (solo i ristoranti di proprietà). Include ricerca per parola chiave, paginazione
+ * e creazione di nuovi ristoranti.
+ */
 public class RestaurantsController {
 
     private static final int PAGE_SIZE = 20;
@@ -70,6 +76,9 @@ public class RestaurantsController {
     @FXML
     private VBox root;
 
+    /**
+     * Inizializza la schermata in modalità browse pubblico, caricando tutti i ristoranti.
+     */
     public void inizializza() {
         this.owner = null;
         restaurantListView.getStyleClass().add("restaurant-list");
@@ -88,6 +97,12 @@ public class RestaurantsController {
         caricaEMostra(GuiContext.getDataStore().getRestaurantDAO().findAll());
     }
 
+    /**
+     * Inizializza la schermata in modalità gestione proprietario, mostrando solo
+     * i ristoranti di proprietà dell'utente loggato e abilitando il pulsante "Nuovo".
+     *
+     * @param owner il proprietario loggato
+     */
     public void inizializzaProprietario(Owner owner) {
         this.owner = owner;
         restaurantListView.getStyleClass().add("restaurant-list");

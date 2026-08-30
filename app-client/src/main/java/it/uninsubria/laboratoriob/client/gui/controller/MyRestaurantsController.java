@@ -27,6 +27,11 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Consumer;
 
+/**
+ * Controller della schermata "I Miei Ristoranti" del proprietario.
+ * Mostra la lista dei ristoranti di proprietà dell'utente loggato, con possibilità
+ * di aprirne i dettagli o crearne uno nuovo.
+ */
 public class MyRestaurantsController {
 
     private Owner owner;
@@ -44,6 +49,10 @@ public class MyRestaurantsController {
     @FXML
     private VBox root;
 
+    /**
+     * Inizializza la schermata caricando i ristoranti di proprietà dell'utente corrente
+     * e configurando la ListView con la cella personalizzata.
+     */
     public void inizializza() {
         User utente = Session.getCurrentUser();
         this.owner = (utente instanceof Owner o) ? o : null;

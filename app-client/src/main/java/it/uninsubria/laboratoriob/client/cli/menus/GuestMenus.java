@@ -16,10 +16,16 @@ import java.util.UUID;
  */
 public class GuestMenus extends Menus {
 
+    /**
+     * Costruisce il menu per utenti non autenticati (guest).
+     *
+     * @param dataStore il data store client per l'accesso ai dati
+     */
     public GuestMenus(ClientDataStore dataStore) {
         super(null, dataStore);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void openMenu() {
         while (true) {

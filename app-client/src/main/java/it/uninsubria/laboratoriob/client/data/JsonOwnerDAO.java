@@ -21,18 +21,31 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * DAO per la gestione degli utenti di tipo {@link Owner}.
+ * Estende {@link JsonUserDAO} gestendo la persistenza locale delle relazioni
+ * di proprietà dei ristoranti e delegando le operazioni RMI al server.
+ */
 public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
 
     private volatile RestaurantServiceInter restaurantService;
     private final JsonRestaurantDAO restaurantDAO;
     private File ownedRestaurantsFile;
 
+    /**
+     * Costruisce un nuovo DAO per gli owner.
+     *
+     * @param authService       servizio di autenticazione RMI
+     * @param restaurantService servizio dei ristoranti RMI
+     * @param restaurantDAO     DAO locale dei ristoranti per la risoluzione degli ID
+     */
     JsonOwnerDAO(AuthServiceInter authService, RestaurantServiceInter restaurantService, JsonRestaurantDAO restaurantDAO) {
         super(Owner.class, UserRole.OWNER, authService);
         this.restaurantService = restaurantService;
         this.restaurantDAO = restaurantDAO;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void repointTo(UUID userId) {
         super.repointTo(userId);
@@ -81,6 +94,7 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         return fresh;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected Owner mapNode(JsonNode node) {
         Owner owner = new Owner(
@@ -101,6 +115,7 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         return owner;
     }
 
+    /** {@inheritDoc} */
     @Override
     protected ArrayNode toArrayNode() {
         ArrayNode array = mapper.createArrayNode();
@@ -112,6 +127,15 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         return array;
     }
 
+    /**
+     * Aggiunge un ristorante alla lista di proprietà di un owner.
+     * Registra l'associazione sia localmente che tramite il servizio RMI.
+     *
+     * @param ownerId    ID dell'owner
+     * @param restaurant ristorante da associare
+     * @return {@code true} se il ristorante è stato aggiunto con successo
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public boolean addOwnedRestaurant(UUID ownerId, Restaurant restaurant) {
         Owner owner = cacheById.get(ownerId);
         if (owner == null || restaurant == null) return false;
@@ -131,6 +155,15 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         return added;
     }
 
+    /**
+     * Rimuove un ristorante dalla lista di proprietà di un owner.
+     * Elimina l'associazione sia localmente che tramite il servizio RMI.
+     *
+     * @param ownerId      ID dell'owner
+     * @param restaurantId ID del ristorante da rimuovere
+     * @return {@code true} se il ristorante è stato rimosso con successo
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public boolean removeOwnedRestaurant(UUID ownerId, UUID restaurantId) {
         Owner owner = cacheById.get(ownerId);
         if (owner == null) return false;
@@ -153,6 +186,12 @@ public final class JsonOwnerDAO extends JsonUserDAO<Owner> {
         return removed;
     }
 
+    /**
+     * Restituisce l'insieme degli ID dei ristoranti di proprietà di un owner.
+     *
+     * @param ownerId ID dell'owner
+     * @return insieme immutabile di ID dei ristoranti, o un insieme vuoto se l'owner non esiste
+     */
     public Set<UUID> findOwnedRestaurants(UUID ownerId) {
         Owner owner = cacheById.get(ownerId);
         return owner != null ? Set.copyOf(owner.getRestaurantsById().keySet()) : Set.of();

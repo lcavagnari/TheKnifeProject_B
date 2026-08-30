@@ -26,6 +26,11 @@ import java.io.IOException;
 import java.util.List;
 import java.util.function.Consumer;
 
+/**
+ * Controller della schermata "Preferiti" del cliente.
+ * Mostra la lista dei ristoranti preferiti dall'utente loggato, con possibilità
+ * di aprirne i dettagli o rimuoverli dai preferiti.
+ */
 public class FavoritesController {
 
     private static final int PAGE_SIZE = 20;
@@ -49,6 +54,10 @@ public class FavoritesController {
     @FXML
     private VBox root;
 
+    /**
+     * Inizializza la schermata caricando la lista dei ristoranti preferiti
+     * dell'utente corrente e configurando la ListView con la cella personalizzata.
+     */
     public void inizializza() {
         User utente = Session.getCurrentUser();
         this.customer = (utente instanceof Customer c) ? c : null;

@@ -12,6 +12,11 @@ import javafx.util.Duration;
 
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Controller di una singola card di recensione all'interno della lista recensioni.
+ * Gestisce la visualizzazione del voto, del testo e della data, nonché le azioni
+ * di risposta (proprietario) e cancellazione (autore) con animazioni di conferma.
+ */
 public class ReviewCardController {
 
     @FXML
@@ -59,6 +64,11 @@ public class ReviewCardController {
         replyInputBoxController.setOnCancel(this::chiudiCasellaRisposta);
     }
 
+    /**
+     * Imposta la recensione da visualizzare e aggiorna il contenuto della card.
+     *
+     * @param review la recensione da mostrare
+     */
     public void setReview(Review review) {
         this.review = review;
         ratingLabel.setText(String.valueOf(review.getValue()));
@@ -110,6 +120,15 @@ public class ReviewCardController {
         }
     }
 
+    /**
+     * Configura il contesto della recensione: imposta la recensione, l'utente corrente
+     * e il ruolo del proprietario per determinare quali azioni (risposta, cancellazione)
+     * sono disponibili.
+     *
+     * @param review       la recensione da visualizzare
+     * @param currentUserId l'ID dell'utente corrente, oppure {@code null} se non loggato
+     * @param isOwner      {@code true} se l'utente corrente è il proprietario del ristorante
+     */
     public void setContext(Review review, String currentUserId, boolean isOwner) {
         setReview(review);
         this.currentUserId = currentUserId;

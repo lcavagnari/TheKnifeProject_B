@@ -26,6 +26,13 @@ public class LoginMenu {
         return user != null && user.isSystem();
     }
 
+    /**
+     * Registra un nuovo utente raccogliendo i dati anagrafici tramite input testuale,
+     * invocando il servizio di registrazione RMI e salvando la cache locale.
+     *
+     * @param dataStore il data store client per la persistenza della cache
+     * @return l'utente registrato, oppure {@code null} in caso di errore o annullamento
+     */
     public static User register(ClientDataStore dataStore) {
         IO.clearScreen();
         System.out.println("=== User Registration ===");
@@ -137,6 +144,13 @@ public class LoginMenu {
         }
     }
 
+    /**
+     * Autentica un utente esistente tramite il servizio RMI, con un massimo di 4 tentativi.
+     * In caso di successo aggiorna la cache locale con l'utente autenticato.
+     *
+     * @param dataStore il data store client per la persistenza della cache
+     * @return l'utente autenticato, oppure {@code null} in caso di fallimento
+     */
     public static User login(ClientDataStore dataStore) {
         IO.clearScreen();
 

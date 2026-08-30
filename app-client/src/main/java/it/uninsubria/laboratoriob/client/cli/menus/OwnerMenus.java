@@ -24,11 +24,18 @@ public class OwnerMenus extends Menus {
 
     private final Owner owner;
 
+    /**
+     * Costruisce il menu per il proprietario di ristoranti.
+     *
+     * @param owner     il proprietario autenticato
+     * @param dataStore il data store client per l'accesso ai dati
+     */
     public OwnerMenus(Owner owner, ClientDataStore dataStore) {
         super(owner, dataStore);
         this.owner = owner;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void openMenu() {
         while (true) {

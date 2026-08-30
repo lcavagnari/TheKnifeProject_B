@@ -30,6 +30,12 @@ import java.util.Comparator;
 import java.util.Objects;
 import java.util.UUID;
 
+/**
+ * Controller della schermata di dettaglio di un ristorante.
+ * Visualizza informazioni complete (nome, descrizione, localizzazione, fascia di prezzo,
+ * stelle Michelin, stella verde, cucine, servizi), la lista delle recensioni e consente
+ * ai clienti di scrivere o modificare la propria recensione e di gestire i preferiti.
+ */
 public class RestaurantDetailsController {
 
     @FXML
@@ -85,6 +91,7 @@ public class RestaurantDetailsController {
 
     private Restaurant restaurant;
 
+    /** {@inheritDoc} */
     @FXML
     public void initialize() {
         String css = Objects.requireNonNull(getClass().getResource("/it/uninsubria/laboratoriob/client/gui/style.css")).toExternalForm();
@@ -136,6 +143,12 @@ public class RestaurantDetailsController {
         carica(restaurant);
     }
 
+    /**
+     * Carica i dati del ristorante specificato e aggiorna tutti i campi della schermata,
+     * incluse le recensioni, i pulsanti di azione e lo stato dei preferiti.
+     *
+     * @param r il ristorante da visualizzare
+     */
     public void carica(Restaurant r) {
         this.restaurant = r;
 

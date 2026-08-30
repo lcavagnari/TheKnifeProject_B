@@ -20,6 +20,11 @@ import javafx.stage.Stage;
 
 import java.util.*;
 
+/**
+ * Controller del form di creazione e modifica di un ristorante.
+ * Gestisce la validazione dei campi, la selezione delle cucine e dei servizi,
+ * e il salvataggio/aggiornamento del ristorante tramite il DAO del proprietario.
+ */
 public class AddEditRestaurantController {
 
     private Owner owner;
@@ -83,6 +88,7 @@ public class AddEditRestaurantController {
 
     private FilteredList<CuisineType> cucineFiltrate;
 
+    /** {@inheritDoc} */
     @FXML
     public void initialize() {
         prezzoCombo.setItems(FXCollections.observableArrayList(PriceRange.values()));
@@ -118,6 +124,12 @@ public class AddEditRestaurantController {
         renderServizi();
     }
 
+    /**
+     * Configura il form per la creazione di un nuovo ristorante,
+     * impostando la fascia di prezzo predefinita a MODERATE.
+     *
+     * @param owner il proprietario che sta creando il ristorante
+     */
     public void configuraNuovo(Owner owner) {
         this.owner = owner;
         this.restaurantInModifica = null;
@@ -126,6 +138,13 @@ public class AddEditRestaurantController {
         prezzoCombo.getSelectionModel().select(PriceRange.MODERATE);
     }
 
+    /**
+     * Configura il form per la modifica di un ristorante esistente,
+     * pre-compilando tutti i campi con i dati attuali.
+     *
+     * @param owner    il proprietario del ristorante
+     * @param restaurant il ristorante da modificare
+     */
     public void configuraModifica(Owner owner, Restaurant restaurant) {
         this.owner = owner;
         this.restaurantInModifica = restaurant;

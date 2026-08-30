@@ -19,11 +19,18 @@ public class CustomerMenus extends Menus {
 
     private final Customer customer;
 
+    /**
+     * Costruisce il menu per il cliente autenticato.
+     *
+     * @param customer il cliente autenticato
+     * @param dataStore il data store client per l'accesso ai dati
+     */
     public CustomerMenus(Customer customer, ClientDataStore dataStore) {
         super(customer, dataStore);
         this.customer = customer;
     }
 
+    /** {@inheritDoc} */
     @Override
     public void openMenu() {
         while (true) {

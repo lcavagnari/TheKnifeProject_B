@@ -23,6 +23,11 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * DAO per la gestione delle recensioni con persistenza su file JSON locale.
+ * Implementa la cache in memoria con {@link ConcurrentHashMap} e sincronizza
+ * le modifiche tramite il servizio RMI {@link ReviewServiceInter}.
+ */
 public final class JsonReviewDAO implements DAO<Review> {
 
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -33,6 +38,12 @@ public final class JsonReviewDAO implements DAO<Review> {
     private final ConcurrentHashMap<UUID, Review> cacheById = new ConcurrentHashMap<>();
     private volatile boolean cacheLoaded = false;
 
+    /**
+     * Costruisce un nuovo DAO per le recensioni.
+     *
+     * @param customerDAO DAO dei clienti per la risoluzione degli utenti
+     * @param service     servizio RMI per la gestione delle recensioni
+     */
     public JsonReviewDAO(JsonCustomerDAO customerDAO, ReviewServiceInter service) {
         this.storeFile = new File(Constants.ROOT, "reviews.json");
         this.customerDAO = customerDAO;
@@ -130,6 +141,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         return node;
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Review> findById(UUID id) {
         ensureCacheLoaded();
@@ -138,6 +150,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         return Optional.empty();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Review> findAll() {
         ensureCacheLoaded();
@@ -158,6 +171,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         return local;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Review> findAll(int offset, int limit) {
         List<Review> all = findAll();
@@ -165,12 +179,21 @@ public final class JsonReviewDAO implements DAO<Review> {
         return all.subList(offset, Math.min(offset + limit, all.size()));
     }
 
+    /** {@inheritDoc} */
     @Override
     public long count() {
         ensureCacheLoaded();
         return cacheById.size();
     }
 
+    /**
+     * Cerca tutte le recensioni associate a un ristorante.
+     * Prima verifica nella cache locale, poi interroga il server se necessario.
+     *
+     * @param restaurantId ID del ristorante
+     * @return lista delle recensioni del ristorante
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public List<Review> findByRestaurant(UUID restaurantId) {
         ensureCacheLoaded();
         List<Review> local = cacheById.values().stream()
@@ -192,6 +215,14 @@ public final class JsonReviewDAO implements DAO<Review> {
         return local;
     }
 
+    /**
+     * Cerca tutte le recensioni scritte da un determinato utente.
+     * Prima verifica nella cache locale, poi interroga il server se necessario.
+     *
+     * @param userId ID dell'utente
+     * @return lista delle recensioni dell'utente
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public List<Review> findByUser(UUID userId) {
         ensureCacheLoaded();
         List<Review> local = cacheById.values().stream()
@@ -213,6 +244,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         return local;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean save(Review review) {
         if (review == null) return false;
@@ -232,6 +264,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean update(Review review) {
         if (review == null) return false;
@@ -251,6 +284,15 @@ public final class JsonReviewDAO implements DAO<Review> {
         return true;
     }
 
+    /**
+     * Aggiunge una risposta del proprietario a una recensione.
+     * Invia la risposta al server e aggiorna localmente la recensione.
+     *
+     * @param review recensione a cui rispondere
+     * @param reply  testo della risposta
+     * @return {@code true} se la risposta è stata registrata con successo
+     * @throws ServiceUnavailableException se il server RMI non è raggiungibile
+     */
     public boolean replyToReview(Review review, String reply) {
         if (review == null || reply == null || reply.isBlank()) return false;
         ensureCacheLoaded();
@@ -273,6 +315,7 @@ public final class JsonReviewDAO implements DAO<Review> {
         return true;
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean delete(UUID id) {
         ensureCacheLoaded();

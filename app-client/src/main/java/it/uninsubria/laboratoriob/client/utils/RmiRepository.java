@@ -15,6 +15,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+/**
+ * Repository centralizzato per la gestione delle connessioni RMI ai servizi del server.
+ * Fornisce lookup opportunistici con cooldown e limite di tentativi falliti,
+ * oltre a una riconnessione forzata tramite {@link #acquireAll()}.
+ */
 @UtilityClass
 public class RmiRepository {
 
@@ -39,11 +44,21 @@ public class RmiRepository {
     private volatile String hostname;
     private volatile int port;
 
+    /**
+     * Configura l'hostname e la porta del registro RMI.
+     *
+     * @param hostname indirizzo del server RMI
+     * @param port     porta del registro RMI
+     */
     public void configure(String hostname, int port) {
         RmiRepository.hostname = hostname;
         RmiRepository.port = port;
     }
 
+    /**
+     * Resetta tutti i riferimenti ai servizi e i contatori di tentativi.
+     * Utile dopo una riconnessione forzata o un cambio di configurazione.
+     */
     public void reset() {
         restaurantService.set(null);
         authService.set(null);
@@ -61,34 +76,78 @@ public class RmiRepository {
         favouriteFailedAttempts.set(0);
     }
 
+    /**
+     * Restituisce il riferimento corrente al servizio dei ristoranti.
+     *
+     * @return stub del servizio ristoranti, o {@code null} se non ancora acquisito
+     */
     public RestaurantServiceInter getRestaurantService() {
         return restaurantService.get();
     }
 
+    /**
+     * Restituisce il riferimento corrente al servizio di autenticazione.
+     *
+     * @return stub del servizio auth, o {@code null} se non ancora acquisito
+     */
     public AuthServiceInter getAuthService() {
         return authService.get();
     }
 
+    /**
+     * Restituisce il riferimento corrente al servizio delle recensioni.
+     *
+     * @return stub del servizio review, o {@code null} se non ancora acquisito
+     */
     public ReviewServiceInter getReviewService() {
         return reviewService.get();
     }
 
+    /**
+     * Restituisce il riferimento corrente al servizio dei preferiti.
+     *
+     * @return stub del servizio favourite, o {@code null} se non ancora acquisito
+     */
     public FavouriteServiceInter getFavouriteService() {
         return favouriteService.get();
     }
 
+    /**
+     * Lookup opportunistico del servizio dei ristoranti.
+     * Rispetta il cooldown e il limite di tentativi falliti.
+     *
+     * @return stub del servizio, o {@code null} se il lookup non è possibile
+     */
     public RestaurantServiceInter lookupRestaurantService() {
         return lookup("restaurant", restaurantService, restaurantLastAttempt, restaurantFailedAttempts);
     }
 
+    /**
+     * Lookup opportunistico del servizio di autenticazione.
+     * Rispetta il cooldown e il limite di tentativi falliti.
+     *
+     * @return stub del servizio, o {@code null} se il lookup non è possibile
+     */
     public AuthServiceInter lookupAuthService() {
         return lookup("auth", authService, authLastAttempt, authFailedAttempts);
     }
 
+    /**
+     * Lookup opportunistico del servizio delle recensioni.
+     * Rispetta il cooldown e il limite di tentativi falliti.
+     *
+     * @return stub del servizio, o {@code null} se il lookup non è possibile
+     */
     public ReviewServiceInter lookupReviewService() {
         return lookup("review", reviewService, reviewLastAttempt, reviewFailedAttempts);
     }
 
+    /**
+     * Lookup opportunistico del servizio dei preferiti.
+     * Rispetta il cooldown e il limite di tentativi falliti.
+     *
+     * @return stub del servizio, o {@code null} se il lookup non è possibile
+     */
     public FavouriteServiceInter lookupFavouriteService() {
         return lookup("favourite", favouriteService, favouriteLastAttempt, favouriteFailedAttempts);
     }

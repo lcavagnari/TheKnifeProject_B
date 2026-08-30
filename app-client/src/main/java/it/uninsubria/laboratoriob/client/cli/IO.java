@@ -16,10 +16,20 @@ public class IO {
     private static final Scanner INPUT = new Scanner(System.in);
     private static final Random rd = new Random();
 
+    /**
+     * Chiude lo scanner di input standard.
+     */
     public static void closeScanner() {
         INPUT.close();
     }
 
+    /**
+     * Stampa un menu formattato su console con titolo, voci e piè di pagina.
+     *
+     * @param title   titolo del menu, o {@code null} per non stamparlo
+     * @param footer  piè di pagina, o {@code null} per non stamparlo
+     * @param items   voci del menu da visualizzare
+     */
     public static void printMenu(String title, String footer, String... items) {
         if (items.length == 0) return;
         else if (title != null) System.out.println(title + "\n");
@@ -31,6 +41,13 @@ public class IO {
         else System.out.println();
     }
 
+    /**
+     * Chiede all'utente un input booleano (sì/no).
+     *
+     * @param promptMessage messaggio da visualizzare come prompt
+     * @return {@code true} se l'utente ha risposto affermativamente
+     * @throws AbortOperationException se l'utente invoca il comando di interruzione
+     */
     public static boolean getBooleanInput(String promptMessage) throws AbortOperationException {
         String input = getUserInput(promptMessage).toLowerCase();
 
@@ -43,6 +60,12 @@ public class IO {
         return Boolean.parseBoolean(bool);
     }
 
+    /**
+     * Legge una riga di input da menu, consumando il newline residuo dello scanner.
+     *
+     * @param promptMessage messaggio da visualizzare come prompt
+     * @return stringa inserita dall'utente
+     */
     public static String getMenuUserInput(String promptMessage) {
         INPUT.nextLine();
         System.out.print(IO.replaceText(32, "> ") + promptMessage);
@@ -51,6 +74,13 @@ public class IO {
         return INPUT.nextLine();
     }
 
+    /**
+     * Legge una riga di input generico da console.
+     *
+     * @param promptMessage messaggio da visualizzare come prompt
+     * @return stringa inserita dall'utente
+     * @throws AbortOperationException se l'utente invoca il comando di interruzione
+     */
     public static String getUserInput(String promptMessage) throws AbortOperationException {
         System.out.print(IO.replaceText(32, "> ") + promptMessage + " ");
         while (!INPUT.hasNext()) INPUT.nextLine();
@@ -63,6 +93,16 @@ public class IO {
         return input;
     }
 
+    /**
+     * Legge una riga di input con vincolo di lunghezza minima e massima.
+     * Continua a chiedere l'input finché la lunghezza non è nel range specificato.
+     *
+     * @param promptMessage messaggio da visualizzare come prompt
+     * @param minLength     lunghezza minima accettata
+     * @param maxLength     lunghezza massima accettata
+     * @return stringa inserita dall'utente con lunghezza valida
+     * @throws AbortOperationException se l'utente invoca il comando di interruzione
+     */
     public static String getUserInput(String promptMessage, int minLength, int maxLength) throws AbortOperationException {
         String input;
         do {
@@ -72,6 +112,13 @@ public class IO {
         return input;
     }
 
+    /**
+     * Chiede all'utente un numero di telefono con prefisso nazionale.
+     * Valida il formato con espressione regolare.
+     *
+     * @return numero di telefono valido
+     * @throws AbortOperationException se l'utente invoca il comando di interruzione
+     */
     public static String getPhoneNumberInput() throws AbortOperationException {
         String input = getUserInput("Inserire numero di telefono con prefisso nazionale:", 10, 15);
 
@@ -83,6 +130,12 @@ public class IO {
         return input;
     }
 
+    /**
+     * Chiede all'utente un valore intero tramite input di menu.
+     *
+     * @param promptMessage messaggio da visualizzare come prompt
+     * @return intero inserito dall'utente
+     */
     public static Integer getMenuInt(String promptMessage) {
         String input = getMenuUserInput(promptMessage);
 
@@ -94,6 +147,12 @@ public class IO {
         return Integer.parseInt(input);
     }
 
+    /**
+     * Chiede all'utente un valore intero generico.
+     *
+     * @param promptMessage messaggio da visualizzare come prompt
+     * @return intero inserito dall'utente
+     */
     public static Integer getInt(String promptMessage) {
         String input = getUserInput(promptMessage);
 
@@ -105,6 +164,14 @@ public class IO {
         return Integer.parseInt(input);
     }
 
+    /**
+     * Chiede all'utente un indirizzo地理位置 nel formato "indirizzo, città, nazione".
+     * Valida i campi e genera coordinate casuali per latitudine e longitudine.
+     *
+     * @param skippable se {@code true}, l'utente può saltare l'inserimento con "::skip"
+     * @return oggetto {@link Location} o {@code null} se saltato
+     * @throws AbortOperationException se l'utente invoca il comando di interruzione
+     */
     public static Location getLocationInput(boolean skippable) throws AbortOperationException {
         Location location = null;
         System.out.println("Puoi inserire l'indirizzo seguendo il formato indicato:");
@@ -142,6 +209,14 @@ public class IO {
         return location;
     }
 
+    /**
+     * Chiede all'utente di selezionare un valore da un enum specificato.
+     *
+     * @param <T>           tipo dell'enum
+     * @param enumType      classe dell'enum
+     * @param promptMessage messaggio da visualizzare come prompt
+     * @return valore dell'enum selezionato, o {@code null} in caso di interruzione
+     */
     public static <T extends Enum<T>> T getEnumInput(Class<T> enumType, String promptMessage) {
         while (true) {
             try {
@@ -156,6 +231,14 @@ public class IO {
         }
     }
 
+    /**
+     * Chiede all'utente di inserire più valori di un enum fino a "::stop".
+     *
+     * @param <E>        tipo dell'enum
+     * @param enumClass  classe dell'enum
+     * @param prompt     messaggio descrittivo da visualizzare
+     * @return insieme dei valori enum inseriti
+     */
     public static <E extends Enum<E>> Set<E> getEnumSetInput(Class<E> enumClass, String prompt) {
         Set<E> result = new HashSet<>();
         System.out.println(prompt + " Scrivi '::stop' per terminare.");
@@ -178,6 +261,12 @@ public class IO {
         return result;
     }
 
+    /**
+     * Chiede all'utente di inserire stringhe validate fino a "::stop".
+     *
+     * @param prompt messaggio descrittivo da visualizzare
+     * @return insieme delle stringhe validate inserite
+     */
     public static Set<String> parseValidatedStrings(String prompt) {
         Set<String> result = new HashSet<>();
         System.out.println(prompt + " Scrivi '::stop' per terminare.");
@@ -199,6 +288,12 @@ public class IO {
         return result;
     }
 
+    /**
+     * Analizza una stringa e restituisce il corrispondente UUID.
+     *
+     * @param uuid stringa da analizzare
+     * @return UUID analizzato, o {@code null} se il formato non è valido
+     */
     public static UUID parseUUID(String uuid) {
         try {
             return UUID.fromString(uuid);
@@ -207,6 +302,13 @@ public class IO {
         }
     }
 
+    /**
+     * Applica un codice colore ANSI a un testo per la visualizzazione su console.
+     *
+     * @param colorCode codice colore ANSI (es. 31 per rosso, 32 per verde)
+     * @param text      testo da formattare
+     * @return testo racchiuso nei codici di escape ANSI
+     */
     public static String replaceText(int colorCode, String text) {
         return "\u001B[" + colorCode + "m" + text + "\u001B[0m";
     }
@@ -215,16 +317,30 @@ public class IO {
         return "-".repeat(Math.max(0, (qta * 4) + 1));
     }
 
+    /**
+     * Stampa un messaggio di errore formattato su console in rosso.
+     *
+     * @param msg messaggio di errore da visualizzare
+     */
     public static void printErrorMessage(String msg) {
         if (msg == null) return;
         System.out.println("\n" + IO.replaceText(31, "! ") + msg);
     }
 
+    /**
+     * Stampa un messaggio di successo formattato su console in verde.
+     *
+     * @param msg messaggio di successo da visualizzare
+     */
     public static void printSuccessMessage(String msg) {
         if (msg == null) return;
         System.out.println("\n" + IO.replaceText(32, " ⩥ ") + msg);
     }
 
+    /**
+     * Pulisce lo schermo della console.
+     * Supporta sia Windows che sistemi Unix-like.
+     */
     public static void clearScreen() {
         try {
             if (System.getProperty("os.name").toLowerCase().contains("windows"))

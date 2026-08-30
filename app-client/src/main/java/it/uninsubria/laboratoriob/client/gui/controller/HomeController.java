@@ -40,6 +40,11 @@ public class HomeController {
     @FXML
     private Button btnEsci;
 
+    /**
+     * Imposta il callback invocato quando l'utente clicca "Disconnetti".
+     *
+     * @param callbackRunnable da eseguire per tornare al menu iniziale
+     */
     public void setOnDisconnettiCallback(Runnable callback) {
         this.onDisconnettiCallback = callback;
     }

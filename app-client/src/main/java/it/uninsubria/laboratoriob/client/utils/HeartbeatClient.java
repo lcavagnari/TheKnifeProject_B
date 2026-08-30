@@ -25,12 +25,23 @@ public class HeartbeatClient {
     private volatile boolean shuttingDown = false;
     private volatile boolean shownErrorMesage = false;
 
+    /**
+     * Costruisce il client di heartbeat con i parametri di connessione specificati.
+     *
+     * @param host            hostname del server heartbeat
+     * @param port            porta TCP del server heartbeat
+     * @param intervalMinutes intervallo in minuti tra un heartbeat e l'altro
+     */
     public HeartbeatClient(String host, int port, long intervalMinutes) {
         this.host = host;
         this.port = port;
         this.intervalMinutes = intervalMinutes;
     }
 
+    /**
+     * Avvia la connessione di heartbeat in background. Se la connessione fallisce,
+     * il client riprova automaticamente ogni 10 secondi.
+     */
     public void start() {
         connect();
     }
@@ -81,6 +92,9 @@ public class HeartbeatClient {
             c.wakeUp();
     }
 
+    /**
+     * Interrompe la connessione di heartbeat e impedisce ulteriori tentativi di riconnessione.
+     */
     public void shutdown() {
         shuttingDown = true;
         HeartbeatChannel c = channel;
