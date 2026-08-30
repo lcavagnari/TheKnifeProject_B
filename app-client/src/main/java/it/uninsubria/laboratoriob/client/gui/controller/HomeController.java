@@ -43,7 +43,7 @@ public class HomeController {
     /**
      * Imposta il callback invocato quando l'utente clicca "Disconnetti".
      *
-     * @param callbackRunnable da eseguire per tornare al menu iniziale
+     * @param callback da eseguire per tornare al menu iniziale
      */
     public void setOnDisconnettiCallback(Runnable callback) {
         this.onDisconnettiCallback = callback;

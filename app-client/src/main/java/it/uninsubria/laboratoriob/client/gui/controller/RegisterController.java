@@ -179,7 +179,7 @@ public class RegisterController {
     /**
      * Imposta il callback invocato quando l'utente annulla la registrazione.
      *
-     * @param callbackRunnable da eseguire per tornare al menu iniziale
+     * @param callback da eseguire per tornare al menu iniziale
      */
     public void setOnCancelCallback(Runnable callback) {
         this.onCancelCallback = callback;
@@ -188,7 +188,7 @@ public class RegisterController {
     /**
      * Imposta il callback invocato dopo una registrazione riuscita.
      *
-     * @param callbackRunnable da eseguire per passare alla schermata home
+     * @param callback da eseguire per passare alla schermata home
      */
     public void setOnRegisterSuccessCallback(Runnable callback) {
         this.onRegisterSuccessCallback = callback;

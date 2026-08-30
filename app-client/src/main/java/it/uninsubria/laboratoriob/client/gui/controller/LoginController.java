@@ -46,7 +46,7 @@ public class LoginController {
     /**
      * Imposta il callback invocato quando l'utente annulla il login.
      *
-     * @param callbackRunnable da eseguire per tornare al menu iniziale
+     * @param callback da eseguire per tornare al menu iniziale
      */
     public void setOnCancelCallback(Runnable callback) {
         this.onCancelCallback = callback;
@@ -55,7 +55,7 @@ public class LoginController {
     /**
      * Imposta il callback invocato dopo un login riuscito.
      *
-     * @param callbackRunnable da eseguire per passare alla schermata home
+     * @param callback da eseguire per passare alla schermata home
      */
     public void setOnLoginSuccessCallback(Runnable callback) {
         this.onLoginSuccessCallback = callback;
