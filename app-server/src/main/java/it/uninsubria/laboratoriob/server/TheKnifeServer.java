@@ -5,9 +5,9 @@ import it.uninsubria.laboratoriob.server.remote.AuthRemoteImpl;
 import it.uninsubria.laboratoriob.server.remote.FavouriteServiceImpl;
 import it.uninsubria.laboratoriob.server.remote.RestaurantServiceImpl;
 import it.uninsubria.laboratoriob.server.remote.ReviewServiceImpl;
+import it.uninsubria.laboratoriob.server.utils.CsvParser;
 import it.uninsubria.laboratoriob.server.utils.Database;
 import it.uninsubria.laboratoriob.server.utils.HeartbeatServer;
-import it.uninsubria.laboratoriob.server.utils.Loader;
 
 import java.io.IOException;
 import java.rmi.registry.LocateRegistry;
@@ -21,11 +21,9 @@ public class TheKnifeServer {
 
     private final HeartbeatServer tcpHbeatServer;
     private final ServerDataStore dataStore;
-    private final Loader loader;
 
     public TheKnifeServer() {
         this.dataStore = new ServerDataStore();
-        this.loader = new Loader(dataStore);
         this.tcpHbeatServer = new HeartbeatServer(heartbeatPort, heartbeatIntervalMinutes);
 
         tcpHbeatServer.start();
@@ -42,9 +40,9 @@ public class TheKnifeServer {
     private void start(String[] args) {
         try {
             if (args.length > 1 && args[0].equals("--update")) {
-                loader.updateMichelinDataset(args[1]);
+                CsvParser.updateMichelinDataset(args[1], dataStore);
             } else if (args.length > 0 && args[0].equals("--update")) {
-                loader.updateMichelinDataset(null);
+                CsvParser.updateMichelinDataset(null, dataStore);
             }
         } catch (IOException e) {
             System.err.println("Error occured during database update: " + e);
@@ -52,7 +50,7 @@ public class TheKnifeServer {
             shutdown();
         }
 
-        loader.initialise();
+        dataStore.initialise();
 
         try {
             Registry registry = LocateRegistry.createRegistry(rmiPort);
