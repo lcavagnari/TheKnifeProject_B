@@ -2,7 +2,7 @@ package it.uninsubria.laboratoriob.server.data.remote;
 
 import it.uninsubria.laboratoriob.api.objects.Review;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
-import it.uninsubria.laboratoriob.server.data.ReviewDAO;
+import it.uninsubria.laboratoriob.server.data.dao.ReviewDAO;
 import it.uninsubria.laboratoriob.server.utils.Loader;
 
 import java.rmi.RemoteException;
@@ -51,5 +51,11 @@ public class ReviewServiceImpl extends UnicastRemoteObject implements ReviewServ
     @Override
     public boolean delete(UUID id) throws RemoteException {
         return rDAO.delete(id);
+    }
+
+    @Override
+    public boolean replyToReview(UUID reviewId, String reply) throws RemoteException {
+        if (reply == null || reply.isBlank()) return false;
+        return rDAO.saveReply(reviewId, reply);
     }
 }
