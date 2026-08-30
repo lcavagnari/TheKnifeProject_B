@@ -5,6 +5,7 @@ import it.uninsubria.laboratoriob.api.objects.Restaurant;
 import it.uninsubria.laboratoriob.server.data.dao.RestaurantDAO;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RestaurantRepository {
@@ -18,6 +19,7 @@ public class RestaurantRepository {
     public boolean save(Restaurant r) {
         boolean ok = dao.save(r);
         if (ok) putCache(r);
+
         return ok;
     }
 
@@ -27,6 +29,7 @@ public class RestaurantRepository {
             byId.put(r.getId(), r);
             byName.put(r.getName(), r);
         }
+
         return ok;
     }
 
@@ -45,6 +48,7 @@ public class RestaurantRepository {
                 r.getCuisinesTypes().addAll(cuisines);
             }
         }
+
         return ok;
     }
 
@@ -92,7 +96,14 @@ public class RestaurantRepository {
 
     // ── DAO access (for Loader bulk load) ──
 
-    public List<Restaurant> loadAllFromDb() { return dao.findAll(); }
+    public CompletableFuture<List<Restaurant>> loadAllFromDb() {
+        return CompletableFuture
+                .supplyAsync(dao::findAll)
+                .exceptionally(ex -> {
+                    System.err.println("Errore caricamento restaurants: " + ex.getMessage());
+                    return new ArrayList<>();
+                });
+    }
 
     public Set<CuisineType> findCuisines(UUID restaurantId) { return dao.findCuisines(restaurantId); }
 
