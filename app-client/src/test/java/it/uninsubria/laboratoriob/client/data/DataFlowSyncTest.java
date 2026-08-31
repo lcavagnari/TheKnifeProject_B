@@ -2,8 +2,10 @@ package it.uninsubria.laboratoriob.client.data;
 
 import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.enums.Nation;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
 import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import org.junit.jupiter.api.AfterEach;
@@ -48,9 +50,9 @@ class DataFlowSyncTest {
         mockRestaurantService = mock(RestaurantServiceInter.class);
         mockReviewService = mock(ReviewServiceInter.class);
 
-        ownerDAO = new JsonOwnerDAO(mockAuthService);
-        customerDAO = new JsonCustomerDAO(mockAuthService);
         restaurantDAO = new JsonRestaurantDAO(mockRestaurantService);
+        ownerDAO = new JsonOwnerDAO(mockAuthService, mockRestaurantService, restaurantDAO);
+        customerDAO = new JsonCustomerDAO(mockAuthService, mock(FavouriteServiceInter.class));
         reviewDAO = new JsonReviewDAO(customerDAO, mockReviewService);
 
         Location loc = new Location(Nation.ITALY, "Milano", 45.4642, 9.1900, "Via Garibaldi 5");
@@ -67,7 +69,7 @@ class DataFlowSyncTest {
         testReview = new Review(testRestaurant, testCustomer, 5, LocalDateTime.now(),
                 "Excellent food", null);
 
-        usersFile = new File(Constants.ROOT, "users.json");
+        usersFile = new File(Constants.ROOT, "user.json");
         restaurantsFile = new File(Constants.ROOT, "restaurants.json");
         reviewsFile = new File(Constants.ROOT, "reviews.json");
     }
@@ -104,11 +106,14 @@ class DataFlowSyncTest {
     @Test
     @DisplayName("User save flow: cache → JSON + RMI register")
     void testUserSaveFlow() throws RemoteException {
-        when(mockAuthService.register(any())).thenReturn(testOwner);
+        when(mockAuthService.register(any(), any(), any(), any(), any(), any(), anyBoolean()))
+                .thenReturn(testOwner);
 
         assertTrue(ownerDAO.save(testOwner));
         assertTrue(usersFile.exists());
-        verify(mockAuthService).register(testOwner);
+        verify(mockAuthService).register(testOwner.getUsername(), testOwner.getPasswordHash(),
+                testOwner.getName(), testOwner.getLastName(), testOwner.getDateOfBirth(),
+                testOwner.getLocation(), true);
     }
 
     @Test
@@ -123,7 +128,7 @@ class DataFlowSyncTest {
         // Verify cache updated
         assertEquals("newhash", ownerDAO.findById(testOwner.getId()).get().getPasswordHash());
         // Verify update() itself made no additional RMI call (only the earlier save() did)
-        verify(mockAuthService, times(1)).register(any());
+        verify(mockAuthService, times(1)).register(any(), any(), any(), any(), any(), any(), anyBoolean());
     }
 
     // --- Restaurant Flow: cache → JSON + RMI ---
@@ -162,6 +167,8 @@ class DataFlowSyncTest {
     @DisplayName("Restaurant findAll: cache hit (no RMI)")
     void testRestaurantFindAllCacheHit() throws RemoteException {
         restaurantDAO.save(testRestaurant);
+        // findAll() only trusts the cache when its size matches the remote count.
+        when(mockRestaurantService.count()).thenReturn(1L);
 
         restaurantDAO.findAll();
         verify(mockRestaurantService, never()).findAll(anyInt(), anyInt());
@@ -201,52 +208,45 @@ class DataFlowSyncTest {
     }
 
     @Test
-    @DisplayName("Review findByRestaurant: cache hit (no RMI)")
-    void testReviewFindByRestaurantCacheHit() throws RemoteException {
+    @DisplayName("Review findByRestaurant: always queries RMI (shared data across sessions)")
+    void testReviewFindByRestaurantAlwaysQueriesRMI() throws RemoteException {
         reviewDAO.save(testReview);
+        when(mockReviewService.findByRestaurant(testRestaurant.getId()))
+                .thenReturn(java.util.List.of(testReview));
 
-        reviewDAO.findByRestaurant(testRestaurant.getId());
-        verify(mockReviewService, never()).findByRestaurant(any());
-    }
-
-    // --- Cross-DAO: Location is local only ---
-
-    @Test
-    @DisplayName("Location: local only, no RMI fallback")
-    void testLocationLocalOnly() {
-        JsonLocationDAO locationDAO = new JsonLocationDAO();
-        Location loc = new Location(Nation.ITALY, "Milano", 45.4642, 9.1900, "Via Garibaldi 5");
-
-        assertTrue(locationDAO.save(loc));
-        assertEquals(1, locationDAO.count());
-        assertTrue(locationDAO.findByCoordinates(45.4642, 9.1900).isPresent());
+        var result = reviewDAO.findByRestaurant(testRestaurant.getId());
+        assertEquals(1, result.size());
+        verify(mockReviewService).findByRestaurant(testRestaurant.getId());
     }
 
     // --- RMI failure resilience ---
 
     @Test
-    @DisplayName("All write operations continue when RMI fails")
+    @DisplayName("Write operations surface RMI failures as ServiceUnavailableException")
     void testWriteOperationsResilientToRMIFailure() throws RemoteException {
-        when(mockAuthService.register(any())).thenThrow(new RemoteException("RMI down"));
+        when(mockAuthService.register(any(), any(), any(), any(), any(), any(), anyBoolean())).thenThrow(new RemoteException("RMI down"));
         when(mockRestaurantService.save(any())).thenThrow(new RemoteException("RMI down"));
         when(mockReviewService.save(any())).thenThrow(new RemoteException("RMI down"));
 
-        assertDoesNotThrow(() -> ownerDAO.save(testOwner));
-        assertDoesNotThrow(() -> restaurantDAO.save(testRestaurant));
-        assertDoesNotThrow(() -> reviewDAO.save(testReview));
+        // Owner: register() is attempted before caching, so a failure prevents the local cache write.
+        assertThrows(ServiceUnavailableException.class, () -> ownerDAO.save(testOwner));
+        assertTrue(ownerDAO.findById(testOwner.getId()).isEmpty());
 
-        assertTrue(ownerDAO.findById(testOwner.getId()).isPresent());
+        // Restaurant/Review: local cache is written before the RMI call, so it survives the failure.
+        assertThrows(ServiceUnavailableException.class, () -> restaurantDAO.save(testRestaurant));
+        assertThrows(ServiceUnavailableException.class, () -> reviewDAO.save(testReview));
+
         assertTrue(restaurantDAO.findById(testRestaurant.getId()).isPresent());
         assertTrue(reviewDAO.findById(testReview.getId()).isPresent());
     }
 
     @Test
-    @DisplayName("RMI read failures return empty/local results")
+    @DisplayName("RMI read failures: restaurant surfaces exception, review falls back to local cache")
     void testReadRMIFailuresReturnEmptyOrLocal() throws RemoteException {
         when(mockRestaurantService.findById(any())).thenThrow(new RemoteException("RMI down"));
         when(mockReviewService.findByRestaurant(any())).thenThrow(new RemoteException("RMI down"));
 
-        assertTrue(restaurantDAO.findById(UUID.randomUUID()).isEmpty());
+        assertThrows(ServiceUnavailableException.class, () -> restaurantDAO.findById(UUID.randomUUID()));
         assertTrue(reviewDAO.findByRestaurant(UUID.randomUUID()).isEmpty());
     }
 }

@@ -5,6 +5,8 @@ import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.objects.Customer;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,12 +37,12 @@ class JsonCustomerDAOTest {
     @BeforeEach
     void setUp() {
         mockAuthService = mock(AuthServiceInter.class);
-        dao = new JsonCustomerDAO(mockAuthService);
+        dao = new JsonCustomerDAO(mockAuthService, mock(FavouriteServiceInter.class));
 
         Location loc = new Location(Nation.ITALY, "Roma", 41.9028, 12.4964, "Via del Corso 10");
         testCustomer = new Customer(UUID.randomUUID(), "luca_verde", "hash789", "salt012",
                 "Luca", "Verde", loc, LocalDate.of(1992, 7, 20));
-        usersFile = new File(Constants.ROOT, "users.json");
+        usersFile = new File(Constants.ROOT, "user.json");
     }
 
     @AfterEach
@@ -87,7 +89,8 @@ class JsonCustomerDAOTest {
         dao.save(testCustomer);
         assertTrue(usersFile.exists());
 
-        JsonOwnerDAO ownerDao = new JsonOwnerDAO(mockAuthService);
+        JsonOwnerDAO ownerDao = new JsonOwnerDAO(mockAuthService, mock(RestaurantServiceInter.class),
+                new JsonRestaurantDAO(mock(RestaurantServiceInter.class)));
         assertTrue(ownerDao.findAll().isEmpty());
     }
 }

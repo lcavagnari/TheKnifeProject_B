@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import it.uninsubria.laboratoriob.api.Constants;
 import it.uninsubria.laboratoriob.api.enums.Nation;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.RestaurantServiceInter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +35,7 @@ class JsonOwnerDAOTest {
     Path tempDir;
 
     private AuthServiceInter mockAuthService;
+    private RestaurantServiceInter mockRestaurantService;
     private JsonOwnerDAO dao;
     private Owner testOwner;
     private File usersFile;
@@ -40,12 +43,13 @@ class JsonOwnerDAOTest {
     @BeforeEach
     void setUp() {
         mockAuthService = mock(AuthServiceInter.class);
-        dao = new JsonOwnerDAO(mockAuthService);
+        mockRestaurantService = mock(RestaurantServiceInter.class);
+        dao = new JsonOwnerDAO(mockAuthService, mockRestaurantService, new JsonRestaurantDAO(mockRestaurantService));
 
         Location loc = new Location(Nation.ITALY, "Milano", 45.4642, 9.1900, "Via Garibaldi 5");
         testOwner = new Owner(UUID.randomUUID(), "mario_rossi", "hash123", "salt456",
                 "Mario", "Rossi", loc, LocalDate.of(1985, 3, 15));
-        usersFile = new File(Constants.ROOT, "users.json");
+        usersFile = new File(Constants.ROOT, "user.json");
     }
 
     @AfterEach
@@ -69,10 +73,11 @@ class JsonOwnerDAOTest {
     }
 
     @Test
-    @DisplayName("save() returns false for duplicate")
-    void testSaveDuplicateReturnsFalse() {
+    @DisplayName("save() overwrites existing entry for the same user (cacheOnly semantics)")
+    void testSaveDuplicateOverwrites() {
         assertTrue(dao.save(testOwner));
-        assertFalse(dao.save(testOwner));
+        assertTrue(dao.save(testOwner));
+        assertEquals(1, dao.count());
     }
 
     @Test
@@ -189,7 +194,7 @@ class JsonOwnerDAOTest {
         Files.createDirectories(usersFile.toPath().getParent());
         mapper.writerWithDefaultPrettyPrinter().writeValue(usersFile, array);
 
-        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService);
+        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService, mockRestaurantService, new JsonRestaurantDAO(mockRestaurantService));
         Optional<Owner> found = newDao.findByUsername("from_file");
         assertTrue(found.isPresent());
     }
@@ -200,7 +205,7 @@ class JsonOwnerDAOTest {
         Files.createDirectories(usersFile.toPath().getParent());
         Files.writeString(usersFile.toPath(), "NOT VALID JSON {{{");
 
-        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService);
+        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService, mockRestaurantService, new JsonRestaurantDAO(mockRestaurantService));
         assertDoesNotThrow(() -> newDao.findAll());
         assertTrue(newDao.findAll().isEmpty());
     }
@@ -212,7 +217,7 @@ class JsonOwnerDAOTest {
         Files.createDirectories(usersFile.toPath().getParent());
         mapper.writeValue(usersFile, mapper.createObjectNode().put("key", "value"));
 
-        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService);
+        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService, mockRestaurantService, new JsonRestaurantDAO(mockRestaurantService));
         assertTrue(newDao.findAll().isEmpty());
     }
 
@@ -222,7 +227,7 @@ class JsonOwnerDAOTest {
         File noFile = new File(Constants.ROOT, "nonexistent.json");
         assertFalse(noFile.exists());
 
-        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService);
+        JsonOwnerDAO newDao = new JsonOwnerDAO(mockAuthService, mockRestaurantService, new JsonRestaurantDAO(mockRestaurantService));
         assertTrue(newDao.findAll().isEmpty());
     }
 
@@ -251,13 +256,12 @@ class JsonOwnerDAOTest {
     }
 
     @Test
-    @DisplayName("login() returns empty on RMI failure")
+    @DisplayName("login() surfaces RMI failure as ServiceUnavailableException")
     void testLoginRMIFailure() throws RemoteException {
         when(mockAuthService.login(anyString(), anyString()))
                 .thenThrow(new RemoteException("Connection failed"));
 
-        Optional<Owner> result = dao.login("mario_rossi", "pass");
-        assertFalse(result.isPresent());
+        assertThrows(ServiceUnavailableException.class, () -> dao.login("mario_rossi", "pass"));
     }
 
     @Test
@@ -277,19 +281,23 @@ class JsonOwnerDAOTest {
     @Test
     @DisplayName("save() syncs to server via RMI register()")
     void testSaveSyncsViaRMI() throws RemoteException {
-        when(mockAuthService.register(any())).thenReturn(testOwner);
+        when(mockAuthService.register(any(), any(), any(), any(), any(), any(), anyBoolean()))
+                .thenReturn(testOwner);
 
         dao.save(testOwner);
-        verify(mockAuthService).register(testOwner);
+        verify(mockAuthService).register(testOwner.getUsername(), testOwner.getPasswordHash(),
+                testOwner.getName(), testOwner.getLastName(), testOwner.getDateOfBirth(),
+                testOwner.getLocation(), true);
     }
 
     @Test
-    @DisplayName("save() continues if RMI fails")
+    @DisplayName("save() surfaces RMI failure and does not cache without server confirmation")
     void testSaveContinuesOnRMIFailure() throws RemoteException {
-        when(mockAuthService.register(any())).thenThrow(new RemoteException("fail"));
+        when(mockAuthService.register(any(), any(), any(), any(), any(), any(), anyBoolean()))
+                .thenThrow(new RemoteException("fail"));
 
-        assertDoesNotThrow(() -> dao.save(testOwner));
-        assertTrue(dao.findById(testOwner.getId()).isPresent());
+        assertThrows(ServiceUnavailableException.class, () -> dao.save(testOwner));
+        assertTrue(dao.findById(testOwner.getId()).isEmpty());
     }
 
 }

@@ -5,8 +5,10 @@ import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.*;
 import it.uninsubria.laboratoriob.api.remote.AuthServiceInter;
+import it.uninsubria.laboratoriob.api.remote.FavouriteServiceInter;
 import it.uninsubria.laboratoriob.api.remote.ReviewServiceInter;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,7 +43,7 @@ class JsonReviewDAOTest {
     void setUp() {
         mockAuthService = mock(AuthServiceInter.class);
         mockReviewService = mock(ReviewServiceInter.class);
-        customerDAO = new JsonCustomerDAO(mockAuthService);
+        customerDAO = new JsonCustomerDAO(mockAuthService, mock(FavouriteServiceInter.class));
         dao = new JsonReviewDAO(customerDAO, mockReviewService);
 
         Location loc = new Location(Nation.ITALY, "Milano", 45.4642, 9.1900, "Via Garibaldi 5");
@@ -121,11 +123,15 @@ class JsonReviewDAOTest {
 
     @Test
     @DisplayName("findByRestaurant() returns filtered reviews")
-    void testFindByRestaurant() {
+    void testFindByRestaurant() throws RemoteException {
         dao.save(testReview);
         Review other = new Review(UUID.randomUUID(), testRestaurant, testCustomer,
                 3, LocalDateTime.now(), "Okay", null);
         dao.save(other);
+        // findByRestaurant() always prefers the server for shared review data,
+        // so the RMI response must be stubbed to reflect what was just saved.
+        when(mockReviewService.findByRestaurant(testRestaurant.getId()))
+                .thenReturn(List.of(testReview, other));
 
         List<Review> byRestaurant = dao.findByRestaurant(testRestaurant.getId());
         assertEquals(2, byRestaurant.size());
@@ -251,11 +257,11 @@ class JsonReviewDAOTest {
     }
 
     @Test
-    @DisplayName("Write operations continue if RMI fails")
+    @DisplayName("save() persists locally then surfaces RMI failure")
     void testWriteContinuesOnRMIFailure() throws RemoteException {
         when(mockReviewService.save(any())).thenThrow(new RemoteException("fail"));
 
-        assertDoesNotThrow(() -> dao.save(testReview));
+        assertThrows(ServiceUnavailableException.class, () -> dao.save(testReview));
         assertTrue(dao.findById(testReview.getId()).isPresent());
     }
 }

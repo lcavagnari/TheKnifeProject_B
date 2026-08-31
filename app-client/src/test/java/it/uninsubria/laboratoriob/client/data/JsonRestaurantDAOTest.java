@@ -5,6 +5,7 @@ import it.uninsubria.laboratoriob.api.enums.Award;
 import it.uninsubria.laboratoriob.api.enums.CuisineType;
 import it.uninsubria.laboratoriob.api.enums.Nation;
 import it.uninsubria.laboratoriob.api.enums.PriceRange;
+import it.uninsubria.laboratoriob.api.exceptions.ServiceUnavailableException;
 import it.uninsubria.laboratoriob.api.objects.Location;
 import it.uninsubria.laboratoriob.api.objects.Owner;
 import it.uninsubria.laboratoriob.api.objects.Restaurant;
@@ -193,11 +194,11 @@ class JsonRestaurantDAOTest {
     }
 
     @Test
-    @DisplayName("findById() returns empty on RMI failure")
+    @DisplayName("findById() surfaces RMI failure as ServiceUnavailableException")
     void testFindByIdRMIFailure() throws RemoteException {
         when(mockService.findById(any())).thenThrow(new RemoteException("fail"));
 
-        assertTrue(dao.findById(UUID.randomUUID()).isEmpty());
+        assertThrows(ServiceUnavailableException.class, () -> dao.findById(UUID.randomUUID()));
     }
 
     @Test
@@ -252,11 +253,11 @@ class JsonRestaurantDAOTest {
     }
 
     @Test
-    @DisplayName("Write operations continue if RMI fails")
+    @DisplayName("save() persists locally then surfaces RMI failure")
     void testWriteContinuesOnRMIFailure() throws RemoteException {
         when(mockService.save(any())).thenThrow(new RemoteException("fail"));
 
-        assertDoesNotThrow(() -> dao.save(testRestaurant));
+        assertThrows(ServiceUnavailableException.class, () -> dao.save(testRestaurant));
         assertTrue(dao.findById(testRestaurant.getId()).isPresent());
     }
 }
