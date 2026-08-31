@@ -37,6 +37,11 @@
                   <shadedPattern>it.uninsubria.laboratoriob.libs.phonenumbers</shadedPattern>
                 </relocation>
               </relocations>
+              <transformers>
+                <transformer>
+                  <mainClass>it.uninsubria.laboratoriob.server.TheKnifeServer</mainClass>
+                </transformer>
+              </transformers>
             </configuration>
           </execution>
         </executions>
