@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * Integration tests against the real docker-composed Postgres (localhost:5432/mydb).
  * Requires {@code docker compose up -d} to be running.
  */
+@Tag("integration")
 @DisplayName("RestaurantRepository (real Postgres)")
 class RestaurantRepositoryTest {
 

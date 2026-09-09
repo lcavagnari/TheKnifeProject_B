@@ -1,0 +1,385 @@
+name: Nightly build, V&V and release
+
+on:
+  schedule:
+    # 20:30 UTC ~= 22:30 Europe/Rome during CEST (summer, most of the year);
+    # becomes 21:30 local during CET (winter) - GitHub Actions cron is UTC-only
+    # and cannot follow DST, so this is a fixed best-effort approximation.
+    - cron: "30 20 * * *"
+  workflow_dispatch: {}
+
+concurrency:
+  group: theknife-nightly
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+env:
+  JAVA_VERSION: "25"
+  PG_DB: mydb
+  PG_USER: testuser
+  PG_PASSWORD: test1234
+  SERVER_JAR: app-server/target/theknifeserver-1.0-SNAPSHOT.jar
+  CLIENT_JAR: app-client/target/theknifeclient-1.0-SNAPSHOT.jar
+
+jobs:
+  # Change classifier: on the scheduled run, diffs against the last successful
+  # nightly (the "nightly" tag) and decides which downstream stages are worth
+  # running. Skipped entirely on workflow_dispatch, which always runs everything
+  # - the same pattern used by this org's Android release pipeline
+  # (lcavagnari/Android-releases: android-release-pipeline.yml "classify" job).
+  classify:
+    name: Classify changes
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    outputs:
+      should_run: ${{ steps.check.outputs.should_run }}
+      run_build: ${{ steps.check.outputs.run_build }}
+      run_unit: ${{ steps.check.outputs.run_unit }}
+      run_integration: ${{ steps.check.outputs.run_integration }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Classify changes since the last nightly tag
+        id: check
+        run: |
+          if ! git rev-parse -q --verify refs/tags/nightly >/dev/null; then
+            echo "No previous 'nightly' tag found - first run, doing everything"
+            {
+              echo "should_run=true"
+              echo "run_build=true"
+              echo "run_unit=true"
+              echo "run_integration=true"
+            } >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          CHANGED=$(git diff --name-only nightly..HEAD)
+
+          if [[ -z "$CHANGED" ]]; then
+            echo "No changes since the last nightly - skipping the whole pipeline"
+            echo "should_run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "should_run=true" >> "$GITHUB_OUTPUT"
+          echo "Changed files since last nightly:"
+          echo "$CHANGED"
+
+          RUN_BUILD=false
+          RUN_UNIT=false
+          RUN_INTEGRATION=false
+
+          while IFS= read -r f; do
+            case "$f" in
+              common-api/src/main/*|pom.xml|*/pom.xml)
+                # shared domain model or build config - affects everything downstream
+                RUN_BUILD=true; RUN_UNIT=true; RUN_INTEGRATION=true ;;
+              app-server/src/main/*|app-server/src/test/*)
+                RUN_BUILD=true; RUN_UNIT=true; RUN_INTEGRATION=true ;;
+              app-client/src/main/*|app-client/src/test/*)
+                RUN_BUILD=true; RUN_UNIT=true; RUN_INTEGRATION=true ;;
+              .github/workflows/*|docker/*|docker-compose.yaml|sql/*)
+                # pipeline/infra itself changed - no shortcuts, verify everything still works
+                RUN_BUILD=true; RUN_UNIT=true; RUN_INTEGRATION=true ;;
+              *)
+                # docs and anything else: no code impact, no stage needed for this file alone
+                ;;
+            esac
+          done <<< "$CHANGED"
+
+          {
+            echo "run_build=$RUN_BUILD"
+            echo "run_unit=$RUN_UNIT"
+            echo "run_integration=$RUN_INTEGRATION"
+          } >> "$GITHUB_OUTPUT"
+
+  # Stage 1: compile client + server, with Maven's dependency cache populated
+  # for next time.
+  build-and-cache:
+    name: Build and cache
+    needs: classify
+    if: |
+      always() &&
+      (github.event_name == 'workflow_dispatch' ||
+       (needs.classify.result == 'success' && needs.classify.outputs.run_build == 'true'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Compile and package (cached)
+        run: mvn -B -ntp clean package -DskipTests
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: nightly-jars
+          path: |
+            ${{ env.SERVER_JAR }}
+            ${{ env.CLIENT_JAR }}
+          retention-days: 1
+          if-no-files-found: error
+
+  # Stage 2: on a brand-new runner with no Maven cache, rebuild both jars from
+  # scratch and prove they run standalone (java -jar only, nothing else on the
+  # classpath) for at least 15s. Fails the whole workflow on any compile error
+  # or if either jar isn't independently executable.
+  clean-rebuild-and-run:
+    name: Clean rebuild and run (fresh environment)
+    needs: [classify, build-and-cache]
+    if: |
+      always() &&
+      (needs.build-and-cache.result == 'success' || needs.build-and-cache.result == 'skipped') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (needs.classify.result == 'success' && needs.classify.outputs.run_build == 'true'))
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_DB: ${{ env.PG_DB }}
+          POSTGRES_USER: ${{ env.PG_USER }}
+          POSTGRES_PASSWORD: ${{ env.PG_PASSWORD }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U testuser -d mydb"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          # deliberately NO cache: here - this step must prove the jars build
+          # from a genuinely empty ~/.m2, on a runner build-and-cache never touched.
+
+      - name: Rebuild both jars from scratch
+        run: mvn -B -ntp clean package -DskipTests
+
+      - name: Run both jars for at least 15s (java -jar only)
+        run: |
+          set -uo pipefail
+
+          java -jar "$SERVER_JAR" > server.log 2>&1 &
+          SERVER_PID=$!
+
+          echo "Waiting for the server to become ready..."
+          for _ in $(seq 1 30); do
+            if grep -q "Server is running" server.log; then break; fi
+            if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+              echo "::error::server jar exited before becoming ready"
+              cat server.log
+              exit 1
+            fi
+            sleep 1
+          done
+          grep -q "Server is running" server.log || {
+            echo "::error::server never reported ready within 30s"
+            cat server.log
+            exit 1
+          }
+
+          # `--cli` opens a blocking text menu that reads from stdin; keep stdin
+          # open (never EOF) so it blocks on the first prompt instead of crashing.
+          tail -f /dev/null | java -jar "$CLIENT_JAR" --cli > client.log 2>&1 &
+          CLIENT_PID=$!
+
+          echo "Both jars started, watching them for 15s..."
+          sleep 15
+
+          FAILED=0
+          if ! kill -0 "$SERVER_PID" 2>/dev/null; then
+            echo "::error::server jar is not running after 15s"; cat server.log; FAILED=1
+          fi
+          if ! kill -0 "$CLIENT_PID" 2>/dev/null; then
+            echo "::error::client jar is not running after 15s"; cat client.log; FAILED=1
+          fi
+
+          kill "$SERVER_PID" "$CLIENT_PID" 2>/dev/null || true
+          exit $FAILED
+
+      - name: Upload run logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clean-run-logs
+          path: |
+            server.log
+            client.log
+          if-no-files-found: warn
+
+  # Stage 3 (V&V): fast unit tests, no database - excludes @Tag("integration").
+  vnv-unit-tests:
+    name: V&V - unit tests
+    needs: [classify, build-and-cache, clean-rebuild-and-run]
+    if: |
+      always() &&
+      (needs.build-and-cache.result == 'success' || needs.build-and-cache.result == 'skipped') &&
+      (needs.clean-rebuild-and-run.result == 'success' || needs.clean-rebuild-and-run.result == 'skipped') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (needs.classify.result == 'success' && needs.classify.outputs.run_unit == 'true'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Run unit tests
+        run: mvn -B -ntp clean test
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unit-test-reports
+          path: "**/target/surefire-reports/*.txt"
+          if-no-files-found: warn
+
+  # Stage 4 (V&V): integration tests against a real Postgres and a real RMI
+  # server, on two different OSes, each a fresh isolated runner untouched by
+  # every other job (no cache, no shared artifacts). Postgres is provisioned
+  # natively (not via `services:`, which only works on Linux runners) so the
+  # same steps work identically on Ubuntu and Windows.
+  vnv-integration-tests:
+    name: V&V - integration tests (${{ matrix.os }})
+    needs: [classify, build-and-cache, clean-rebuild-and-run]
+    if: |
+      always() &&
+      (needs.build-and-cache.result == 'success' || needs.build-and-cache.result == 'skipped') &&
+      (needs.clean-rebuild-and-run.result == 'success' || needs.clean-rebuild-and-run.result == 'skipped') &&
+      (github.event_name == 'workflow_dispatch' ||
+       (needs.classify.result == 'success' && needs.classify.outputs.run_integration == 'true'))
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Start a native Postgres (cross-OS, no Docker required)
+        uses: ikalnytskyi/action-setup-postgres@v8
+        with:
+          username: ${{ env.PG_USER }}
+          password: ${{ env.PG_PASSWORD }}
+          database: ${{ env.PG_DB }}
+          port: 5432
+
+      - name: 'Run integration tests (@Tag("integration"): real Postgres + real RMI)'
+        run: mvn -B -ntp -pl app-server -am test "-DexcludedGroups=" "-Dgroups=integration"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: integration-test-reports-${{ matrix.os }}
+          path: app-server/target/surefire-reports/*.txt
+          if-no-files-found: warn
+
+  # Stage 5: publish/update the moving "nightly" GitHub Release with the two
+  # jars built in build-and-cache - only once every prior stage is green
+  # (or was legitimately skipped by the classifier).
+  nightly-release:
+    name: Publish nightly release
+    needs: [build-and-cache, clean-rebuild-and-run, vnv-unit-tests, vnv-integration-tests]
+    if: |
+      always() &&
+      (needs.build-and-cache.result == 'success' || needs.build-and-cache.result == 'skipped') &&
+      (needs.clean-rebuild-and-run.result == 'success' || needs.clean-rebuild-and-run.result == 'skipped') &&
+      (needs.vnv-unit-tests.result == 'success' || needs.vnv-unit-tests.result == 'skipped') &&
+      (needs.vnv-integration-tests.result == 'success' || needs.vnv-integration-tests.result == 'skipped')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: nightly-jars
+          path: dist
+
+      - name: Compute build date
+        id: date
+        run: echo "value=$(date -u +%Y-%m-%d)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish/replace the "nightly" release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: nightly
+          name: "Nightly build ${{ steps.date.outputs.value }}"
+          body: "Automated nightly build. Commit: ${{ github.sha }}"
+          prerelease: true
+          files: |
+            dist/${{ env.SERVER_JAR }}
+            dist/${{ env.CLIENT_JAR }}
+
+  # Stage 6: only if everything above passed, do one final clean rebuild on
+  # `master` and commit the resulting jars into bin/, so bin/ always tracks a
+  # build that's known to compile, pass V&V, and run standalone.
+  commit-jars-to-master:
+    name: Commit rebuilt jars to bin/ on master
+    needs:
+      [classify, build-and-cache, clean-rebuild-and-run, vnv-unit-tests, vnv-integration-tests, nightly-release]
+    if: |
+      always() &&
+      (github.event_name == 'workflow_dispatch' ||
+       (needs.classify.result == 'success' && needs.classify.outputs.should_run == 'true')) &&
+      (needs.build-and-cache.result == 'success' || needs.build-and-cache.result == 'skipped') &&
+      (needs.clean-rebuild-and-run.result == 'success' || needs.clean-rebuild-and-run.result == 'skipped') &&
+      (needs.vnv-unit-tests.result == 'success' || needs.vnv-unit-tests.result == 'skipped') &&
+      (needs.vnv-integration-tests.result == 'success' || needs.vnv-integration-tests.result == 'skipped') &&
+      (needs.nightly-release.result == 'success' || needs.nightly-release.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+          cache: maven
+
+      - name: Final clean rebuild of both jars
+        run: mvn -B -ntp clean package -DskipTests
+
+      - name: Commit jars to bin/ if they changed
+        run: |
+          mkdir -p bin
+          cp "$SERVER_JAR" bin/
+          cp "$CLIENT_JAR" bin/
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add bin/theknifeserver-1.0-SNAPSHOT.jar bin/theknifeclient-1.0-SNAPSHOT.jar
+
+          if git diff --cached --quiet; then
+            echo "Jars unchanged since last nightly commit, nothing to push"
+            exit 0
+          fi
+
+          git commit -m "chore: nightly rebuild of bin/ jars [skip ci]"
+          git push origin HEAD:master
+
+      - name: Move the "nightly" tag to this commit
+        run: |
+          git tag -f nightly
+          git push origin nightly --force

@@ -20,6 +20,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
         <destination.dir>${basedir}/bin</destination.dir>
+
+        <!-- Default: `mvn test` runs unit tests only. CI flips this for the
+             DB-backed integration stage with -DexcludedGroups= -Dgroups=integration -->
+        <excludedGroups>integration</excludedGroups>
     </properties>
 
     <build>
@@ -51,6 +55,21 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>3.2.5</version>
+                <configuration>
+                    <argLine>-XX:+EnableDynamicAgentLoading</argLine>
+                    <!--
+                        Tests tagged "integration" (server tests hitting a real Postgres) are
+                        excluded by default so plain `mvn test` is fast and needs no database.
+                        CI runs them explicitly with -DexcludedGroups= -Dgroups=integration.
+                        NOTE: these must stay on Surefire (pre-`package`), not Failsafe: the
+                        app-server/app-client shade executions relocate `it.uninsubria.laboratoriob.api`
+                        inside the packaged jar, and Failsafe's post-`package` classpath resolves to
+                        that shaded jar - the relocation breaks any test that references DAO/domain
+                        classes directly (e.g. LocationDAO.save(Location) becomes a different, relocated
+                        method signature at that point and testing it produces NoSuchMethodError).
+                    -->
+                    <excludedGroups>${excludedGroups}</excludedGroups>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -94,14 +113,14 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>5.11.0</version>
+            <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.11.0</version>
+            <version>5.23.0</version>
             <scope>test</scope>
         </dependency>
 

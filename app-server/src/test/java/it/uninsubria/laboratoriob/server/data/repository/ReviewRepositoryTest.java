@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * {@link RestaurantRepository}. Count assertions below use before/after deltas since the
  * table is shared with any other process pointed at this Postgres instance.
  */
+@Tag("integration")
 @DisplayName("ReviewRepository (real Postgres)")
 class ReviewRepositoryTest {
 
