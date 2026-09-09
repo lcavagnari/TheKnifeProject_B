@@ -347,6 +347,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - uses: actions/checkout@v4
         with:
@@ -361,7 +362,15 @@ jobs:
       - name: Final clean rebuild of both jars
         run: mvn -B -ntp clean package -DskipTests
 
-      - name: Commit jars to bin/ if they changed
+      # master requires a PR + signed commits, and the bot token has no bypass
+      # for that (verified by hand: a direct `git push` to master from this
+      # account was let through only because of a personal bypass grant, the
+      # same push would be rejected for github-actions[bot]). So: commit to a
+      # throwaway branch, open a PR, and let GitHub merge it - GitHub signs
+      # merge commits it performs itself, which satisfies the signature rule
+      # without any bypass rule or PAT.
+      - name: Commit jars to a branch if they changed
+        id: commit
         run: |
           mkdir -p bin
           cp "$SERVER_JAR" bin/
@@ -372,14 +381,33 @@ jobs:
           git add bin/theknifeserver-1.0-SNAPSHOT.jar bin/theknifeclient-1.0-SNAPSHOT.jar
 
           if git diff --cached --quiet; then
-            echo "Jars unchanged since last nightly commit, nothing to push"
+            echo "Jars unchanged since last nightly commit, nothing to open a PR for"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          git commit -m "chore: nightly rebuild of bin/ jars [skip ci]"
-          git push origin HEAD:master
+          BRANCH="nightly-bin-update-${{ github.run_id }}"
+          git checkout -b "$BRANCH"
+          git commit -m "chore: nightly rebuild of bin/ jars"
+          git push origin "$BRANCH"
+          echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Move the "nightly" tag to this commit
+      - name: Open and merge the PR into master
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git tag -f nightly
+          PR_URL=$(gh pr create \
+            --base master \
+            --head "${{ steps.commit.outputs.branch }}" \
+            --title "chore: nightly rebuild of bin/ jars" \
+            --body "Automated nightly rebuild - build, clean rebuild+run, unit tests and integration tests (ubuntu+windows) all passed. Source commit: ${{ github.sha }}")
+          echo "Opened $PR_URL"
+          gh pr merge "$PR_URL" --squash --delete-branch
+
+      - name: Move the "nightly" tag to the verified commit
+        run: |
+          git fetch origin master
+          git tag -f nightly origin/master
           git push origin nightly --force
